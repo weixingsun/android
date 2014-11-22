@@ -12,7 +12,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.util.*;
 import android.view.*;
 
-public class MainView extends android.app.Activity implements SensorEventListener, OnItemSelectedListener {
+public class MainView extends android.app.Activity implements OnItemSelectedListener {
 
 	protected static final int GUIUPDATEIDENTIFIER = 0x101;
 	private Spinner spinner;
@@ -20,9 +20,10 @@ public class MainView extends android.app.Activity implements SensorEventListene
 	private static SurfaceView surfaceView;
 	//private static TextView tv;
 	private String[] select = new String[] { "Motion Sensors","Position Sensors", "Environment Sensors", "Connect Modules" };
-	static SensorManager sm;
 	DisplayMetrics metrics;
+	SensorManager sm;
 	LocationManager locationManager;
+	Thread thread;
 	static Handler myHandler = new Handler() {
         public void handleMessage(Message msg) {
              switch (msg.what) {
@@ -36,13 +37,18 @@ public class MainView extends android.app.Activity implements SensorEventListene
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.main);
-		if (Sensors.current == null)
-			Sensors.current = Sensors.motions;
 		setupSelect();
+		sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+		GenericSensors.init(sm);
+		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		GPS.generateGPSData(locationManager);
+		Sensors.initConnectModule();
+		//Sensors.initGenericSensors();
+		//switchToCommonSensor(Sensors.motions);
 		surfaceView = (SurfaceView) findViewById(R.id.surfaceview);
 		//tv=(TextView) findViewById(R.id.Textview00);
-		sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-		new Thread(new MyDisplayThread()).start(); 
+		thread = new Thread(new MyDisplayThread());
+		thread.start();
 	}
 
 	public void onDestroy() {
@@ -61,16 +67,19 @@ public class MainView extends android.app.Activity implements SensorEventListene
 	}
 
 	public void Cleanup() {
-		//mIsRunning = false;
-		sm.unregisterListener(this);
+		GenericSensors.stop();
+		GPS.stop();
+		thread.interrupt();
 	}
 
 	public void onResume() {
 		super.onResume();
 		if(Sensors.current!=null){
-			registerSensors(Sensors.current);
+			GenericSensors.start();
+		}else{
+			GPS.start();
 		}
-		//mIsRunning = true;
+		//thread.start();
 	}
 
 	private void setupSelect() {
@@ -88,60 +97,33 @@ public class MainView extends android.app.Activity implements SensorEventListene
 
 	public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
 			long arg3) {
-		// Toast.makeText(arg1, array[arg2] + " selected",
-		// Toast.LENGTH_LONG).show();
+		// Toast.makeText(arg1,"test",Toast.LENGTH_LONG).show();
 		if (arg2 == 0) {// motion sensors
-			Sensors.current = Sensors.motions;
-			switchToCommonSensor();
+			switchToCommonSensor(Sensors.motions);
 		}
 		if (arg2 == 1) {// position sensors
-			Sensors.current = Sensors.positions;
-			registerSensors(Sensors.current);
+			switchToCommonSensor(Sensors.positions);
 		}
 		if (arg2 == 2) {// environment sensors
-			Sensors.current = Sensors.environments;
-			registerSensors(Sensors.current);
+			switchToCommonSensor(Sensors.environments);
 		}
 		if (arg2 == 3) {// connection modules
-			Sensors.current = null;
 			switchToConnect();
 		}
 	}
 	private void switchToConnect(){
-		sm.unregisterListener(this);
-		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		Sensors.current = null;
+		GenericSensors.stop();
 		Sensors.initConnectModule();
-		GPS.generateGPSData(locationManager);
 		GPS.start();
 	}
-	private void switchToCommonSensor(){
-		registerSensors(Sensors.current);
+	private void switchToCommonSensor(int[] to){
+		Sensors.initGenericSensors();
+		GenericSensors.switchTo(to) ;
+		GenericSensors.start();
 		GPS.stop();
 	}
 	public void onNothingSelected(AdapterView<?> arg0) {
-	}
-
-	private void registerSensors(int[] sensors) {
-		Sensors.init();
-		for (int i : sensors) {
-			Sensor s = sm.getDefaultSensor(i);
-			if (s != null) {
-				sm.registerListener(this, s, Sensors.refreshRate);
-				Sensors.currentSupportedSensors.add( s.getType());
-			}
-		}
-	}
-
-	@Override
-	public void onSensorChanged(SensorEvent event) {
-		// don't have to refresh screen so frequently.(in a thread)
-		collectData(event);
-		// drawSurface();
-	}
-
-	private void collectData(SensorEvent event) {
-		SensorData sd = new SensorData(event.sensor, event.values);
-		Sensors.saData.append(event.sensor.getType(), sd);
 	}
 
 	private static void drawSurface() {
@@ -207,10 +189,6 @@ public class MainView extends android.app.Activity implements SensorEventListene
 		}
 	}
 
-	@Override
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
-	}
-
 	private void ScheduleSelfCheck() {
 		AlarmManager scheduler = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 		Intent intent = new Intent(getApplicationContext(), SensorService.class);
@@ -243,9 +221,12 @@ public class MainView extends android.app.Activity implements SensorEventListene
                       Thread.sleep(1000);    
                       drawSurface();
                  } catch (InterruptedException e) {   
-                      Thread.currentThread().interrupt();   
+                      Thread.currentThread().interrupt();
                  }   
             }
-       }  
+       }
+        public static void interrupt(){
+        	Thread.currentThread().interrupt();
+        }
 	}
 }

@@ -35,6 +35,7 @@ public class Sensors {
 	//public static SparseArray<Sensor> supportedSensors = new SparseArray<Sensor>();
 	public static List<Integer> currentSupportedSensors = new ArrayList<Integer>();
 	public static int[] current;
+	public static int[] toStop;
 	public static int[] motions = new int[]{
 			Sensor.TYPE_ACCELEROMETER,
 			Sensor.TYPE_GRAVITY,
@@ -79,4 +80,8 @@ public class Sensors {
 		currentSupportedSensors.clear();
 		currentSupportedSensors.add(GPS);
 	}
+	public static void initGenericSensors(){
+		currentSupportedSensors.clear();
+	}
+	
 }
