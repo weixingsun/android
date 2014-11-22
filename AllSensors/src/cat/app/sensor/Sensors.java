@@ -22,15 +22,15 @@ import android.util.SparseArray;
 // Motion: Accelerometer/Orientation/Gravity/Rotation/Gyroscope
 // Environment: Sound/Light/Magnetic/Temperature
 
-// SENSOR_DELAY_FASTEST 最灵敏 因为太快了没必要使用
-// SENSOR_DELAY_GAME 游戏开发中使用
-// SENSOR_DELAY_NORMAL 正常速度
-// SENSOR_DELAY_UI 最慢的速度
+// SENSOR_DELAY_FASTEST 20ms
+// SENSOR_DELAY_GAME 40ms
+// SENSOR_DELAY_UI   90ms
+// SENSOR_DELAY_NORMAL 230ms
 public class Sensors {
 	public static int[] colors = new int[] { Color.RED, Color.GREEN, Color.BLUE,
 		Color.YELLOW, Color.CYAN, Color.GRAY,Color.WHITE };
 
-	public static int refreshRate = SensorManager.SENSOR_DELAY_UI;
+	public static int refreshRate = SensorManager.SENSOR_DELAY_NORMAL;
 	public static SparseArray<SensorData> saData = new SparseArray<SensorData>();
 	//public static SparseArray<Sensor> supportedSensors = new SparseArray<Sensor>();
 	public static List<Integer> currentSupportedSensors = new ArrayList<Integer>();
