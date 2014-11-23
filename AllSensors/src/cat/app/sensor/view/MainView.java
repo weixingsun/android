@@ -43,8 +43,6 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		GPS.generateGPSData(locationManager);
 		Sensors.initConnectModule();
-		//Sensors.initGenericSensors();
-		//switchToCommonSensor(Sensors.motions);
 		surfaceView = (SurfaceView) findViewById(R.id.surfaceview);
 		//tv=(TextView) findViewById(R.id.Textview00);
 		thread = new Thread(new MyDisplayThread());
@@ -79,7 +77,8 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		}else{
 			GPS.start();
 		}
-		//thread.start();
+		if(thread.isInterrupted()||!thread.isAlive())
+			thread.start();
 	}
 
 	private void setupSelect() {
@@ -147,7 +146,7 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 						if(!GPS.status.equals(GPS.STATUS_AVAILABLE)&&type==Sensors.GPS){
 							mCanvas.drawText("GPS "+GPS.status, 10, y+20, mPaint);
 						}else{
-							mCanvas.drawText("No data for type:"+Sensors.currentSupportedSensors.get(i), 10, y+20, mPaint);
+							mCanvas.drawText("No data for:"+Sensors.findNameById(type), 10, y+20, mPaint);
 						}
 						mPaint.setColor(Color.WHITE);
 						mCanvas.drawLine(10, y+cellHeight, 400, y+cellHeight, mPaint);

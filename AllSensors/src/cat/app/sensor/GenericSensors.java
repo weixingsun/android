@@ -43,8 +43,8 @@ public class GenericSensors implements SensorEventListener{
 	}
 	public static void stop(int[] toStop) {
 		for(int id:toStop){
-			Sensor s = sensorManager.getDefaultSensor(id);
-			sensorManager.unregisterListener(gsensors,s);
+			//Sensor s = sensorManager.getDefaultSensor(id);
+			//sensorManager.unregisterListener(gsensors,s);
 		}
 		
 	}
