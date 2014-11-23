@@ -67,7 +67,7 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 	public void Cleanup() {
 		GenericSensors.stop();
 		GPS.stop();
-		thread.interrupt();
+		
 	}
 
 	public void onResume() {
@@ -77,8 +77,8 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		}else{
 			GPS.start();
 		}
-		if(thread.isInterrupted()||!thread.isAlive())
-			thread.start();
+		//if(thread.isInterrupted()||!thread.isAlive())
+		//	thread.start();
 	}
 
 	private void setupSelect() {
@@ -180,10 +180,7 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 			} catch (Exception e) {
 				e.printStackTrace();
 			} finally {
-				// if (mCanvas != null) {
-				//sh.lockCanvas(new Rect(0,0,0,0));
 				sh.unlockCanvasAndPost(mCanvas);
-				// }
 			}
 		}
 	}
