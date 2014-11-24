@@ -18,19 +18,23 @@ import android.util.SparseArray;
  * Sensor.TYPE_TEMPERATURE 7 温度传感器
  * Sensor.TYPE_PROXIMITY 8 距离传感器
  */
-// Connect: GSM/NFC/Bluetooth/WiFi/GPS/Camera
-// Motion: Accelerometer/Orientation/Gravity/Rotation/Gyroscope
-// Environment: Sound/Light/Magnetic/Temperature
-
-// SENSOR_DELAY_FASTEST 20ms
-// SENSOR_DELAY_GAME 40ms
-// SENSOR_DELAY_UI   90ms
-// SENSOR_DELAY_NORMAL 230ms
+/* Connect: GSM/NFC/Bluetooth/WiFi/GPS/Camera
+ * Motion: Accelerometer/Orientation/Gravity/Rotation/Gyroscope
+ * Environment: Sound/Light/Magnetic/Temperature
+ * SENSOR_DELAY_FASTEST 20ms
+ * SENSOR_DELAY_GAME 40ms
+ * SENSOR_DELAY_UI   90ms
+ * SENSOR_DELAY_NORMAL 230ms
+ * 
+ */
 public class Sensors {
 	public static int refreshRate = SensorManager.SENSOR_DELAY_NORMAL;
 	public static SparseArray<SensorData> saData = new SparseArray<SensorData>();
 	//public static SparseArray<Sensor> supportedSensors = new SparseArray<Sensor>();
-	public static List<Integer> currentSupportedSensors = new ArrayList<Integer>();
+	public static List<Integer> currentPageSensors = new ArrayList<Integer>();
+	//public static Map<Integer,String> currentPageSensorMetrics = new HashMap<Integer,String>();
+	//public static Map<Integer,String> currentPageSensorUnits = new HashMap<Integer,String>();
+	public static List<int[]> logSensors = new ArrayList<int[]>(); //all supported
 	public static int[] current;
 	public static int[] toStop;
 	public static int[] colors = new int[] { Color.RED, Color.GREEN, Color.BLUE,
@@ -54,10 +58,11 @@ public class Sensors {
 			 *TYPE_STEP_COUNTER
 			 *TYPE_STEP_DETECTOR*/
 	public static String[] positionNames = new String[]{
-		Sensor.STRING_TYPE_LIGHT,
-		Sensor.STRING_TYPE_PRESSURE,
-		Sensor.STRING_TYPE_RELATIVE_HUMIDITY,
-		Sensor.STRING_TYPE_AMBIENT_TEMPERATURE
+		Sensor.STRING_TYPE_MAGNETIC_FIELD,
+		Sensor.STRING_TYPE_ORIENTATION,
+		Sensor.STRING_TYPE_GAME_ROTATION_VECTOR,
+		Sensor.STRING_TYPE_GEOMAGNETIC_ROTATION_VECTOR,
+		Sensor.STRING_TYPE_PROXIMITY
 	};
 	public static int[] positions = new int[]{
 			Sensor.TYPE_MAGNETIC_FIELD,
@@ -78,8 +83,7 @@ public class Sensors {
 			Sensor.TYPE_RELATIVE_HUMIDITY,
 			Sensor.TYPE_AMBIENT_TEMPERATURE
 			};
-	/** 
-			Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED **/
+	/** Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED **/
 	public static int[] connects = new int[]{
 		-10,		//GSM or CDMA
 		-20,		//GPS
@@ -106,19 +110,21 @@ public class Sensors {
 	public static Object[] names= merge(merge(motionNames,positionNames),environmentNames);
 	public static String findNameById(int sensorId){
 		int index = Arrays.asList(ids).indexOf(sensorId);
-		return names[index].toString();
+		String name_package = names[index].toString();
+		String[] packages =  name_package.split(".");
+		return packages[packages.length-1];
 	}
 
 	/** Virtual Sensor Id of GPS **/
 	public static int GPS = -20;
 	public static void init(){
-		currentSupportedSensors.clear();
+		currentPageSensors.clear();
 	}
 	public static void initConnectModule(){
-		currentSupportedSensors.clear();
-		currentSupportedSensors.add(GPS);
+		currentPageSensors.clear();
+		currentPageSensors.add(GPS);
 	}
 	public static void initGenericSensors(){
-		currentSupportedSensors.clear();
+		currentPageSensors.clear();
 	}
 }

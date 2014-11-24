@@ -54,7 +54,7 @@ public class GenericSensors implements SensorEventListener{
 			Sensor s = sensorManager.getDefaultSensor(i);
 			if (s != null) {
 				sensorManager.registerListener(gsensors, s, Sensors.refreshRate);
-				Sensors.currentSupportedSensors.add( s.getType());
+				Sensors.currentPageSensors.add( s.getType());
 			}
 		}
 	}

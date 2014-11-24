@@ -1,6 +1,8 @@
 package cat.app.sensor.view;
 
 import cat.app.sensor.*;
+import cat.app.sensor.connect.GPS;
+import cat.app.sensor.db.DbHelper;
 import android.location.LocationManager;
 import android.os.*;
 import android.app.*;
@@ -23,7 +25,9 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 	DisplayMetrics metrics;
 	SensorManager sm;
 	LocationManager locationManager;
-	Thread thread;
+	static DbHelper db;
+	Thread displayThread;
+	Thread dbThread;
 	static Handler myHandler = new Handler() {
         public void handleMessage(Message msg) {
              switch (msg.what) {
@@ -45,8 +49,11 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		Sensors.initConnectModule();
 		surfaceView = (SurfaceView) findViewById(R.id.surfaceview);
 		//tv=(TextView) findViewById(R.id.Textview00);
-		thread = new Thread(new MyDisplayThread());
-		thread.start();
+		displayThread = new Thread(new MyDisplayThread());
+		displayThread.start();
+		db=DbHelper.getInstance(this);
+		dbThread = new Thread(new MyDbThread());
+		dbThread.start();
 	}
 
 	public void onDestroy() {
@@ -136,45 +143,15 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 				int cellHeight = 80;
 				mCanvas.drawColor(Color.BLACK);
 				//mCanvas.drawText("data="+Sensors.saData.size(), 50, 50, mPaint);
-				for (int i = 0; i < Sensors.currentSupportedSensors.size(); i++) {
+				for (int i = 0; i < Sensors.currentPageSensors.size(); i++) {
 					mPaint.setColor(Color.WHITE);
-					int type =Sensors.currentSupportedSensors.get(i);
+					int type =Sensors.currentPageSensors.get(i);
 					SensorData sd = Sensors.saData.get(type);
 					int y = i* cellHeight;
 					if (sd == null){
-						mPaint.setColor(Color.RED);
-						if(!GPS.status.equals(GPS.STATUS_AVAILABLE)&&type==Sensors.GPS){
-							mCanvas.drawText("GPS "+GPS.status, 10, y+20, mPaint);
-						}else{
-							mCanvas.drawText("No data for:"+Sensors.findNameById(type), 10, y+20, mPaint);
-						}
-						mPaint.setColor(Color.WHITE);
-						mCanvas.drawLine(10, y+cellHeight, 400, y+cellHeight, mPaint);
+						drawEmptyData(mCanvas,mPaint,type, y, cellHeight);
 					} else {
-						String name = null;
-						int z=0;
-						if(sd.object instanceof Sensor) {
-							name=((Sensor)sd.object).getName();
-							for (int j = 0; j < sd.fdata.length; j++) {
-								mPaint.setColor(Sensors.colors[j]);
-								String str ="value " + j + " =" + sd.fdata[j];
-								mCanvas.drawText(str,200, y + j * 20 + 20, mPaint);
-							}
-							z = y + sd.fdata.length * 20 + 10;
-						}
-						else if(sd.object instanceof String){
-							name=sd.object.toString();
-							for (int j = 0; j < sd.ddata.length; j++) {
-								mPaint.setColor(Sensors.colors[j]);
-								String str ="value " + j + " =" + sd.ddata[j];
-								mCanvas.drawText(str,200, y + j * 20 + 20, mPaint);
-							}
-							z = y + sd.ddata.length * 20 + 10;
-						}
-						mPaint.setColor(Color.WHITE);
-						mCanvas.drawText(name, 10, y + 20, mPaint);
-						mPaint.setColor(Color.WHITE);
-						mCanvas.drawLine(10, z, 400, z, mPaint);
+						drawData(mCanvas,mPaint,y,sd);
 					}
 				}
 			} catch (Exception e) {
@@ -185,9 +162,46 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		}
 	}
 
+	private static void drawEmptyData(Canvas mCanvas, Paint mPaint, int type, int y, int cellHeight) {
+		mPaint.setColor(Color.RED);
+		if(!GPS.status.equals(GPS.STATUS_AVAILABLE)&&type==Sensors.GPS){
+			mCanvas.drawText("GPS "+GPS.status, 10, y+20, mPaint);
+		}else{
+			mCanvas.drawText("No data for:"+Sensors.findNameById(type), 10, y+20, mPaint);
+		}
+		mPaint.setColor(Color.WHITE);
+		mCanvas.drawLine(10, y+cellHeight, 400, y+cellHeight, mPaint);
+	}
+	private static void drawData(Canvas mCanvas, Paint mPaint, int y, SensorData sd) {
+		String name = null;
+		int z=0;
+		if(sd.object instanceof Sensor) {
+			name=((Sensor)sd.object).getName();
+			for (int j = 0; j < sd.fdata.length; j++) {
+				mPaint.setColor(Sensors.colors[j]);
+				String str ="value " + j + " =" + sd.fdata[j];
+				mCanvas.drawText(str,200, y + j * 20 + 20, mPaint);
+			}
+			z = y + sd.fdata.length * 20 + 10;
+		}
+		else if(sd.object instanceof String){
+			name=sd.object.toString();
+			for (int j = 0; j < sd.ddata.length; j++) {
+				mPaint.setColor(Sensors.colors[j]);
+				String str ="value " + j + " =" + sd.ddata[j];
+				mCanvas.drawText(str,200, y + j * 20 + 20, mPaint);
+			}
+			z = y + sd.ddata.length * 20 + 10;
+		}
+		mPaint.setColor(Color.WHITE);
+		mCanvas.drawText(name, 10, y + 20, mPaint);
+		mPaint.setColor(Color.WHITE);
+		mCanvas.drawLine(10, z, 400, z, mPaint);
+	}
+	
 	private void ScheduleSelfCheck() {
 		AlarmManager scheduler = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-		Intent intent = new Intent(getApplicationContext(), SensorService.class);
+		Intent intent = new Intent(getApplicationContext(), SensorServiceUnused.class);
 		PendingIntent scheduledIntent = PendingIntent.getService(
 				getApplicationContext(), 0, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
@@ -199,7 +213,7 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 
 	private void CancelScheduledSelfCheckService() {
 		AlarmManager scheduler = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-		Intent intent = new Intent(this, SensorService.class);
+		Intent intent = new Intent(this, SensorServiceUnused.class);
 		PendingIntent scheduledIntent = PendingIntent.getService(
 				getApplicationContext(), 0, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
@@ -216,13 +230,25 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
                  try {
                       Thread.sleep(1000);    
                       drawSurface();
-                 } catch (InterruptedException e) {   
+                 } catch (InterruptedException e) {
                       Thread.currentThread().interrupt();
-                 }   
+                 }
             }
        }
         public static void interrupt(){
         	Thread.currentThread().interrupt();
         }
+	}
+	static class MyDbThread implements Runnable {
+        public void run() {  
+            while (!Thread.currentThread().isInterrupted()) {
+                 try {
+                      Thread.sleep(10000);
+                      DbHelper.dbWriter();
+                 } catch (InterruptedException e) {
+                      Thread.currentThread().interrupt();
+                 }
+            }
+       }
 	}
 }
