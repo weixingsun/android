@@ -48,6 +48,7 @@ public class Sensors {
 		};
 	public static int[] motions = new int[]{
 			Sensor.TYPE_ACCELEROMETER,
+			Sensor.TYPE_MAGNETIC_FIELD,
 			Sensor.TYPE_GRAVITY,
 			Sensor.TYPE_GYROSCOPE,
 			Sensor.TYPE_LINEAR_ACCELERATION,
@@ -58,14 +59,12 @@ public class Sensors {
 			 *TYPE_STEP_COUNTER
 			 *TYPE_STEP_DETECTOR*/
 	public static String[] positionNames = new String[]{
-		Sensor.STRING_TYPE_MAGNETIC_FIELD,
 		Sensor.STRING_TYPE_ORIENTATION,
 		Sensor.STRING_TYPE_GAME_ROTATION_VECTOR,
 		Sensor.STRING_TYPE_GEOMAGNETIC_ROTATION_VECTOR,
 		Sensor.STRING_TYPE_PROXIMITY
 	};
 	public static int[] positions = new int[]{
-			Sensor.TYPE_MAGNETIC_FIELD,
 			Sensor.TYPE_ORIENTATION,
 			Sensor.TYPE_GAME_ROTATION_VECTOR,
 			Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR,
@@ -127,4 +126,5 @@ public class Sensors {
 	public static void initGenericSensors(){
 		currentPageSensors.clear();
 	}
+	
 }

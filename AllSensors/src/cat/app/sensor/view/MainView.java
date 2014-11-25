@@ -25,7 +25,7 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 	DisplayMetrics metrics;
 	SensorManager sm;
 	LocationManager locationManager;
-	static DbHelper db;
+	static DbHelper dbHelper;
 	Thread displayThread;
 	Thread dbThread;
 	static Handler myHandler = new Handler() {
@@ -51,7 +51,8 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		//tv=(TextView) findViewById(R.id.Textview00);
 		displayThread = new Thread(new MyDisplayThread());
 		displayThread.start();
-		db=DbHelper.getInstance(this);
+		dbHelper=DbHelper.getInstance(this);
+		dbHelper.prepareMetricData();
 		dbThread = new Thread(new MyDbThread());
 		dbThread.start();
 	}
@@ -244,7 +245,7 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
             while (!Thread.currentThread().isInterrupted()) {
                  try {
                       Thread.sleep(10000);
-                      DbHelper.dbWriter();
+                      dbHelper.dbWriter();
                  } catch (InterruptedException e) {
                       Thread.currentThread().interrupt();
                  }
