@@ -13,12 +13,12 @@ import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.widget.Toast;
 
-public class UDPClientBroadcastThread implements Runnable{
-	private static int BROADCAST_NUMBER = 5;
-	private static int BROADCAST_TRIED = 0;
-	private final static String TAG = "AllSensors.UDPClientThread";
-	public static String BROADCAST_IP = "224.0.0.1";//224.0.0.1 //224.224.224.224
-	public static int BROADCAST_PORT = 4444;
+public class UDPClientMulticaster implements Runnable{
+	private static int MULTICAST_NUMBER = 5;
+	private static int MULTICAST_TRIED = 0;
+	private final static String TAG = "AllSensors.UDPClientMulticaster";
+	public static String MULTICAST_IP = "224.0.0.1";//(224.0.0.0,239.255.255.255)
+	public static int MULTICAST_PORT = 4444;
 	public static String MAC, localIP;
 	MulticastSocket multicastSocket;
 	InetAddress serverAddress;
@@ -28,12 +28,12 @@ public class UDPClientBroadcastThread implements Runnable{
 
 	boolean connected=false;
 
-	public UDPClientBroadcastThread(Context context) {
+	public UDPClientMulticaster(Context context) {
 		try {
-			UDPClientBroadcastThread.context = context;
-			multicastSocket = new MulticastSocket(BROADCAST_PORT);
+			UDPClientMulticaster.context = context;
+			multicastSocket = new MulticastSocket(MULTICAST_PORT);
 			multicastSocket.setTimeToLive(1);
-			serverAddress = InetAddress.getByName(BROADCAST_IP);
+			serverAddress = InetAddress.getByName(MULTICAST_IP);
 			// MAC=getLocalMacAddressFromWifiInfo();
 			localIP = getLocalIpAddress();
 			data = localIP.getBytes();
@@ -43,11 +43,11 @@ public class UDPClientBroadcastThread implements Runnable{
 		}
 	}
 
-	public void broadcast() {
-		DatagramPacket pack = new DatagramPacket(data, data.length, serverAddress, BROADCAST_PORT);
+	public void multicast() {
+		DatagramPacket pack = new DatagramPacket(data, data.length, serverAddress, MULTICAST_PORT);
 		try {
 			multicastSocket.send(pack);
-			Log.i(TAG, "broadcast package("+BROADCAST_TRIED+"/"+BROADCAST_NUMBER+"):"+new String(data)+" to "+BROADCAST_IP+":"+BROADCAST_PORT);
+			Log.i(TAG, "multicast("+MULTICAST_TRIED+"/"+MULTICAST_NUMBER+"):"+new String(data)+" to "+MULTICAST_IP+":"+MULTICAST_PORT);
 		} catch (IOException e) {
 			Toast.makeText(context,"Multicaster Error:"+e.getMessage(),Toast.LENGTH_SHORT).show();
 			e.printStackTrace();
@@ -110,10 +110,10 @@ public class UDPClientBroadcastThread implements Runnable{
 		while(!Thread.currentThread().isInterrupted()){
 			if(!Thread.currentThread().isInterrupted()){
 				try {
-	                this.broadcast();
+	                this.multicast();
 	                Thread.sleep(10000);
-	                if(BROADCAST_TRIED>BROADCAST_NUMBER) break;
-	                BROADCAST_TRIED++;
+	                if(MULTICAST_TRIED>MULTICAST_NUMBER) break;
+	                MULTICAST_TRIED++;
 	            } catch (InterruptedException e) {
 	                Thread.currentThread().interrupt();
 	            }

@@ -5,19 +5,19 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
-public class UDPClient extends UDPAgent {
+public class UDPClient1 extends UDPAgent {
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) throws Exception {
-		new UDPClient("www.javadoc.cn", 2008, -1).start();
+		new UDPClient1("www.javadoc.cn", 2008, -1).start();
 	}
 
 	String serverName;
 	int serverPort;
 	SocketAddress server;
 
-	public UDPClient(String host, int port, int localPort) {
+	public UDPClient1(String host, int port, int localPort) {
 		super(localPort);
 		this.server = new InetSocketAddress(host, port);
 	}

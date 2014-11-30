@@ -1,11 +1,11 @@
 package cat.app.sensor.net.udp.nouse;
 
-public class UDPServer extends UDPAgent {
+public class UDPServer1 extends UDPAgent {
 	public static void main(String[] args) throws Exception {
-		new UDPServer(2008).start();
+		new UDPServer1(2008).start();
 	}
 
-	public UDPServer(int port) {
+	public UDPServer1(int port) {
 		super(port);
 	}
 }

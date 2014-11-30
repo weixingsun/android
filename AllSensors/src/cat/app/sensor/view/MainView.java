@@ -6,8 +6,8 @@ import java.util.List;
 import cat.app.sensor.*;
 import cat.app.sensor.connect.GPS;
 import cat.app.sensor.db.DbHelper;
-import cat.app.sensor.net.udp.UDPClientBroadcastThread;
-import cat.app.sensor.net.udp.UDPHandshakeListener;
+import cat.app.sensor.net.udp.UDPClientMulticaster;
+import cat.app.sensor.net.udp.UDPClient;
 import android.location.LocationManager;
 import android.os.*;
 import android.app.*;
@@ -169,10 +169,10 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		//Toast.makeText(this,"Client Mode Selected",Toast.LENGTH_SHORT).show();
 		//Thread sender = new Multicaster(this);
 		//sender.start();
-		broadcastThread = new Thread(new UDPClientBroadcastThread(this));
+		broadcastThread = new Thread(new UDPClientMulticaster(this));
 		broadcastThread.start();
 		//confirmThread = new Thread(new UDPListener());
-		UDPHandshakeListener.startListen(SERVER_PORT);
+		UDPClient.startListen(SERVER_PORT);
 	}
 
 	private void switchToConnect(){
