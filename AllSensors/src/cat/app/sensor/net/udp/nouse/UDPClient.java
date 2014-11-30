@@ -1,4 +1,4 @@
-package cat.app.sensor.net.udp;
+package cat.app.sensor.net.udp.nouse;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;

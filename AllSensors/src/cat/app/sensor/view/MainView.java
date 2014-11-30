@@ -1,8 +1,13 @@
 package cat.app.sensor.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import cat.app.sensor.*;
 import cat.app.sensor.connect.GPS;
 import cat.app.sensor.db.DbHelper;
+import cat.app.sensor.net.udp.UDPClientBroadcastThread;
+import cat.app.sensor.net.udp.UDPHandshakeListener;
 import android.location.LocationManager;
 import android.os.*;
 import android.app.*;
@@ -16,18 +21,28 @@ import android.view.*;
 
 public class MainView extends android.app.Activity implements OnItemSelectedListener {
 
+	private final static String TAG = "AllSensors.MainView";
+	private List<String> clientList = new ArrayList<String>();
 	protected static final int GUIUPDATEIDENTIFIER = 0x101;
-	private Spinner spinner;
-	private ArrayAdapter<String> adapter;
+	private Spinner spinnerSensorType;
+	private Spinner spinnerClientServer;
+	private ArrayAdapter<String> adapterSensorType;
+	private ArrayAdapter<String> adapterClientServer;
 	private static SurfaceView surfaceView;
 	//private static TextView tv;
-	private String[] select = new String[] { "Motion Sensors","Position Sensors", "Environment Sensors", "Connect Modules" };
+	private String[] selectType = new String[] { "Motion Sensors","Position Sensors", "Environment Sensors", "Connect Modules" };
+	private String[] selectCS = new String[] { "Client Mode","Server Mode" };
 	DisplayMetrics metrics;
 	SensorManager sm;
 	LocationManager locationManager;
 	static DbHelper dbHelper;
 	Thread displayThread;
 	Thread dbThread;
+	Thread broadcastThread;
+	Thread confirmThread;
+	String serverIP;
+	public static int SERVER_PORT = 6000;
+	
 	static Handler myHandler = new Handler() {
         public void handleMessage(Message msg) {
              switch (msg.what) {
@@ -49,6 +64,10 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		Sensors.initConnectModule();
 		surfaceView = (SurfaceView) findViewById(R.id.surfaceview);
 		//tv=(TextView) findViewById(R.id.Textview00);
+		if(displayThread!=null && displayThread.isAlive()){
+			Toast.makeText(this,"Threads Alive",Toast.LENGTH_SHORT).show();
+			return;
+		}
 		displayThread = new Thread(new MyDisplayThread());
 		displayThread.start();
 		dbHelper=DbHelper.getInstance(this);
@@ -60,6 +79,12 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 	public void onDestroy() {
 		super.onDestroy();
 		Cleanup();
+		stopThreads();
+	}
+
+	private void stopThreads() {
+		displayThread.interrupt();
+		dbThread.interrupt();
 	}
 
 	public void onStop() {
@@ -91,33 +116,65 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 
 	private void setupSelect() {
 		//tv0 = (TextView) findViewById(R.id.Textview00);
-		spinner = (Spinner) findViewById(R.id.Spinner01);
+		spinnerSensorType = (Spinner) findViewById(R.id.SpinnerSensorType);//2131230720 [0x7f080000]
 		metrics = this.getResources().getDisplayMetrics();
-		spinner.setMinimumWidth((int) (metrics.widthPixels / 2));
-		adapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_spinner_item, select);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinner.setAdapter(adapter);
-		spinner.setVisibility(View.VISIBLE);
-		spinner.setOnItemSelectedListener(this);
+		spinnerSensorType.setMinimumWidth((int) (metrics.widthPixels / 2));
+		adapterSensorType = new ArrayAdapter<String>(this,
+				android.R.layout.simple_spinner_item, selectType);
+		adapterSensorType.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinnerSensorType.setAdapter(adapterSensorType);
+		spinnerSensorType.setVisibility(View.VISIBLE);
+		spinnerSensorType.setOnItemSelectedListener(this);
+		
+		spinnerClientServer = (Spinner) findViewById(R.id.SpinnerCS);//2131230722 [0x7f080002]
+		spinnerClientServer.setMinimumWidth((int) (metrics.widthPixels / 4));
+		adapterClientServer = new ArrayAdapter<String>(this,
+				android.R.layout.simple_spinner_item, selectCS);
+		adapterClientServer.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinnerClientServer.setAdapter(adapterClientServer);
+		spinnerClientServer.setVisibility(View.VISIBLE);
+		spinnerClientServer.setOnItemSelectedListener(this);
+		
 	}
 
 	public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
 			long arg3) {
-		// Toast.makeText(arg1,"test",Toast.LENGTH_LONG).show();
-		if (arg2 == 0) {// motion sensors
-			switchToCommonSensor(Sensors.motions);
-		}
-		if (arg2 == 1) {// position sensors
-			switchToCommonSensor(Sensors.positions);
-		}
-		if (arg2 == 2) {// environment sensors
-			switchToCommonSensor(Sensors.environments);
-		}
-		if (arg2 == 3) {// connection modules
-			switchToConnect();
+		
+		// 
+		if(arg0.getId()==R.id.SpinnerSensorType){
+			if (arg2 == 0) {// motion sensors
+				switchToCommonSensor(Sensors.motions);
+			}
+			if (arg2 == 1) {// position sensors
+				switchToCommonSensor(Sensors.positions);
+			}
+			if (arg2 == 2) {// environment sensors
+				switchToCommonSensor(Sensors.environments);
+			}
+			if (arg2 == 3) {// connection modules
+				switchToConnect();
+			}
+		}else if(arg0.getId()==R.id.SpinnerCS){
+			if (arg2 == 0) {// client mode
+				switchToClientMode();
+			}else if (arg2 == 1) {// server mode
+				switchToServerMode();
+			}
 		}
 	}
+	private void switchToServerMode() {
+		
+	}
+	private void switchToClientMode() {
+		//Toast.makeText(this,"Client Mode Selected",Toast.LENGTH_SHORT).show();
+		//Thread sender = new Multicaster(this);
+		//sender.start();
+		broadcastThread = new Thread(new UDPClientBroadcastThread(this));
+		broadcastThread.start();
+		//confirmThread = new Thread(new UDPListener());
+		UDPHandshakeListener.startListen(SERVER_PORT);
+	}
+
 	private void switchToConnect(){
 		Sensors.current = null;
 		GenericSensors.stop();
@@ -241,7 +298,7 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
         }
 	}
 	static class MyDbThread implements Runnable {
-        public void run() {  
+        public void run() {
             while (!Thread.currentThread().isInterrupted()) {
                  try {
                       Thread.sleep(10000);
@@ -251,5 +308,21 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
                  }
             }
        }
+        public static void interrupt(){
+        	Thread.currentThread().interrupt();
+        }
 	}
 }
+		 /*AlertDialog.Builder dialog = new  AlertDialog.Builder(this);
+		 dialog.setTitle("IP:port").setIcon(android.R.drawable.ic_dialog_info);
+		 dialog.setNegativeButton("Cancel", null);
+		 final EditText input = new EditText(this);
+		 dialog.setView(input);
+		 dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				clientList.add(input.getText().toString());
+				Log.i(TAG, "add client:"+input.getText().toString());
+			}
+		});
+		dialog.show();*/

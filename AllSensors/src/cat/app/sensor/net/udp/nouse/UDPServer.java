@@ -1,4 +1,4 @@
-package cat.app.sensor.net.udp;
+package cat.app.sensor.net.udp.nouse;
 
 public class UDPServer extends UDPAgent {
 	public static void main(String[] args) throws Exception {

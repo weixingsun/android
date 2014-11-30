@@ -1,4 +1,4 @@
-package cat.app.sensor.net.udp;
+package cat.app.sensor.net.udp.nouse;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

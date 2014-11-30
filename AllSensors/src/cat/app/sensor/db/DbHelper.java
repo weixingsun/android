@@ -14,20 +14,20 @@ import android.hardware.Sensor;
 import android.util.Log;
 
 	public class DbHelper extends SQLiteOpenHelper {
-		private static final String TAG = "AllSensors.DB";
+		private static final String TAG = "AllSensors.DBhelper";
 		static DbHelper dbHelper;
 		private SQLiteDatabase db = null; 
 		private final static String DATABASE_NAME="allsensors.db";
 	    private final static int DATABASE_VERSION=1;
 	    private final static String SENSOR_TABLE="sensor_data";
 	    private final static String METRIC_TABLE="sensor_metric";
+	    private final static String SERVER_TABLE="server_info";
 	    //private final static String TABLE_ID="sensor_id";
 
 	    private static String STR_CREATE;
-	    private final static String SENSOR_NAME="sensor_name";
-	    private final static String SENSOR_TYPE="sensor_type";
-	    //static SQLiteDatabase readDb;
-	    //static SQLiteDatabase writeDb;
+	    //sensor_data(data_id,createtime,sensor_type,sensor_metric_seq,sensor_metric_data)
+	    //sensor_metric(sensor_type,sensor_name,sensor_metric_seq,sensor_metric_name,sensor_metric_unit)
+	    //server_info(server_ip,server_port,net_type,interval_min)
 	    private DbHelper(Context context){
 	    	super(context, DATABASE_NAME,null, DATABASE_VERSION);
 	    }
@@ -35,6 +35,9 @@ import android.util.Log;
 	    	if(dbHelper==null){
 	    		dbHelper = new DbHelper(context);
 	    	}
+	    	return dbHelper;
+	    }
+	    public static DbHelper getInstance(){
 	    	return dbHelper;
 	    }
 	    /*@Override  
@@ -47,16 +50,17 @@ import android.util.Log;
 	        }  
 	        return db;  
 	    }*/
-	    //(data_id,createtime,sensor_type,sensor_name,sensor_metric_name,sensor_metric_seq,sensor_metric_unit,sensor_metric_data,comments)
+	    
 	    @Override
 	    public void onCreate(SQLiteDatabase db) {
-	    	recreateTables(db);
+	    	//recreateTables(db);
 	    }
-
+	    
 	    private void recreateTables(SQLiteDatabase db) {
-	    	Log.i(TAG,"recreate table:"+SENSOR_TABLE+","+SENSOR_TABLE);
+	    	Log.i(TAG,"recreate table:"+SENSOR_TABLE+","+SENSOR_TABLE+","+SERVER_TABLE);
 	    	dropTable(SENSOR_TABLE);
 	    	dropTable(METRIC_TABLE);
+	    	dropTable(SERVER_TABLE);
 	    	STR_CREATE = "CREATE TABLE IF NOT EXISTS "    //+DATABASE_NAME+"."
 		    		+SENSOR_TABLE+ " ("
 		    		+"data_id integer not null primary key autoincrement "
@@ -71,6 +75,9 @@ import android.util.Log;
 	        		+"sensor_metric_seq smallint,sensor_metric_name varchar(100), sensor_metric_unit varchar(10));";
 	        db.execSQL(STR_CREATE);
 	        STR_CREATE="CREATE INDEX sensor_metric_index_1 on "+METRIC_TABLE+ " (sensor_type, sensor_metric_seq);";
+	        db.execSQL(STR_CREATE);
+	        STR_CREATE = "CREATE TABLE IF NOT EXISTS "+SERVER_TABLE+ " ("
+	        		+"server_ip varchar(20),server_port smallint,net_type varchar(10),interval_min integer);";
 	        db.execSQL(STR_CREATE);
 	        Log.i(TAG,"table recreated:"+SENSOR_TABLE+","+SENSOR_TABLE);
 	        db.close();
@@ -105,7 +112,7 @@ import android.util.Log;
 	    {
 	    	this.db = getWritableDatabase();
 	        ContentValues cv=new ContentValues();
-	        cv.put(SENSOR_TYPE, sensor_type);
+	        cv.put("sensor_type", sensor_type);
 	        cv.put("sensor_metric_seq", sensor_metric_seq);
 	        cv.put("sensor_metric_data", data);
 	        //cv.put(SENSOR_NAME, sensor_name);
@@ -117,44 +124,43 @@ import android.util.Log;
 	    public long insert(int sensor_type, String sensor_name, int sensor_metric_seq, String sensor_metric_name, String unit)
 	    {
 	        ContentValues cv=new ContentValues();
-	        cv.put(SENSOR_TYPE, sensor_type);
+	        cv.put("sensor_type", sensor_type);
 	        cv.put("sensor_metric_seq", sensor_metric_seq);
-	        cv.put(SENSOR_NAME, sensor_name);
+	        cv.put("sensor_name", sensor_name);
 	        cv.put("sensor_metric_name", sensor_metric_name);
 	        cv.put("sensor_metric_unit", unit);
-	        //long row=db.insert(, null, cv);
 	        return insert(METRIC_TABLE,cv);
 	    }
 	    public long insert(String tableName,ContentValues cv){
 	    	return db.insert(tableName, null, cv);
 	    }
 	    
-	    public void deleteOldData(SQLiteDatabase db)
+	    public void deleteOldSensorData(SQLiteDatabase db)
 	    {
-	    	Log.i(TAG,"deleting: old data > 1 min before");
+	    	//Log.i(TAG,"deleting: old data > 1 min before");
 			//db = getWritableDatabase();
-	    	String sql = "delete from "+SENSOR_TYPE+" where createtime<datetime('now','localtime','-1 minute');";
+	    	String sql = "delete from sensor_data where createtime<datetime('now','localtime','-1 minute');";
 	        String where="createtime<datetime('now','localtime','-1 minute')";
 	        //datetime('now','+1 hour','-12 minute');
 	        int a = db.delete(SENSOR_TABLE, where,null);
 	        //db.close();
-	        Log.i(TAG,"deleting: "+a+" rows deleted");
+	        //Log.i(TAG,"deleting: "+a+" rows deleted");
 	    }
-	    public void delete(Timestamp time)
+	    /*public void delete(Timestamp time)
 	    {
 			this.db = getWritableDatabase();
 	        String where="createtime<?";
 	        String[] whereValue={time.toString()};
 	        db.delete(SENSOR_TABLE, where, whereValue);
 	        db.close();
-	    }
+	    }*/
 	    
 	    public void update(int id,String value)
 	    {
-	        String where=SENSOR_TYPE+"=?";
+	        String where="sensor_type=?";
 	        String[] whereValue={Integer.toString(id)};
 	        ContentValues cv=new ContentValues(); 
-	        cv.put(SENSOR_NAME, value);
+	        cv.put("sensor_name", value);
 	        db.update(SENSOR_TABLE, cv, where, whereValue);
 	    }
 
@@ -184,7 +190,7 @@ import android.util.Log;
 					}
 				}
 			}
-			deleteOldData(db);
+			deleteOldSensorData(db);
 			db.close();
 		}
 		
@@ -228,5 +234,27 @@ import android.util.Log;
 			this.insert(Sensor.TYPE_AMBIENT_TEMPERATURE, "Temperature",  0, "Degree", "¡ãC");
 			db.close();
 		}
-		
+		//SERVER_TABLE(server_ip,server_port,net_type,interval_min)
+		public void updateServerInfo(String ip, int port){
+			this.db = getWritableDatabase();
+			deleteServer(null);
+			insertServer(ip,port,"UDP",10);
+			db.close();
+		}
+		public void deleteServer(String ip)
+	    {
+	    	String where = ip==null?null:" server_ip="+ip+";";
+	        int a = db.delete(SERVER_TABLE, where,null);
+	        //db.close();
+	        Log.i(TAG,"deleting from "+SERVER_TABLE+": "+a+" rows deleted");
+	    }
+		public long insertServer(String serverIp, int serverPort, String net, int intervalMin)
+	    {
+	        ContentValues cv=new ContentValues();
+	        cv.put("server_ip", serverIp);
+	        cv.put("server_port", serverPort);
+	        cv.put("net_type", net);
+	        cv.put("interval_min", intervalMin);
+	        return insert(SERVER_TABLE,cv);
+	    }
 	}
