@@ -17,7 +17,7 @@ public class UDPClient implements Runnable {
     private static int PORT;
     private byte[] msg = new byte[1024];
     private static boolean listening = false;
-    private static DatagramSocket dSocket = null;
+    //private static DatagramSocket dSocket = null;
     public  static String ServerIP;
     
     public static void startListen(int port) {
@@ -33,23 +33,19 @@ public class UDPClient implements Runnable {
 
     @Override
     public void run() {
-        DatagramSocket dSocket = null;
+        DatagramSocket socket = null;
         DatagramPacket packet = new DatagramPacket(msg, msg.length);
         Log.i(TAG, "listener started: ");
         try {
-            dSocket = new DatagramSocket(PORT);
-            while (listening) {
+        	socket = new DatagramSocket(PORT);
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    dSocket.receive(packet);//阻塞方法
-	                Thread.sleep(1000);
-                    byte[] data = new byte[packet.getLength()];
-                    System.arraycopy(packet.getData(), packet.getOffset(), data, 0, packet.getLength());
-                    ServerIP=new String(data);
-                    //UDPClientMulticaster.interrupt();
-                    DbHelper db =DbHelper.getInstance();
-                    db.updateServerInfo(ServerIP,PORT);
-                    Log.i(TAG, "sever IP received:"+ServerIP);
-                    listening=false;
+                	if(listening){
+                		listen(socket,packet);
+                	}else{
+                		send(socket,ServerIP,PORT,"sensor data in json");
+                	}
+                    
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
@@ -59,11 +55,24 @@ public class UDPClient implements Runnable {
         } catch (SocketException e) {
             e.printStackTrace();
         } finally{
-        	dSocket.close();
+        	socket.close();
         }
     }
-  //return 0 -> success, 1-> fail
-    public static int send(String ip,int port,String msg) {
+     
+  private void listen(DatagramSocket socket,DatagramPacket packet) throws IOException, InterruptedException {
+	  socket.receive(packet);//阻塞方法
+      byte[] data = new byte[packet.getLength()];
+      System.arraycopy(packet.getData(), packet.getOffset(), data, 0, packet.getLength());
+      ServerIP=new String(data);
+      //UDPClientMulticaster.interrupt();
+      DbHelper db =DbHelper.getInstance();
+      db.updateServerInfo(ServerIP,PORT);
+      Log.i(TAG, "sever IP received:"+ServerIP);
+      listening=false;
+      Thread.sleep(1000);
+	}
+	//return 0 -> success, 1-> fail
+    public static int send(DatagramSocket socket,String ip,int port,String msg) {
         //StringBuilder sb = new StringBuilder();
         System.out.println("ready to send message to: " + ip);
         InetAddress local = null;
@@ -75,7 +84,7 @@ public class UDPClient implements Runnable {
             e.printStackTrace();
         }
         try {
-            dSocket = new DatagramSocket(); // 注意此处要先在配置文件里设置权限,否则会抛权限不足的异常
+        	socket = new DatagramSocket(); // 注意此处要先在配置文件里设置权限,否则会抛权限不足的异常
             //sb.append("正在连接服务器...").append("/n");
         } catch (SocketException e) {
             e.printStackTrace();
@@ -84,14 +93,15 @@ public class UDPClient implements Runnable {
         int msg_len = msg == null ? 0 : msg.length();
         DatagramPacket dPacket = new DatagramPacket(msg.getBytes(), msg_len,local, port);
         System.out.println("准备发送数据到："+ip);
+        Log.i(TAG, "Sending sensor data to server:"+ip+":"+PORT);
         try {
-            dSocket.send(dPacket);
+        	socket.send(dPacket);
             //sb.append("消息发送成功!").append("/n");
         } catch (IOException e) {
             e.printStackTrace();
             //sb.append("消息发送失败.").append("/n");
         }
-        dSocket.close();
+        socket.close();
         return 0;
     }
 }
