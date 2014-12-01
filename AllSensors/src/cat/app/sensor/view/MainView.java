@@ -38,10 +38,11 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 	static DbHelper dbHelper;
 	Thread displayThread;
 	Thread dbThread;
-	Thread broadcastThread;
-	Thread confirmThread;
+	//Thread broadcastThread;
+	//Thread netThread;
 	String serverIP;
 	public static int SERVER_PORT = 6000;
+	public static int MULTICAST_PORT = 4444;
 	
 	static Handler myHandler = new Handler() {
         public void handleMessage(Message msg) {
@@ -166,17 +167,18 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		
 	}
 	private void switchToClientMode() {
-		if(broadcastThread!=null&& broadcastThread.isAlive()){
-			UDPClientMulticaster.interrupt();
-			UDPClient.interrupt();
-		}
-		broadcastThread = new Thread(new UDPClientMulticaster(this));
-		broadcastThread.start();
-		//confirmThread = new Thread(new UDPListener());
-		UDPClient.startListen(SERVER_PORT);
+		stopClientThreads();
+		startClientThreads();
 		
 	}
-
+	private void stopClientThreads(){
+		UDPClientMulticaster.interrupt();
+		UDPClient.interrupt();
+	}
+	private void startClientThreads(){
+		UDPClientMulticaster.startMulticast(MULTICAST_PORT);
+		UDPClient.startListen(SERVER_PORT);
+	}
 	private void switchToConnect(){
 		Sensors.current = null;
 		GenericSensors.stop();

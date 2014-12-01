@@ -14,24 +14,27 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class UDPClientMulticaster implements Runnable{
+	private final static String TAG = "AllSensors.UDPClientMulticaster";
+    private static Thread t = null;
 	private static int MULTICAST_NUMBER = 5;
 	private static int MULTICAST_TRIED = 0;
-	private final static String TAG = "AllSensors.UDPClientMulticaster";
 	public static String MULTICAST_IP = "224.0.0.1";//(224.0.0.0,239.255.255.255)
 	public static int MULTICAST_PORT = 4444;
 	public static String MAC, localIP;
 	MulticastSocket multicastSocket;
 	InetAddress serverAddress;
-	static Context context;
+	//static Context context;
 	byte[] data; // = new byte[1024];
-	private byte[] msg = new byte[1024];
+	//private byte[] msg = new byte[1024];
 
 	boolean connected=false;
+	private static boolean running=true;
 
-	public UDPClientMulticaster(Context context) {
+	public UDPClientMulticaster(int port) {
 		try {
-			UDPClientMulticaster.context = context;
-			multicastSocket = new MulticastSocket(MULTICAST_PORT);
+			//UDPClientMulticaster.context = context;
+			MULTICAST_PORT=port;
+			multicastSocket = new MulticastSocket(port);
 			multicastSocket.setTimeToLive(1);
 			serverAddress = InetAddress.getByName(MULTICAST_IP);
 			// MAC=getLocalMacAddressFromWifiInfo();
@@ -42,14 +45,17 @@ public class UDPClientMulticaster implements Runnable{
 			e.printStackTrace();
 		}
 	}
-
+	public static void startMulticast(int port) {
+    	t = new Thread(new UDPClientMulticaster(port));
+        t.start();
+    }
 	public void multicast() {
 		DatagramPacket pack = new DatagramPacket(data, data.length, serverAddress, MULTICAST_PORT);
 		try {
 			multicastSocket.send(pack);
 			Log.i(TAG, "multicast("+MULTICAST_TRIED+"/"+MULTICAST_NUMBER+"):"+new String(data)+" to "+MULTICAST_IP+":"+MULTICAST_PORT);
 		} catch (IOException e) {
-			Toast.makeText(context,"Multicaster Error:"+e.getMessage(),Toast.LENGTH_SHORT).show();
+			//Toast.makeText(context,"Multicaster Error:"+e.getMessage(),Toast.LENGTH_SHORT).show();
 			e.printStackTrace();
 		}
 	}
@@ -59,16 +65,16 @@ public class UDPClientMulticaster implements Runnable{
 			multicastSocket.leaveGroup(serverAddress);
 			multicastSocket.close();
 		} catch (IOException e) {
-			Toast.makeText(context,"Multicaster Error:"+e.getMessage(),Toast.LENGTH_SHORT).show();
+			//Toast.makeText(context,"Multicaster Error:"+e.getMessage(),Toast.LENGTH_SHORT).show();
 			e.printStackTrace();
 		}
 	}
 
-	public static String getLocalMacAddressFromWifiInfo() {
+	/*public static String getLocalMacAddressFromWifiInfo() {
 		WifiManager wifi = (WifiManager) context
 				.getSystemService(Context.WIFI_SERVICE);
 		return wifi.getConnectionInfo().getMacAddress();
-	}
+	}*/
 
 	/*
 	 * public String getIPAddress(Context context){ WifiManager wifi_service =
@@ -107,7 +113,7 @@ public class UDPClientMulticaster implements Runnable{
 
 	@Override
 	public void run() {
-		while(!Thread.currentThread().isInterrupted()){
+		while(running&&!Thread.currentThread().isInterrupted()){
 			if(!Thread.currentThread().isInterrupted()){
 				try {
 	                this.multicast();
@@ -124,6 +130,9 @@ public class UDPClientMulticaster implements Runnable{
 		stop();
 	}
 	public static void interrupt(){
-    	Thread.currentThread().interrupt();
+		if(Thread.currentThread()!=null&& Thread.currentThread().isAlive()){
+			Thread.currentThread().interrupt();
+		}
+		running=false;
     }
 }

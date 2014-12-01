@@ -13,19 +13,22 @@ import android.util.Log;
 
 public class UDPClient implements Runnable {
 	private final  static String TAG = "AllSensors.UDPClient";
-    private static Thread t = new Thread(new UDPClient());
+    private static Thread t = null;
     private static int PORT;
     private byte[] msg = new byte[1024];
+	private static boolean running=true; //shared with all threads
     private static boolean listening = false;
     private static int INTERVAL_MIN = 1;
     public  static String ServerIP;
     
     public static void startListen(int port) {
+    	t = new Thread(new UDPClient());
         PORT = port;
         listening=true;
         t.start();
     }
     public static void startSend(String ip, int port) {
+    	t = new Thread(new UDPClient());
         PORT = port;
         listening=true;
         t.start();
@@ -38,7 +41,7 @@ public class UDPClient implements Runnable {
         Log.i(TAG, "listener started: ");
         try {
         	socket = new DatagramSocket(PORT);
-            while (!Thread.currentThread().isInterrupted()) {
+            while (running&&!Thread.currentThread().isInterrupted()) {
                 try {
                 	if(listening){
                 		listen(socket,packet);
@@ -58,6 +61,12 @@ public class UDPClient implements Runnable {
         	socket.close();
         }
     }
+    public static void interrupt(){
+		if(Thread.currentThread()!=null&& Thread.currentThread().isAlive()){
+			Thread.currentThread().interrupt();
+		}
+    	running = false;
+    }
      
   private void listen(DatagramSocket socket,DatagramPacket packet) throws IOException, InterruptedException {
 	  socket.receive(packet);//×èÈû·½·¨
@@ -75,22 +84,23 @@ public class UDPClient implements Runnable {
   
 	//return 0 -> success, 1-> fail
     public static int send(DatagramSocket socket,String ip,int port,String msg) {
-        InetAddress local = null;
+        InetAddress net = null;
         try {
-            local = InetAddress.getByName(ip);
+            net = InetAddress.getByName(ip);
         	socket = new DatagramSocket();
         } catch (Exception e) {
             e.printStackTrace();
         }
         int msg_len = msg == null ? 0 : msg.length();
-        DatagramPacket dPacket = new DatagramPacket(msg.getBytes(), msg_len,local, port);
+        DatagramPacket dPacket = new DatagramPacket(msg.getBytes(), msg_len,net, port);
         Log.i(TAG, "Sending sensor data to server:"+ip+":"+PORT);
         try {
         	socket.send(dPacket);
         } catch (IOException e) {
             e.printStackTrace();
+        } finally{
+        	socket.close();
         }
-        socket.close();
         return 0;
     }
 }
