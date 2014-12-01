@@ -166,13 +166,15 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		
 	}
 	private void switchToClientMode() {
-		//Toast.makeText(this,"Client Mode Selected",Toast.LENGTH_SHORT).show();
-		//Thread sender = new Multicaster(this);
-		//sender.start();
+		if(broadcastThread!=null&& broadcastThread.isAlive()){
+			UDPClientMulticaster.interrupt();
+			UDPClient.interrupt();
+		}
 		broadcastThread = new Thread(new UDPClientMulticaster(this));
 		broadcastThread.start();
 		//confirmThread = new Thread(new UDPListener());
 		UDPClient.startListen(SERVER_PORT);
+		
 	}
 
 	private void switchToConnect(){

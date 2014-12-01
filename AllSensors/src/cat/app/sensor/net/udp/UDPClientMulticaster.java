@@ -36,7 +36,7 @@ public class UDPClientMulticaster implements Runnable{
 			serverAddress = InetAddress.getByName(MULTICAST_IP);
 			// MAC=getLocalMacAddressFromWifiInfo();
 			localIP = getLocalIpAddress();
-			data = localIP.getBytes();
+			data = ("C:"+localIP).getBytes();
 			multicastSocket.joinGroup(serverAddress);
 		} catch (IOException e) {
 			e.printStackTrace();
