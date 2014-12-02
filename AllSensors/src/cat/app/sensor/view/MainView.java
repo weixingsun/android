@@ -168,15 +168,17 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 	private void switchToClientMode() {
 		stopClientThreads();
 		startClientThreads();
-		
 	}
 	private void stopClientThreads(){
-		UDPClientMulticaster.interrupt();
-		UDPClient.interrupt();
+		//UDPClientMulticaster.interrupt();
+		//UDPClient.interrupt();
 	}
 	private void startClientThreads(){
 		UDPClientMulticaster.startMulticast(MULTICAST_PORT);
-		UDPClient.startListen(SERVER_PORT);
+		//UDPClient.startListen(SERVER_PORT);
+		Intent i = new Intent(this, UDPClient.class);
+		i.putExtra("port", SERVER_PORT);
+		startService(i);
 	}
 	private void switchToConnect(){
 		Sensors.current = null;
