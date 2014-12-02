@@ -1,7 +1,5 @@
 package cat.app.sensor.db;
 
-	import java.sql.Timestamp;
-
 import cat.app.sensor.SensorData;
 import cat.app.sensor.Sensors;
 import android.content.ContentValues;
@@ -9,7 +7,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.hardware.Sensor;
 import android.util.Log;
 
@@ -107,6 +104,25 @@ import android.util.Log;
 	        db.close();
 	        return name;
 	    }
+	    public String selectSensorNameById(int sensorType)
+	    {
+	    	this.db = getReadableDatabase();
+	    	//String[] columns = {"sensor_metric_unit"};
+	        //Cursor cursor=mDefaultWritableDatabase.query(METRIC_TABLE, columns, null, null, null, null, null);
+	    	String sql = "SELECT sensor_name FROM " +METRIC_TABLE+" where sensor_type="+sensorType+" and sensor_metric_seq=0";
+	    	Cursor cursor = db.rawQuery(sql, null);
+	    	if (cursor != null)
+	        	cursor.moveToFirst();
+	    	String name=null;
+	    	try{
+	    	  name = cursor.getString(0);
+	    	}catch(Exception e){
+	    		Log.i(TAG, "sql="+sql);
+	    	}
+	    	cursor.close();
+	        db.close();
+	        return name;
+	    }
 	    //(sensor_type,sensor_metric_seq,sensor_metric_data)
 	    public long insert(int sensor_type, int sensor_metric_seq,double data)
 	    {
@@ -135,16 +151,17 @@ import android.util.Log;
 	    	return db.insert(tableName, null, cv);
 	    }
 	    
-	    public void deleteOldSensorData(SQLiteDatabase db)
+	    public int deleteOldSensorData(SQLiteDatabase db)
 	    {
 	    	//Log.i(TAG,"deleting: old data > 1 min before");
 			//db = getWritableDatabase();
-	    	String sql = "delete from sensor_data where createtime<datetime('now','localtime','-1 minute');";
+	    	//String sql = "delete from sensor_data where createtime<datetime('now','localtime','-1 minute');";
 	        String where="createtime<datetime('now','localtime','-1 minute')";
 	        //datetime('now','+1 hour','-12 minute');
 	        int a = db.delete(SENSOR_TABLE, where,null);
 	        //db.close();
 	        //Log.i(TAG,"deleting: "+a+" rows deleted");
+	        return a;
 	    }
 	    /*public void delete(Timestamp time)
 	    {
@@ -232,6 +249,9 @@ import android.util.Log;
 			this.insert(Sensor.TYPE_ORIENTATION, "Orientation",  0, "Azimuth", "");
 			this.insert(Sensor.TYPE_RELATIVE_HUMIDITY, "Humidity",  0, "Air", "percent");
 			this.insert(Sensor.TYPE_AMBIENT_TEMPERATURE, "Temperature",  0, "Degree", "¡ãC");
+			this.insert(Sensor.TYPE_GAME_ROTATION_VECTOR, "Game Rotation Vector",  0, "x*sin(¦È/2)", "");
+			this.insert(Sensor.TYPE_GAME_ROTATION_VECTOR, "Game Rotation Vector",  1, "y*sin(¦È/2)", "");
+			this.insert(Sensor.TYPE_GAME_ROTATION_VECTOR, "Game Rotation Vector",  2, "z*sin(¦È/2)", "");
 			db.close();
 		}
 		//SERVER_TABLE(server_ip,server_port,net_type,interval_min)

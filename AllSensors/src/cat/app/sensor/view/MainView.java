@@ -6,8 +6,7 @@ import java.util.List;
 import cat.app.sensor.*;
 import cat.app.sensor.connect.GPS;
 import cat.app.sensor.db.DbHelper;
-import cat.app.sensor.net.udp.UDPClientMulticaster;
-import cat.app.sensor.net.udp.UDPClient;
+import cat.app.sensor.net.udp.*;
 import android.location.LocationManager;
 import android.os.*;
 import android.app.*;
@@ -164,7 +163,7 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		}
 	}
 	private void switchToServerMode() {
-		
+		stopClientThreads();
 	}
 	private void switchToClientMode() {
 		stopClientThreads();

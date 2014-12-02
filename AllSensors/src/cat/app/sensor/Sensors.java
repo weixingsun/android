@@ -2,9 +2,13 @@ package cat.app.sensor;
 
 import java.util.*;
 
+import cat.app.sensor.db.CacheIdName;
+import cat.app.sensor.db.DbHelper;
+
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.util.Log;
 import android.util.SparseArray;
 
 /*
@@ -28,6 +32,7 @@ import android.util.SparseArray;
  * 
  */
 public class Sensors {
+	private final static String TAG = "AllSensors.Sensors";
 	public static int refreshRate = SensorManager.SENSOR_DELAY_NORMAL;
 	public static SparseArray<SensorData> saData = new SparseArray<SensorData>();
 	//public static SparseArray<Sensor> supportedSensors = new SparseArray<Sensor>();
@@ -105,15 +110,19 @@ public class Sensors {
 		System.arraycopy(array2, 0, array1and2, array1.length, array2.length);
 		return array1and2;
 	}
-	public static int[] ids=merge(merge(motions,positions),environments);
+	public static    int[]   ids= merge(merge(motions,    positions),    environments);
 	public static Object[] names= merge(merge(motionNames,positionNames),environmentNames);
 	public static String findNameById(int sensorId){
-		int index = Arrays.asList(ids).indexOf(sensorId);
-		String name_package = names[index].toString();
-		String[] packages =  name_package.split(".");
-		return packages[packages.length-1];
+		return CacheIdName.getSensorNameById(sensorId);
 	}
-
+	private static List<Integer> convertToList(int[] array){
+		List<Integer> intList = new ArrayList<Integer>();
+		for (int index = 0; index < array.length; index++)
+	    {
+	        intList.add(array[index]);
+	    }
+		return intList;
+	}
 	/** Virtual Sensor Id of GPS **/
 	public static int GPS = -20;
 	public static void init(){

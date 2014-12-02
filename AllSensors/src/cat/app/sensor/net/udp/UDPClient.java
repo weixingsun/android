@@ -25,6 +25,7 @@ public class UDPClient implements Runnable {
     	t = new Thread(new UDPClient());
         PORT = port;
         listening=true;
+        running=true;
         t.start();
     }
     public static void startSend(String ip, int port) {
@@ -36,30 +37,22 @@ public class UDPClient implements Runnable {
 
     @Override
     public void run() {
-        DatagramSocket socket = null;
         DatagramPacket packet = new DatagramPacket(msg, msg.length);
         Log.i(TAG, "listener started: ");
-        try {
-        	socket = new DatagramSocket(PORT);
             while (running&&!Thread.currentThread().isInterrupted()) {
                 try {
                 	if(listening){
-                		listen(socket,packet);
+                		listen(PORT,packet);
                 	}else{
-                		send(socket,ServerIP,PORT,"sensor data in json");
+                		send(ServerIP,PORT,"sensor data in json");
                 	}
                     Thread.sleep(INTERVAL_MIN*60*1000);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+                	running=false;
+				} 
             }
-        } catch (SocketException e) {
-            e.printStackTrace();
-        } finally{
-        	socket.close();
-        }
     }
     public static void interrupt(){
 		if(Thread.currentThread()!=null&& Thread.currentThread().isAlive()){
@@ -68,40 +61,31 @@ public class UDPClient implements Runnable {
     	running = false;
     }
      
-  private void listen(DatagramSocket socket,DatagramPacket packet) throws IOException, InterruptedException {
+  private void listen(int port,DatagramPacket packet) throws IOException, InterruptedException {
+	  DatagramSocket socket = new DatagramSocket(port);
 	  socket.receive(packet);//×èÈû·½·¨
 	  ServerIP=new String(packet.getData(), packet.getOffset(), packet.getLength());
+	  socket.close();
       //UDPClientMulticaster.interrupt();
       DbHelper db =DbHelper.getInstance();
       db.updateServerInfo(ServerIP,PORT);
       Log.i(TAG, "sever IP received:"+ServerIP);
       listening=false;
-      Thread.sleep(1000);
+      Thread.sleep(500);
 	}
   //byte[] data = new byte[packet.getLength()];
   //System.arraycopy(packet.getData(), packet.getOffset(), data, 0, packet.getLength());
   //ServerIP=new String(data);
   
 	//return 0 -> success, 1-> fail
-    public static int send(DatagramSocket socket,String ip,int port,String msg) {
-        InetAddress net = null;
-        try {
-            net = InetAddress.getByName(ip);
-        	socket = new DatagramSocket();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static int send(String ip,int port,String msg) throws IOException {
+        InetAddress net = InetAddress.getByName(ip);
+        DatagramSocket socket = new DatagramSocket(port);
         int msg_len = msg == null ? 0 : msg.length();
         DatagramPacket dPacket = new DatagramPacket(msg.getBytes(), msg_len,net, port);
         Log.i(TAG, "Sending sensor data to server:"+ip+":"+PORT);
-        try {
-        	socket.send(dPacket);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally{
-        	socket.close();
-        }
+    	socket.send(dPacket);
+    	socket.close();
         return 0;
     }
 }
-

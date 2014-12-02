@@ -16,7 +16,7 @@ import android.widget.Toast;
 public class UDPClientMulticaster implements Runnable{
 	private final static String TAG = "AllSensors.UDPClientMulticaster";
     private static Thread t = null;
-	private static int MULTICAST_NUMBER = 5;
+	private static int MULTICAST_NUMBER = 2;
 	private static int MULTICAST_TRIED = 0;
 	public static String MULTICAST_IP = "224.0.0.1";//(224.0.0.0,239.255.255.255)
 	public static int MULTICAST_PORT = 4444;
@@ -47,7 +47,9 @@ public class UDPClientMulticaster implements Runnable{
 	}
 	public static void startMulticast(int port) {
     	t = new Thread(new UDPClientMulticaster(port));
+    	running=true;
         t.start();
+        Log.i(TAG, "startMulticast("+port+")");
     }
 	public void multicast() {
 		DatagramPacket pack = new DatagramPacket(data, data.length, serverAddress, MULTICAST_PORT);
@@ -121,10 +123,8 @@ public class UDPClientMulticaster implements Runnable{
 	                if(MULTICAST_TRIED>MULTICAST_NUMBER) break;
 	                MULTICAST_TRIED++;
 	            } catch (InterruptedException e) {
-	                Thread.currentThread().interrupt();
+	                running=false;
 	            }
-			}else{
-				
 			}
 		}
 		stop();
