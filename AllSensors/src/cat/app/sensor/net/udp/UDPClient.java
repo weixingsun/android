@@ -41,7 +41,7 @@ public class UDPClient extends IntentService {
 	private static DatagramPacket packet = new DatagramPacket(msg, msg.length);
 
 	public static void startListen(int port) {
-		Log.i(TAG, "startListen (" + port + ")");
+		//Log.i(TAG, "startListen (" + port + ")");
 		listen(port, packet);
 	}
 	public void multicastInit(int multiport) {
@@ -94,7 +94,6 @@ public class UDPClient extends IntentService {
 			socket.receive(packet);
 			ServerIP = new String(packet.getData(), packet.getOffset(),packet.getLength());
 			connected = true;
-			//multicasting=false;
 			DbHelper db = DbHelper.getInstance();
 			db.updateServerInfo(ServerIP, port);
 			Log.i(TAG, "sever IP received:" + ServerIP);
@@ -110,12 +109,7 @@ public class UDPClient extends IntentService {
 	}
 
 	public static void startSend(String ip, int port) {
-		Log.i(TAG, "startSend " + ip + "(" + port + ")");
 		send(ServerIP, port, "sensor data in json");
-		try {
-			Thread.sleep(INTERVAL_MIN * 60 * 1000);
-		} catch (InterruptedException e) {
-		}
 	}
 
 	public static void send(String ip, int port, String msg) {
@@ -174,12 +168,13 @@ public class UDPClient extends IntentService {
 	protected void onHandleIntent(Intent intent) {
 		int port = intent.getIntExtra("port", 0);
 		int multiport = intent.getIntExtra("multiport",0);
-		Log.i(TAG, "multicast to port:"+multiport+", startListen on port:" + port);
 		
 		if(!connected){
+			Log.i(TAG, "multicast to port:"+multiport+", startListen on port:" + port);
 			multicast(multiport);
 			startListen(port);
 		}else{
+			Log.i(TAG, "sending data to:"+ServerIP);
 			startSend(ServerIP, port);
 		}
 	}

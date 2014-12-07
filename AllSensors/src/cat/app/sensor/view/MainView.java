@@ -18,16 +18,20 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.util.*;
 import android.view.*;
 
-public class MainView extends android.app.Activity implements OnItemSelectedListener {
+public class MainView extends android.app.Activity implements
+		OnItemSelectedListener {
 	private static Context context;
-	public static Context getAppContext() {
-        return MainView.context;
-    }
+
+	/*public static Context getAppContext() {
+		return MainView.context;
+	}*/
+
 	private final static String TAG = "AllSensors.MainView";
 	/*
-	//private static final int DisplayMessage  = 0x1;
-	//private static final int NetworkMessage  = 0x2;
-	//private static final int DatabaseMessage = 0x3;*/
+	 * //private static final int DisplayMessage = 0x1; //private static final
+	 * int NetworkMessage = 0x2; //private static final int DatabaseMessage =
+	 * 0x3;
+	 */
 	BackgroundTimerTask btt = new BackgroundTimerTask();
 	Timer timer = new Timer(true);
 	private Spinner spinnerSensorType;
@@ -35,8 +39,9 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 	private ArrayAdapter<String> adapterSensorType;
 	private ArrayAdapter<String> adapterClientServer;
 	private static SurfaceView surfaceView;
-	private String[] selectType = new String[] { "Motion Sensors","Position Sensors", "Environment Sensors", "Connect Modules" };
-	private String[] selectCS = new String[] { "Client Mode","Server Mode" };
+	private String[] selectType = new String[] { "Motion Sensors",
+			"Position Sensors", "Environment Sensors", "Connect Modules" };
+	private String[] selectCS = new String[] { "Client Mode", "Server Mode" };
 	DisplayMetrics metrics;
 	SensorManager sm;
 	LocationManager locationManager;
@@ -44,8 +49,8 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 	private static boolean serverMode = false;
 	public static int SERVER_PORT = 6000;
 	public static int MULTICAST_PORT = 4444;
-	private static int UPDATE_INTERVAL = 6*1000;
-	
+	private static int UPDATE_INTERVAL = 6 * 1000;
+
 	protected void onCreate(Bundle savedInstanceState) {
 		MainView.context = getApplicationContext();
 		super.onCreate(savedInstanceState);
@@ -58,7 +63,7 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		GPS.generateGPSData(locationManager);
 		Sensors.initConnectModule();
 		surfaceView = (SurfaceView) findViewById(R.id.surfaceview);
-		dbHelper=DbHelper.getInstance(this);
+		dbHelper = DbHelper.getInstance(this);
 		dbHelper.prepareMetricData();
 		timer.schedule(btt, 1000, UPDATE_INTERVAL);
 	}
@@ -67,51 +72,60 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		super.onDestroy();
 		Cleanup();
 	}
+
 	public void onStop() {
 		super.onStop();
 		Cleanup();
 	}
+
 	public void onPause() {
 		super.onPause();
 		Cleanup();
 	}
+
 	public void Cleanup() {
 		GenericSensors.stop();
 		GPS.stop();
 	}
+
 	public void onResume() {
 		super.onResume();
-		if(Sensors.current!=null){
+		if (Sensors.current != null) {
 			GenericSensors.start();
-		}else{
+		} else {
 			GPS.start();
 		}
 	}
+
 	private void setupSelect() {
-		//tv0 = (TextView) findViewById(R.id.Textview00);
-		spinnerSensorType = (Spinner) findViewById(R.id.SpinnerSensorType);//2131230720 [0x7f080000]
+		spinnerSensorType = (Spinner) findViewById(R.id.SpinnerSensorType);// 2131230720
+																			// [0x7f080000]
 		metrics = this.getResources().getDisplayMetrics();
 		spinnerSensorType.setMinimumWidth((int) (metrics.widthPixels / 2));
 		adapterSensorType = new ArrayAdapter<String>(this,
 				android.R.layout.simple_spinner_item, selectType);
-		adapterSensorType.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		adapterSensorType
+				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerSensorType.setAdapter(adapterSensorType);
 		spinnerSensorType.setVisibility(View.VISIBLE);
 		spinnerSensorType.setOnItemSelectedListener(this);
-		
-		spinnerClientServer = (Spinner) findViewById(R.id.SpinnerCS);//2131230722 [0x7f080002]
+
+		spinnerClientServer = (Spinner) findViewById(R.id.SpinnerCS);// 2131230722
+																		// [0x7f080002]
 		spinnerClientServer.setMinimumWidth((int) (metrics.widthPixels / 4));
 		adapterClientServer = new ArrayAdapter<String>(this,
 				android.R.layout.simple_spinner_item, selectCS);
-		adapterClientServer.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		adapterClientServer
+				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinnerClientServer.setAdapter(adapterClientServer);
 		spinnerClientServer.setVisibility(View.VISIBLE);
 		spinnerClientServer.setOnItemSelectedListener(this);
-		
+
 	}
+
 	public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
 			long arg3) {
-		if(arg0.getId()==R.id.SpinnerSensorType){
+		if (arg0.getId() == R.id.SpinnerSensorType) {
 			if (arg2 == 0) {// motion sensors
 				switchToCommonSensor(Sensors.motions);
 			}
@@ -124,66 +138,72 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 			if (arg2 == 3) {// connection modules
 				switchToConnect();
 			}
-		}else if(arg0.getId()==R.id.SpinnerCS){
+		} else if (arg0.getId() == R.id.SpinnerCS) {
 			if (arg2 == 0) {// client mode
 				switchToClientMode();
-			}else if (arg2 == 1) {// server mode
+			} else if (arg2 == 1) {// server mode
 				switchToServerMode();
 			}
 		}
 	}
+
 	private void switchToServerMode() {
-		serverMode=true;
+		serverMode = true;
 	}
+
 	private void switchToClientMode() {
-		serverMode=false;
+		serverMode = false;
 		startClientServerThreads();
 	}
 
-	private static void startClientServerThreads(){
-		if(serverMode==false){
+	private static void startClientServerThreads() {
+		if (serverMode == false) {
 			Intent i = new Intent(MainView.context, UDPClient.class);
 			i.putExtra("multiport", MULTICAST_PORT);
 			i.putExtra("port", SERVER_PORT);
-			UDPClient.setTimeOut(UPDATE_INTERVAL-2000);
+			UDPClient.setTimeOut(UPDATE_INTERVAL - 2000);
 			MainView.context.startService(i);
 		}
 	}
-	private void switchToConnect(){
+
+	private void switchToConnect() {
 		Sensors.current = null;
 		GenericSensors.stop();
 		Sensors.initConnectModule();
 		GPS.start();
 	}
-	private void switchToCommonSensor(int[] to){
+
+	private void switchToCommonSensor(int[] to) {
 		Sensors.initGenericSensors();
-		GenericSensors.switchTo(to) ;
+		GenericSensors.switchTo(to);
 		GenericSensors.start();
 		GPS.stop();
 	}
+
 	public void onNothingSelected(AdapterView<?> arg0) {
 	}
 
 	private static void drawSurface() {
 		Paint mPaint = new Paint();
 		mPaint.setColor(Color.WHITE);
-		//tv.setText("Sensors.saData="+Sensors.saData.size());
+		// tv.setText("Sensors.saData="+Sensors.saData.size());
 		SurfaceHolder sh = surfaceView.getHolder();
 		Canvas mCanvas = sh.lockCanvas();
 		if (mCanvas != null) {
 			try {
 				int cellHeight = 80;
 				mCanvas.drawColor(Color.BLACK);
-				//mCanvas.drawText("data="+Sensors.saData.size(), 50, 50, mPaint);
+				// mCanvas.drawText("data="+Sensors.saData.size(), 50, 50,
+				// mPaint);
 				for (int i = 0; i < Sensors.currentPageSensors.size(); i++) {
 					mPaint.setColor(Color.WHITE);
-					int type =Sensors.currentPageSensors.get(i);
+					int type = Sensors.currentPageSensors.get(i);
 					SensorData sd = Sensors.saData.get(type);
-					int y = i* cellHeight;
-					if (sd == null){
-						drawEmptyData(mCanvas,mPaint,type, y, cellHeight);
+					int y = i * cellHeight;
+					if (sd == null) {
+						drawEmptyData(mCanvas, mPaint, type, y, cellHeight);
 					} else {
-						drawData(mCanvas,mPaint,y,sd);
+						drawData(mCanvas, mPaint, y, sd);
 					}
 				}
 			} catch (Exception e) {
@@ -194,34 +214,37 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		}
 	}
 
-	private static void drawEmptyData(Canvas mCanvas, Paint mPaint, int type, int y, int cellHeight) {
+	private static void drawEmptyData(Canvas mCanvas, Paint mPaint, int type,
+			int y, int cellHeight) {
 		mPaint.setColor(Color.RED);
-		if(!GPS.status.equals(GPS.STATUS_AVAILABLE)&&type==Sensors.GPS){
-			mCanvas.drawText("GPS "+GPS.status, 10, y+20, mPaint);
-		}else{
-			mCanvas.drawText("No data for:"+Sensors.findNameById(type), 10, y+20, mPaint);
+		if (!GPS.status.equals(GPS.STATUS_AVAILABLE) && type == Sensors.GPS) {
+			mCanvas.drawText("GPS " + GPS.status, 10, y + 20, mPaint);
+		} else {
+			mCanvas.drawText("No data for:" + Sensors.findNameById(type), 10,
+					y + 20, mPaint);
 		}
 		mPaint.setColor(Color.WHITE);
-		mCanvas.drawLine(10, y+cellHeight, 400, y+cellHeight, mPaint);
+		mCanvas.drawLine(10, y + cellHeight, 400, y + cellHeight, mPaint);
 	}
-	private static void drawData(Canvas mCanvas, Paint mPaint, int y, SensorData sd) {
+
+	private static void drawData(Canvas mCanvas, Paint mPaint, int y,
+			SensorData sd) {
 		String name = null;
-		int z=0;
-		if(sd.object instanceof Sensor) {
-			name=((Sensor)sd.object).getName();
+		int z = 0;
+		if (sd.object instanceof Sensor) {
+			name = ((Sensor) sd.object).getName();
 			for (int j = 0; j < sd.fdata.length; j++) {
 				mPaint.setColor(Sensors.colors[j]);
-				String str ="value " + j + " =" + sd.fdata[j];
-				mCanvas.drawText(str,200, y + j * 20 + 20, mPaint);
+				String str = "value " + j + " =" + sd.fdata[j];
+				mCanvas.drawText(str, 200, y + j * 20 + 20, mPaint);
 			}
 			z = y + sd.fdata.length * 20 + 10;
-		}
-		else if(sd.object instanceof String){
-			name=sd.object.toString();
+		} else if (sd.object instanceof String) {
+			name = sd.object.toString();
 			for (int j = 0; j < sd.ddata.length; j++) {
 				mPaint.setColor(Sensors.colors[j]);
-				String str ="value " + j + " =" + sd.ddata[j];
-				mCanvas.drawText(str,200, y + j * 20 + 20, mPaint);
+				String str = "value " + j + " =" + sd.ddata[j];
+				mCanvas.drawText(str, 200, y + j * 20 + 20, mPaint);
 			}
 			z = y + sd.ddata.length * 20 + 10;
 		}
@@ -230,10 +253,11 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		mPaint.setColor(Color.WHITE);
 		mCanvas.drawLine(10, z, 400, z, mPaint);
 	}
-	
+
 	private void ScheduleSelfCheck() {
 		AlarmManager scheduler = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-		Intent intent = new Intent(getApplicationContext(), SensorServiceUnused.class);
+		Intent intent = new Intent(getApplicationContext(),
+				SensorServiceUnused.class);
 		PendingIntent scheduledIntent = PendingIntent.getService(
 				getApplicationContext(), 0, intent,
 				PendingIntent.FLAG_UPDATE_CURRENT);
@@ -253,49 +277,35 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		scheduler.cancel(scheduledIntent);
 	}
 
-	static Runnable backgroundR=new Runnable(){
+	static Runnable backgroundR = new Runnable() {
 		@Override
 		public void run() {
-	         /*Message message = new Message();   
-	         message.what = DisplayMessage;
-	         MainView.myHandler.sendMessage(message);*/
+			/*
+			 * Message message = new Message(); message.what = DisplayMessage;
+			 * MainView.myHandler.sendMessage(message);
+			 */
 			drawSurface();
 			dbHelper.dbWriter();
-	    	startClientServerThreads();
+			startClientServerThreads();
 		}
 	};
 	static Handler myHandler = new Handler();
 
 	private static class BackgroundTimerTask extends TimerTask {
-	    @Override    
-	    public void run() {
-	    	myHandler.post(backgroundR);
-	    }
+		@Override
+		public void run() {
+			myHandler.post(backgroundR);
+		}
 	}
 }
-/**public void handleMessage(Message msg) {
-switch (msg.what) {
-     case DisplayMessage:
-         //drawSurface();
-         break;
-     case NetworkMessage:
-   	  //startClientThreads();
-   	  break;
-     case DatabaseMessage:
-   	  //dbHelper.dbWriter();
-   	  break;
-}   
-super.handleMessage(msg);
-}
-};
-Log.i(TAG, "entering backgroundtimer");
-   Message message = new Message();
-   message.what = NetworkMessage;
-   myHandler.sendMessage(message);
-
-   message.what = DisplayMessage;
-   myHandler.sendMessage(message);
-
-   message.what = DatabaseMessage;
-   myHandler.sendMessage(message);
-*/
+/**
+ * public void handleMessage(Message msg) { switch (msg.what) { case
+ * DisplayMessage: //drawSurface(); break; case NetworkMessage:
+ * //startClientThreads(); break; case DatabaseMessage: //dbHelper.dbWriter();
+ * break; } super.handleMessage(msg); } Message message = new Message();
+ * message.what = NetworkMessage; myHandler.sendMessage(message);
+ * 
+ * message.what = DisplayMessage; myHandler.sendMessage(message);
+ * 
+ * message.what = DatabaseMessage; myHandler.sendMessage(message);
+ */
