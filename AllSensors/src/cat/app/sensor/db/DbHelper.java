@@ -1,5 +1,7 @@
 package cat.app.sensor.db;
 
+import java.util.Date;
+
 import cat.app.sensor.SensorData;
 import cat.app.sensor.Sensors;
 import android.content.ContentValues;
@@ -196,6 +198,8 @@ import android.util.Log;
 
 		public void dbWriter(){
 			db = getWritableDatabase();
+			//Date d = new Date();
+			//Log.i(TAG, "inserting sensor data:"+d.toString());
 			for (int id:Sensors.ids){
 				SensorData sd = Sensors.saData.get(id);
 				if(sd!=null){

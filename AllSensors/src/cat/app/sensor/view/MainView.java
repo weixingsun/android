@@ -1,7 +1,7 @@
 package cat.app.sensor.view;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cat.app.sensor.*;
 import cat.app.sensor.connect.GPS;
@@ -19,40 +19,35 @@ import android.util.*;
 import android.view.*;
 
 public class MainView extends android.app.Activity implements OnItemSelectedListener {
-
+	private static Context context;
+	public static Context getAppContext() {
+        return MainView.context;
+    }
 	private final static String TAG = "AllSensors.MainView";
-	private List<String> clientList = new ArrayList<String>();
-	protected static final int GUIUPDATEIDENTIFIER = 0x101;
+	/*
+	//private static final int DisplayMessage  = 0x1;
+	//private static final int NetworkMessage  = 0x2;
+	//private static final int DatabaseMessage = 0x3;*/
+	BackgroundTimerTask btt = new BackgroundTimerTask();
+	Timer timer = new Timer(true);
 	private Spinner spinnerSensorType;
 	private Spinner spinnerClientServer;
 	private ArrayAdapter<String> adapterSensorType;
 	private ArrayAdapter<String> adapterClientServer;
 	private static SurfaceView surfaceView;
-	//private static TextView tv;
 	private String[] selectType = new String[] { "Motion Sensors","Position Sensors", "Environment Sensors", "Connect Modules" };
 	private String[] selectCS = new String[] { "Client Mode","Server Mode" };
 	DisplayMetrics metrics;
 	SensorManager sm;
 	LocationManager locationManager;
 	static DbHelper dbHelper;
-	Thread displayThread;
-	Thread dbThread;
-	//Thread broadcastThread;
-	//Thread netThread;
-	String serverIP;
+	private static boolean serverMode = false;
 	public static int SERVER_PORT = 6000;
 	public static int MULTICAST_PORT = 4444;
+	private static int UPDATE_INTERVAL = 6*1000;
 	
-	static Handler myHandler = new Handler() {
-        public void handleMessage(Message msg) {
-             switch (msg.what) {
-                  case MainView.GUIUPDATEIDENTIFIER:
-                       break;
-             }   
-             super.handleMessage(msg);
-        }
-   };
 	protected void onCreate(Bundle savedInstanceState) {
+		MainView.context = getApplicationContext();
 		super.onCreate(savedInstanceState);
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.main);
@@ -63,46 +58,27 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		GPS.generateGPSData(locationManager);
 		Sensors.initConnectModule();
 		surfaceView = (SurfaceView) findViewById(R.id.surfaceview);
-		//tv=(TextView) findViewById(R.id.Textview00);
-		if(displayThread!=null && displayThread.isAlive()){
-			Toast.makeText(this,"Threads Alive",Toast.LENGTH_SHORT).show();
-			return;
-		}
-		displayThread = new Thread(new MyDisplayThread());
-		displayThread.start();
 		dbHelper=DbHelper.getInstance(this);
 		dbHelper.prepareMetricData();
-		dbThread = new Thread(new MyDbThread());
-		dbThread.start();
+		timer.schedule(btt, 1000, UPDATE_INTERVAL);
 	}
 
 	public void onDestroy() {
 		super.onDestroy();
 		Cleanup();
-		stopThreads();
 	}
-
-	private void stopThreads() {
-		displayThread.interrupt();
-		dbThread.interrupt();
-	}
-
 	public void onStop() {
 		super.onStop();
 		Cleanup();
 	}
-
 	public void onPause() {
 		super.onPause();
 		Cleanup();
 	}
-
 	public void Cleanup() {
 		GenericSensors.stop();
 		GPS.stop();
-		
 	}
-
 	public void onResume() {
 		super.onResume();
 		if(Sensors.current!=null){
@@ -110,10 +86,7 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		}else{
 			GPS.start();
 		}
-		//if(thread.isInterrupted()||!thread.isAlive())
-		//	thread.start();
 	}
-
 	private void setupSelect() {
 		//tv0 = (TextView) findViewById(R.id.Textview00);
 		spinnerSensorType = (Spinner) findViewById(R.id.SpinnerSensorType);//2131230720 [0x7f080000]
@@ -136,11 +109,8 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		spinnerClientServer.setOnItemSelectedListener(this);
 		
 	}
-
 	public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
 			long arg3) {
-		
-		// 
 		if(arg0.getId()==R.id.SpinnerSensorType){
 			if (arg2 == 0) {// motion sensors
 				switchToCommonSensor(Sensors.motions);
@@ -163,22 +133,21 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		}
 	}
 	private void switchToServerMode() {
-		stopClientThreads();
+		serverMode=true;
 	}
 	private void switchToClientMode() {
-		stopClientThreads();
-		startClientThreads();
+		serverMode=false;
+		startClientServerThreads();
 	}
-	private void stopClientThreads(){
-		//UDPClientMulticaster.interrupt();
-		//UDPClient.interrupt();
-	}
-	private void startClientThreads(){
-		UDPClientMulticaster.startMulticast(MULTICAST_PORT);
-		//UDPClient.startListen(SERVER_PORT);
-		Intent i = new Intent(this, UDPClient.class);
-		i.putExtra("port", SERVER_PORT);
-		startService(i);
+
+	private static void startClientServerThreads(){
+		if(serverMode==false){
+			Intent i = new Intent(MainView.context, UDPClient.class);
+			i.putExtra("multiport", MULTICAST_PORT);
+			i.putExtra("port", SERVER_PORT);
+			UDPClient.setTimeOut(UPDATE_INTERVAL-2000);
+			MainView.context.startService(i);
+		}
 	}
 	private void switchToConnect(){
 		Sensors.current = null;
@@ -284,50 +253,49 @@ public class MainView extends android.app.Activity implements OnItemSelectedList
 		scheduler.cancel(scheduledIntent);
 	}
 
-	static class MyDisplayThread implements Runnable {
-        public void run() {  
-            while (!Thread.currentThread().isInterrupted()) {
-                 Message message = new Message();   
-                 message.what = MainView.GUIUPDATEIDENTIFIER;
-                 MainView.myHandler.sendMessage(message);
-                 try {
-                      Thread.sleep(1000);    
-                      drawSurface();
-                 } catch (InterruptedException e) {
-                      Thread.currentThread().interrupt();
-                 }
-            }
-       }
-        public static void interrupt(){
-        	Thread.currentThread().interrupt();
-        }
-	}
-	static class MyDbThread implements Runnable {
-        public void run() {
-            while (!Thread.currentThread().isInterrupted()) {
-                 try {
-                      Thread.sleep(10000);
-                      dbHelper.dbWriter();
-                 } catch (InterruptedException e) {
-                      Thread.currentThread().interrupt();
-                 }
-            }
-       }
-        public static void interrupt(){
-        	Thread.currentThread().interrupt();
-        }
+	static Runnable backgroundR=new Runnable(){
+		@Override
+		public void run() {
+	         /*Message message = new Message();   
+	         message.what = DisplayMessage;
+	         MainView.myHandler.sendMessage(message);*/
+			drawSurface();
+			dbHelper.dbWriter();
+	    	startClientServerThreads();
+		}
+	};
+	static Handler myHandler = new Handler();
+
+	private static class BackgroundTimerTask extends TimerTask {
+	    @Override    
+	    public void run() {
+	    	myHandler.post(backgroundR);
+	    }
 	}
 }
-		 /*AlertDialog.Builder dialog = new  AlertDialog.Builder(this);
-		 dialog.setTitle("IP:port").setIcon(android.R.drawable.ic_dialog_info);
-		 dialog.setNegativeButton("Cancel", null);
-		 final EditText input = new EditText(this);
-		 dialog.setView(input);
-		 dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				clientList.add(input.getText().toString());
-				Log.i(TAG, "add client:"+input.getText().toString());
-			}
-		});
-		dialog.show();*/
+/**public void handleMessage(Message msg) {
+switch (msg.what) {
+     case DisplayMessage:
+         //drawSurface();
+         break;
+     case NetworkMessage:
+   	  //startClientThreads();
+   	  break;
+     case DatabaseMessage:
+   	  //dbHelper.dbWriter();
+   	  break;
+}   
+super.handleMessage(msg);
+}
+};
+Log.i(TAG, "entering backgroundtimer");
+   Message message = new Message();
+   message.what = NetworkMessage;
+   myHandler.sendMessage(message);
+
+   message.what = DisplayMessage;
+   myHandler.sendMessage(message);
+
+   message.what = DatabaseMessage;
+   myHandler.sendMessage(message);
+*/
