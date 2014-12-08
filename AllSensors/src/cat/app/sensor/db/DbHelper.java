@@ -203,11 +203,11 @@ import android.util.Log;
 			for (int id:Sensors.ids){
 				SensorData sd = Sensors.saData.get(id);
 				if(sd!=null){
-					if(sd.object instanceof Sensor){
-						DbHelper.insertFloatData(id,sd);
-					}
-					else if(sd.object instanceof String){
+					if(sd.sensor == null){
 						DbHelper.insertDoubleData(id,sd);
+					}
+					else{
+						DbHelper.insertFloatData(id,sd);
 					}
 				}
 			}

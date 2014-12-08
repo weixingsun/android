@@ -2,6 +2,10 @@ package cat.app.sensor;
 
 import java.util.*;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import cat.app.sensor.db.CacheIdName;
 import cat.app.sensor.db.DbHelper;
 
@@ -135,5 +139,21 @@ public class Sensors {
 	public static void initGenericSensors(){
 		currentPageSensors.clear();
 	}
-	
+	public static JSONObject getJson(){
+
+		JSONArray array = new JSONArray();
+		for(int i = 0; i < saData.size(); i++) {
+		   int key = saData.keyAt(i);
+		   SensorData sd = saData.get(key);
+		   JSONObject o = sd.getJson();
+		   array.put(o);
+		}
+		JSONObject json = new JSONObject();
+		try {
+			json.put("sensors", array);
+		} catch (JSONException e) {
+			Log.w(TAG, "create json object failed:"+e.getMessage());
+		}
+		return json;
+	}
 }

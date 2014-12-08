@@ -21,16 +21,9 @@ import android.view.*;
 public class MainView extends android.app.Activity implements
 		OnItemSelectedListener {
 	private static Context context;
-
-	/*public static Context getAppContext() {
-		return MainView.context;
-	}*/
-
 	private final static String TAG = "AllSensors.MainView";
 	/*
-	 * //private static final int DisplayMessage = 0x1; //private static final
-	 * int NetworkMessage = 0x2; //private static final int DatabaseMessage =
-	 * 0x3;
+	 *private static int DisplayMessage=0x1;NetworkMessage=0x2;DatabaseMessage=0x3;
 	 */
 	BackgroundTimerTask btt = new BackgroundTimerTask();
 	Timer timer = new Timer(true);
@@ -49,7 +42,7 @@ public class MainView extends android.app.Activity implements
 	private static boolean serverMode = false;
 	public static int SERVER_PORT = 6000;
 	public static int MULTICAST_PORT = 4444;
-	private static int UPDATE_INTERVAL = 6 * 1000;
+	private static int UPDATE_INTERVAL = 10 * 1000;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		MainView.context = getApplicationContext();
@@ -98,8 +91,7 @@ public class MainView extends android.app.Activity implements
 	}
 
 	private void setupSelect() {
-		spinnerSensorType = (Spinner) findViewById(R.id.SpinnerSensorType);// 2131230720
-																			// [0x7f080000]
+		spinnerSensorType = (Spinner) findViewById(R.id.SpinnerSensorType);
 		metrics = this.getResources().getDisplayMetrics();
 		spinnerSensorType.setMinimumWidth((int) (metrics.widthPixels / 2));
 		adapterSensorType = new ArrayAdapter<String>(this,
@@ -109,9 +101,7 @@ public class MainView extends android.app.Activity implements
 		spinnerSensorType.setAdapter(adapterSensorType);
 		spinnerSensorType.setVisibility(View.VISIBLE);
 		spinnerSensorType.setOnItemSelectedListener(this);
-
-		spinnerClientServer = (Spinner) findViewById(R.id.SpinnerCS);// 2131230722
-																		// [0x7f080002]
+		spinnerClientServer = (Spinner) findViewById(R.id.SpinnerCS);
 		spinnerClientServer.setMinimumWidth((int) (metrics.widthPixels / 4));
 		adapterClientServer = new ArrayAdapter<String>(this,
 				android.R.layout.simple_spinner_item, selectCS);
@@ -229,18 +219,18 @@ public class MainView extends android.app.Activity implements
 
 	private static void drawData(Canvas mCanvas, Paint mPaint, int y,
 			SensorData sd) {
-		String name = null;
+		//String name = null;
 		int z = 0;
-		if (sd.object instanceof Sensor) {
-			name = ((Sensor) sd.object).getName();
+		if (sd.sensor != null) {
+			//name = sd.sensor.getName();
 			for (int j = 0; j < sd.fdata.length; j++) {
 				mPaint.setColor(Sensors.colors[j]);
 				String str = "value " + j + " =" + sd.fdata[j];
 				mCanvas.drawText(str, 200, y + j * 20 + 20, mPaint);
 			}
 			z = y + sd.fdata.length * 20 + 10;
-		} else if (sd.object instanceof String) {
-			name = sd.object.toString();
+		} else {
+			//name = sd.object.toString();
 			for (int j = 0; j < sd.ddata.length; j++) {
 				mPaint.setColor(Sensors.colors[j]);
 				String str = "value " + j + " =" + sd.ddata[j];
@@ -249,7 +239,7 @@ public class MainView extends android.app.Activity implements
 			z = y + sd.ddata.length * 20 + 10;
 		}
 		mPaint.setColor(Color.WHITE);
-		mCanvas.drawText(name, 10, y + 20, mPaint);
+		mCanvas.drawText(sd.getName(), 10, y + 20, mPaint);
 		mPaint.setColor(Color.WHITE);
 		mCanvas.drawLine(10, z, 400, z, mPaint);
 	}

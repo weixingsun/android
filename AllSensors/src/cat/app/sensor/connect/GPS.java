@@ -33,7 +33,7 @@ public class GPS implements LocationListener {
 		Location location = locationManager.getLastKnownLocation(provider);
 		if(location !=null){
 		double[] data = new double[]{location.getLatitude(),location.getLongitude()};
-		SensorData sd = new SensorData("GPS", data);
+		SensorData sd = new SensorData(Sensors.GPS,"GPS", data);
 		Sensors.saData.append(virtualSensorId, sd);
 		}
 	}
@@ -55,7 +55,7 @@ public class GPS implements LocationListener {
 	@Override
 	public void onLocationChanged(Location location) {
 		double[] data = new double[] { location.getLatitude(),location.getLongitude() };
-		SensorData sd = new SensorData("GPS", data);
+		SensorData sd = new SensorData(Sensors.GPS,"GPS", data);
 		Sensors.saData.append(virtualSensorId, sd);
 	}
 
