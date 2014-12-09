@@ -18,7 +18,7 @@ public class MainActivity extends android.app.Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-        String comments1 = "The capital city of China.";
+        String comments1 = "A beautiful garden city";
         LatLng position = new LatLng(39.915291, 116.396860);
         position = new LatLng(-43.5320544,172.6362254);
         marker(position,comments1);
@@ -27,7 +27,7 @@ public class MainActivity extends android.app.Activity {
     public void marker(LatLng point,String comments){
     	map.setMyLocationEnabled(true);
         map.addMarker(new MarkerOptions()
-        .title("Beijing")
+        .title("Christchurch")
         .snippet(comments)
         .position(point));
     }
