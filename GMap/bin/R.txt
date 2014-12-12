@@ -91,6 +91,8 @@ int drawable ic_plusone_tall_off_client 0x7f02001e
 int drawable powered_by_google_dark 0x7f02001f
 int drawable powered_by_google_light 0x7f020020
 int id book_now 0x7f08000e
+int id btnAdd 0x7f080014
+int id btnExec 0x7f080015
 int id buyButton 0x7f08000a
 int id buy_now 0x7f08000f
 int id buy_with_google 0x7f080010
@@ -99,9 +101,11 @@ int id grayscale 0x7f080012
 int id holo_dark 0x7f080005
 int id holo_light 0x7f080006
 int id hybrid 0x7f080000
-int id map 0x7f080014
+int id inputAddress 0x7f080017
+int id map 0x7f080016
 int id match_parent 0x7f08000c
 int id monochrome 0x7f080013
+int id navigateBtn 0x7f080018
 int id none 0x7f080001
 int id normal 0x7f080002
 int id production 0x7f080007
@@ -147,6 +151,7 @@ int string create_calendar_message 0x7f050005
 int string create_calendar_title 0x7f050004
 int string decline 0x7f050003
 int string hello_world 0x7f050024
+int string navigateBtn 0x7f050025
 int string store_picture_message 0x7f050001
 int string store_picture_title 0x7f050000
 int string wallet_buy_button_place_holder 0x7f050022
