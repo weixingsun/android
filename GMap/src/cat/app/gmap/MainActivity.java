@@ -5,6 +5,7 @@ import com.google.android.gms.maps.model.*;
 import com.google.android.maps.GeoPoint;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,15 +15,16 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 public class MainActivity extends android.app.Activity {
 
 	protected static final String TAG = "GMap.MainActivity";
 	GMap gMap = new GMap();
-	Button routeBtn;
-	//Button addBtn;
-	Location loc;
+	Button NaviBtn;
+	EditText inputAddress;
+	//Location loc;
 	
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,30 +36,25 @@ public class MainActivity extends android.app.Activity {
     }
     private void showUI(){
     	setButtons();
+    	setText();
     }
+	private void setText() {
+		this.inputAddress = (EditText) findViewById(R.id.inputAddress);
+		inputAddress.setTextColor(Color.BLACK);
+	}
 	private void setButtons() {
 		//addBtn = (Button) findViewById(R.id.btnAdd);
-		routeBtn = (Button) findViewById(R.id.btnExec);
-	    routeBtn.setOnClickListener(new OnClickListener() {
+		NaviBtn = (Button) findViewById(R.id.navigateBtn);
+	    NaviBtn.setOnClickListener(new OnClickListener() {
 	        @Override
 	        public void onClick(View v) {
-	        	if(loc==null){ loc = gMap.map.getMyLocation(); return;}
-	        	else{
-	        		LatLng start = new LatLng(loc.getLatitude(),loc.getLongitude());
-	        		gMap.move(start);
-		        	if(gMap.markers.size()>0){
-		        		GoogleMapRouteTask.removePreviousRoute();
-			            LatLng end = gMap.markers.get(gMap.markerSeq-1).getPosition();
-			            String url = gMap.getDirectionsUrl(start, end);  
-			            GoogleMapRouteTask task = new GoogleMapRouteTask(gMap,url);  
-			            task.execute();  
-			            gMap.move(start);
-		        	}else{
-		        		Toast.makeText(gMap.activity, "Please select a target", Toast.LENGTH_LONG).show(); 
-		        	}
-	        	}
+	        	/*if(gMap.loc!=null || gMap.markers.size()>0){
+		        	gMap.refreshRoute();
+	        	}*/
+	        	
 	        }
 	    });
 	}
+	
 	
 }

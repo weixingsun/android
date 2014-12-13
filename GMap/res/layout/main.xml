@@ -4,31 +4,11 @@
     android:layout_height="match_parent"
     tools:context="${relativePackage}.${activityClass}" >
 
-    <Button
-        android:id="@+id/btnAdd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="false"
-        android:layout_alignParentTop="true"
-        android:text="Add" />
-
-    <Button
-        android:id="@+id/btnExec"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginRight="14dp"
-        android:layout_toLeftOf="@id/btnExec"
-        android:text="View" />
-
     <fragment
-		 android:id="@+id/map"  
-		 android:layout_width="match_parent" 
-		 android:layout_height="match_parent" 
-		 android:layout_below="@+id/btnExec"
-		 class="com.google.android.gms.maps.MapFragment"/>
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        class="com.google.android.gms.maps.MapFragment" />
 
     <EditText
         android:id="@+id/inputAddress"

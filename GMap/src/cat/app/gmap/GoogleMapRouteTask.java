@@ -34,7 +34,7 @@ public class GoogleMapRouteTask extends
     private static final String TAG = "GMap.GoogleMapRouteTask";
 	HttpClient client;  
     String url;  
-    static Polyline preRoute;
+    static List<Polyline> preRoutes = new ArrayList<Polyline>();
     List<LatLng> routes = null;  
     GMap gmap;
     public GoogleMapRouteTask(GMap gmap,String url) {  
@@ -50,19 +50,15 @@ public class GoogleMapRouteTask extends
             int statusecode = response.getStatusLine().getStatusCode();  
             System.out.println("response:" + response + "      statuscode:"  
                     + statusecode);  
-            if (statusecode == 200) {  
-  
-                String responseString = EntityUtils.toString(response  
-                        .getEntity());  
-  
+            if (statusecode == 200) {
+                String responseString = EntityUtils.toString(response.getEntity());
                 int status = responseString.indexOf("<status>OK</status>");  
                 System.out.println("status:" + status);  
                 if (-1 != status) {  
                     int pos = responseString.indexOf("<overview_polyline>");  
                     pos = responseString.indexOf("<points>", pos + 1);  
                     int pos2 = responseString.indexOf("</points>", pos);  
-                    responseString = responseString  
-                            .substring(pos + 8, pos2);  
+                    responseString = responseString.substring(pos + 8, pos2);  
                     routes = decodePoly(responseString);  
                 } else {  
                     // 错误代码，  
@@ -71,8 +67,7 @@ public class GoogleMapRouteTask extends
             } else {
                 // 请求失败  
                 return null;  
-            }  
-  
+            }
         } catch (ClientProtocolException e) {  
             Log.i(TAG, "ClientProtocolException:"+e.getMessage());
         } catch (IOException e) {  
@@ -87,8 +82,7 @@ public class GoogleMapRouteTask extends
         client = new DefaultHttpClient();  
         client.getParams().setParameter(  
                 CoreConnectionPNames.CONNECTION_TIMEOUT, 15000);  
-        client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT,  
-                15000);  
+        client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT,15000);  
         super.onPreExecute();
     }  
   
@@ -100,24 +94,24 @@ public class GoogleMapRouteTask extends
             Toast.makeText(gmap.activity, "No route found.", Toast.LENGTH_LONG).show();
         }  
         else{
-        	removePreviousRoute();
+        	//removePreviousRoute();
             PolylineOptions lineOptions = new PolylineOptions();  
             lineOptions.addAll(routes);  
             lineOptions.width(10);
             lineOptions.color(Color.BLUE);
-            preRoute = gmap.map.addPolyline(lineOptions);
+            preRoutes.add(gmap.map.addPolyline(lineOptions)) ;
             //定位到第0点经纬度  
-            gmap.map.animateCamera(CameraUpdateFactory.newLatLng(routes.get(0)));
+            //gmap.map.animateCamera(CameraUpdateFactory.newLatLng(routes.get(0)));
         }
     }
-    
-    public static void removePreviousRoute() {
-		if(preRoute!=null){
-			preRoute.remove();
-			Log.i(TAG, "preRoute removed");
-		}
-	}
 
+    public static void removePreviousRoute() {
+    	if(preRoutes!=null){
+	    	for(Polyline pl:preRoutes){
+	    		pl.remove();
+	    	}
+    	}
+	}
 	/** 
      * 解析返回xml中overview_polyline的路线编码 
      *  
@@ -152,5 +146,65 @@ public class GoogleMapRouteTask extends
         }  
         return poly;  
     }  
-  
+    /** 
+     * 组合成googlemap direction所需要的url
+     *  
+     * @param origin 
+     * @param dest 
+     * @return url 
+     */  
+    public static String getDirectionsUrl(LatLng origin, LatLng dest) {
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;  
+        // Sensor enabled
+        String sensor = "sensor=false";
+        // Travelling Mode  
+        String mode = "mode=driving";
+        // String waypointLatLng = "waypoints="+"40.036675"+","+"116.32885";
+        // 如果使用途径点，需要添加此字段
+        // String waypoints = "waypoints=";
+        String parameters = null;  
+        // Building the parameters to the web service
+        parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode;  
+        // parameters = str_origin + "&" + str_dest + "&" + sensor + "&"  
+        // + mode+"&"+waypoints;
+        // String output = "json";
+        String output = "xml";
+        // Building the url to the web service  
+        String url = "https://maps.googleapis.com/maps/api/directions/"  
+                + output + "?" + parameters;
+        Log.i(TAG,"getDerectionsURL--->: " + url);  
+        return url;  
+    }
+    
+    /** 
+     * 组合成googlemap direction所需要的url
+     *  
+     * @param origin 
+     * @param dest 
+     * @return url 
+     */
+    public static String getDirectionsUrl(LatLng origin, List<LatLng> waypointLatLng, LatLng dest) {
+        String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;  
+        // Sensor enabled
+        String sensor = "sensor=false";
+        // Travelling Mode  
+        String mode = "mode=driving";
+        // 如果使用途径点，需要添加此字段
+        String waypointsURL = "waypoints=";
+        for(LatLng ll : waypointLatLng){
+        	waypointsURL+= ll.latitude+","+ll.longitude + "%7C";
+        }
+        // Building the parameters to the web service
+        //parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode;  
+        String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode+"&"+waypointsURL;
+        // String output = "json";
+        String output = "xml";
+        // Building the url to the web service  
+        String url = "https://maps.googleapis.com/maps/api/directions/"  
+                + output + "?" + parameters;
+        Log.i(TAG,"getDerectionsURL--->: " + url);  
+        return url;  
+    }
 }
