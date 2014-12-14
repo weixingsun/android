@@ -4,6 +4,12 @@
     android:layout_height="match_parent"
     tools:context="${relativePackage}.${activityClass}" >
 
+    <!-- <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" > -->
+    
     <fragment
         android:id="@+id/map"
         android:layout_width="match_parent"
@@ -30,5 +36,17 @@
         android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/map"
         android:text="@string/navigateBtn" />
+
+	<!-- </FrameLayout> -->
+
+    <ListView
+        android:id="@+id/listSuggestion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/inputAddress"
+        android:layout_toLeftOf="@+id/navigateBtn" >
+
+    </ListView>
 
 </RelativeLayout>

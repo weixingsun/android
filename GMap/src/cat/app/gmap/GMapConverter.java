@@ -1,6 +1,7 @@
 package cat.app.gmap;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -9,15 +10,24 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
+import android.util.Log;
+
 public class GMapConverter {
+	private static final String TAG = "GMap.GMapConverter";
+
 	// 根据地址获取对应的经纬度
 	public static double[] getLocationInfo(String address) {
+    	Log.i(TAG, "find location by name: "+address);
 		// 定义一个HttpClient，用于向指定地址发送请求
 		HttpClient client = new DefaultHttpClient();
 		// 向指定地址发送GET请求
-		HttpGet httpGet = new HttpGet("http://maps.google."
-				+ "com/maps/api/geocode/json?address=" + address
-				+ "ka&sensor=false");
+		String parsedValue=null;
+		try {
+			parsedValue = java.net.URLEncoder.encode(address, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+		}
+		HttpGet httpGet = new HttpGet("http://maps.google.com/maps/api/geocode/json?"
+				+ "address=" + parsedValue + "&sensor=false");
 		StringBuilder sb = new StringBuilder();
 		try {
 			// 获取服务器的响应
@@ -44,6 +54,7 @@ public class GMapConverter {
 			return new double[] { longitude, latitude };
 		} catch (Exception e) {
 			e.printStackTrace();
+			Log.e(TAG, "exception="+e.getMessage());
 		}
 		return null;
 	}

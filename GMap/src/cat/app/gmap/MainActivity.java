@@ -1,21 +1,22 @@
 package cat.app.gmap;
 
-import com.google.android.gms.maps.*;
-import com.google.android.gms.maps.model.*;
-import com.google.android.maps.GeoPoint;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
 
-import android.annotation.SuppressLint;
 import android.graphics.Color;
-import android.location.Location;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 public class MainActivity extends android.app.Activity {
@@ -24,7 +25,7 @@ public class MainActivity extends android.app.Activity {
 	GMap gMap = new GMap();
 	Button NaviBtn;
 	EditText inputAddress;
-	//Location loc;
+	ListView listSuggestion;
 	
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,25 +36,53 @@ public class MainActivity extends android.app.Activity {
         showUI();
     }
     private void showUI(){
-    	setButtons();
     	setText();
+    	setButtons();
+    	setList();
     }
+	private void setList() {
+		this.listSuggestion = (ListView) findViewById(R.id.listSuggestion);
+		
+		this.listSuggestion.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				SuggestPoint sp = gMap.points.get(position);
+				gMap.addMarker(sp);
+				listSuggestion.setVisibility(View.INVISIBLE);
+				gMap.move(sp.getLocation());
+				
+			}});
+	}
 	private void setText() {
 		this.inputAddress = (EditText) findViewById(R.id.inputAddress);
 		inputAddress.setTextColor(Color.BLACK);
+		inputAddress.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				if(inputAddress.getText().toString().length()>10){
+					//GoogleMapConverterTask task = new GoogleMapConverterTask(gMap,inputAddress.getText().toString());
+		            //task.execute();
+				}
+			}
+			@Override
+			public void afterTextChanged(Editable s) {}
+    });
 	}
 	private void setButtons() {
 		//addBtn = (Button) findViewById(R.id.btnAdd);
 		NaviBtn = (Button) findViewById(R.id.navigateBtn);
-	    NaviBtn.setOnClickListener(new OnClickListener() {
-	        @Override
-	        public void onClick(View v) {
-	        	/*if(gMap.loc!=null || gMap.markers.size()>0){
-		        	gMap.refreshRoute();
-	        	}*/
-	        	
-	        }
-	    });
+	    
+	    NaviBtn.setOnClickListener(new OnClickListener() {         
+            public void onClick(View v) {
+                //Toast.makeText(MainActivity.this, "button clicked", Toast.LENGTH_LONG).show();
+                GoogleMapConverterTask task = new GoogleMapConverterTask(gMap,inputAddress.getText().toString());
+	            task.execute();
+	            listSuggestion.setVisibility(View.VISIBLE);
+            }
+        });
 	}
 	
 	

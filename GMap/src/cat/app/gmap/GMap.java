@@ -34,14 +34,16 @@ public class GMap implements OnMapLongClickListener,OnMyLocationChangeListener {
     //GooglePlayServicesClient.OnConnectionFailedListener
 	private static final String TAG = "GMap";
 	GoogleMap map;
-	Activity activity;
+	MainActivity activity;
 	Location loc;
 	public Map<String,Marker> markers=new TreeMap<String,Marker>();
 	//public Map<String,LatLng> markerLatLngs=new HashMap<String,LatLng>();
 	public int markerSeq = 0;
 	public String lastMarkerId;
+	List<SuggestPoint> points = new ArrayList<SuggestPoint>();
+	
 	@SuppressLint("NewApi") 
-	public void init(Activity activity){
+	public void init(MainActivity activity){
 		this.activity= activity;
 		map = ((MapFragment) activity.getFragmentManager().findFragmentById(R.id.map)).getMap();
 		map.getUiSettings().setCompassEnabled(true);
@@ -63,19 +65,18 @@ public class GMap implements OnMapLongClickListener,OnMyLocationChangeListener {
 	}
 
 	public void refreshRoute(LatLng currentLoc){
-		Toast.makeText(activity, "draw lines", Toast.LENGTH_LONG).show(); 
+		//Toast.makeText(activity, "draw lines", Toast.LENGTH_LONG).show(); 
+		GoogleMapRouteTask.removePreviousRoute();
 		if(markers.size()>0){
-			GoogleMapRouteTask.removePreviousRoute();
             //LatLng end = markers.get(lastMarkerId).getPosition();
 			LatLng start = currentLoc;
     		for(LatLng dest:getWaypoints()){
-	            String url = GoogleMapRouteTask.getDirectionsUrl(start,dest);
-	            GoogleMapRouteTask task = new GoogleMapRouteTask(this,url);
+	            GoogleMapRouteTask task = new GoogleMapRouteTask(this,start,dest);
 	            task.execute();
 	            start=dest;
     		}
     	}else{
-    		Toast.makeText(activity, "Please select a target", Toast.LENGTH_LONG).show(); 
+    		Toast.makeText(activity, "Please select a target", Toast.LENGTH_LONG).show();
     	}
 	}
 
@@ -101,6 +102,20 @@ public class GMap implements OnMapLongClickListener,OnMyLocationChangeListener {
         //BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
     	refreshRoute();
     }
+	public void addMarker(SuggestPoint point){
+    	
+    	Marker marker = map.addMarker(new MarkerOptions()
+        .title(point.getMarkerTitle())
+        .snippet(point.getMarkerSnippet())
+        .position(point.getLocation()));
+    	markers.put(marker.getId(), marker);
+    	lastMarkerId = marker.getId();
+        //BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
+    	refreshRoute();
+    }
+	public void move(LatLng latlng){
+		map.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+}
     /*public void move(MarkerPoint point){
     	map.moveCamera(CameraUpdateFactory.newLatLngZoom(point.getLatlng(), 13));
     }
@@ -173,7 +188,7 @@ public class GMap implements OnMapLongClickListener,OnMyLocationChangeListener {
     		//if(!entry.getKey().equals(this.lastMarkerId))
     		ll.add(mk.getPosition());
     	}
-    	Log.i(TAG, "markers.size()="+markers.size()+", waypoints.size()="+ll.size());
+    	//Log.i(TAG, "markers.size()="+markers.size()+", waypoints.size()="+ll.size());
     	//Collections.reverse(ll);
 		return ll;
     }

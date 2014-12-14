@@ -41,15 +41,18 @@ public class GoogleMapRouteTask extends
     	this.gmap = gmap;
         this.url = url;  
     }
-    @Override  
+    public GoogleMapRouteTask(GMap gmap, LatLng start, LatLng dest) {
+    	this.gmap = gmap;
+        this.url = getDirectionsUrl(start,dest);
+	}
+	@Override  
     protected List<LatLng> doInBackground(String... params) {
   
         HttpGet get = new HttpGet(url);
         try {
             HttpResponse response = client.execute(get);  
             int statusecode = response.getStatusLine().getStatusCode();  
-            System.out.println("response:" + response + "      statuscode:"  
-                    + statusecode);  
+            //System.out.println("response:" + response + "      statuscode:"+ statusecode);  
             if (statusecode == 200) {
                 String responseString = EntityUtils.toString(response.getEntity());
                 int status = responseString.indexOf("<status>OK</status>");  
@@ -119,7 +122,7 @@ public class GoogleMapRouteTask extends
      * @return List<LatLng> 
      */  
     private List<LatLng> decodePoly(String encoded) {  
-        List<LatLng> poly = new ArrayList<LatLng>();  
+        List<LatLng> poly = new ArrayList<LatLng>();
         int index = 0, len = encoded.length();  
         int lat = 0, lng = 0;  
         while (index < len) {  
@@ -170,10 +173,10 @@ public class GoogleMapRouteTask extends
         // + mode+"&"+waypoints;
         // String output = "json";
         String output = "xml";
-        // Building the url to the web service  
-        String url = "https://maps.googleapis.com/maps/api/directions/"  
+        //String newIP = "http://173.194.72.31/maps/api/directions/"+output+"?"+parameters;
+        String url = "https://maps.googleapis.com/maps/api/directions/"
                 + output + "?" + parameters;
-        Log.i(TAG,"getDerectionsURL--->: " + url);  
+        //Log.i(TAG,"getDerectionsURL--->: " + url);
         return url;  
     }
     
@@ -184,7 +187,7 @@ public class GoogleMapRouteTask extends
      * @param dest 
      * @return url 
      */
-    public static String getDirectionsUrl(LatLng origin, List<LatLng> waypointLatLng, LatLng dest) {
+    /*public static String getDirectionsUrl(LatLng origin, List<LatLng> waypointLatLng, LatLng dest) {
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
         String str_dest = "destination=" + dest.latitude + "," + dest.longitude;  
         // Sensor enabled
@@ -206,5 +209,5 @@ public class GoogleMapRouteTask extends
                 + output + "?" + parameters;
         Log.i(TAG,"getDerectionsURL--->: " + url);  
         return url;  
-    }
+    }*/
 }
