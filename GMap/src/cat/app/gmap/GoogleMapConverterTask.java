@@ -1,7 +1,9 @@
 package cat.app.gmap;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,26 +47,28 @@ public class GoogleMapConverterTask extends
     private static final String TAG = "GMap.GoogleMapConverterTask";
 	HttpClient client;  
     String url;
-    
+    String address;
     GMap gmap;
     public GoogleMapConverterTask(GMap gmap,String address) {
+    	this.address=address;
     	this.gmap = gmap;
         this.url = getLocationURL(address);  
     }
     @Override  
     public List<SuggestPoint> doInBackground(String... params) {
     	gmap.points.clear();
+    	if(this.address.length()<2) return null;
     	StringBuilder sb = new StringBuilder();
         HttpGet get = new HttpGet(url);
         try {
             HttpResponse response = client.execute(get);
+            response.addHeader("Accept-Language", "zh-CN");
             HttpEntity entity = response.getEntity();
-			InputStream stream = entity.getContent();
-			int b;
-			// 循环读取服务器响应
-			while ((b = stream.read()) != -1) {
-				sb.append((char) b);
-			}
+            BufferedReader bf=new BufferedReader(new InputStreamReader((entity.getContent()),"UTF-8"));
+            String line = "";
+            while((line=bf.readLine())!=null){
+            	sb.append(line);
+            }
             int statusecode = response.getStatusLine().getStatusCode();
             //Log.i(TAG,"response:" + sb.toString());  
             if (statusecode == 200 ) {
@@ -95,7 +99,7 @@ public class GoogleMapConverterTask extends
     }  
   
     @Override  
-    protected void onPreExecute() {  
+    protected void onPreExecute() {
         client = new DefaultHttpClient();  
         client.getParams().setParameter(  
                 CoreConnectionPNames.CONNECTION_TIMEOUT, 15000);  
@@ -137,39 +141,6 @@ public class GoogleMapConverterTask extends
         item.put("name", name);
         return item;
       }
-	/** 
-     * 解析返回xml中overview_polyline的路线编码 
-     *  
-     * @param encoded 
-     * @return List<LatLng> 
-     */  
-    private List<LatLng> decodePoly(String encoded) {  
-        List<LatLng> poly = new ArrayList<LatLng>();  
-        int index = 0, len = encoded.length();  
-        int lat = 0, lng = 0;  
-        while (index < len) {  
-            int b, shift = 0, result = 0;  
-            do {  
-                b = encoded.charAt(index++) - 63;  
-                result |= (b & 0x1f) << shift;  
-                shift += 5;  
-            } while (b >= 0x20);  
-            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));  
-            lat += dlat;  
-            shift = 0;  
-            result = 0;  
-            do {  
-                b = encoded.charAt(index++) - 63;  
-                result |= (b & 0x1f) << shift;  
-                shift += 5;  
-            } while (b >= 0x20);  
-            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));  
-            lng += dlng;  
-            LatLng p = new LatLng((((double) lat / 1E5)),  (((double) lng / 1E5)));  
-            poly.add(p);  
-        }  
-        return poly;  
-    }  
     /** 
      * 组合成googlemap direction所需要的url
      *  
@@ -187,7 +158,7 @@ public class GoogleMapConverterTask extends
         String sensor = "sensor=false";
         String format = "json";
         // String format = "xml";
-        String url = "https://maps.googleapis.com/maps/api/geocode/"+format+"?address="+parsedValue;
+        String url = "https://maps.googleapis.com/maps/api/geocode/"+format+"?address="+parsedValue+"&sensor=false&Accept-Language:zh-CN";
         Log.i(TAG,"getLocationURL--->: " + url);
         return url;  
     }

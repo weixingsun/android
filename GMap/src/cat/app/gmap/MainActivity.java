@@ -1,18 +1,17 @@
 package cat.app.gmap;
 
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.MotionEvent;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -59,25 +58,38 @@ public class MainActivity extends android.app.Activity {
 	private void setText() {
 		this.inputAddress = (EditText) findViewById(R.id.inputAddress);
 		inputAddress.setTextColor(Color.BLACK);
-		inputAddress.addTextChangedListener(new TextWatcher() {
+		inputAddress.addTextChangedListener(new DelayedTextWatcher(2000) {
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				if(inputAddress.getText().toString().length()>10){
-					//GoogleMapConverterTask task = new GoogleMapConverterTask(gMap,inputAddress.getText().toString());
-		            //task.execute();
-				}
-			}
+			public void onTextChanged(CharSequence s, int start, int before, int count) {}
 			@Override
 			public void afterTextChanged(Editable s) {}
-    });
+			@Override
+			public void afterTextChangedDelayed(Editable s) {
+				if(inputAddress.getText().toString().length()>10){
+					GoogleMapConverterTask task = new GoogleMapConverterTask(gMap,inputAddress.getText().toString());
+		            task.execute();
+				}
+			}
+		});
+		inputAddress.setOnKeyListener(new OnKeyListener() {
+
+			@Override
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				if(keyCode == 66) { //Enter
+					GoogleMapConverterTask task = new GoogleMapConverterTask(gMap,inputAddress.getText().toString());
+		            task.execute();
+		            closeKeyBoard();
+				}
+				return false;
+			}});
 	}
 	private void setButtons() {
 		NaviBtn = (Button) findViewById(R.id.navigateBtn);
 	    NaviBtn.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if(inputAddress.getText().toString().trim().length()<2){
+                if(inputAddress.getText().toString().trim().length()<3){
                 	listSuggestion.setVisibility(View.INVISIBLE);
                 	Toast.makeText(MainActivity.this, "Please enter a longer name.", Toast.LENGTH_LONG).show();
                 }
@@ -87,6 +99,10 @@ public class MainActivity extends android.app.Activity {
             }
         });
 	}
-	
+	private void closeKeyBoard(){
+		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(inputAddress.getWindowToken(), 0);
+		//inputAddress.setInputType(InputType.TYPE_NULL);
+	}
 	
 }

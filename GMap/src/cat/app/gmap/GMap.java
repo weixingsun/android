@@ -12,9 +12,13 @@ import java.util.TreeMap;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.location.Location;
+import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationClient;
@@ -31,7 +35,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class GMap implements OnMapLongClickListener,OnMyLocationChangeListener {
+public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLocationChangeListener {
 	//GooglePlayServicesClient.ConnectionCallbacks,
     //GooglePlayServicesClient.OnConnectionFailedListener
 	private static final String TAG = "GMap";
@@ -49,7 +53,8 @@ public class GMap implements OnMapLongClickListener,OnMyLocationChangeListener {
 		this.activity= activity;
 		map = ((MapFragment) activity.getFragmentManager().findFragmentById(R.id.map)).getMap();
 		map.getUiSettings().setCompassEnabled(true);
-    	map.setMyLocationEnabled(true);
+		map.setMyLocationEnabled(true);
+    	map.getUiSettings().setMyLocationButtonEnabled(false);
     	map.setBuildingsEnabled(true);
     	map.setOnMapLongClickListener(this);
     	map.setOnMyLocationChangeListener(this);
@@ -70,9 +75,21 @@ public class GMap implements OnMapLongClickListener,OnMyLocationChangeListener {
             	activity.listSuggestion.setVisibility(View.INVISIBLE);
             }
         });
-        //map.setM
+        
 	}
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	    View mapView = super.onCreateView(inflater, container, savedInstanceState);
 
+	    // Get the button view 
+	    View locationButton = ((View) mapView.findViewById(1).getParent()).findViewById(2);
+	    RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
+	    // position on right bottom
+	    rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+	    rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
+	    rlp.setMargins(0, 0, 300, 300);
+		return mapView;
+	}
 	public void refreshRoute(LatLng currentLoc){
 		//Toast.makeText(activity, "draw lines", Toast.LENGTH_LONG).show(); 
 		GoogleMapRouteTask.removePreviousRoute();
