@@ -8,7 +8,8 @@ public class SuggestPoint {
 		return formatted_address.split(",")[0];
 	}
 	public String getMarkerSnippet() {
-		return formatted_address.split(",")[0];
+		
+		return formatted_address.split(",")[1];
 	}
 	public String getFormatted_address() {
 		return formatted_address;

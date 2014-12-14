@@ -77,7 +77,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
         });
         
 	}
-	@Override
+	/*@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 	    View mapView = super.onCreateView(inflater, container, savedInstanceState);
 
@@ -89,7 +89,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 	    rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
 	    rlp.setMargins(0, 0, 300, 300);
 		return mapView;
-	}
+	}*/
 	public void refreshRoute(LatLng currentLoc){
 		//Toast.makeText(activity, "draw lines", Toast.LENGTH_LONG).show(); 
 		GoogleMapRouteTask.removePreviousRoute();
@@ -117,16 +117,9 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 	}
 
 	public void addMarker(MarkerPoint point){
+		GoogleMapSearchByPositionTask task = new GoogleMapSearchByPositionTask(this, point.getLatlng());
+		task.execute();
     	
-    	Marker marker = map.addMarker(new MarkerOptions()
-        .title(point.getTitle())
-        .snippet(point.getComment())
-        .position(point.getLatlng()));
-    	
-    	markers.put(marker.getId(), marker);
-    	lastMarkerId = marker.getId();
-        //BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
-    	refreshRoute();
     }
 	public void addMarker(SuggestPoint point){
     	
@@ -176,6 +169,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
    	 	MarkerPoint mp = new MarkerPoint(""+markerSeq,"Point "+markerSeq, 
    	 			"Click to remove", arg0);
    	 	addMarker(mp);
+   	 	//To do: add real name into the pin point
 	}
     public void showMarkers(){
     	LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
@@ -210,11 +204,8 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
     	Iterator<Entry<String, Marker>> iter = markers.entrySet().iterator();
     	while(iter.hasNext()){
     		Entry<String,Marker> entry = iter.next();
-    		Marker mk = entry.getValue();
-    		//if(!entry.getKey().equals(this.lastMarkerId))
-    		ll.add(mk.getPosition());
+    		ll.add(entry.getValue().getPosition());
     	}
-    	//Log.i(TAG, "markers.size()="+markers.size()+", waypoints.size()="+ll.size());
     	//Collections.reverse(ll);
 		return ll;
     }

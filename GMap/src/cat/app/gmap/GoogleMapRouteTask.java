@@ -44,6 +44,7 @@ public class GoogleMapRouteTask extends
     public GoogleMapRouteTask(GMap gmap, LatLng start, LatLng dest) {
     	this.gmap = gmap;
         this.url = getDirectionsUrl(start,dest);
+        Log.i(TAG, "url="+url);
 	}
 	@Override  
     protected List<LatLng> doInBackground(String... params) {
@@ -52,12 +53,10 @@ public class GoogleMapRouteTask extends
         try {
             HttpResponse response = client.execute(get);  
             int statusecode = response.getStatusLine().getStatusCode();  
-            //System.out.println("response:" + response + "      statuscode:"+ statusecode);  
             if (statusecode == 200) {
                 String responseString = EntityUtils.toString(response.getEntity());
                 int status = responseString.indexOf("<status>OK</status>");  
-                System.out.println("status:" + status);  
-                if (-1 != status) {  
+                if (-1 != status) {
                     int pos = responseString.indexOf("<overview_polyline>");  
                     pos = responseString.indexOf("<points>", pos + 1);  
                     int pos2 = responseString.indexOf("</points>", pos);  
@@ -168,7 +167,7 @@ public class GoogleMapRouteTask extends
         // String waypoints = "waypoints=";
         String parameters = null;  
         // Building the parameters to the web service
-        parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode;  
+        parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode+"&"+"alternatives=true";  
         // parameters = str_origin + "&" + str_dest + "&" + sensor + "&"  
         // + mode+"&"+waypoints;
         // String output = "json";
