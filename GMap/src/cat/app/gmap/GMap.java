@@ -14,6 +14,7 @@ import android.app.Activity;
 import android.location.Location;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.location.LocationClient;
@@ -21,6 +22,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
+import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationChangeListener;
 import com.google.android.gms.maps.MapFragment;
@@ -43,7 +45,7 @@ public class GMap implements OnMapLongClickListener,OnMyLocationChangeListener {
 	List<SuggestPoint> points = new ArrayList<SuggestPoint>();
 	
 	@SuppressLint("NewApi") 
-	public void init(MainActivity activity){
+	public void init(final MainActivity activity){
 		this.activity= activity;
 		map = ((MapFragment) activity.getFragmentManager().findFragmentById(R.id.map)).getMap();
 		map.getUiSettings().setCompassEnabled(true);
@@ -62,6 +64,13 @@ public class GMap implements OnMapLongClickListener,OnMyLocationChangeListener {
 				refreshRoute();
 			}
         });
+        map.setOnMapClickListener(new OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng arg0) {
+            	activity.listSuggestion.setVisibility(View.INVISIBLE);
+            }
+        });
+        //map.setM
 	}
 
 	public void refreshRoute(LatLng currentLoc){
@@ -198,4 +207,5 @@ public class GMap implements OnMapLongClickListener,OnMyLocationChangeListener {
 		//move(start);
 		this.refreshRoute(start);
 	}
+	
 }

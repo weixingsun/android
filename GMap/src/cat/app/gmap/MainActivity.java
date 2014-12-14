@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -34,6 +35,7 @@ public class MainActivity extends android.app.Activity {
         setContentView(R.layout.main);
         gMap.init(this);
         showUI();
+        
     }
     private void showUI(){
     	setText();
@@ -72,12 +74,13 @@ public class MainActivity extends android.app.Activity {
     });
 	}
 	private void setButtons() {
-		//addBtn = (Button) findViewById(R.id.btnAdd);
 		NaviBtn = (Button) findViewById(R.id.navigateBtn);
-	    
-	    NaviBtn.setOnClickListener(new OnClickListener() {         
+	    NaviBtn.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                //Toast.makeText(MainActivity.this, "button clicked", Toast.LENGTH_LONG).show();
+                if(inputAddress.getText().toString().trim().length()<2){
+                	listSuggestion.setVisibility(View.INVISIBLE);
+                	Toast.makeText(MainActivity.this, "Please enter a longer name.", Toast.LENGTH_LONG).show();
+                }
                 GoogleMapConverterTask task = new GoogleMapConverterTask(gMap,inputAddress.getText().toString());
 	            task.execute();
 	            listSuggestion.setVisibility(View.VISIBLE);

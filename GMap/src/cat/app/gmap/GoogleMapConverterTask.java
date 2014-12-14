@@ -16,6 +16,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -67,13 +68,15 @@ public class GoogleMapConverterTask extends
             int statusecode = response.getStatusLine().getStatusCode();
             //Log.i(TAG,"response:" + sb.toString());  
             if (statusecode == 200 ) {
-            	JSONObject jsonObject = new JSONObject(sb.toString());
-            	JSONObject addressFull = jsonObject.getJSONArray("results").getJSONObject(0);
-            	JSONObject location = addressFull.getJSONObject("geometry").getJSONObject("location");
-            	String formatted_address = addressFull.getString("formatted_address");
-    			LatLng ll = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
-    			SuggestPoint sp = new SuggestPoint(ll,formatted_address);
-    			gmap.points.add(sp);
+            	JSONArray posArray = new JSONObject(sb.toString()).getJSONArray("results");
+            	for(int i=0;i<posArray.length()&&i<3;i++){
+	            	JSONObject addressFull = posArray.getJSONObject(i);
+	            	JSONObject location = addressFull.getJSONObject("geometry").getJSONObject("location");
+	            	String formatted_address = addressFull.getString("formatted_address");
+	    			LatLng ll = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
+	    			SuggestPoint sp = new SuggestPoint(ll,formatted_address);
+	    			gmap.points.add(sp);
+            	}
     			return gmap.points;
             } else {
             	Log.w(TAG,"doInBackground:statusecode="+statusecode);
