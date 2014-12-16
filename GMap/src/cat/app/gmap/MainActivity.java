@@ -22,7 +22,7 @@ public class MainActivity extends android.app.Activity {
 
 	protected static final String TAG = "GMap.MainActivity";
 	GMap gMap = new GMap();
-	Button NaviBtn;
+	//Button NaviBtn;
 	EditText inputAddress;
 	ListView listSuggestion;
 
@@ -56,32 +56,15 @@ public class MainActivity extends android.app.Activity {
 			}
 		});
 	}
-
 	private void setText() {
 		this.inputAddress = (EditText) findViewById(R.id.inputAddress);
 		inputAddress.setTextColor(Color.BLACK);
-		inputAddress.addTextChangedListener(new DelayedTextWatcher(2000) {
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-			}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-			}
-
-			@Override
-			public void afterTextChanged(Editable s) {
-			}
-
+		inputAddress.addTextChangedListener(new DelayedTextWatcher(1500) {
 			@Override
 			public void afterTextChangedDelayed(Editable s) {
-				// if(inputAddress.getText().toString().length()>2){
 				GoogleMapSearchByNameTask task = new GoogleMapSearchByNameTask(
 						gMap, inputAddress.getText().toString());
 				task.execute();
-				// }
 			}
 		});
 		inputAddress.setOnKeyListener(new OnKeyListener() {
@@ -97,29 +80,27 @@ public class MainActivity extends android.app.Activity {
 			}
 		});
 	}
-
 	private void setButtons() {
-		NaviBtn = (Button) findViewById(R.id.navigateBtn);
+		/*NaviBtn = (Button) findViewById(R.id.navigateBtn);
 		NaviBtn.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				if (inputAddress.getText().toString().trim().length() < 3) {
 					listSuggestion.setVisibility(View.INVISIBLE);
 					Toast.makeText(MainActivity.this,
-							"Please enter a longer name.", Toast.LENGTH_LONG)
-							.show();
+							"Need a longer name.", Toast.LENGTH_LONG).show();
 				}
 				GoogleMapSearchByNameTask task = new GoogleMapSearchByNameTask(
 						gMap, inputAddress.getText().toString());
 				task.execute();
 				listSuggestion.setVisibility(View.VISIBLE);
 			}
-		});
+		});*/
 	}
 
+	
 	private void closeKeyBoard() {
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(inputAddress.getWindowToken(), 0);
-		// inputAddress.setInputType(InputType.TYPE_NULL);
 	}
 
 }

@@ -54,7 +54,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 		map = ((MapFragment) activity.getFragmentManager().findFragmentById(R.id.map)).getMap();
 		map.getUiSettings().setCompassEnabled(true);
 		map.setMyLocationEnabled(true);
-    	map.getUiSettings().setMyLocationButtonEnabled(false);
+    	map.getUiSettings().setMyLocationButtonEnabled(true);
     	map.setBuildingsEnabled(true);
     	map.setOnMapLongClickListener(this);
     	map.setOnMyLocationChangeListener(this);

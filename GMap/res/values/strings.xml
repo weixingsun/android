@@ -3,6 +3,7 @@
 
     <string name="app_name">GMap</string>
     <string name="hello_world">Hello world!</string>
-    <string name="navigateBtn">Navigate</string>
+    <string name="navigate">Find</string>
+    <string name="settings">IIII</string>
 
 </resources>

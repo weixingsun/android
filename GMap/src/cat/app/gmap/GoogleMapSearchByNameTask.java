@@ -32,6 +32,7 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -70,13 +71,13 @@ public class GoogleMapSearchByNameTask extends
             	sb.append(line);
             }
             int statusecode = response.getStatusLine().getStatusCode();
-            //Log.i(TAG,"response:" + sb.toString());  
             if (statusecode == 200 ) {
             	JSONArray posArray = new JSONObject(sb.toString()).getJSONArray("results");
             	for(int i=0;i<posArray.length()&&i<3;i++){
 	            	JSONObject addressFull = posArray.getJSONObject(i);
 	            	JSONObject location = addressFull.getJSONObject("geometry").getJSONObject("location");
 	            	String formatted_address = addressFull.getString("formatted_address");
+	            	//Log.i(TAG,"formatted_address:" + formatted_address);
 	    			LatLng ll = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
 	    			SuggestPoint sp = new SuggestPoint(ll,formatted_address);
 	    			gmap.points.add(sp);
@@ -115,8 +116,6 @@ public class GoogleMapSearchByNameTask extends
             Toast.makeText(gmap.activity, "No route found.", Toast.LENGTH_LONG).show();
         }  
         else{
-        	//removePreviousRoute();
-    		//gmap.activity.inputAddress.setText(points.get(0).getFormatted_address());
     		fillList();
         }
     }
@@ -127,6 +126,7 @@ public class GoogleMapSearchByNameTask extends
         SimpleAdapter adapter = new SuggestListAdapter(gmap.activity, list,
             android.R.layout.simple_list_item_2, from, to);
         gmap.activity.listSuggestion.setAdapter(adapter);
+        gmap.activity.listSuggestion.setVisibility(View.VISIBLE);
     }
     private ArrayList<Map<String, String>> buildData() {
         ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
@@ -158,7 +158,7 @@ public class GoogleMapSearchByNameTask extends
         String sensor = "sensor=false";
         String format = "json";
         // String format = "xml";
-        String url = "https://maps.googleapis.com/maps/api/geocode/"+format+"?address="+parsedValue+"&sensor=false&Accept-Language:zh-CN";
+        String url = "https://maps.googleapis.com/maps/api/geocode/"+format+"?address="+parsedValue+"&sensor=false&Accept-Language:zh-CN";//&region=es
         Log.i(TAG,"getLocationURL--->: " + url);
         return url;  
     }

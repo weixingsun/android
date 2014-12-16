@@ -79,7 +79,7 @@ public class GoogleMapSearchByPositionTask extends
 	            	JSONObject addressFull = posArray.getJSONObject(0);
 	            	JSONObject location = addressFull.getJSONObject("geometry").getJSONObject("location");
 	            	String formatted_address = addressFull.getString("formatted_address");
-	            	this.position = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
+	            	//this.position = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
 	            	this.foundPoint = new SuggestPoint(this.position,formatted_address);
 	    			//gmap.points.add(sp);
             	//}

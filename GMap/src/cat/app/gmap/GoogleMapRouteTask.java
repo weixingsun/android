@@ -11,6 +11,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -35,7 +38,7 @@ public class GoogleMapRouteTask extends
 	HttpClient client;  
     String url;  
     static List<Polyline> preRoutes = new ArrayList<Polyline>();
-    List<LatLng> routes = null;  
+    List<LatLng> route = null;
     GMap gmap;
     public GoogleMapRouteTask(GMap gmap,String url) {  
     	this.gmap = gmap;
@@ -43,7 +46,7 @@ public class GoogleMapRouteTask extends
     }
     public GoogleMapRouteTask(GMap gmap, LatLng start, LatLng dest) {
     	this.gmap = gmap;
-        this.url = getDirectionsUrl(start,dest);
+        this.url = getDirectionsUrl(start,dest,"json");
         Log.i(TAG, "url="+url);
 	}
 	@Override  
@@ -55,28 +58,29 @@ public class GoogleMapRouteTask extends
             int statusecode = response.getStatusLine().getStatusCode();  
             if (statusecode == 200) {
                 String responseString = EntityUtils.toString(response.getEntity());
-                int status = responseString.indexOf("<status>OK</status>");  
-                if (-1 != status) {
-                    int pos = responseString.indexOf("<overview_polyline>");  
-                    pos = responseString.indexOf("<points>", pos + 1);  
-                    int pos2 = responseString.indexOf("</points>", pos);  
-                    responseString = responseString.substring(pos + 8, pos2);  
-                    routes = decodePoly(responseString);  
-                } else {  
-                    // 错误代码，  
-                    return null;  
+                JSONObject object = new JSONObject(responseString);
+                if (object.getString("status").equals("OK")) {
+                	JSONArray routesArray = new JSONObject(responseString).getJSONArray("routes");
+                	JSONObject route1 = routesArray.getJSONObject(0);
+	            	JSONObject overview_polyline = route1.getJSONObject("overview_polyline");
+	            	String points = overview_polyline.getString("points");
+	            	//Log.i(TAG, "points="+points);
+                    route = decodePolyXML(points);
+                } else {
+                    return null;
                 }
             } else {
-                // 请求失败  
                 return null;  
             }
         } catch (ClientProtocolException e) {  
             Log.i(TAG, "ClientProtocolException:"+e.getMessage());
         } catch (IOException e) {  
         	Log.i(TAG, "IOException:"+e.getMessage());
-        }  
+        } catch (JSONException e) {
+        	Log.i(TAG, "JSONException:"+e.getMessage());
+		}  
         //Log.i(TAG,"doInBackground:"+routes);
-        return routes;  
+        return route;  
     }  
   
     @Override  
@@ -89,20 +93,19 @@ public class GoogleMapRouteTask extends
     }  
   
     @Override  
-    protected void onPostExecute(List<LatLng> routes) {  
-        super.onPostExecute(routes);  
-        if (routes == null) {  
+    protected void onPostExecute(List<LatLng> route) {  
+        super.onPostExecute(route);  
+        if (route == null) {  
             //failed to navigate
             Toast.makeText(gmap.activity, "No route found.", Toast.LENGTH_LONG).show();
         }  
         else{
         	//removePreviousRoute();
-            PolylineOptions lineOptions = new PolylineOptions();  
-            lineOptions.addAll(routes);  
+            PolylineOptions lineOptions = new PolylineOptions();
+            lineOptions.addAll(route);
             lineOptions.width(10);
             lineOptions.color(Color.BLUE);
-            preRoutes.add(gmap.map.addPolyline(lineOptions)) ;
-            //定位到第0点经纬度  
+            preRoutes.add(gmap.map.addPolyline(lineOptions));
             //gmap.map.animateCamera(CameraUpdateFactory.newLatLng(routes.get(0)));
         }
     }
@@ -120,30 +123,29 @@ public class GoogleMapRouteTask extends
      * @param encoded 
      * @return List<LatLng> 
      */  
-    private List<LatLng> decodePoly(String encoded) {  
+    private List<LatLng> decodePolyXML(String encoded) {
         List<LatLng> poly = new ArrayList<LatLng>();
-        int index = 0, len = encoded.length();  
-        int lat = 0, lng = 0;  
-        while (index < len) {  
-            int b, shift = 0, result = 0;  
-            do {  
-                b = encoded.charAt(index++) - 63;  
+        int index = 0, len = encoded.length();
+        int lat = 0, lng = 0;
+        while (index < len) {
+            int b, shift = 0, result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
                 result |= (b & 0x1f) << shift;  
                 shift += 5;  
             } while (b >= 0x20);  
-            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));  
-            lat += dlat;  
-            shift = 0;  
-            result = 0;  
-            do {  
-                b = encoded.charAt(index++) - 63;  
-                result |= (b & 0x1f) << shift;  
-                shift += 5;  
-            } while (b >= 0x20);  
-            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));  
-            lng += dlng;  
-            LatLng p = new LatLng((((double) lat / 1E5)),  
-                    (((double) lng / 1E5)));  
+            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+            LatLng p = new LatLng((((double) lat / 1E5)),(((double) lng / 1E5)));
             poly.add(p);  
         }  
         return poly;  
@@ -155,28 +157,26 @@ public class GoogleMapRouteTask extends
      * @param dest 
      * @return url 
      */  
-    public static String getDirectionsUrl(LatLng origin, LatLng dest) {
+    public static String getDirectionsUrl(LatLng origin, LatLng dest, String format) {
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
         String str_dest = "destination=" + dest.latitude + "," + dest.longitude;  
         // Sensor enabled
         String sensor = "sensor=false";
         // Travelling Mode  
         String mode = "mode=driving";
-        // String waypointLatLng = "waypoints="+"40.036675"+","+"116.32885";
-        // 如果使用途径点，需要添加此字段
-        // String waypoints = "waypoints=";
+        // String waypointLatLng = "waypoints="+"40.036675"+","+"116.32885"; // 如果使用途径点，需要添加此字段
         String parameters = null;  
         // Building the parameters to the web service
-        parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode+"&"+"alternatives=true";  
-        // parameters = str_origin + "&" + str_dest + "&" + sensor + "&"  
-        // + mode+"&"+waypoints;
-        // String output = "json";
-        String output = "xml";
-        //String newIP = "http://173.194.72.31/maps/api/directions/"+output+"?"+parameters;
-        String url = "https://maps.googleapis.com/maps/api/directions/"
-                + output + "?" + parameters;
+        parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode; //+"&alternatives=true";
+        // String format = "json"; "xml";
+        String url = "https://maps.googleapis.com/maps/api/directions/"+ format + "?" + parameters;
         //Log.i(TAG,"getDerectionsURL--->: " + url);
         return url;  
+    }
+    private boolean isLocationOnEdge(){
+    	
+		return false;
+    	
     }
     
     /** 
