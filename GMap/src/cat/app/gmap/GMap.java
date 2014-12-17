@@ -25,6 +25,8 @@ import android.widget.Toast;
 
 import cat.app.gmap.model.MarkerPoint;
 import cat.app.gmap.model.SuggestPoint;
+import cat.app.gmap.task.GoogleMapRouteTask;
+import cat.app.gmap.task.GoogleMapSearchByPositionTask;
 
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
@@ -45,14 +47,14 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 	//GooglePlayServicesClient.ConnectionCallbacks,
     //GooglePlayServicesClient.OnConnectionFailedListener
 	private static final String TAG = "GMap";
-	GoogleMap map;
-	MainActivity activity;
-	Location loc;
+	public GoogleMap map;
+	public MainActivity activity;
+	public Location loc;
 	public Map<String,Marker> markers=new TreeMap<String,Marker>();
 	//public Map<String,LatLng> markerLatLngs=new HashMap<String,LatLng>();
 	public int markerSeq = 0;
 	public String lastMarkerId;
-	List<SuggestPoint> points = new ArrayList<SuggestPoint>();
+	public List<SuggestPoint> points = new ArrayList<SuggestPoint>();
 	
 	@SuppressLint("NewApi") 
 	public void init(final MainActivity activity){

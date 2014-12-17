@@ -3,6 +3,7 @@ package cat.app.gmap;
 import cat.app.gmap.adapter.SubNavDrawerListAdapter;
 import cat.app.gmap.listener.DrawerItemClickListener;
 import cat.app.gmap.model.SuggestPoint;
+import cat.app.gmap.task.GoogleMapSearchByNameTask;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -26,9 +27,9 @@ import android.widget.Toast;
 public class MainActivity extends FragmentActivity {
 
 	protected static final String TAG = "GMap.MainActivity";
-	GMap gMap = new GMap();
-	EditText inputAddress;
-	ListView listSuggestion;
+	public GMap gMap = new GMap();
+	public EditText inputAddress;
+	public ListView listSuggestion;
     private String[] mPlanetTitles;
     private DrawerLayout mDrawerLayout;
     public ListView mDrawerListParent;

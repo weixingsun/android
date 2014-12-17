@@ -1,4 +1,4 @@
-package cat.app.gmap;
+package cat.app.gmap.task;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,6 +22,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import cat.app.gmap.GMap;
 import cat.app.gmap.model.SuggestPoint;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
