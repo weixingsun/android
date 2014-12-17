@@ -11,6 +11,8 @@ import java.util.TreeMap;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,6 +23,9 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import cat.app.gmap.model.MarkerPoint;
+import cat.app.gmap.model.SuggestPoint;
+
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,6 +35,7 @@ import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationChangeListener;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -51,7 +57,10 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 	@SuppressLint("NewApi") 
 	public void init(final MainActivity activity){
 		this.activity= activity;
-		map = ((MapFragment) activity.getFragmentManager().findFragmentById(R.id.map)).getMap();
+		FragmentManager myFM = activity.getFragmentManager();
+		final MapFragment fragment = (MapFragment) myFM.findFragmentById(R.id.map);
+		//MapFragment fragment = (MapFragment) activity.getFragmentManager().findFragmentById(R.id.map);
+		map = fragment.getMap();
 		map.getUiSettings().setCompassEnabled(true);
 		map.setMyLocationEnabled(true);
     	map.getUiSettings().setMyLocationButtonEnabled(true);

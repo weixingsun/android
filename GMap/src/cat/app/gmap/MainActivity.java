@@ -1,8 +1,13 @@
 package cat.app.gmap;
 
+import cat.app.gmap.adapter.SubNavDrawerListAdapter;
+import cat.app.gmap.listener.DrawerItemClickListener;
+import cat.app.gmap.model.SuggestPoint;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -13,18 +18,21 @@ import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class MainActivity extends android.app.Activity {
+public class MainActivity extends FragmentActivity {
 
 	protected static final String TAG = "GMap.MainActivity";
 	GMap gMap = new GMap();
-	//Button NaviBtn;
 	EditText inputAddress;
 	ListView listSuggestion;
+    private String[] mPlanetTitles;
+    private DrawerLayout mDrawerLayout;
+    public ListView mDrawerListParent;
+    public ListView mDrawerListChild;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -34,13 +42,24 @@ public class MainActivity extends android.app.Activity {
 		setContentView(R.layout.main);
 		gMap.init(this);
 		showUI();
-
 	}
 
 	private void showUI() {
 		setText();
 		setButtons();
 		setList();
+		setDrawer();
+	}
+
+private void setDrawer() {
+		mPlanetTitles = getResources().getStringArray(R.array.nav_drawer_items);
+		//mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		mDrawerListChild = (ListView) findViewById(R.id.left_drawer_child);
+		mDrawerListParent = (ListView) findViewById(R.id.left_drawer_parent);
+		mDrawerListParent.setAdapter(new ArrayAdapter<String>(this,R.layout.drawer_list_item, mPlanetTitles));
+		ArrayAdapter<String> childAdapter = new ArrayAdapter<String>(this,R.layout.drawer_list_item, mPlanetTitles);
+		mDrawerListChild.setAdapter(childAdapter);
+		mDrawerListParent.setOnItemClickListener(new DrawerItemClickListener(this,childAdapter));
 	}
 
 	private void setList() {
@@ -56,6 +75,7 @@ public class MainActivity extends android.app.Activity {
 			}
 		});
 	}
+	
 	private void setText() {
 		this.inputAddress = (EditText) findViewById(R.id.inputAddress);
 		inputAddress.setTextColor(Color.BLACK);
@@ -80,27 +100,13 @@ public class MainActivity extends android.app.Activity {
 			}
 		});
 	}
-	private void setButtons() {
-		/*NaviBtn = (Button) findViewById(R.id.navigateBtn);
-		NaviBtn.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				if (inputAddress.getText().toString().trim().length() < 3) {
-					listSuggestion.setVisibility(View.INVISIBLE);
-					Toast.makeText(MainActivity.this,
-							"Need a longer name.", Toast.LENGTH_LONG).show();
-				}
-				GoogleMapSearchByNameTask task = new GoogleMapSearchByNameTask(
-						gMap, inputAddress.getText().toString());
-				task.execute();
-				listSuggestion.setVisibility(View.VISIBLE);
-			}
-		});*/
-	}
 
-	
+	private void setButtons() {
+	}
 	private void closeKeyBoard() {
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(inputAddress.getWindowToken(), 0);
 	}
-
+	
+	
 }
