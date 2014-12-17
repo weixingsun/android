@@ -41,8 +41,8 @@ public class MenuItemClickListener implements OnItemClickListener {
 
 	private void selectItem(View view, int position) {
 		//Log.i(TAG, "view.Class="+view.getClass()+",Parent.Class="+view.getParent().getClass());
-		TextView tv = (TextView)view;
-		Log.i(TAG, "DrawerItem.Click="+position+", text"+tv.getText().toString());
+		//Log.i(TAG, "DrawerItem.Click="+position+", text"+tv.getText().toString());
+		//TextView tv = (TextView)view;
 		changeSubMenu(subMenus[position]);
 		//childAdapter.notifyDataSetChanged();
 		//ListView lv = (ListView)view.getParent();

@@ -14,8 +14,7 @@
     <string-array name="menu_items">
         <item >Navigation Settings</item>
         <item >Map Settings</item>
-        <!--<item >Server Settings</item>-->
-        <item >Find Police</item>
+        <item >Report Data</item>
         <item >What\'s Hot</item>
     </string-array>
      
@@ -34,7 +33,9 @@
     
     <string-array name="find_police_items">
         <item >Police Car</item>
-        <item >Camera</item>
+        <item >Monitor Camera</item>
+        <item >Closed Road</item>
+        <item >Medical Emergency</item>
     </string-array>
     
     <string-array name="whats_hot_items">
