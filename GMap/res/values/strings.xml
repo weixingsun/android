@@ -10,15 +10,37 @@
     <string name="drawer_open">Slider Menu Opened</string>
     <string name="drawer_close">Slider Menu Closed</string>
      
-    <!-- Nav Drawer Menu Items -->
-    <string-array name="nav_drawer_items">
+    <!-- Main Nav Drawer Menu Items -->
+    <string-array name="menu_items">
         <item >Navigation Settings</item>
         <item >Map Settings</item>
-        <item >Server Settings</item>
+        <!--<item >Server Settings</item>-->
         <item >Find Police</item>
         <item >What\'s Hot</item>
     </string-array>
      
+    <string-array name="nav_type_items">
+        <item >Driving</item>
+        <item >Walking</item>
+        <item >Biking</item>
+        <item >Bus</item>
+    </string-array>
+    
+    <string-array name="map_type_items">
+        <item >Satellite</item>
+        <item >Terrain</item>
+        <item >Traffic</item>
+    </string-array>
+    
+    <string-array name="find_police_items">
+        <item >Police Car</item>
+        <item >Camera</item>
+    </string-array>
+    
+    <string-array name="whats_hot_items">
+        <item >Activity</item>
+        <item >Sale</item>
+    </string-array>
     <!-- Nav Drawer List Item Icons -->
     <!-- Keep them in order as the titles are in -->
     <array name="nav_drawer_icons">

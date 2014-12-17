@@ -1,7 +1,7 @@
 package cat.app.gmap;
 
 import cat.app.gmap.adapter.SubNavDrawerListAdapter;
-import cat.app.gmap.listener.DrawerItemClickListener;
+import cat.app.gmap.listener.MenuItemClickListener;
 import cat.app.gmap.model.SuggestPoint;
 import cat.app.gmap.task.GoogleMapSearchByNameTask;
 import android.content.Context;
@@ -30,10 +30,12 @@ public class MainActivity extends FragmentActivity {
 	public GMap gMap = new GMap();
 	public EditText inputAddress;
 	public ListView listSuggestion;
-    private String[] mPlanetTitles;
+    
     private DrawerLayout mDrawerLayout;
     public ListView mDrawerListParent;
     public ListView mDrawerListChild;
+    private String[] mMainSettings;
+    private String[] mSubSettings;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,14 +55,11 @@ public class MainActivity extends FragmentActivity {
 	}
 
 private void setDrawer() {
-		mPlanetTitles = getResources().getStringArray(R.array.nav_drawer_items);
-		//mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-		mDrawerListChild = (ListView) findViewById(R.id.left_drawer_child);
+		mMainSettings = getResources().getStringArray(R.array.menu_items);
 		mDrawerListParent = (ListView) findViewById(R.id.left_drawer_parent);
-		mDrawerListParent.setAdapter(new ArrayAdapter<String>(this,R.layout.drawer_list_item, mPlanetTitles));
-		ArrayAdapter<String> childAdapter = new ArrayAdapter<String>(this,R.layout.drawer_list_item, mPlanetTitles);
-		mDrawerListChild.setAdapter(childAdapter);
-		mDrawerListParent.setOnItemClickListener(new DrawerItemClickListener(this,childAdapter));
+		mDrawerListParent.setAdapter(new ArrayAdapter<String>(this,R.layout.drawer_list_item, mMainSettings));
+		mDrawerListParent.setOnItemClickListener(new MenuItemClickListener(this));
+		
 	}
 
 	private void setList() {
@@ -108,6 +107,5 @@ private void setDrawer() {
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(inputAddress.getWindowToken(), 0);
 	}
-	
 	
 }

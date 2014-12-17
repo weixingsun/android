@@ -116,7 +116,7 @@
 	                android:id="@+id/left_drawer_child"
 	                android:layout_width="match_parent"
 	                android:layout_height="match_parent"
-	                android:background="#000000"
+	                android:background="#cccccc"
 	                android:choiceMode="singleChoice" >
 	            </ListView>
 	        </LinearLayout>
