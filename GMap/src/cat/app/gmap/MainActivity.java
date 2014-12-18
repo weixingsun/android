@@ -1,8 +1,5 @@
 package cat.app.gmap;
 
-import java.util.HashMap;
-
-import cat.app.gmap.adapter.SubNavDrawerListAdapter;
 import cat.app.gmap.listener.MenuItemClickListener;
 import cat.app.gmap.model.SuggestPoint;
 import cat.app.gmap.task.GoogleMapSearchByNameTask;
@@ -13,9 +10,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
@@ -23,22 +20,21 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 //http://servicedata.net76.net/select.php
 public class MainActivity extends FragmentActivity {
 
-	protected static final String TAG = "GMap.MainActivity";
+	private static final String TAG = "GMap.MainActivity";
 	public GMap gMap = new GMap();
 	public EditText inputAddress;
 	public ListView listSuggestion;
     
-    private DrawerLayout mDrawerLayout;
-    public ListView mDrawerListParent;
-    public ListView mDrawerListChild;
+	private ListView mDrawerListParent;
     private String[] mMainSettings;
-    private String[] mSubSettings;
+    private DrawerLayout mDrawerLayout;
+    //private ActionBarDrawerToggle mDrawerToggle;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -57,12 +53,23 @@ public class MainActivity extends FragmentActivity {
 		setDrawer();
 	}
 
-private void setDrawer() {
+	private void setDrawer() {
 		mMainSettings = getResources().getStringArray(R.array.menu_items);
 		mDrawerListParent = (ListView) findViewById(R.id.left_drawer_parent);
 		mDrawerListParent.setAdapter(new ArrayAdapter<String>(this,R.layout.drawer_list_item, mMainSettings));
 		mDrawerListParent.setOnItemClickListener(new MenuItemClickListener(this));
+		mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
 		
+		mDrawerLayout.closeDrawers();
+		ImageView iv = (ImageView) findViewById(R.id.settingsIcon);
+		iv.setOnClickListener(new View.OnClickListener() {
+		    @Override
+		    public void onClick(View v) {
+		        //Toast.makeText(MainActivity.this,"drawer is opening",Toast.LENGTH_LONG).show();
+		    	Log.i(TAG, "drawer is opening");
+				mDrawerLayout.openDrawer(Gravity.LEFT);
+		    }
+		});
 	}
 
 	private void setList() {
@@ -110,4 +117,5 @@ private void setDrawer() {
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(inputAddress.getWindowToken(), 0);
 	}
+	
 }

@@ -65,10 +65,12 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 		final MapFragment fragment = (MapFragment) myFM.findFragmentById(R.id.map);
 		//MapFragment fragment = (MapFragment) activity.getFragmentManager().findFragmentById(R.id.map);
 		map = fragment.getMap();
-		map.getUiSettings().setCompassEnabled(true);
+		map.getUiSettings().setCompassEnabled(false);
+		map.getUiSettings().setRotateGesturesEnabled(false);
 		map.setMyLocationEnabled(true);
     	map.getUiSettings().setMyLocationButtonEnabled(true);
     	map.setBuildingsEnabled(true);
+    	map.setIndoorEnabled(true);
     	map.setOnMapLongClickListener(this);
     	map.setOnMyLocationChangeListener(this);
         map.setOnInfoWindowClickListener(new OnInfoWindowClickListener(){
@@ -163,21 +165,6 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
     public float getZoomLevel(){
     	return map.getCameraPosition().zoom;
     }
-    /**
-		There are 5 types of map
-		Normal：典型的地圖。
-		Hybrid：混合衛星照片及道路地圖。
-		Satellite：衛星照片。
-		Terrain：地形圖。
-     */
-    private void changeMapType(){
-    	if(map.getMapType()==GoogleMap.MAP_TYPE_NORMAL){
-    		map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-    	}else if(map.getMapType()==GoogleMap.MAP_TYPE_SATELLITE){
-    		map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-    	}
-    }
-
 
 	@Override
 	public void onMapLongClick(LatLng arg0) {
