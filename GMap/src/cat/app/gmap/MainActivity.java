@@ -34,7 +34,6 @@ public class MainActivity extends FragmentActivity {
 	private ListView mDrawerListParent;
     private String[] mMainSettings;
     private DrawerLayout mDrawerLayout;
-    //private ActionBarDrawerToggle mDrawerToggle;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

@@ -119,20 +119,11 @@ public class GoogleMapSearchByPositionTask extends
             //failed to navigate
             Toast.makeText(gmap.activity, "No location found.", Toast.LENGTH_LONG).show();
         } else{
-        	Marker marker = gmap.map.addMarker(new MarkerOptions()
-            .title(foundPoint.getMarkerTitle())
-            .snippet(foundPoint.getMarkerSnippet())
-            .position(foundPoint.getLocation()));
-        	
-        	gmap.markers.put(marker.getId(), marker);
-        	gmap.lastMarkerId = marker.getId();
-            //BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
-        	gmap.refreshRoute();
+        	gmap.addMarker(foundPoint);
         }
     }
     /** 
      * 组合成googlemap direction所需要的url
-     *  
      * @param origin 
      * @param dest 
      * @return url 
