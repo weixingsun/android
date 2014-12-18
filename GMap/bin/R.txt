@@ -1,4 +1,4 @@
-int array find_police_items 0x7f080003
+int array find_road_items 0x7f080003
 int array map_type_items 0x7f080002
 int array menu_items 0x7f080000
 int array nav_drawer_icons 0x7f080005

@@ -23,7 +23,7 @@ public class MenuItemClickListener implements OnItemClickListener {
 	int[] subMenus = {
 			R.array.nav_type_items,
 			R.array.map_type_items,
-			R.array.find_police_items,
+			R.array.find_road_items,
 			R.array.whats_hot_items};
 	private static final String TAG = "GMap.DrawerItemClickListener";
 	MainActivity activity;
@@ -53,5 +53,6 @@ public class MenuItemClickListener implements OnItemClickListener {
 		ArrayAdapter<String> childAdapter = new ArrayAdapter<String>(activity,R.layout.drawer_list_item, subSettings);
 		ListView listChild = (ListView) activity.findViewById(R.id.left_drawer_child);
 		listChild.setAdapter(childAdapter);
+		listChild.setOnItemClickListener(new SubMenuItemClickListener(activity));
 	}
 }

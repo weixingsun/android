@@ -1,5 +1,7 @@
 package cat.app.gmap;
 
+import java.util.HashMap;
+
 import cat.app.gmap.adapter.SubNavDrawerListAdapter;
 import cat.app.gmap.listener.MenuItemClickListener;
 import cat.app.gmap.model.SuggestPoint;
@@ -108,5 +110,4 @@ private void setDrawer() {
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(inputAddress.getWindowToken(), 0);
 	}
-	
 }

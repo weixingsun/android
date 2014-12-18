@@ -46,6 +46,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLocationChangeListener {
 	//GooglePlayServicesClient.ConnectionCallbacks,
     //GooglePlayServicesClient.OnConnectionFailedListener
+
+    private HashMap<String,String> settings = new HashMap<String, String>();
 	private static final String TAG = "GMap";
 	public GoogleMap map;
 	public MainActivity activity;
@@ -86,7 +88,9 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
             	activity.listSuggestion.setVisibility(View.INVISIBLE);
             }
         });
-        
+        settings.put("TrafficEnabled", "false");
+        //settings.put("TrafficEnabled", "false");
+        //settings.put("TrafficEnabled", "false");
 	}
 	/*@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -226,5 +230,20 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 		//move(start);
 		this.refreshRoute(start);
 	}
-	
+
+	//TrafficEnabled
+	public void switchSettings(String settingName){
+		if(settings.get(settingName)==null) return;
+		switch(settingName){
+			case "TrafficEnabled":
+				if(map.isTrafficEnabled()){
+					map.setTrafficEnabled(false);
+				}else{
+					map.setTrafficEnabled(true);
+				}
+				break;
+			default:
+				Toast.makeText(activity, "Settings:"+settingName+" not found", Toast.LENGTH_LONG).show();
+		}
+	}
 }
