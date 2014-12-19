@@ -106,21 +106,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
         });
         settings.put("TrafficEnabled", "false");
         //settings.put("TrafficEnabled", "false");
-        //settings.put("TrafficEnabled", "false");
 	}
-	/*@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-	    View mapView = super.onCreateView(inflater, container, savedInstanceState);
-
-	    // Get the button view 
-	    View locationButton = ((View) mapView.findViewById(1).getParent()).findViewById(2);
-	    RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) locationButton.getLayoutParams();
-	    // position on right bottom
-	    rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
-	    rlp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RelativeLayout.TRUE);
-	    rlp.setMargins(0, 0, 300, 300);
-		return mapView;
-	}*/
 	public void refreshRoute(LatLng currentLoc){
 		//Toast.makeText(activity, "draw lines", Toast.LENGTH_LONG).show(); 
 		GoogleMapRouteTask.removePreviousRoute();
@@ -133,7 +119,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 	            start=dest;
     		}
     	}else{
-    		Toast.makeText(activity, "No target", Toast.LENGTH_LONG).show();
+    		Toast.makeText(activity, "No Target", Toast.LENGTH_LONG).show();
     	}
 	}
 
@@ -148,12 +134,12 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 	}
 
 	public void addMarker(MarkerPoint point){
-		GoogleMapSearchByPositionTask task = new GoogleMapSearchByPositionTask(this, point.getLatlng());
-		task.execute();
+		
     }
 	public void addMarker(SuggestPoint point){
 		Bitmap bmRaw = BitmapFactory.decodeResource(activity.getResources(), R.drawable.marker_blue_32);
-		Bitmap bm =generatorSequencedIcon(bmRaw);
+		
+		Bitmap bm =generatorSequencedIcon(bmRaw,markerSeq);
 		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(bm);
     	Marker marker = map.addMarker(new MarkerOptions()
         .title(point.getMarkerTitle())
@@ -184,11 +170,10 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
     }
 
 	@Override
-	public void onMapLongClick(LatLng arg0) {
-   	 	MarkerPoint mp = new MarkerPoint(""+markerSeq,"Point "+markerSeq, 
-   	 			"Click to remove", arg0);
-   	 	addMarker(mp);
-   	 	//To do: add real name into the pin point
+	public void onMapLongClick(LatLng point) {
+   	 	//MarkerPoint mp = new MarkerPoint(markerSeq,""+markerSeq, "Click to remove", point);
+   	 	GoogleMapSearchByPositionTask task = new GoogleMapSearchByPositionTask(this, point);
+		task.execute();
 	}
     public void showMarkers(){
     	LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
@@ -256,7 +241,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
      * @param icon 给定的图片
      * @return 带联系人数量的图片
      */
-    private Bitmap generatorSequencedIcon(Bitmap markerIcon){
+    private Bitmap generatorSequencedIcon(Bitmap markerIcon,int seq){
     	//初始化画布
     	//int iconSize=(int)activity.getResources().getDimension(android.R.dimen.app_icon_size);
     	//int iconSize=(int)activity.getResources().getDimension(R.drawable.marker_blue_32);

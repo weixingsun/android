@@ -80,7 +80,7 @@ public class GoogleMapSearchByPositionTask extends
             	JSONArray posArray = new JSONObject(sb.toString()).getJSONArray("results");
             	//for(int i=0;i<posArray.length()&&i<2;i++){
 	            	JSONObject addressFull = posArray.getJSONObject(0);
-	            	JSONObject location = addressFull.getJSONObject("geometry").getJSONObject("location");
+	            	//JSONObject location = addressFull.getJSONObject("geometry").getJSONObject("location");
 	            	String formatted_address = addressFull.getString("formatted_address");
 	            	//this.position = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
 	            	this.foundPoint = new SuggestPoint(this.position,formatted_address);
@@ -105,15 +105,15 @@ public class GoogleMapSearchByPositionTask extends
   
     @Override  
     protected void onPreExecute() {
-        client = new DefaultHttpClient();  
-        client.getParams().setParameter(  
-                CoreConnectionPNames.CONNECTION_TIMEOUT, 15000);  
-        client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT,15000);  
+        client = new DefaultHttpClient();
+        client.getParams().setParameter(
+                CoreConnectionPNames.CONNECTION_TIMEOUT, 15000);
+        client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT,15000);
         super.onPreExecute();
-    }  
+    }
   
     @Override  
-    protected void onPostExecute(List<SuggestPoint> points) {  
+    protected void onPostExecute(List<SuggestPoint> points) {
         super.onPostExecute(points);  
         if (foundPoint == null) {  
             //failed to navigate

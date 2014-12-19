@@ -4,25 +4,25 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class MarkerPoint {
 
-	private String cityCode;
+	private int seq;
 	private String title;
 	private String comment;
 	private LatLng latlng;
 	//private Icon icon;
 
-	public MarkerPoint(String code,String title,String comment,LatLng latlng){
-		this.cityCode=code;
+	public MarkerPoint(int seq,String title,String comment,LatLng latlng){
+		this.seq=seq;
 		this.title=title;
 		this.comment=comment;
 		this.latlng=latlng;
 	}
 
-	public String getCityCode() {
-		return cityCode;
+	public int getCityCode() {
+		return seq;
 	}
 
-	public void setCityCode(String cityCode) {
-		this.cityCode = cityCode;
+	public void setCityCode(int seq) {
+		this.seq = seq;
 	}
 
 	public String getTitle() {
