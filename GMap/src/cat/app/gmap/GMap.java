@@ -66,7 +66,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 	public MainActivity activity;
 	public Location loc;
 	public Map<String,Marker> markers=new TreeMap<String,Marker>();
-	public Map<String,MarkerPoint> markerpoints=new TreeMap<String,MarkerPoint>();
+	public TreeMap<String,MarkerPoint> markerpoints=new TreeMap<String,MarkerPoint>();
 	//public Map<String,LatLng> markerLatLngs=new HashMap<String,LatLng>();
 	public int markerMaxSeq = 1;
 	public List<SuggestPoint> suggestPoints = new ArrayList<SuggestPoint>();
@@ -94,7 +94,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 				markerpoints.remove(marker.getId());
 				markers.remove(marker.getId());
 				updateMarkerSeq();
-				refreshRoute();
+				refreshRoute(true);
 				markerMaxSeq--;
 			}
         });
@@ -118,22 +118,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
     		}
     	}
 	}
-	public void refreshRoute(LatLng currentLoc){
-		//Toast.makeText(activity, "draw lines", Toast.LENGTH_LONG).show(); 
-		GoogleMapRouteTask.removePreviousRoute();
-		if(markerpoints.size()>0){
-            //LatLng end = markers.get(lastMarkerId).getPosition();
-			LatLng start = currentLoc;
-    		for(LatLng dest:getWaypoints()){
-	            GoogleMapRouteTask task = new GoogleMapRouteTask(this,start,dest);
-	            task.execute();
-	            start=dest;
-    		}
-    	}else{
-    		//Toast.makeText(activity, "No Target", Toast.LENGTH_LONG).show();
-    	}
-	}
-
+	
 	protected String getLastMarkerId() {
     	Iterator<Entry<String, MarkerPoint>> iter = markerpoints.entrySet().iterator();
     	String key = null;
@@ -160,7 +145,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
     	MarkerPoint mp = new MarkerPoint(markerMaxSeq,point.getMarkerTitle(),point.getMarkerSnippet(),point.getLocation());
     	markerpoints.put(marker.getId(), mp);
     	markers.put(marker.getId(), marker);
-    	refreshRoute();
+    	refreshRoute(false);
     	markerMaxSeq++;
     }
 	public void move(LatLng latlng){
@@ -224,10 +209,38 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 		return ll;
     }
 
-	public void refreshRoute() {
-		LatLng start = new LatLng(loc.getLatitude(),loc.getLongitude());
-		//move(start);
-		this.refreshRoute(start);
+	public void refreshRoute(boolean restart) {
+		LatLng myLoc = new LatLng(loc.getLatitude(),loc.getLongitude());
+		if(restart){//redraw all routes
+			GoogleMapRouteTask.removePreviousRoute();
+			refreshRoute(myLoc);
+		}else{ //draw only last route
+			Entry<String,MarkerPoint> lastEntry = markerpoints.pollLastEntry();
+			LatLng end = lastEntry.getValue().getLatlng();
+			LatLng start=null;
+			if(markerpoints.size()==0) {
+				start=myLoc;
+			}else{
+				start=markerpoints.lastEntry().getValue().getLatlng();
+			}
+			GoogleMapRouteTask task = new GoogleMapRouteTask(this,start,end);
+            task.execute();
+			markerpoints.put(lastEntry.getKey(), lastEntry.getValue());
+		}
+	}
+	public void refreshRoute(LatLng loc){
+		//Toast.makeText(activity, "draw lines", Toast.LENGTH_LONG).show(); 
+		if(markerpoints.size()>0){
+            //LatLng end = markers.get(lastMarkerId).getPosition();
+			LatLng start = loc;
+    		for(LatLng dest:getWaypoints()){
+	            GoogleMapRouteTask task = new GoogleMapRouteTask(this,start,dest);
+	            task.execute();
+	            start=dest;
+    		}
+    	}else{
+    		//Toast.makeText(activity, "No Target", Toast.LENGTH_LONG).show();
+    	}
 	}
 
 	//TrafficEnabled
