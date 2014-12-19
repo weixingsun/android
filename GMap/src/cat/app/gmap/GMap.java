@@ -66,10 +66,10 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 	public MainActivity activity;
 	public Location loc;
 	public Map<String,Marker> markers=new TreeMap<String,Marker>();
+	public Map<String,MarkerPoint> markerpoints=new TreeMap<String,MarkerPoint>();
 	//public Map<String,LatLng> markerLatLngs=new HashMap<String,LatLng>();
-	public int markerSeq = 0;
-	public String lastMarkerId;
-	public List<SuggestPoint> points = new ArrayList<SuggestPoint>();
+	public int markerMaxSeq = 1;
+	public List<SuggestPoint> suggestPoints = new ArrayList<SuggestPoint>();
 	
 	@SuppressLint("NewApi") 
 	public void init(final MainActivity activity){
@@ -89,13 +89,13 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
     	map.setOnMyLocationChangeListener(this);
         map.setOnInfoWindowClickListener(new OnInfoWindowClickListener(){
 			@Override
-			public void onInfoWindowClick(Marker arg0) {
-				arg0.remove();
-				markers.remove(arg0.getId());
-				if(!markers.containsKey(lastMarkerId)){
-					lastMarkerId = getLastMarkerId(markers);
-				}
+			public void onInfoWindowClick(Marker marker) {
+				marker.remove();
+				markerpoints.remove(marker.getId());
+				markers.remove(marker.getId());
+				updateMarkerSeq();
 				refreshRoute();
+				markerMaxSeq--;
 			}
         });
         map.setOnMapClickListener(new OnMapClickListener() {
@@ -107,10 +107,21 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
         settings.put("TrafficEnabled", "false");
         //settings.put("TrafficEnabled", "false");
 	}
+
+	private void updateMarkerSeq() {
+		Iterator<Entry<String, MarkerPoint>> iter = markerpoints.entrySet().iterator();
+    	for(int i=1;iter.hasNext();i++){
+    		Entry<String,MarkerPoint> entry = iter.next();
+    		if(entry.getValue().getSeq()!=i){
+    			BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createSeqBitmap(i));
+    			markers.get(entry.getKey()).setIcon(bd);
+    		}
+    	}
+	}
 	public void refreshRoute(LatLng currentLoc){
 		//Toast.makeText(activity, "draw lines", Toast.LENGTH_LONG).show(); 
 		GoogleMapRouteTask.removePreviousRoute();
-		if(markers.size()>0){
+		if(markerpoints.size()>0){
             //LatLng end = markers.get(lastMarkerId).getPosition();
 			LatLng start = currentLoc;
     		for(LatLng dest:getWaypoints()){
@@ -119,38 +130,38 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 	            start=dest;
     		}
     	}else{
-    		Toast.makeText(activity, "No Target", Toast.LENGTH_LONG).show();
+    		//Toast.makeText(activity, "No Target", Toast.LENGTH_LONG).show();
     	}
 	}
 
-	protected String getLastMarkerId(Map<String, Marker> markers2) {
-    	Iterator<Entry<String, Marker>> iter = markers.entrySet().iterator();
+	protected String getLastMarkerId() {
+    	Iterator<Entry<String, MarkerPoint>> iter = markerpoints.entrySet().iterator();
     	String key = null;
     	while(iter.hasNext()){
-    		Entry<String,Marker> entry = iter.next();
+    		Entry<String,MarkerPoint> entry = iter.next();
     		key = entry.getKey();
     	}
 		return key;
 	}
 
-	public void addMarker(MarkerPoint point){
-		
-    }
-	public void addMarker(SuggestPoint point){
+	private Bitmap createSeqBitmap(int seq){
 		Bitmap bmRaw = BitmapFactory.decodeResource(activity.getResources(), R.drawable.marker_blue_32);
+		return generatorSequencedIcon(bmRaw,seq);
+	}
+	public void addMarker(SuggestPoint point){
 		
-		Bitmap bm =generatorSequencedIcon(bmRaw,markerSeq);
-		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(bm);
+		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createSeqBitmap(markerMaxSeq));
     	Marker marker = map.addMarker(new MarkerOptions()
-        .title(point.getMarkerTitle())
-        .snippet(point.getMarkerSnippet())
-        .position(point.getLocation())
-        .icon(bd)
+	        .title(point.getMarkerTitle())
+	        .snippet(point.getMarkerSnippet())
+	        .position(point.getLocation())
+	        .icon(bd)
         );
+    	MarkerPoint mp = new MarkerPoint(markerMaxSeq,point.getMarkerTitle(),point.getMarkerSnippet(),point.getLocation());
+    	markerpoints.put(marker.getId(), mp);
     	markers.put(marker.getId(), marker);
-    	lastMarkerId = marker.getId();
-        //BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)
     	refreshRoute();
+    	markerMaxSeq++;
     }
 	public void move(LatLng latlng){
 		map.moveCamera(CameraUpdateFactory.newLatLng(latlng));
@@ -171,11 +182,10 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 
 	@Override
 	public void onMapLongClick(LatLng point) {
-   	 	//MarkerPoint mp = new MarkerPoint(markerSeq,""+markerSeq, "Click to remove", point);
    	 	GoogleMapSearchByPositionTask task = new GoogleMapSearchByPositionTask(this, point);
 		task.execute();
 	}
-    public void showMarkers(){
+    /*public void showMarkers(){
     	LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
 
     	Iterator<Entry<String, Marker>> iter = markers.entrySet().iterator();
@@ -191,7 +201,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
         		mk.setVisible(false);
         	}
     	}
-    }
+    }*/
 
 	@Override
 	public void onMyLocationChange(Location arg0) {
@@ -205,10 +215,10 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 	}
     public List<LatLng> getWaypoints(){
     	List<LatLng> ll = new ArrayList<LatLng>();
-    	Iterator<Entry<String, Marker>> iter = markers.entrySet().iterator();
+    	Iterator<Entry<String, MarkerPoint>> iter = markerpoints.entrySet().iterator();
     	while(iter.hasNext()){
-    		Entry<String,Marker> entry = iter.next();
-    		ll.add(entry.getValue().getPosition());
+    		Entry<String,MarkerPoint> entry = iter.next();
+    		ll.add(entry.getValue().getLatlng());
     	}
     	//Collections.reverse(ll);
 		return ll;
@@ -242,11 +252,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
      * @return 带联系人数量的图片
      */
     private Bitmap generatorSequencedIcon(Bitmap markerIcon,int seq){
-    	//初始化画布
-    	//int iconSize=(int)activity.getResources().getDimension(android.R.dimen.app_icon_size);
-    	//int iconSize=(int)activity.getResources().getDimension(R.drawable.marker_blue_32);
-    	//Log.d(TAG, "the icon size is "+iconSize);
-    	;
+    	
     	Bitmap contactIcon=Bitmap.createBitmap(markerIcon.getWidth(), markerIcon.getHeight(), Config.ARGB_8888);
     	Canvas canvas=new Canvas(contactIcon);
     	
@@ -258,14 +264,12 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
     	Rect dst=new Rect(0, 0, markerIcon.getWidth(), markerIcon.getHeight());
     	canvas.drawBitmap(markerIcon, src, dst, iconPaint);
     	
-    	//在图片上创建一个覆盖的联系人个数
-    	int index=markers.size();
     	//启用抗锯齿和使用设备的文本字距
     	Paint countPaint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.DEV_KERN_TEXT_FLAG);
     	countPaint.setColor(Color.RED);
     	countPaint.setTextSize(20f);
     	countPaint.setTypeface(Typeface.DEFAULT_BOLD);
-    	canvas.drawText(String.valueOf(index), markerIcon.getWidth()-20, 25, countPaint);
+    	canvas.drawText(String.valueOf(seq), markerIcon.getWidth()-37, 35, countPaint);
     	return contactIcon;
     }
 }

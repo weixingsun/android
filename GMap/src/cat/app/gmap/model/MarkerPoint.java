@@ -17,11 +17,11 @@ public class MarkerPoint {
 		this.latlng=latlng;
 	}
 
-	public int getCityCode() {
+	public int getSeq() {
 		return seq;
 	}
 
-	public void setCityCode(int seq) {
+	public void setSeq(int seq) {
 		this.seq = seq;
 	}
 

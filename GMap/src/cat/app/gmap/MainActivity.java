@@ -77,7 +77,7 @@ public class MainActivity extends FragmentActivity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				SuggestPoint sp = gMap.points.get(position);
+				SuggestPoint sp = gMap.suggestPoints.get(position);
 				gMap.addMarker(sp);
 				listSuggestion.setVisibility(View.INVISIBLE);
 				gMap.move(sp.getLocation());

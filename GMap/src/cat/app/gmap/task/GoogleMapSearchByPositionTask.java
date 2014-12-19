@@ -62,7 +62,7 @@ public class GoogleMapSearchByPositionTask extends
     }
     @Override  
     public List<SuggestPoint> doInBackground(String... params) {
-    	gmap.points.clear();
+    	gmap.suggestPoints.clear();
     	StringBuilder sb = new StringBuilder();
         HttpGet get = new HttpGet(url);
         try {
@@ -100,7 +100,7 @@ public class GoogleMapSearchByPositionTask extends
 			e.printStackTrace();
 		}  
         //Log.i(TAG,"doInBackground:"+routes);
-        return gmap.points;  
+        return gmap.suggestPoints;  
     }  
   
     @Override  

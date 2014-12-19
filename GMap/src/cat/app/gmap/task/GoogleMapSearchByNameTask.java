@@ -61,7 +61,7 @@ public class GoogleMapSearchByNameTask extends
     }
     @Override  
     public List<SuggestPoint> doInBackground(String... params) {
-    	gmap.points.clear();
+    	gmap.suggestPoints.clear();
     	if(this.address.length()<2) return null;
     	StringBuilder sb = new StringBuilder();
         HttpGet get = new HttpGet(url);
@@ -84,9 +84,9 @@ public class GoogleMapSearchByNameTask extends
 	            	//Log.i(TAG,"formatted_address:" + formatted_address);
 	    			LatLng ll = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
 	    			SuggestPoint sp = new SuggestPoint(ll,formatted_address);
-	    			gmap.points.add(sp);
+	    			gmap.suggestPoints.add(sp);
             	}
-    			return gmap.points;
+    			return gmap.suggestPoints;
             } else {
             	Log.w(TAG,"doInBackground:statusecode="+statusecode);
                 return null;
@@ -100,7 +100,7 @@ public class GoogleMapSearchByNameTask extends
 			e.printStackTrace();
 		}  
         //Log.i(TAG,"doInBackground:"+routes);
-        return gmap.points;  
+        return gmap.suggestPoints;  
     }  
   
     @Override  
@@ -134,7 +134,7 @@ public class GoogleMapSearchByNameTask extends
     }
     private ArrayList<Map<String, String>> buildData() {
         ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
-        for(SuggestPoint sp:gmap.points){
+        for(SuggestPoint sp:gmap.suggestPoints){
         	list.add(putData(sp.getFormatted_address()));
         }
         return list;
