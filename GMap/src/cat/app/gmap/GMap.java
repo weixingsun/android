@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import cat.app.gmap.model.MarkerPoint;
 import cat.app.gmap.model.SuggestPoint;
+import cat.app.gmap.nav.Route;
 import cat.app.gmap.task.GoogleMapRouteTask;
 import cat.app.gmap.task.GoogleMapSearchByPositionTask;
 
@@ -70,6 +71,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 	//public Map<String,LatLng> markerLatLngs=new HashMap<String,LatLng>();
 	public int markerMaxSeq = 1;
 	public List<SuggestPoint> suggestPoints = new ArrayList<SuggestPoint>();
+	public List<Route> routes;
 	
 	@SuppressLint("NewApi") 
 	public void init(final MainActivity activity){

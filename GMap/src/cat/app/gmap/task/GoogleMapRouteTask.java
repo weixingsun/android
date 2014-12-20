@@ -16,6 +16,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import cat.app.gmap.GMap;
+import cat.app.gmap.nav.Route;
+import cat.app.gmap.nav.RouteParser;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -62,12 +64,8 @@ public class GoogleMapRouteTask extends
                 String responseString = EntityUtils.toString(response.getEntity());
                 JSONObject object = new JSONObject(responseString);
                 if (object.getString("status").equals("OK")) {
-                	JSONArray routesArray = new JSONObject(responseString).getJSONArray("routes");
-                	JSONObject route1 = routesArray.getJSONObject(0);
-	            	JSONObject overview_polyline = route1.getJSONObject("overview_polyline");
-	            	String points = overview_polyline.getString("points");
-	            	//Log.i(TAG, "points="+points);
-                    route = decodePolyXML(points);
+                	gmap.routes = RouteParser.parse(responseString);
+                	route = RouteParser.getWholeRoutePoints(gmap.routes.get(0));
                 } else {
                     return null;
                 }
@@ -80,7 +78,7 @@ public class GoogleMapRouteTask extends
         	Log.i(TAG, "IOException:"+e.getMessage());
         } catch (JSONException e) {
         	Log.i(TAG, "JSONException:"+e.getMessage());
-		}  
+		}
         //Log.i(TAG,"doInBackground:"+routes);
         return route;  
     }  
@@ -125,7 +123,7 @@ public class GoogleMapRouteTask extends
      * @param encoded 
      * @return List<LatLng> 
      */  
-    private List<LatLng> decodePolyXML(String encoded) {
+    private List<LatLng> decodePoly(String encoded) {
         List<LatLng> poly = new ArrayList<LatLng>();
         int index = 0, len = encoded.length();
         int lat = 0, lng = 0;
