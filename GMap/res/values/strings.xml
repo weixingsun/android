@@ -2,7 +2,8 @@
 <resources>
 
     <string name="app_name">GMap</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="speech_prompt">Say something&#8230;</string>
+    <string name="speech_not_supported">Sorry! Your device doesn\'t support speech input</string>
     <string name="navigate">II</string>
     <string name="settings">Settings</string>
     <string name="subsettings">Sub Settings</string>

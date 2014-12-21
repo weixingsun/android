@@ -1,11 +1,17 @@
 package cat.app.gmap;
 
+import java.util.List;
+import java.util.Locale;
+
 import cat.app.gmap.listener.MenuItemClickListener;
 import cat.app.gmap.model.SuggestPoint;
 import cat.app.gmap.task.GoogleMapSearchByNameTask;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Editable;
@@ -22,30 +28,29 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 //http://servicedata.net76.net/select.php
 public class MainActivity extends FragmentActivity {
 
-	private static final String TAG = "GMap.MainActivity";
+	private final String TAG = "GMap.MainActivity";
+	private final int REQ_CODE_SPEECH_INPUT = 2;
 	public GMap gMap = new GMap();
-	public EditText inputAddress;
 	public ListView listSuggestion;
-    
+	private EditText inputAddress;
 	private ListView mDrawerListParent;
     private String[] mMainSettings;
     private DrawerLayout mDrawerLayout;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-		// WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.main);
 		gMap.init(this);
 		showUI();
 	}
 
-	private void showUI() {
+	void showUI() {
 		setText();
 		setButtons();
 		setList();
@@ -58,8 +63,7 @@ public class MainActivity extends FragmentActivity {
 		mDrawerListParent.setAdapter(new ArrayAdapter<String>(this,R.layout.drawer_list_item, mMainSettings));
 		mDrawerListParent.setOnItemClickListener(new MenuItemClickListener(this));
 		mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-		
-		mDrawerLayout.closeDrawers();
+		//mDrawerLayout.closeDrawers();
 		ImageView iv = (ImageView) findViewById(R.id.settingsIcon);
 		iv.setOnClickListener(new View.OnClickListener() {
 		    @Override
@@ -75,8 +79,7 @@ public class MainActivity extends FragmentActivity {
 		this.listSuggestion = (ListView) findViewById(R.id.listSuggestion);
 		this.listSuggestion.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				SuggestPoint sp = gMap.suggestPoints.get(position);
 				gMap.addMarker(sp);
 				listSuggestion.setVisibility(View.INVISIBLE);
@@ -86,7 +89,7 @@ public class MainActivity extends FragmentActivity {
 	}
 	
 	private void setText() {
-		this.inputAddress = (EditText) findViewById(R.id.inputAddress);
+		inputAddress = (EditText) findViewById(R.id.inputAddress);
 		inputAddress.setTextColor(Color.BLACK);
 		inputAddress.addTextChangedListener(new DelayedTextWatcher(1500) {
 			@Override
@@ -111,10 +114,47 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	private void setButtons() {
+		ImageView voiceInput = (ImageView) findViewById(R.id.voiceInput);
+		voiceInput.setOnClickListener(new View.OnClickListener() {
+		    @Override
+		    public void onClick(View v) {
+		    	promptSpeechInput();
+		    }
+		});
 	}
 	private void closeKeyBoard() {
 		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(inputAddress.getWindowToken(), 0);
+	}
+	
+	private void promptSpeechInput() {
+		Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+		intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+				RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+		intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+		intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
+				getString(R.string.speech_prompt));
+		try {
+			startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
+		} catch (ActivityNotFoundException a) {
+			Toast.makeText(getApplicationContext(),
+					getString(R.string.speech_not_supported),
+					Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		switch (requestCode) {
+			case REQ_CODE_SPEECH_INPUT: {
+				if (resultCode == RESULT_OK && null != data) {
+					List<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+					inputAddress.setText(result.get(0));
+				}
+				break;
+			}
+		}
 	}
 	
 }

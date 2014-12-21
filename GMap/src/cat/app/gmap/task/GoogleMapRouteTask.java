@@ -59,7 +59,7 @@ public class GoogleMapRouteTask extends
         HttpGet get = new HttpGet(url);
         try {
             HttpResponse response = client.execute(get);  
-            int statusecode = response.getStatusLine().getStatusCode();  
+            int statusecode = response.getStatusLine().getStatusCode();
             if (statusecode == 200) {
                 String responseString = EntityUtils.toString(response.getEntity());
                 JSONObject object = new JSONObject(responseString);

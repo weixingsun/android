@@ -68,7 +68,6 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 	public Location loc;
 	public Map<String,Marker> markers=new TreeMap<String,Marker>();
 	public TreeMap<String,MarkerPoint> markerpoints=new TreeMap<String,MarkerPoint>();
-	//public Map<String,LatLng> markerLatLngs=new HashMap<String,LatLng>();
 	public int markerMaxSeq = 1;
 	public List<SuggestPoint> suggestPoints = new ArrayList<SuggestPoint>();
 	public List<Route> routes;
@@ -77,8 +76,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 	public void init(final MainActivity activity){
 		this.activity= activity;
 		FragmentManager myFM = activity.getFragmentManager();
-		final MapFragment fragment = (MapFragment) myFM.findFragmentById(R.id.map);
-		//MapFragment fragment = (MapFragment) activity.getFragmentManager().findFragmentById(R.id.map);
+		MapFragment fragment = (MapFragment) myFM.findFragmentById(R.id.map);
 		map = fragment.getMap();
 		map.getUiSettings().setCompassEnabled(false);
 		map.getUiSettings().setRotateGesturesEnabled(false);
@@ -119,16 +117,6 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
     			markers.get(entry.getKey()).setIcon(bd);
     		}
     	}
-	}
-	
-	protected String getLastMarkerId() {
-    	Iterator<Entry<String, MarkerPoint>> iter = markerpoints.entrySet().iterator();
-    	String key = null;
-    	while(iter.hasNext()){
-    		Entry<String,MarkerPoint> entry = iter.next();
-    		key = entry.getKey();
-    	}
-		return key;
 	}
 
 	private Bitmap createSeqBitmap(int seq){
@@ -188,13 +176,22 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
         		mk.setVisible(false);
         	}
     	}
-    }*/
+    }
+	protected String getLastMarkerId() {
+    	Iterator<Entry<String, MarkerPoint>> iter = markerpoints.entrySet().iterator();
+    	String key = null;
+    	while(iter.hasNext()){
+    		Entry<String,MarkerPoint> entry = iter.next();
+    		key = entry.getKey();
+    	}
+		return key;
+	}
+    */
 
 	@Override
 	public void onMyLocationChange(Location arg0) {
 		loc = arg0;
 		if(getZoomLevel()<5){
-			//Toast.makeText(activity, "getZoomLevel="+getZoomLevel(), Toast.LENGTH_LONG).show();
 			//map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(arg0.getLatitude(),arg0.getLongitude())));
 			map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(arg0.getLatitude(),arg0.getLongitude()), 13));
 		}
