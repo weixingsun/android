@@ -10,10 +10,14 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
+import android.telephony.TelephonyManager;
 import android.text.Editable;
 import android.util.Log;
 import android.view.Gravity;
@@ -55,6 +59,11 @@ public class MainActivity extends FragmentActivity {
 		setButtons();
 		setList();
 		setDrawer();
+		setTest();
+	}
+
+	private void setTest() {
+		
 	}
 
 	private void setDrawer() {
@@ -69,7 +78,7 @@ public class MainActivity extends FragmentActivity {
 		    @Override
 		    public void onClick(View v) {
 		        //Toast.makeText(MainActivity.this,"drawer is opening",Toast.LENGTH_LONG).show();
-		    	Log.i(TAG, "drawer is opening");
+		    	//Log.i(TAG, "drawer is opening");
 				mDrawerLayout.openDrawer(Gravity.LEFT);
 		    }
 		});
@@ -156,5 +165,6 @@ public class MainActivity extends FragmentActivity {
 			}
 		}
 	}
+	
 	
 }

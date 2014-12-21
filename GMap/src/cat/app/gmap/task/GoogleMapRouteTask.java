@@ -16,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import cat.app.gmap.GMap;
+import cat.app.gmap.nav.Navi;
 import cat.app.gmap.nav.Route;
 import cat.app.gmap.nav.RouteParser;
 
@@ -41,7 +42,7 @@ public class GoogleMapRouteTask extends
     private static final String TAG = "GMap.GoogleMapRouteTask";
 	HttpClient client;  
     String url;  
-    static List<Polyline> preRoutes = new ArrayList<Polyline>();
+    //static List<Polyline> preRoutes = new ArrayList<Polyline>();
     List<LatLng> route = null;
     GMap gmap;
     public GoogleMapRouteTask(GMap gmap,String url) {  
@@ -64,8 +65,12 @@ public class GoogleMapRouteTask extends
                 String responseString = EntityUtils.toString(response.getEntity());
                 JSONObject object = new JSONObject(responseString);
                 if (object.getString("status").equals("OK")) {
-                	gmap.routes = RouteParser.parse(responseString);
-                	route = RouteParser.getWholeRoutePoints(gmap.routes.get(0));
+                	Route r = RouteParser.parse(responseString).get(0);
+                	gmap.routes.add(r);
+                	if(Navi.currentStep==null){
+                		Navi.init(gmap.routes);
+                	}
+                	route = RouteParser.getWholeRoutePoints(r);
                 } else {
                     return null;
                 }
@@ -105,51 +110,14 @@ public class GoogleMapRouteTask extends
             lineOptions.addAll(route);
             lineOptions.width(10);
             lineOptions.color(Color.BLUE);
-            preRoutes.add(gmap.map.addPolyline(lineOptions));
+            Polyline pl = gmap.map.addPolyline(lineOptions);
+            gmap.routesPolyLines.add(pl);
             //gmap.map.animateCamera(CameraUpdateFactory.newLatLng(routes.get(0)));
         }
     }
 
-    public static void removePreviousRoute() {
-    	if(preRoutes!=null){
-	    	for(Polyline pl:preRoutes){
-	    		pl.remove();
-	    	}
-    	}
-	}
-	/** 
-     * 解析返回xml中overview_polyline的路线编码 
-     *  
-     * @param encoded 
-     * @return List<LatLng> 
-     */  
-    private List<LatLng> decodePoly(String encoded) {
-        List<LatLng> poly = new ArrayList<LatLng>();
-        int index = 0, len = encoded.length();
-        int lat = 0, lng = 0;
-        while (index < len) {
-            int b, shift = 0, result = 0;
-            do {
-                b = encoded.charAt(index++) - 63;
-                result |= (b & 0x1f) << shift;
-                shift += 5;
-            } while (b >= 0x20);
-            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-            lat += dlat;
-            shift = 0;
-            result = 0;
-            do {
-                b = encoded.charAt(index++) - 63;
-                result |= (b & 0x1f) << shift;  
-                shift += 5;  
-            } while (b >= 0x20);  
-            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-            lng += dlng;
-            LatLng p = new LatLng((((double) lat / 1E5)),(((double) lng / 1E5)));
-            poly.add(p);  
-        }  
-        return poly;  
-    }  
+    
+	
     /** 
      * 组合成googlemap direction所需要的url
      *  
@@ -172,11 +140,6 @@ public class GoogleMapRouteTask extends
         String url = "https://maps.googleapis.com/maps/api/directions/"+ format + "?" + parameters;
         //Log.i(TAG,"getDerectionsURL--->: " + url);
         return url;  
-    }
-    private boolean isLocationOnEdge(){
-    	
-		return false;
-    	
     }
     
     /** 
@@ -208,5 +171,39 @@ public class GoogleMapRouteTask extends
                 + output + "?" + parameters;
         Log.i(TAG,"getDerectionsURL--->: " + url);  
         return url;  
-    }*/
+    }
+     * 
+     * 解析返回xml中overview_polyline的路线编码 
+     *  
+     * @param encoded 
+     * @return List<LatLng> 
+       
+    private List<LatLng> decodePoly(String encoded) {
+        List<LatLng> poly = new ArrayList<LatLng>();
+        int index = 0, len = encoded.length();
+        int lat = 0, lng = 0;
+        while (index < len) {
+            int b, shift = 0, result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;
+                shift += 5;
+            } while (b >= 0x20);
+            int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lat += dlat;
+            shift = 0;
+            result = 0;
+            do {
+                b = encoded.charAt(index++) - 63;
+                result |= (b & 0x1f) << shift;  
+                shift += 5;  
+            } while (b >= 0x20);  
+            int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+            lng += dlng;
+            LatLng p = new LatLng((((double) lat / 1E5)),(((double) lng / 1E5)));
+            poly.add(p);  
+        }  
+        return poly;  
+    }  
+    */
 }

@@ -1,44 +1,34 @@
 package cat.app.gmap;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Typeface;
-import android.graphics.Bitmap.Config;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
-import android.os.Bundle;
 import android.util.Log;
-import android.util.SparseArray;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import cat.app.gmap.model.MarkerPoint;
 import cat.app.gmap.model.SuggestPoint;
+import cat.app.gmap.nav.Leg;
+import cat.app.gmap.nav.Navi;
 import cat.app.gmap.nav.Route;
+import cat.app.gmap.nav.Step;
 import cat.app.gmap.task.GoogleMapRouteTask;
 import cat.app.gmap.task.GoogleMapSearchByPositionTask;
 
-import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
@@ -46,13 +36,12 @@ import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMyLocationChangeListener;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 
 public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLocationChangeListener {
 	//GooglePlayServicesClient.ConnectionCallbacks,
@@ -63,18 +52,21 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 	//&sensor=true&key=AIzaSyApl-_heZUCRD6bJ5TltYPn4gcSCy1LY3A
     private HashMap<String,String> settings = new HashMap<String, String>();
 	private static final String TAG = "GMap";
+	public String myCountryCode=null;
 	public GoogleMap map;
 	public MainActivity activity;
 	public Location loc;
+	public Geocoder gc;
 	public Map<String,Marker> markers=new TreeMap<String,Marker>();
 	public TreeMap<String,MarkerPoint> markerpoints=new TreeMap<String,MarkerPoint>();
 	public int markerMaxSeq = 1;
 	public List<SuggestPoint> suggestPoints = new ArrayList<SuggestPoint>();
-	public List<Route> routes;
+	public List<Route> routes = new ArrayList<Route>();
+	public List<Polyline> routesPolyLines = new ArrayList<Polyline>();
 	
-	@SuppressLint("NewApi") 
 	public void init(final MainActivity activity){
 		this.activity= activity;
+	    gc = new Geocoder(this.activity, Locale.getDefault());
 		FragmentManager myFM = activity.getFragmentManager();
 		MapFragment fragment = (MapFragment) myFM.findFragmentById(R.id.map);
 		map = fragment.getMap();
@@ -121,7 +113,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 
 	private Bitmap createSeqBitmap(int seq){
 		Bitmap bmRaw = BitmapFactory.decodeResource(activity.getResources(), R.drawable.marker_blue_32);
-		return generatorSequencedIcon(bmRaw,seq);
+		return Util.generatorSequencedIcon(bmRaw,seq);
 	}
 	public void addMarker(SuggestPoint point){
 		
@@ -140,17 +132,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
     }
 	public void move(LatLng latlng){
 		map.moveCamera(CameraUpdateFactory.newLatLng(latlng));
-}
-    /*public void move(MarkerPoint point){
-    	map.moveCamera(CameraUpdateFactory.newLatLngZoom(point.getLatlng(), 13));
-    }
-    public void move(LatLng latlng){
-    		map.moveCamera(CameraUpdateFactory.newLatLng(latlng));
-    }
-    public void move(Location loc){
-    	if(loc!=null)
-    		map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(loc.getLatitude(),loc.getLongitude()), 13));
-    }*/
+	}
     public float getZoomLevel(){
     	return map.getCameraPosition().zoom;
     }
@@ -160,43 +142,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
    	 	GoogleMapSearchByPositionTask task = new GoogleMapSearchByPositionTask(this, point);
 		task.execute();
 	}
-    /*public void showMarkers(){
-    	LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
 
-    	Iterator<Entry<String, Marker>> iter = markers.entrySet().iterator();
-    	while(iter.hasNext()){
-    		Entry<String,Marker> entry = iter.next();
-    		//String key = entry.getKey();
-    		Marker mk = entry.getValue();
-    		if(bounds.contains(mk.getPosition()))
-        	{
-        	    mk.setVisible(true);
-        	}else{
-        		//mk.remove();
-        		mk.setVisible(false);
-        	}
-    	}
-    }
-	protected String getLastMarkerId() {
-    	Iterator<Entry<String, MarkerPoint>> iter = markerpoints.entrySet().iterator();
-    	String key = null;
-    	while(iter.hasNext()){
-    		Entry<String,MarkerPoint> entry = iter.next();
-    		key = entry.getKey();
-    	}
-		return key;
-	}
-    */
-
-	@Override
-	public void onMyLocationChange(Location arg0) {
-		loc = arg0;
-		if(getZoomLevel()<5){
-			//map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(arg0.getLatitude(),arg0.getLongitude())));
-			map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(arg0.getLatitude(),arg0.getLongitude()), 13));
-		}
-		//Log.i(TAG, "loc="+loc.getLatitude()+","+loc.getLongitude());
-	}
     public List<LatLng> getWaypoints(){
     	List<LatLng> ll = new ArrayList<LatLng>();
     	Iterator<Entry<String, MarkerPoint>> iter = markerpoints.entrySet().iterator();
@@ -207,11 +153,19 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
     	//Collections.reverse(ll);
 		return ll;
     }
-
+    public void removePreviousRoute() {
+    	if(routesPolyLines!=null){
+	    	for(Polyline pl:routesPolyLines){
+	    		pl.remove();
+	    	}
+    	}
+	}
 	public void refreshRoute(boolean restart) {
 		LatLng myLoc = new LatLng(loc.getLatitude(),loc.getLongitude());
+		
 		if(restart){//redraw all routes
-			GoogleMapRouteTask.removePreviousRoute();
+			removePreviousRoute();
+			routes.clear();
 			refreshRoute(myLoc);
 		}else{ //draw only last route
 			Entry<String,MarkerPoint> lastEntry = markerpoints.pollLastEntry();
@@ -226,11 +180,11 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
             task.execute();
 			markerpoints.put(lastEntry.getKey(), lastEntry.getValue());
 		}
+		
 	}
 	public void refreshRoute(LatLng loc){
-		//Toast.makeText(activity, "draw lines", Toast.LENGTH_LONG).show(); 
+		//Toast.makeText(activity, "draw lines", Toast.LENGTH_LONG).show();
 		if(markerpoints.size()>0){
-            //LatLng end = markers.get(lastMarkerId).getPosition();
 			LatLng start = loc;
     		for(LatLng dest:getWaypoints()){
 	            GoogleMapRouteTask task = new GoogleMapRouteTask(this,start,dest);
@@ -242,7 +196,6 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
     	}
 	}
 
-	//TrafficEnabled
 	public void switchSettings(String settingName){
 		if(settings.get(settingName)==null) return;
 		switch(settingName){
@@ -257,31 +210,40 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 				Toast.makeText(activity, "Settings:"+settingName+" not found", Toast.LENGTH_LONG).show();
 		}
 	}
-
-	/**
-     * 在给定的图片的右上角加上联系人数量。数量用红色表示
-     * @param icon 给定的图片
-     * @return 带联系人数量的图片
-     */
-    private Bitmap generatorSequencedIcon(Bitmap markerIcon,int seq){
-    	
-    	Bitmap contactIcon=Bitmap.createBitmap(markerIcon.getWidth(), markerIcon.getHeight(), Config.ARGB_8888);
-    	Canvas canvas=new Canvas(contactIcon);
-    	
-    	//拷贝图片
-    	Paint iconPaint=new Paint();
-    	iconPaint.setDither(true);//防抖动
-    	iconPaint.setFilterBitmap(true);//用来对Bitmap进行滤波处理，这样，当你选择Drawable时，会有抗锯齿的效果
-    	Rect src=new Rect(0, 0, markerIcon.getWidth(), markerIcon.getHeight());
-    	Rect dst=new Rect(0, 0, markerIcon.getWidth(), markerIcon.getHeight());
-    	canvas.drawBitmap(markerIcon, src, dst, iconPaint);
-    	
-    	//启用抗锯齿和使用设备的文本字距
-    	Paint countPaint=new Paint(Paint.ANTI_ALIAS_FLAG|Paint.DEV_KERN_TEXT_FLAG);
-    	countPaint.setColor(Color.RED);
-    	countPaint.setTextSize(20f);
-    	countPaint.setTypeface(Typeface.DEFAULT_BOLD);
-    	canvas.drawText(String.valueOf(seq), markerIcon.getWidth()-37, 35, countPaint);
-    	return contactIcon;
-    }
+    
+	@Override
+	public void onMyLocationChange(Location arg0) {
+		loc = arg0;
+		LatLng point = new LatLng(loc.getLatitude(),loc.getLongitude());
+		if(getZoomLevel()<5){
+			//map.moveCamera(CameraUpdateFactory.newLatLng(point));
+			map.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 13));
+		}
+		if(this.myCountryCode==null){
+			getMyCountryCode();
+		}
+		if(routes.size()>0){
+			//if(Navi.isInPolylines(routesPolyLines,point)){ //away from all routes
+			//Step s = Navi.currentStep;
+			//while(!Navi.isInStep(s,point)){
+			//	s=Navi.findNextStep();
+			//}
+			//Navi.currentStep=s;
+			//Log.i(TAG, "Instructions="+Navi.currentStep.getHtmlInstructions());
+			Toast.makeText(activity,Navi.currentStep.getHtmlInstructions(),Toast.LENGTH_LONG).show();
+			//}
+		}
+	}
+	public String getMyCountryCode(){
+		//TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+	    //String countryCode = tm.getSimCountryIso();
+	    //Toast.makeText(MainActivity.this,"simCountryCode="+countryCode,Toast.LENGTH_LONG).show();
+		try {
+			Address addr = gc.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1).get(0);
+			this.myCountryCode=addr.getCountryCode();
+		} catch (IOException e) {
+			Log.i(TAG, "CountryCode="+myCountryCode);
+		}
+		return this.myCountryCode;
+	}
 }

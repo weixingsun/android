@@ -105,10 +105,11 @@ int drawable list_item_bg_normal 0x7f020021
 int drawable list_item_bg_pressed 0x7f020022
 int drawable list_selector 0x7f020023
 int drawable marker_blue_32 0x7f020024
-int drawable next_50 0x7f020025
-int drawable powered_by_google_dark 0x7f020026
-int drawable powered_by_google_light 0x7f020027
-int drawable voice_48 0x7f020028
+int drawable mic_52 0x7f020025
+int drawable next_50 0x7f020026
+int drawable powered_by_google_dark 0x7f020027
+int drawable powered_by_google_light 0x7f020028
+int drawable voice_48 0x7f020029
 int id book_now 0x7f09000e
 int id buyButton 0x7f09000a
 int id buy_now 0x7f09000f

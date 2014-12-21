@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
@@ -147,10 +148,9 @@ public class GoogleMapSearchByNameTask extends
       }
     /** 
      * 组合成googlemap direction所需要的url
-     *  
-     * @param origin 
-     * @param dest 
-     * @return url 
+     * @param origin
+     * @param dest
+     * @return url
      */
     public String getLocationURL(String address) {
         String parsedValue = null;
@@ -159,11 +159,14 @@ public class GoogleMapSearchByNameTask extends
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-        String sensor = "sensor=false";
+        String sensor = "&sensor=false";
+        String language = "&Accept-Language:zh-CN";
+        String region = "&components=country:"+gmap.myCountryCode;
+        String geoapi = "https://maps.googleapis.com/maps/api/geocode/";
         String format = "json";
-        // String format = "xml";
-        String url = "https://maps.googleapis.com/maps/api/geocode/"+format+"?address="+parsedValue+"&sensor=false&Accept-Language:zh-CN";//&region=es
+        String addressURL = "?address="+parsedValue;
+		String url = geoapi +format+addressURL+language+sensor+region;
         Log.i(TAG,"getLocationURL--->: " + url);
-        return url;  
+        return url;
     }
 }
