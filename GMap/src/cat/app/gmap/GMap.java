@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import android.app.FragmentManager;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Address;
@@ -29,6 +30,7 @@ import cat.app.gmap.nav.Leg;
 import cat.app.gmap.nav.Navi;
 import cat.app.gmap.nav.Route;
 import cat.app.gmap.nav.Step;
+import cat.app.gmap.task.GetAddressTask;
 import cat.app.gmap.task.GoogleMapRouteTask;
 import cat.app.gmap.task.GoogleMapSearchByPositionTask;
 
@@ -71,10 +73,16 @@ public class GMap extends MapFragment
 	
 	public void init(final MainActivity activity){
 		this.activity= activity;
-	    gc = new Geocoder(this.activity, Locale.getDefault());
+		LocationManager lm=(LocationManager)activity.getSystemService(Context.LOCATION_SERVICE);
+		loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+	    
 		FragmentManager myFM = activity.getFragmentManager();
 		MapFragment fragment = (MapFragment) myFM.findFragmentById(R.id.map);
 		map = fragment.getMap();
+		if (loc != null) {
+	        LatLng ll = new LatLng(loc.getLatitude(),loc.getLongitude());
+	        move(ll,13);
+	    }
 		map.getUiSettings().setCompassEnabled(false);
 		map.getUiSettings().setRotateGesturesEnabled(false);
 		map.setMyLocationEnabled(true);
@@ -139,6 +147,10 @@ public class GMap extends MapFragment
     }
 	public void move(LatLng latlng){
 		map.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+	}
+
+	public void move(LatLng latlng, int zoomLevel){
+		map.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, zoomLevel));
 	}
     public float getZoomLevel(){
     	return map.getCameraPosition().zoom;
@@ -221,13 +233,8 @@ public class GMap extends MapFragment
 	@Override
 	public void onMyLocationChange(Location arg0) {
 		loc = arg0;
-		LatLng point = new LatLng(loc.getLatitude(),loc.getLongitude());
-		if(getZoomLevel()<5){
-			//map.moveCamera(CameraUpdateFactory.newLatLng(point));
-			map.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 13));
-		}
 		if(this.myCountryCode==null){
-			getMyCountryCode();
+			startMyCountryCodeTask();
 		}
 		if(routes.size()>0){
 			//if(Navi.isInPolylines(routesPolyLines,point)){ //away from all routes
@@ -241,17 +248,10 @@ public class GMap extends MapFragment
 			//}
 		}
 	}
-	public String getMyCountryCode(){
+	public void startMyCountryCodeTask(){
 		//TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 	    //String countryCode = tm.getSimCountryIso();
-	    //Toast.makeText(MainActivity.this,"simCountryCode="+countryCode,Toast.LENGTH_LONG).show();
-		try {
-			Address addr = gc.getFromLocation(loc.getLatitude(), loc.getLongitude(), 1).get(0);
-			this.myCountryCode=addr.getCountryCode();
-		} catch (IOException e) {
-			Log.i(TAG, "CountryCode="+myCountryCode);
-		}
-		return this.myCountryCode;
+		(new GetAddressTask(activity)).execute(loc);
 	}
 
 }
