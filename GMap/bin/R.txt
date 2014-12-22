@@ -121,9 +121,10 @@ int id holo_dark 0x7f090005
 int id holo_light 0x7f090006
 int id hybrid 0x7f090000
 int id inputAddress 0x7f090018
-int id left_drawer_child 0x7f09001f
-int id left_drawer_parent 0x7f09001d
+int id left_drawer_child 0x7f090020
+int id left_drawer_parent 0x7f09001e
 int id listSuggestion 0x7f09001b
+int id listVoiceSuggestion 0x7f09001c
 int id map 0x7f090016
 int id match_parent 0x7f09000c
 int id monochrome 0x7f090013
@@ -138,8 +139,8 @@ int id settingsIcon 0x7f090017
 int id strict_sandbox 0x7f090009
 int id terrain 0x7f090004
 int id text1 0x7f090014
-int id tvsettings 0x7f09001c
-int id tvsubsettings 0x7f09001e
+int id tvsettings 0x7f09001d
+int id tvsubsettings 0x7f09001f
 int id voiceInput 0x7f090019
 int id wrap_content 0x7f09000d
 int integer google_play_services_version 0x7f070000

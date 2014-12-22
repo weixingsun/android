@@ -1,5 +1,7 @@
 package cat.app.gmap;
 
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -7,8 +9,12 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.Bitmap.Config;
+import android.view.inputmethod.InputMethodManager;
 
 public class Util {
+
+	public static final int REQ_CODE_SPEECH_INPUT = 2;
+	
 	public static final String NAV_DRIVING = "Driving";
 	public static final String NAV_WALKING = "Walking";
 	public static final String NAV_BIKING  = "Biking";
@@ -50,7 +56,11 @@ public class Util {
     	canvas.drawText(String.valueOf(seq), markerIcon.getWidth()-37, 35, countPaint);
     	return contactIcon;
     }
-
+    
+	public static void closeKeyBoard(MainActivity activity) {
+		InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(activity.inputAddress.getWindowToken(), 0);
+	}
     /*public void showMarkers(){
     	LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
 

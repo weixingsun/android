@@ -3,9 +3,12 @@ package cat.app.gmap;
 import java.util.List;
 import java.util.Locale;
 
+import cat.app.gmap.adapter.VoiceSuggestListAdapter;
 import cat.app.gmap.listener.MenuItemClickListener;
+import cat.app.gmap.listener.Voice;
 import cat.app.gmap.model.SuggestPoint;
 import cat.app.gmap.task.GoogleMapSearchByNameTask;
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -32,16 +35,17 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 //http://servicedata.net76.net/select.php
 public class MainActivity extends FragmentActivity {
 
 	private final String TAG = "GMap.MainActivity";
-	private final int REQ_CODE_SPEECH_INPUT = 2;
 	public GMap gMap = new GMap();
 	public ListView listSuggestion;
-	private EditText inputAddress;
+	public ListView listVoice ;
+	public EditText inputAddress;
 	private ListView mDrawerListParent;
     private String[] mMainSettings;
     private DrawerLayout mDrawerLayout;
@@ -85,6 +89,15 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	private void setList() {
+		this.listVoice = (ListView) findViewById(R.id.listVoiceSuggestion);
+		this.listVoice.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				TextView tv = (TextView)view;
+				inputAddress.setText(tv.getText());
+				listVoice.setVisibility(View.INVISIBLE);
+			}
+		});
 		this.listSuggestion = (ListView) findViewById(R.id.listSuggestion);
 		this.listSuggestion.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -108,6 +121,7 @@ public class MainActivity extends FragmentActivity {
 				task.execute();
 			}
 		});
+		
 		inputAddress.setOnKeyListener(new OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -115,7 +129,7 @@ public class MainActivity extends FragmentActivity {
 					GoogleMapSearchByNameTask task = new GoogleMapSearchByNameTask(
 							gMap, inputAddress.getText().toString());
 					task.execute();
-					closeKeyBoard();
+					Util.closeKeyBoard(MainActivity.this);
 				}
 				return false;
 			}
@@ -127,39 +141,26 @@ public class MainActivity extends FragmentActivity {
 		voiceInput.setOnClickListener(new View.OnClickListener() {
 		    @Override
 		    public void onClick(View v) {
-		    	promptSpeechInput();
+		    	Voice.promptSpeechInput(MainActivity.this);
 		    }
 		});
 	}
-	private void closeKeyBoard() {
-		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.hideSoftInputFromWindow(inputAddress.getWindowToken(), 0);
-	}
-	
-	private void promptSpeechInput() {
-		Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-		intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-				RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-		intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-		intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
-				getString(R.string.speech_prompt));
-		try {
-			startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
-		} catch (ActivityNotFoundException a) {
-			Toast.makeText(getApplicationContext(),
-					getString(R.string.speech_not_supported),
-					Toast.LENGTH_SHORT).show();
-		}
-	}
+
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		switch (requestCode) {
-			case REQ_CODE_SPEECH_INPUT: {
+			case Util.REQ_CODE_SPEECH_INPUT: {
 				if (resultCode == RESULT_OK && null != data) {
 					List<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-					inputAddress.setText(result.get(0));
+					//inputAddress.setText(result.get(0));
+					
+					ArrayAdapter<String> adapter = new VoiceSuggestListAdapter(this,
+					        android.R.layout.simple_list_item_1, result);
+					//new CustomListAdapter(YourActivity.this , R.layout.custom_list , mList);
+					listVoice.setAdapter(adapter);
+					listVoice.setVisibility(View.VISIBLE);
 				}
 				break;
 			}

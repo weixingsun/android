@@ -16,6 +16,9 @@ import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -43,7 +46,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 
-public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLocationChangeListener {
+public class GMap extends MapFragment 
+	implements OnMapLongClickListener,OnMyLocationChangeListener {
 	//GooglePlayServicesClient.ConnectionCallbacks,
     //GooglePlayServicesClient.OnConnectionFailedListener
 
@@ -56,6 +60,7 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 	public GoogleMap map;
 	public MainActivity activity;
 	public Location loc;
+	public LocationManager lm;
 	public Geocoder gc;
 	public Map<String,Marker> markers=new TreeMap<String,Marker>();
 	public TreeMap<String,MarkerPoint> markerpoints=new TreeMap<String,MarkerPoint>();
@@ -94,6 +99,8 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
             @Override
             public void onMapClick(LatLng arg0) {
             	activity.listSuggestion.setVisibility(View.INVISIBLE);
+            	activity.listVoice.setVisibility(View.INVISIBLE);
+            	Util.closeKeyBoard(activity);
             }
         });
         settings.put("TrafficEnabled", "false");
@@ -246,4 +253,5 @@ public class GMap extends MapFragment implements OnMapLongClickListener,OnMyLoca
 		}
 		return this.myCountryCode;
 	}
+
 }

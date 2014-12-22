@@ -63,13 +63,24 @@
 					android:visibility="invisible" />
 			
 		    </LinearLayout>
-			<ListView
-				android:id="@+id/listSuggestion"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content" >
-	
-			</ListView>
-			
+		    <LinearLayout
+		        android:baselineAligned="true"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:orientation="horizontal">
+
+				<ListView
+				    android:id="@+id/listSuggestion"
+				    android:layout_width="0dp"
+				    android:layout_height="wrap_content"
+				    android:layout_weight="5" />
+
+				<ListView 
+					android:id="@+id/listVoiceSuggestion"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+				    android:layout_weight="1" />
+			</LinearLayout>
 		</LinearLayout>
 		
 	</RelativeLayout>
