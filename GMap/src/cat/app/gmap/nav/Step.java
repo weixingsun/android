@@ -14,6 +14,7 @@ public class Step {
     private LatLng endLocation;
     private LatLng startLocation;
     private String htmlInstructions;
+    private String maneuver;
     private String travelMode;
     private List<LatLng> points;
 
@@ -72,4 +73,12 @@ public class Step {
     public void setTravelMode(String travelMode) {
         this.travelMode = travelMode;
     }
+
+	public String getManeuver() {
+		return maneuver;
+	}
+
+	public void setManeuver(String maneuver) {
+		this.maneuver = maneuver;
+	}
 }

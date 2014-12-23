@@ -8,6 +8,7 @@ import cat.app.gmap.listener.MenuItemClickListener;
 import cat.app.gmap.listener.Voice;
 import cat.app.gmap.model.SuggestPoint;
 import cat.app.gmap.task.GoogleMapSearchByNameTask;
+import cat.app.gmap.task.Player;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -57,7 +58,11 @@ public class MainActivity extends FragmentActivity {
 		gMap.init(this);
 		showUI();
 	}
-
+	@Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Player.release();
+    }
 	void showUI() {
 		setText();
 		setButtons();
@@ -146,6 +151,7 @@ public class MainActivity extends FragmentActivity {
 		});
 	}
 
+	
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {

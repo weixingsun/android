@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import cat.app.gmap.MainActivity;
 
 import android.content.Context;
@@ -14,7 +16,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
-public class GetAddressTask extends AsyncTask<Location, Void, String> {
+public class GetAddressTask extends AsyncTask<LatLng, Void, String> {
 	MainActivity act;
 	private static final String TAG = "GMap.GetAddressTask";
 	public GetAddressTask(MainActivity act) {
@@ -23,12 +25,12 @@ public class GetAddressTask extends AsyncTask<Location, Void, String> {
 	}
 
 	@Override
-	protected String doInBackground(Location... params) {
+	protected String doInBackground(LatLng... params) {
 		Geocoder geocoder = new Geocoder(act, Locale.getDefault());
-        Location loc = params[0];
+        LatLng loc = params[0];
         List<Address> addresses = null;
         try {
-            addresses = geocoder.getFromLocation(loc.getLatitude(),loc.getLongitude(), 1);
+            addresses = geocoder.getFromLocation(loc.latitude,loc.longitude, 1);
         } catch (IOException e1) {
 	        Log.e(TAG,"IO Exception in getFromLocation(): ");
 	        return null;

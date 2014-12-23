@@ -1,5 +1,10 @@
 package cat.app.gmap;
 
+import java.io.File;
+import java.io.IOException;
+
+import com.google.android.gms.maps.model.LatLng;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,6 +14,9 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.Bitmap.Config;
+import android.location.Location;
+import android.os.Environment;
+import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 
 public class Util {
@@ -62,6 +70,22 @@ public class Util {
 	public static void closeKeyBoard(MainActivity activity) {
 		InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(activity.inputAddress.getWindowToken(), 0);
+	}
+	
+	public static float getDistance(LatLng oldPosition  ,LatLng newPosition){
+		float[] results = new float[1];
+		Location.distanceBetween(oldPosition.latitude, oldPosition.longitude,
+		                newPosition.latitude, newPosition.longitude, results);
+		return results[0];
+	}
+	public static boolean isFileExist(String filepath){
+		File file = new File(filepath);
+	    return file.exists();
+	}
+	public static void createFolder(File folder) {
+    	if (!folder.mkdirs()) {
+    		Log.i("Util", "failed to create dir:"+folder.getAbsolutePath());
+    	}
 	}
     /*public void showMarkers(){
     	LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;

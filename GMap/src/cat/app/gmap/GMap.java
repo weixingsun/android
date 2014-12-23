@@ -1,5 +1,6 @@
 package cat.app.gmap;
 
+import java.io.File;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -7,6 +8,8 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.graphics.*;
 import android.location.*;
+import android.media.MediaPlayer;
+import android.os.Environment;
 import android.util.*;
 import android.view.View;
 import android.widget.Toast;
@@ -30,10 +33,16 @@ public class GMap extends MapFragment
     private HashMap<String,String> settings = new HashMap<String, String>();
 	private static final String TAG = "GMap";
 	public String myCountryCode;
+	public String currentHintFile;
+	public String nextHintFile;
+	public String currentHintString;
+	public String nextHintString;
 	public GoogleMap map;
 	public MainActivity activity;
-	public Location loc;
-	public Location lastLoc;
+	//public Location loc;
+	//public Location lastLoc;
+	public LatLng myLatLng;
+	public LatLng myLastLatLng;
 	public LocationManager lm;
 	public Map<String,Marker> markers=new TreeMap<String,Marker>();
 	public TreeMap<String,MarkerPoint> markerpoints=new TreeMap<String,MarkerPoint>();
@@ -44,15 +53,20 @@ public class GMap extends MapFragment
 	
 	public void init(final MainActivity activity){
 		this.activity= activity;
+		initStorage();
+		initMap();
+        settings.put("TrafficEnabled", "false");
+	}
+
+	private void initMap() {
 		LocationManager lm=(LocationManager)activity.getSystemService(Context.LOCATION_SERVICE);
-		loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-		//lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,Util.LOCATION_UPDATE_INTERVAL,0,this);
+		Location myloc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		FragmentManager myFM = activity.getFragmentManager();
 		MapFragment fragment = (MapFragment) myFM.findFragmentById(R.id.map);
 		map = fragment.getMap();
-		if (loc != null) {
-	        LatLng ll = new LatLng(loc.getLatitude(),loc.getLongitude());
-	        move(ll,13);
+		if (myloc != null) {
+			myLatLng = new LatLng(myloc.getLatitude(),myloc.getLongitude());
+	        move(myLatLng,13);
 	    }
 		map.getUiSettings().setCompassEnabled(false);
 		map.getUiSettings().setRotateGesturesEnabled(false);
@@ -82,8 +96,14 @@ public class GMap extends MapFragment
             	Util.closeKeyBoard(activity);
             }
         });
-        settings.put("TrafficEnabled", "false");
-        //settings.put("TrafficEnabled", "false");
+	}
+
+	private void initStorage() {
+		String hintFolderPath = Environment.getExternalStorageDirectory() + "/GMap/routes/hint/";
+		File folder = new File(hintFolderPath);
+		currentHintFile = hintFolderPath+ "currentHint.mp3";
+		nextHintFile=hintFolderPath+ "nextHint.mp3";
+		Util.createFolder(folder);
 	}
 
 	private void updateMarkerSeq() {
@@ -151,18 +171,18 @@ public class GMap extends MapFragment
     	}
 	}
 	public void refreshRoute(boolean restart) {
-		LatLng myLoc = new LatLng(loc.getLatitude(),loc.getLongitude());
+		//LatLng myLoc = new LatLng(loc.getLatitude(),loc.getLongitude());
 		
 		if(restart){//redraw all routes
 			removePreviousRoute();
 			routes.clear();
-			refreshRoute(myLoc);
+			refreshRoute(myLatLng);
 		}else{ //draw only last route
 			Entry<String,MarkerPoint> lastEntry = markerpoints.pollLastEntry();
 			LatLng end = lastEntry.getValue().getLatlng();
 			LatLng start=null;
 			if(markerpoints.size()==0) {
-				start=myLoc;
+				start=myLatLng;
 			}else{
 				start=markerpoints.lastEntry().getValue().getLatlng();
 			}
@@ -170,7 +190,6 @@ public class GMap extends MapFragment
             task.execute();
 			markerpoints.put(lastEntry.getKey(), lastEntry.getValue());
 		}
-		
 	}
 	public void refreshRoute(LatLng loc){
 		//Toast.makeText(activity, "draw lines", Toast.LENGTH_LONG).show();
@@ -205,23 +224,36 @@ public class GMap extends MapFragment
 	public void startMyCountryCodeTask(){
 		//TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 	    //String countryCode = tm.getSimCountryIso();
-		(new GetAddressTask(activity)).execute(loc);
+		(new GetAddressTask(activity)).execute(myLatLng);
 	}
 	@Override
 	public void onMyLocationChange(Location arg0) {
-		loc = arg0;
-		if(lastLoc==null) lastLoc=loc;
-		if(this.myCountryCode==null){
+		myLatLng = new LatLng(arg0.getLatitude(),arg0.getLongitude());
+		if(myLastLatLng==null) myLastLatLng=myLatLng;
+		if(myCountryCode==null){
 			startMyCountryCodeTask();
 		}
-		if(lastLoc.distanceTo(loc)>10){	//more than 10 meters
-			
-			lastLoc=loc;
+		if(Util.getDistance(myLatLng, myLastLatLng)>10){	//more than 10 meters
+			myLastLatLng=myLatLng;
 		}
 		if(routes.size()>0){
-			if(NaviTask.currentStep==null) NaviTask.init(routes);
-			LatLng ll = new LatLng(loc.getLatitude(),loc.getLongitude());
-			(new NaviTask(activity)).execute(ll);
+			if(NaviTask.routes==null) NaviTask.init(routes);
+			(new NaviTask(activity)).execute(myLatLng); //text hint: nextHintString
+			if(nextHintString!=null && !nextHintString.equals(currentHintString)){
+				(new TextToSpeechTask(activity)).execute(nextHintString);
+				currentHintString=nextHintString;
+			}
+			if(nextHintFile!=null && !nextHintFile.equals(currentHintFile)){
+				play(nextHintFile);
+				currentHintFile=nextHintFile;
+			}
 		}
+	}
+
+	private void play(String hintFile) {
+		//Toast.makeText(activity, "hintFile="+hintFile, Toast.LENGTH_LONG).show();
+		Log.i(TAG, "Locale.Language="+Locale.getDefault().getLanguage()+"hintFile="+hintFile);
+		//MediaPlayer mPlayer = MediaPlayer.create(activity, R.raw.aaanicholas);
+		Player.play(hintFile);
 	}
 }

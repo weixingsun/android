@@ -26,6 +26,7 @@ public class RouteParser {
 	private static final String POLYLINE = "polyline";
 	private static final String END_LOCATION = "end_location";
 	private static final String START_LOCATION = "start_location";
+	private static final String MANEUVER = "maneuver";
 
 	public static List<Route> parse(String routesJSONString) throws JSONException {
 	    try {
@@ -56,6 +57,7 @@ public class RouteParser {
 	                    stepEndLocationLatLng = new LatLng(stepEndLocationJSONObject.getDouble(LATITUDE), stepEndLocationJSONObject.getDouble(LONGITUDE));
 	                    step.setEndLocation(stepEndLocationLatLng);
 	                    step.setHtmlInstructions(stepJSONObject.getString(HTML_INSTRUCTION));
+	                    step.setManeuver(stepJSONObject.getString(MANEUVER)); //sometimes null
 	                    legPolyLineJSONObject = stepJSONObject.getJSONObject(POLYLINE);
 	                    String encodedString = legPolyLineJSONObject.getString(POINTS);
 	                    step.setPoints(decodePolyLines(encodedString));
