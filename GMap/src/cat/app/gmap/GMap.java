@@ -33,14 +33,9 @@ public class GMap extends MapFragment
     private HashMap<String,String> settings = new HashMap<String, String>();
 	private static final String TAG = "GMap";
 	public String myCountryCode;
-	public String currentHintFile;
-	public String nextHintFile;
-	public String currentHintString;
-	public String nextHintString;
+	public Map<String,String> instructionToMp3 = new HashMap<String,String>();
 	public GoogleMap map;
 	public MainActivity activity;
-	//public Location loc;
-	//public Location lastLoc;
 	public LatLng myLatLng;
 	public LatLng myLastLatLng;
 	public LocationManager lm;
@@ -49,6 +44,9 @@ public class GMap extends MapFragment
 	public int markerMaxSeq = 1;
 	public List<SuggestPoint> suggestPoints = new ArrayList<SuggestPoint>();
 	public List<Route> routes = new ArrayList<Route>();
+	public List<Step> steps = new ArrayList<Step>();
+	public int currentStepIndex = 0;
+	public int previousStepIndex = -1;
 	public List<Polyline> routesPolyLines = new ArrayList<Polyline>();
 	
 	public void init(final MainActivity activity){
@@ -99,10 +97,7 @@ public class GMap extends MapFragment
 	}
 
 	private void initStorage() {
-		String hintFolderPath = Environment.getExternalStorageDirectory() + "/GMap/routes/hint/";
-		File folder = new File(hintFolderPath);
-		currentHintFile = hintFolderPath+ "currentHint.mp3";
-		nextHintFile=hintFolderPath+ "nextHint.mp3";
+		File folder = new File(Util.baseDir);
 		Util.createFolder(folder);
 	}
 
@@ -171,12 +166,12 @@ public class GMap extends MapFragment
     	}
 	}
 	public void refreshRoute(boolean restart) {
-		//LatLng myLoc = new LatLng(loc.getLatitude(),loc.getLongitude());
-		
 		if(restart){//redraw all routes
 			removePreviousRoute();
 			routes.clear();
-			refreshRoute(myLatLng);
+			steps.clear();
+			instructionToMp3.clear();
+			redrawRoutes(myLatLng);
 		}else{ //draw only last route
 			Entry<String,MarkerPoint> lastEntry = markerpoints.pollLastEntry();
 			LatLng end = lastEntry.getValue().getLatlng();
@@ -191,7 +186,7 @@ public class GMap extends MapFragment
 			markerpoints.put(lastEntry.getKey(), lastEntry.getValue());
 		}
 	}
-	public void refreshRoute(LatLng loc){
+	public void redrawRoutes(LatLng loc){
 		//Toast.makeText(activity, "draw lines", Toast.LENGTH_LONG).show();
 		if(markerpoints.size()>0){
 			LatLng start = loc;
@@ -224,7 +219,7 @@ public class GMap extends MapFragment
 	public void startMyCountryCodeTask(){
 		//TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 	    //String countryCode = tm.getSimCountryIso();
-		(new GetAddressTask(activity)).execute(myLatLng);
+		(new GetAddressTask(activity,myLatLng)).execute();
 	}
 	@Override
 	public void onMyLocationChange(Location arg0) {
@@ -237,23 +232,23 @@ public class GMap extends MapFragment
 			myLastLatLng=myLatLng;
 		}
 		if(routes.size()>0){
-			if(NaviTask.routes==null) NaviTask.init(routes);
-			(new NaviTask(activity)).execute(myLatLng); //text hint: nextHintString
-			if(nextHintString!=null && !nextHintString.equals(currentHintString)){
-				(new TextToSpeechTask(activity)).execute(nextHintString);
-			}
-			if(nextHintString!=null && !nextHintString.equals(currentHintString)){
-				Log.i(TAG, "currentHintString="+currentHintString+",nextHintString="+nextHintString);
-				play(nextHintFile);
-				currentHintString=nextHintString;
+			(new FindMyStepTask(activity)).execute(myLatLng); //currentStepIndex found
+			if(previousStepIndex!=currentStepIndex){
+				String hintHTML = this.steps.get(currentStepIndex).getHtmlInstructions();
+				String hintFile = this.instructionToMp3.get(hintHTML);
+				if(hintFile!=null){
+					Player.play(hintFile);
+				}
+				previousStepIndex=currentStepIndex;
 			}
 		}
 	}
-
-	private void play(String hintFile) {
-		//Toast.makeText(activity, "hintFile="+hintFile, Toast.LENGTH_LONG).show();
-		Log.i(TAG, "Locale.Language="+Locale.getDefault().getLanguage()+"hintFile="+hintFile);
-		//MediaPlayer mPlayer = MediaPlayer.create(activity, R.raw.aaanicholas);
-		Player.play(hintFile);
+	public void in(int old_size){
+        for(int i=old_size;i<steps.size();i++){
+        	String hintFile = Util.createHintFileName(i);//baseDir+/GMap/routes/hint/
+        	String hintHTML = steps.get(i).getHtmlInstructions();
+        	(new TextToSpeechTask(this,hintHTML,hintFile)).execute();	//gMap.instructionToMp3(hint,hintFile)
+        }
 	}
+	
 }

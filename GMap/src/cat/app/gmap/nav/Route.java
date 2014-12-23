@@ -2,6 +2,7 @@ package cat.app.gmap.nav;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import android.content.Context;
 import com.google.android.gms.maps.model.Polyline;
@@ -66,5 +67,15 @@ public class Route implements Serializable {
     public static long getSerialversionuid() {
         return serialVersionUID;
     }
+
+	public List<Step> getSteps() {
+		List<Step> steps = new ArrayList<Step>();
+		for(Leg l:getLegs()){
+			for(Step s:l.getSteps()){
+				steps.add(s);
+			}
+		}
+		return steps;
+	}
 
 }

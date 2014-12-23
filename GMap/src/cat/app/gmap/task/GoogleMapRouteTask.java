@@ -16,7 +16,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import cat.app.gmap.GMap;
-import cat.app.gmap.nav.NaviTask;
+import cat.app.gmap.Util;
+import cat.app.gmap.nav.FindMyStepTask;
 import cat.app.gmap.nav.Route;
 import cat.app.gmap.nav.RouteParser;
 
@@ -28,6 +29,7 @@ import com.google.android.gms.maps.model.PolylineOptions;
 
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.text.Html;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -42,7 +44,7 @@ public class GoogleMapRouteTask extends
     private static final String TAG = "GMap.GoogleMapRouteTask";
 	HttpClient client;  
     String url;  
-    //static List<Polyline> preRoutes = new ArrayList<Polyline>();
+    int old_size=0;
     List<LatLng> route = null;
     GMap gmap;
     public GoogleMapRouteTask(GMap gmap,String url) {  
@@ -56,7 +58,6 @@ public class GoogleMapRouteTask extends
 	}
 	@Override  
     protected List<LatLng> doInBackground(String... params) {
-  
         HttpGet get = new HttpGet(url);
         try {
             HttpResponse response = client.execute(get);  
@@ -67,6 +68,8 @@ public class GoogleMapRouteTask extends
                 if (object.getString("status").equals("OK")) {
                 	Route r = RouteParser.parse(responseString).get(0);
                 	gmap.routes.add(r);
+                	old_size=gmap.steps.size();
+                	gmap.steps.addAll(r.getSteps());
                 	route = RouteParser.getWholeRoutePoints(r);
                 } else {
                     return null;
@@ -90,26 +93,24 @@ public class GoogleMapRouteTask extends
         client = new DefaultHttpClient();  
         client.getParams().setParameter(  
                 CoreConnectionPNames.CONNECTION_TIMEOUT, 15000);  
-        client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT,15000);  
+        client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT,15000);
         super.onPreExecute();
     }  
   
     @Override  
     protected void onPostExecute(List<LatLng> route) {  
         super.onPostExecute(route);  
-        if (route == null) {  
-            //failed to navigate
+        if (route == null) {
             Toast.makeText(gmap.activity, "No route found.", Toast.LENGTH_LONG).show();
         }  
         else{
-        	//removePreviousRoute();
             PolylineOptions lineOptions = new PolylineOptions();
             lineOptions.addAll(route);
             lineOptions.width(10);
             lineOptions.color(Color.BLUE);
             Polyline pl = gmap.map.addPolyline(lineOptions);
             gmap.routesPolyLines.add(pl);
-            //gmap.map.animateCamera(CameraUpdateFactory.newLatLng(routes.get(0)));
+            gmap.in(old_size);
         }
     }
 

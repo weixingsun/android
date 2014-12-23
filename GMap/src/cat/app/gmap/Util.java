@@ -39,6 +39,7 @@ public class Util {
 	public static final String ROAD_MEDICAL_EMERGENCY = "Medical Emergency";
 
 	public static final long LOCATION_UPDATE_INTERVAL = 1000 * 10; //10 seconds
+	static String baseDir = Environment.getExternalStorageDirectory() + "/GMap/routes/hint/";
 	
 	/**
      * 在给定的图片的右上角加上联系人数量。数量用红色表示
@@ -114,4 +115,8 @@ public class Util {
 		return key;
 	}
     */
+
+	public static String createHintFileName(int currentStepIndex) {
+		return baseDir+"hint_"+currentStepIndex+".mp3";
+	}
 }

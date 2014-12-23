@@ -9,31 +9,27 @@ import android.util.Log;
 import android.widget.Toast;
 
 import cat.app.gmap.MainActivity;
+import cat.app.gmap.Util;
+import cat.app.gmap.task.TextToSpeechTask;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 
-public class NaviTask extends AsyncTask<LatLng, Void, String> {
+public class FindMyStepTask extends AsyncTask<LatLng, Void, String> {
 	MainActivity act;
 	private static final String TAG = "GMap.NaviTask";
-	public NaviTask(MainActivity act) {
+	public FindMyStepTask(MainActivity act) {
 		super();
 		this.act = act;
-	}
-	public static int currentStepIndex;
-	public static List<Route> routes;
-	static List<Step> steps = new ArrayList<Step>();
-	public static void init(List<Route> routes){
-		NaviTask.routes = routes;
-		for(Route r:routes){
-			for(Leg l:r.getLegs()){
-				for(Step s:l.getSteps()){
-					steps.add(s);
-				}
-			}
-		}
+		this.steps = act.gMap.steps;
 		currentStepIndex=0;
 	}
+	public int currentStepIndex;
+	//public List<Route> routes;
+	public List<Step> steps;
+	public static List<String> stepHintStrings = new ArrayList<String>();
+	public static List<String> stepHintFiles = new ArrayList<String>();
+	
 	public Step findNextStep(){
 		if(currentStepIndex+1==steps.size()){
 			return null;
@@ -75,8 +71,8 @@ public class NaviTask extends AsyncTask<LatLng, Void, String> {
 		
 		if(isIn){
 			return step.getHtmlInstructions();
-		}else{//continue to search in next step
-			Log.i(TAG, "Not in first step");
+		}else{
+			Log.w(TAG, "Find next step......................");
 			while((step = findNextStep())!=null){
 				if(isInPointList(step.getPoints(),params[0])){
 					return step.getHtmlInstructions();
@@ -89,8 +85,7 @@ public class NaviTask extends AsyncTask<LatLng, Void, String> {
 	@Override
     protected void onPostExecute(String instruction) {
 		//http://translate.google.com/translate_tts?tl=en&q=Hello%20World
-		String hint=Html.fromHtml(instruction).toString();
-        //Toast.makeText(act, hint, Toast.LENGTH_SHORT).show();
-		act.gMap.nextHintString=hint;
+		//String hint=Html.fromHtml(instruction).toString();
+		act.gMap.currentStepIndex = this.currentStepIndex;
     }
 }

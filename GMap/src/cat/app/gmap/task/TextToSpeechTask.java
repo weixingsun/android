@@ -1,7 +1,6 @@
 package cat.app.gmap.task;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,19 +9,26 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import cat.app.gmap.GMap;
 import cat.app.gmap.MainActivity;
 
 import android.os.AsyncTask;
+import android.text.Html;
 import android.util.Log;
 
 public class TextToSpeechTask extends AsyncTask<String, Void, String> {
-	MainActivity act;
-	public TextToSpeechTask(MainActivity act) {
+	GMap gmap;
+	String hintHTML;
+	String instructionVoiceFile;
+	public TextToSpeechTask(GMap gmap,String hintHTML,String voiceFile) {
 		super();
-		this.act = act;
+		this.gmap = gmap;
+		this.hintHTML = hintHTML;
+		this.instructionVoiceFile = voiceFile;
 	}
 	private static final String TAG = "GMap.TextToSpeechTask";
 	//http://translate.google.com/translate_tts? tl=en &q=Hello%20World
+	//Locale.getDefault().getLanguage() == "zh" / "en"
 	String urlStr;
 	String site="http://translate.google.com/translate_tts?";
 	String language="tl=en";
@@ -36,7 +42,8 @@ public class TextToSpeechTask extends AsyncTask<String, Void, String> {
 	protected String doInBackground(String... params) {
 		String parsedValue = null;
 		try {
-			parsedValue = java.net.URLEncoder.encode(params[0], "UTF-8");
+			String hint = Html.fromHtml(hintHTML).toString();
+			parsedValue = java.net.URLEncoder.encode(hint, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			Log.i(TAG, "URLEncoder.encode exception ");
 		}
@@ -46,7 +53,7 @@ public class TextToSpeechTask extends AsyncTask<String, Void, String> {
 			URL url = new URL(urlStr);
 			url.openStream();
 			InputStream input = new BufferedInputStream(url.openStream(),1024);
-			OutputStream output = new FileOutputStream(act.gMap.nextHintFile);
+			OutputStream output = new FileOutputStream(instructionVoiceFile);
 			byte[] data = new byte[1024];
 			int count=0;
 			while ((count=input.read(data)) > -1) {
@@ -61,11 +68,11 @@ public class TextToSpeechTask extends AsyncTask<String, Void, String> {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return act.gMap.nextHintFile;
+		return instructionVoiceFile;
 	}
 	@Override  
     protected void onPostExecute(String filePath) {
         //super.onPostExecute(filePath);
-        Log.i(TAG, "Next Hint File="+filePath);
+        gmap.instructionToMp3.put(hintHTML, instructionVoiceFile);
     }
 }

@@ -1,6 +1,5 @@
 package cat.app.gmap.task;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 
 import android.media.MediaPlayer;
@@ -10,8 +9,9 @@ public class Player {
 	
 	public static void init(String fileName) {
         try {
-            FileInputStream fis = new FileInputStream(fileName);
-	        mp.setDataSource(fis.getFD());
+        	
+        	mp.reset();
+	        mp.setDataSource(fileName);
 			mp.prepare();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -21,9 +21,11 @@ public class Player {
 		mp.start();
 	}
 	public static void play(String fileName){
+		if( mp.isPlaying() ){
+			mp.stop();
+		}
 		init(fileName);
 		mp.start();
-		//mp.stop();
 	}
 	public static void release(){
 		mp.release();
