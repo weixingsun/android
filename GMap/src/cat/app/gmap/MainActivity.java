@@ -81,13 +81,10 @@ public class MainActivity extends FragmentActivity {
 		mDrawerListParent.setAdapter(new ArrayAdapter<String>(this,R.layout.drawer_list_item, mMainSettings));
 		mDrawerListParent.setOnItemClickListener(new MenuItemClickListener(this));
 		mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-		//mDrawerLayout.closeDrawers();
 		ImageView iv = (ImageView) findViewById(R.id.settingsIcon);
 		iv.setOnClickListener(new View.OnClickListener() {
 		    @Override
 		    public void onClick(View v) {
-		        //Toast.makeText(MainActivity.this,"drawer is opening",Toast.LENGTH_LONG).show();
-		    	//Log.i(TAG, "drawer is opening");
 				mDrawerLayout.openDrawer(Gravity.LEFT);
 		    }
 		});
@@ -158,8 +155,6 @@ public class MainActivity extends FragmentActivity {
 			case Util.REQ_CODE_SPEECH_INPUT: {
 				if (resultCode == RESULT_OK && null != data) {
 					List<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-					//inputAddress.setText(result.get(0));
-					
 					ArrayAdapter<String> adapter = new VoiceSuggestListAdapter(this,
 					        android.R.layout.simple_list_item_1, result);
 					//new CustomListAdapter(YourActivity.this , R.layout.custom_list , mList);
