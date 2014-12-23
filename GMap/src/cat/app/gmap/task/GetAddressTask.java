@@ -25,29 +25,18 @@ public class GetAddressTask extends AsyncTask<Location, Void, String> {
 	@Override
 	protected String doInBackground(Location... params) {
 		Geocoder geocoder = new Geocoder(act, Locale.getDefault());
-		// Get the current location from the input parameter list
         Location loc = params[0];
-        // Create a list to contain the result address
         List<Address> addresses = null;
         try {
-        	//1 address is enough for country code
             addresses = geocoder.getFromLocation(loc.getLatitude(),loc.getLongitude(), 1);
         } catch (IOException e1) {
 	        Log.e(TAG,"IO Exception in getFromLocation(): ");
-	        e1.printStackTrace();
 	        return null;
         } catch (IllegalArgumentException e2) {
-	        // Error message to post in the log
-	        /*String errorString = "Illegal arguments " +
-                Double.toString(loc.getLatitude()) +" , " +
-                Double.toString(loc.getLongitude()) +" passed to address service";*/
 	        Log.e("LocationSampleActivity", e2.getMessage());
-	        e2.printStackTrace();
 	        return null;
         }
-     // If the reverse geocode returned an address
         if (addresses != null && addresses.size() > 0) {
-            // Get the first address
             Address address = addresses.get(0);
             return address.getCountryCode();
         }

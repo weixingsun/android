@@ -29,6 +29,8 @@ public class Util {
 	public static final String ROAD_MONITOR_CAMERA = "Monitor Camera";
 	public static final String ROAD_CLOSED_ROAD    = "Closed Road";
 	public static final String ROAD_MEDICAL_EMERGENCY = "Medical Emergency";
+
+	public static final long LOCATION_UPDATE_INTERVAL = 1000 * 10; //10 seconds
 	
 	/**
      * 在给定的图片的右上角加上联系人数量。数量用红色表示

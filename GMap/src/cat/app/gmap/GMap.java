@@ -1,55 +1,26 @@
 package cat.app.gmap;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import android.app.FragmentManager;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.os.Bundle;
-import android.util.Log;
+import android.graphics.*;
+import android.location.*;
+import android.util.*;
 import android.view.View;
 import android.widget.Toast;
 
-import cat.app.gmap.model.MarkerPoint;
-import cat.app.gmap.model.SuggestPoint;
-import cat.app.gmap.nav.Leg;
-import cat.app.gmap.nav.Navi;
-import cat.app.gmap.nav.Route;
-import cat.app.gmap.nav.Step;
-import cat.app.gmap.task.GetAddressTask;
-import cat.app.gmap.task.GoogleMapRouteTask;
-import cat.app.gmap.task.GoogleMapSearchByPositionTask;
+import cat.app.gmap.model.*;
+import cat.app.gmap.nav.*;
+import cat.app.gmap.task.*;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMapLongClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMyLocationChangeListener;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.*;
+import com.google.android.gms.maps.GoogleMap.*;
+import com.google.android.gms.maps.model.*;
 
 public class GMap extends MapFragment 
-	implements OnMapLongClickListener,OnMyLocationChangeListener {
+	implements OnMapLongClickListener, OnMyLocationChangeListener {
 	//GooglePlayServicesClient.ConnectionCallbacks,
     //GooglePlayServicesClient.OnConnectionFailedListener
 
@@ -58,12 +29,12 @@ public class GMap extends MapFragment
 	//&sensor=true&key=AIzaSyApl-_heZUCRD6bJ5TltYPn4gcSCy1LY3A
     private HashMap<String,String> settings = new HashMap<String, String>();
 	private static final String TAG = "GMap";
-	public String myCountryCode=null;
+	public String myCountryCode;
 	public GoogleMap map;
 	public MainActivity activity;
 	public Location loc;
+	public Location lastLoc;
 	public LocationManager lm;
-	public Geocoder gc;
 	public Map<String,Marker> markers=new TreeMap<String,Marker>();
 	public TreeMap<String,MarkerPoint> markerpoints=new TreeMap<String,MarkerPoint>();
 	public int markerMaxSeq = 1;
@@ -75,7 +46,7 @@ public class GMap extends MapFragment
 		this.activity= activity;
 		LocationManager lm=(LocationManager)activity.getSystemService(Context.LOCATION_SERVICE);
 		loc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-	    
+		//lm.requestLocationUpdates(LocationManager.GPS_PROVIDER,Util.LOCATION_UPDATE_INTERVAL,0,this);
 		FragmentManager myFM = activity.getFragmentManager();
 		MapFragment fragment = (MapFragment) myFM.findFragmentById(R.id.map);
 		map = fragment.getMap();
@@ -230,28 +201,27 @@ public class GMap extends MapFragment
 		}
 	}
     
-	@Override
-	public void onMyLocationChange(Location arg0) {
-		loc = arg0;
-		if(this.myCountryCode==null){
-			startMyCountryCodeTask();
-		}
-		if(routes.size()>0){
-			//if(Navi.isInPolylines(routesPolyLines,point)){ //away from all routes
-			//Step s = Navi.currentStep;
-			//while(!Navi.isInStep(s,point)){
-			//	s=Navi.findNextStep();
-			//}
-			//Navi.currentStep=s;
-			//Log.i(TAG, "Instructions="+Navi.currentStep.getHtmlInstructions());
-			Toast.makeText(activity,Navi.currentStep.getHtmlInstructions(),Toast.LENGTH_LONG).show();
-			//}
-		}
-	}
+
 	public void startMyCountryCodeTask(){
 		//TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 	    //String countryCode = tm.getSimCountryIso();
 		(new GetAddressTask(activity)).execute(loc);
 	}
-
+	@Override
+	public void onMyLocationChange(Location arg0) {
+		loc = arg0;
+		if(lastLoc==null) lastLoc=loc;
+		if(this.myCountryCode==null){
+			startMyCountryCodeTask();
+		}
+		if(lastLoc.distanceTo(loc)>10){	//more than 10 meters
+			
+			lastLoc=loc;
+		}
+		if(routes.size()>0){
+			if(NaviTask.currentStep==null) NaviTask.init(routes);
+			LatLng ll = new LatLng(loc.getLatitude(),loc.getLongitude());
+			(new NaviTask(activity)).execute(ll);
+		}
+	}
 }

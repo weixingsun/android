@@ -16,7 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import cat.app.gmap.GMap;
-import cat.app.gmap.nav.Navi;
+import cat.app.gmap.nav.NaviTask;
 import cat.app.gmap.nav.Route;
 import cat.app.gmap.nav.RouteParser;
 
@@ -67,9 +67,6 @@ public class GoogleMapRouteTask extends
                 if (object.getString("status").equals("OK")) {
                 	Route r = RouteParser.parse(responseString).get(0);
                 	gmap.routes.add(r);
-                	if(Navi.currentStep==null){
-                		Navi.init(gmap.routes);
-                	}
                 	route = RouteParser.getWholeRoutePoints(r);
                 } else {
                     return null;
