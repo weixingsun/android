@@ -241,11 +241,11 @@ public class GMap extends MapFragment
 			(new NaviTask(activity)).execute(myLatLng); //text hint: nextHintString
 			if(nextHintString!=null && !nextHintString.equals(currentHintString)){
 				(new TextToSpeechTask(activity)).execute(nextHintString);
-				currentHintString=nextHintString;
 			}
-			if(nextHintFile!=null && !nextHintFile.equals(currentHintFile)){
+			if(nextHintString!=null && !nextHintString.equals(currentHintString)){
+				Log.i(TAG, "currentHintString="+currentHintString+",nextHintString="+nextHintString);
 				play(nextHintFile);
-				currentHintFile=nextHintFile;
+				currentHintString=nextHintString;
 			}
 		}
 	}
