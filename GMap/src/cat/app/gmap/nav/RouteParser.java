@@ -57,7 +57,11 @@ public class RouteParser {
 	                    stepEndLocationLatLng = new LatLng(stepEndLocationJSONObject.getDouble(LATITUDE), stepEndLocationJSONObject.getDouble(LONGITUDE));
 	                    step.setEndLocation(stepEndLocationLatLng);
 	                    step.setHtmlInstructions(stepJSONObject.getString(HTML_INSTRUCTION));
-	                    step.setManeuver(stepJSONObject.getString(MANEUVER)); //sometimes null
+	                    try{
+	                    	step.setManeuver(stepJSONObject.getString(MANEUVER)); //sometimes null
+	                    }catch (JSONException e){
+	                    	//doesn't matter if no MANEUVER
+	                    }
 	                    legPolyLineJSONObject = stepJSONObject.getJSONObject(POLYLINE);
 	                    String encodedString = legPolyLineJSONObject.getString(POINTS);
 	                    step.setPoints(decodePolyLines(encodedString));
