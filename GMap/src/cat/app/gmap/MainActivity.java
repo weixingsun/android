@@ -7,7 +7,7 @@ import cat.app.gmap.adapter.VoiceSuggestListAdapter;
 import cat.app.gmap.listener.MenuItemClickListener;
 import cat.app.gmap.listener.Voice;
 import cat.app.gmap.model.SuggestPoint;
-import cat.app.gmap.task.GoogleMapSearchByNameTask;
+import cat.app.gmap.task.GoogleSearchByAddressNameTask;
 import cat.app.gmap.task.Player;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -74,7 +74,7 @@ public class MainActivity extends FragmentActivity {
 	private void setTest() {
 		
 	}
-
+	
 	private void setDrawer() {
 		mMainSettings = getResources().getStringArray(R.array.menu_items);
 		mDrawerListParent = (ListView) findViewById(R.id.left_drawer_parent);
@@ -121,7 +121,7 @@ public class MainActivity extends FragmentActivity {
 		inputAddress.addTextChangedListener(new DelayedTextWatcher(1500) {
 			@Override
 			public void afterTextChangedDelayed(Editable s) {
-				GoogleMapSearchByNameTask task = new GoogleMapSearchByNameTask(
+				GoogleSearchByAddressNameTask task = new GoogleSearchByAddressNameTask(
 						gMap, inputAddress.getText().toString());
 				task.execute();
 			}
@@ -131,7 +131,7 @@ public class MainActivity extends FragmentActivity {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (keyCode == 66) { // Enter
-					GoogleMapSearchByNameTask task = new GoogleMapSearchByNameTask(
+					GoogleSearchByAddressNameTask task = new GoogleSearchByAddressNameTask(
 							gMap, inputAddress.getText().toString());
 					task.execute();
 					Util.closeKeyBoard(MainActivity.this);

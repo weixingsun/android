@@ -1,4 +1,4 @@
-package cat.app.gmap.nav;
+package cat.app.gmap.task;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,8 @@ import android.widget.Toast;
 
 import cat.app.gmap.MainActivity;
 import cat.app.gmap.Util;
-import cat.app.gmap.task.TextToSpeechTask;
+import cat.app.gmap.nav.PolyUtil;
+import cat.app.gmap.nav.Step;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
@@ -25,10 +26,7 @@ public class FindMyStepTask extends AsyncTask<LatLng, Void, String> {
 		currentStepIndex=0;
 	}
 	public int currentStepIndex;
-	//public List<Route> routes;
 	public List<Step> steps;
-	public static List<String> stepHintStrings = new ArrayList<String>();
-	public static List<String> stepHintFiles = new ArrayList<String>();
 	
 	public Step findNextStep(){
 		if(currentStepIndex+1==steps.size()){
@@ -62,6 +60,7 @@ public class FindMyStepTask extends AsyncTask<LatLng, Void, String> {
 	}
 	@Override
 	protected String doInBackground(LatLng... params) {
+		if(steps==null || steps.size()<1){return null;} 
 		Step step = steps.get(currentStepIndex);
 		boolean isIn= false;
 		if(currentStepIndex==0)
@@ -70,11 +69,13 @@ public class FindMyStepTask extends AsyncTask<LatLng, Void, String> {
 			isIn = isInPointList(step.getPoints(),params[0]);
 		
 		if(isIn){
+			//act.gMap.currentStepIndex = this.currentStepIndex;
 			return step.getHtmlInstructions();
 		}else{
 			Log.w(TAG, "Find next step......................");
 			while((step = findNextStep())!=null){
 				if(isInPointList(step.getPoints(),params[0])){
+					act.gMap.currentStepIndex = this.currentStepIndex;
 					return step.getHtmlInstructions();
 				}
 			}
@@ -86,6 +87,5 @@ public class FindMyStepTask extends AsyncTask<LatLng, Void, String> {
     protected void onPostExecute(String instruction) {
 		//http://translate.google.com/translate_tts?tl=en&q=Hello%20World
 		//String hint=Html.fromHtml(instruction).toString();
-		act.gMap.currentStepIndex = this.currentStepIndex;
     }
 }

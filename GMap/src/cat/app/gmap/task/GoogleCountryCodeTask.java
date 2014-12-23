@@ -29,13 +29,13 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
-public class GetAddressTask extends AsyncTask<LatLng, Void, String> {
+public class GoogleCountryCodeTask extends AsyncTask<LatLng, Void, String> {
 	MainActivity act;
 	private static final String TAG = "GMap.GetAddressTask";
 	private String website = "https://maps.googleapis.com/maps/api/geocode/json?latlng=";  //40.714224,-73.961452
 	HttpClient client;
 	LatLng point;
-	public GetAddressTask(MainActivity act,LatLng point) {
+	public GoogleCountryCodeTask(MainActivity act,LatLng point) {
 		super();
 		this.act = act;
 		this.point=point;

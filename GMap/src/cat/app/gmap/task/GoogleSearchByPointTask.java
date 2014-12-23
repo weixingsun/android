@@ -8,7 +8,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
@@ -24,12 +23,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import cat.app.gmap.GMap;
-import cat.app.gmap.adapter.SuggestListAdapter;
 import cat.app.gmap.model.SuggestPoint;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -37,7 +37,6 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -46,23 +45,24 @@ import android.widget.Toast;
 /** 
  * 自定义class通过AsyncTask机制异步请求获取位置数据
  * @author Weixing Sun
+ *  
  */  
-public class GoogleMapSearchByNameTask extends
+public class GoogleSearchByPointTask extends
         AsyncTask<String, Void, List<SuggestPoint>> {
     private static final String TAG = "GMap.GoogleMapConverterTask";
 	HttpClient client;  
     String url;
-    String address;
+    LatLng position;
+    SuggestPoint foundPoint;
     GMap gmap;
-    public GoogleMapSearchByNameTask(GMap gmap,String address) {
-    	this.address=address;
+    public GoogleSearchByPointTask(GMap gmap,LatLng position) {
+    	this.position=position;
     	this.gmap = gmap;
-        this.url = getLocationURL(address);
+        this.url = getLocationURL(position);
     }
     @Override  
     public List<SuggestPoint> doInBackground(String... params) {
     	gmap.suggestPoints.clear();
-    	if(this.address.length()<2) return null;
     	StringBuilder sb = new StringBuilder();
         HttpGet get = new HttpGet(url);
         try {
@@ -75,18 +75,18 @@ public class GoogleMapSearchByNameTask extends
             	sb.append(line);
             }
             int statusecode = response.getStatusLine().getStatusCode();
+            //Log.i(TAG,"response:" + sb.toString());
             if (statusecode == 200 ) {
             	JSONArray posArray = new JSONObject(sb.toString()).getJSONArray("results");
-            	for(int i=0;i<posArray.length()&&i<3;i++){
-	            	JSONObject addressFull = posArray.getJSONObject(i);
-	            	JSONObject location = addressFull.getJSONObject("geometry").getJSONObject("location");
+            	//for(int i=0;i<posArray.length()&&i<2;i++){
+	            	JSONObject addressFull = posArray.getJSONObject(0);
+	            	//JSONObject location = addressFull.getJSONObject("geometry").getJSONObject("location");
 	            	String formatted_address = addressFull.getString("formatted_address");
-	            	//Log.i(TAG,"formatted_address:" + formatted_address);
-	    			LatLng ll = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
-	    			SuggestPoint sp = new SuggestPoint(ll,formatted_address);
-	    			gmap.suggestPoints.add(sp);
-            	}
-    			return gmap.suggestPoints;
+	            	//this.position = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
+	            	this.foundPoint = new SuggestPoint(this.position,formatted_address);
+	    			//gmap.points.add(sp);
+            	//}
+    			return null;
             } else {
             	Log.w(TAG,"doInBackground:statusecode="+statusecode);
                 return null;
@@ -105,67 +105,37 @@ public class GoogleMapSearchByNameTask extends
   
     @Override  
     protected void onPreExecute() {
-        client = new DefaultHttpClient();  
-        client.getParams().setParameter(  
-                CoreConnectionPNames.CONNECTION_TIMEOUT, 15000);  
-        client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT,15000);  
+        client = new DefaultHttpClient();
+        client.getParams().setParameter(
+                CoreConnectionPNames.CONNECTION_TIMEOUT, 15000);
+        client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT,15000);
         super.onPreExecute();
-    }  
+    }
   
     @Override  
-    protected void onPostExecute(List<SuggestPoint> points) {  
+    protected void onPostExecute(List<SuggestPoint> points) {
         super.onPostExecute(points);  
-        if (points == null) {  
+        if (foundPoint == null) {  
             //failed to navigate
-            Toast.makeText(gmap.activity, "No route found.", Toast.LENGTH_LONG).show();
-        }  
-        else{
-    		fillList();
+            Toast.makeText(gmap.activity, "No location found.", Toast.LENGTH_LONG).show();
+        } else{
+        	gmap.addMarker(foundPoint);
         }
     }
-    private void fillList(){
-        ArrayList<Map<String, String>> list = buildData();
-        String[] from = { "name"};
-        int[] to = { android.R.id.text1 };
-        SimpleAdapter adapter = new SuggestListAdapter(gmap.activity, list,
-            android.R.layout.simple_list_item_2, from, to);
-        gmap.activity.listSuggestion.setAdapter(adapter);
-        gmap.activity.listSuggestion.setVisibility(View.VISIBLE);
-    }
-    private ArrayList<Map<String, String>> buildData() {
-        ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
-        for(SuggestPoint sp:gmap.suggestPoints){
-        	list.add(putData(sp.getFormatted_address()));
-        }
-        return list;
-      }
-
-      private HashMap<String, String> putData(String name) {
-        HashMap<String, String> item = new HashMap<String, String>();
-        item.put("name", name);
-        return item;
-      }
     /** 
      * 组合成googlemap direction所需要的url
-     * @param origin
-     * @param dest
-     * @return url
+     * @param origin 
+     * @param dest 
+     * @return url 
      */
-    public String getLocationURL(String address) {
-        String parsedValue = null;
-		try {
-			parsedValue = java.net.URLEncoder.encode(address, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-        String sensor = "&sensor=false";
-        String language = "&Accept-Language:zh-CN";
-        String region = "&components=country:"+gmap.myCountryCode;
-        String geoapi = "https://maps.googleapis.com/maps/api/geocode/";
+    public String getLocationURL(LatLng position) {
+        
+        //String sensor = "&sensor=false";
         String format = "json";
-        String addressURL = "?address="+parsedValue;
-		String url = geoapi +format+addressURL+language+sensor+region;
+        // String format = "xml";
+        String url = "https://maps.googleapis.com/maps/api/geocode/"+format+"?latlng="+position.latitude+","+position.longitude+"&sensor=false&Accept-Language:zh-CN";
+        //http://maps.google.com/maps/api/geocode/json?latlng=-43.5320544,172.6362254&sensor=false&ion=cn
         Log.i(TAG,"getLocationURL--->: " + url);
-        return url;
+        return url;  
     }
 }

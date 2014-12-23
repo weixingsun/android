@@ -10,6 +10,7 @@ import android.graphics.*;
 import android.location.*;
 import android.media.MediaPlayer;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.*;
 import android.view.View;
 import android.widget.Toast;
@@ -145,7 +146,7 @@ public class GMap extends MapFragment
 
 	@Override
 	public void onMapLongClick(LatLng point) {
-   	 	GoogleMapSearchByPositionTask task = new GoogleMapSearchByPositionTask(this, point);
+   	 	GoogleSearchByPointTask task = new GoogleSearchByPointTask(this, point);
 		task.execute();
 	}
 
@@ -172,6 +173,8 @@ public class GMap extends MapFragment
 			routes.clear();
 			steps.clear();
 			instructionToMp3.clear();
+			currentStepIndex=0;
+			previousStepIndex=-1;
 			redrawRoutes(myLatLng);
 		}else{ //draw only last route
 			Entry<String,MarkerPoint> lastEntry = markerpoints.pollLastEntry();
@@ -182,7 +185,7 @@ public class GMap extends MapFragment
 			}else{
 				start=markerpoints.lastEntry().getValue().getLatlng();
 			}
-			GoogleMapRouteTask task = new GoogleMapRouteTask(this,start,end,travelMode);
+			GoogleRouteTask task = new GoogleRouteTask(this,start,end,travelMode);
             task.execute();
 			markerpoints.put(lastEntry.getKey(), lastEntry.getValue());
 		}
@@ -192,7 +195,7 @@ public class GMap extends MapFragment
 		if(markerpoints.size()>0){
 			LatLng start = loc;
     		for(LatLng dest:getWaypoints()){
-	            GoogleMapRouteTask task = new GoogleMapRouteTask(this,start,dest,travelMode);
+	            GoogleRouteTask task = new GoogleRouteTask(this,start,dest,travelMode);
 	            task.execute();
 	            start=dest;
     		}
@@ -220,7 +223,7 @@ public class GMap extends MapFragment
 	public void startMyCountryCodeTask(){
 		//TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 	    //String countryCode = tm.getSimCountryIso();
-		(new GetAddressTask(activity,myLatLng)).execute();
+		(new GoogleCountryCodeTask(activity,myLatLng)).execute();
 	}
 	@Override
 	public void onMyLocationChange(Location arg0) {
@@ -244,10 +247,12 @@ public class GMap extends MapFragment
 			}
 		}
 	}
-	public void in(int old_size){
+	public void findNewRouteSpeech(int old_size){
+		Handler handler = new Handler();
         for(int i=old_size;i<steps.size();i++){
         	String hintFile = Util.createHintFileName(i);//baseDir+/GMap/routes/hint/
         	String hintHTML = steps.get(i).getHtmlInstructions();
+        	handler.postDelayed(null,10);
         	(new TextToSpeechTask(this,hintHTML,hintFile)).execute();	//gMap.instructionToMp3(hint,hintFile)
         }
 	}
