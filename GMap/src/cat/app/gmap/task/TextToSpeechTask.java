@@ -28,10 +28,13 @@ public class TextToSpeechTask extends AsyncTask<String, Void, String> {
 	}
 	private static final String TAG = "GMap.TextToSpeechTask";
 	//http://translate.google.com/translate_tts? tl=en &q=Hello%20World
+	//http://translate.google.com/translate_tts?q=testing+1+2+3&tl=en_us
+	//http://translate.google.com/translate_tts?q=testing+1+2+3&tl=en_gb
+	//http://translate.google.com/translate_tts?q=testing+1+2+3&tl=en_au
 	//Locale.getDefault().getLanguage() == "zh" / "en"
 	String urlStr;
 	String site="http://translate.google.com/translate_tts?";
-	String language="tl=en";
+	String language="tl=en_us";
 	String q="&q=";
 	
     @Override  
