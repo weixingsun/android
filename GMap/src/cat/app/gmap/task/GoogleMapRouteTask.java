@@ -51,9 +51,9 @@ public class GoogleMapRouteTask extends
     	this.gmap = gmap;
         this.url = url;  
     }
-    public GoogleMapRouteTask(GMap gmap, LatLng start, LatLng dest) {
+    public GoogleMapRouteTask(GMap gmap, LatLng start, LatLng dest,String mode) {
     	this.gmap = gmap;
-        this.url = getDirectionsUrl(start,dest,"json");
+        this.url = getDirectionsUrl(start,dest,"json",mode);
         Log.i(TAG, "url="+url);
 	}
 	@Override  
@@ -123,13 +123,13 @@ public class GoogleMapRouteTask extends
      * @param dest 
      * @return url 
      */  
-    public static String getDirectionsUrl(LatLng origin, LatLng dest, String format) {
+    public static String getDirectionsUrl(LatLng origin, LatLng dest, String format, String travelMode) {
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
         String str_dest = "destination=" + dest.latitude + "," + dest.longitude;  
         // Sensor enabled
         String sensor = "sensor=false";
         // Travelling Mode  
-        String mode = "mode=driving";
+        String mode = "mode="+travelMode;
         // String waypointLatLng = "waypoints="+"40.036675"+","+"116.32885"; // 如果使用途径点，需要添加此字段
         String parameters = null;  
         // Building the parameters to the web service

@@ -39,6 +39,7 @@ public class GMap extends MapFragment
 	public LatLng myLatLng;
 	public LatLng myLastLatLng;
 	public LocationManager lm;
+	public String travelMode;
 	public Map<String,Marker> markers=new TreeMap<String,Marker>();
 	public TreeMap<String,MarkerPoint> markerpoints=new TreeMap<String,MarkerPoint>();
 	public int markerMaxSeq = 1;
@@ -181,7 +182,7 @@ public class GMap extends MapFragment
 			}else{
 				start=markerpoints.lastEntry().getValue().getLatlng();
 			}
-			GoogleMapRouteTask task = new GoogleMapRouteTask(this,start,end);
+			GoogleMapRouteTask task = new GoogleMapRouteTask(this,start,end,travelMode);
             task.execute();
 			markerpoints.put(lastEntry.getKey(), lastEntry.getValue());
 		}
@@ -191,7 +192,7 @@ public class GMap extends MapFragment
 		if(markerpoints.size()>0){
 			LatLng start = loc;
     		for(LatLng dest:getWaypoints()){
-	            GoogleMapRouteTask task = new GoogleMapRouteTask(this,start,dest);
+	            GoogleMapRouteTask task = new GoogleMapRouteTask(this,start,dest,travelMode);
 	            task.execute();
 	            start=dest;
     		}

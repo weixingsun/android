@@ -39,6 +39,18 @@ public class SubMenuItemClickListener implements OnItemClickListener {
 			case Util.MAP_TRAFFIC:
 				activity.gMap.switchSettings("TrafficEnabled");
 				break;
+			case Util.NAV_DRIVING:
+				activity.gMap.travelMode=Util.NAV_DRIVING.toLowerCase();
+				break;
+			case Util.NAV_WALKING:
+				activity.gMap.travelMode=Util.NAV_WALKING.toLowerCase();
+				break;
+			case Util.NAV_BICYCLING:
+				activity.gMap.travelMode=Util.NAV_BICYCLING.toLowerCase();
+				break;
+			case Util.NAV_TRANSIT:
+				activity.gMap.travelMode=Util.NAV_TRANSIT.toLowerCase();
+				break;
 			default:
 				Toast.makeText(activity, "SubMenuItem.Clicked:"+text, Toast.LENGTH_LONG).show();
 		}

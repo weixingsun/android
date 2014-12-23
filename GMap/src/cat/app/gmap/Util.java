@@ -23,10 +23,10 @@ public class Util {
 
 	public static final int REQ_CODE_SPEECH_INPUT = 2;
 	
-	public static final String NAV_DRIVING = "Driving";
-	public static final String NAV_WALKING = "Walking";
-	public static final String NAV_BIKING  = "Biking";
-	public static final String NAV_BUS     = "Bus";
+	public static final String NAV_DRIVING   = "Driving";
+	public static final String NAV_WALKING   = "Walking";
+	public static final String NAV_BICYCLING = "Bicycling";
+	public static final String NAV_TRANSIT   = "Transit";
 	
 	public static final String MAP_SATELLITE  = "Satellite";
 	public static final String MAP_TERRAIN    = "Terrain";
