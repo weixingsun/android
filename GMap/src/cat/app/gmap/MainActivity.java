@@ -1,43 +1,39 @@
 package cat.app.gmap;
 
 import java.util.List;
-import java.util.Locale;
-
 import cat.app.gmap.adapter.VoiceSuggestListAdapter;
 import cat.app.gmap.listener.MenuItemClickListener;
 import cat.app.gmap.listener.Voice;
 import cat.app.gmap.model.SuggestPoint;
 import cat.app.gmap.task.GoogleSearchByAddressNameTask;
 import cat.app.gmap.task.Player;
-import android.app.Activity;
-import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
-import android.telephony.TelephonyManager;
 import android.text.Editable;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.LinearLayout.LayoutParams;
 
 //http://servicedata.net76.net/select.php
 public class MainActivity extends FragmentActivity {
@@ -50,6 +46,8 @@ public class MainActivity extends FragmentActivity {
 	private ListView mDrawerListParent;
     private String[] mMainSettings;
     private DrawerLayout mDrawerLayout;
+    PopupWindow popup;
+	DisplayMetrics  dm;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -63,16 +61,30 @@ public class MainActivity extends FragmentActivity {
         super.onDestroy();
         Player.release();
     }
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent event) {
+		//View v = getCurrentFocus();
+	    boolean ret = super.dispatchTouchEvent(event);
+	    if(event.getAction() == MotionEvent.ACTION_DOWN) {
+            float x = event.getX();
+    	    popup.dismiss();
+    	    //popup=null;
+    	    //Log.i(TAG, "dispatchTouchEvent called");
+        }
+	    if(event.getAction() == MotionEvent.ACTION_UP) {}
+		return false;
+	}
 	void showUI() {
 		setText();
 		setButtons();
 		setList();
 		setDrawer();
-		setTest();
+		setWindow();
 	}
 
-	private void setTest() {
-		
+	private void setWindow() {
+	     dm = new DisplayMetrics();
+	     getWindowManager().getDefaultDisplay().getMetrics(dm);
 	}
 	
 	private void setDrawer() {
@@ -85,7 +97,7 @@ public class MainActivity extends FragmentActivity {
 		iv.setOnClickListener(new View.OnClickListener() {
 		    @Override
 		    public void onClick(View v) {
-				mDrawerLayout.openDrawer(Gravity.LEFT);
+				mDrawerLayout.openDrawer(Gravity.LEFT);	//Gravity.TOP / Gravity.BOTTOM
 		    }
 		});
 	}
@@ -139,6 +151,27 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	private void setButtons() {
+		Button btn_show = (Button) findViewById(R.id.btn_show);
+		btn_show.setVisibility(View.VISIBLE);
+		btn_show.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openMenu();
+            }
+        });
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View popupLayout = inflater.inflate(R.layout.popup, null);
+        popup =new PopupWindow(popupLayout, LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);
+        //popup.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        //popup.setOutsideTouchable(true);
+        popup.setFocusable(false);
+		Button btn_dismiss = (Button) popupLayout.findViewById(R.id.btn_dismiss);
+        btn_dismiss.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openMenu();
+            }
+        });
 		ImageView voiceInput = (ImageView) findViewById(R.id.voiceInput);
 		voiceInput.setOnClickListener(new View.OnClickListener() {
 		    @Override
@@ -147,7 +180,13 @@ public class MainActivity extends FragmentActivity {
 		    }
 		});
 	}
-
+    public void openMenu() {
+            popup.setAnimationStyle(R.style.AnimBottom);
+            popup.showAtLocation(findViewById(R.id.btn_show), Gravity.BOTTOM, 0, 0);
+            //popup.setFocusable(true);
+            popup.update();
+    }
+    
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);

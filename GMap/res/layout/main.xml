@@ -55,7 +55,7 @@
 					android:contentDescription="@null" >
 				</ImageView>
 				<Button
-					android:id="@+id/navigateBtn"
+					android:id="@+id/btn_show"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
 					android:text="@string/navigate"
@@ -86,9 +86,6 @@
 	            android:layout_height="wrap_content"
 	            android:background="#cccccc"
 	            android:orientation="horizontal" >
-			    
-
-			
 		    </LinearLayout>
 		</LinearLayout>
 		
@@ -105,7 +102,7 @@
         android:baselineAligned="false"
         android:layout_width="300dp"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
+        android:layout_gravity="left"
         android:background="#0000FF"
         android:orientation="horizontal">
 			<LinearLayout
@@ -154,5 +151,14 @@
 	            </ListView>
 	        </LinearLayout>
         </LinearLayout>
+        
+        <LinearLayout
+	        android:baselineAligned="false"
+	        android:layout_width="300dp"
+	        android:layout_height="match_parent"
+	        android:layout_gravity="right"
+	        android:background="#333333"
+	        android:orientation="horizontal">
+		</LinearLayout>
 </android.support.v4.widget.DrawerLayout>
 

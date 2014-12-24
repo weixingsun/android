@@ -43,7 +43,7 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 /** 
- * 自定义class通过AsyncTask机制异步请求获取位置数据
+ * AsyncTask: search list(lat,lng) by given name 
  * @author Weixing Sun
  */  
 public class GoogleSearchByAddressNameTask extends

@@ -33,7 +33,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 /** 
- * 自定义class通过AsyncTask机制异步请求获取导航数据
+ * AsyncTask: search route list(lat,lng) by start/end point
  * @author Weixing Sun
  */  
 public class GoogleRouteTask extends  
@@ -44,7 +44,7 @@ public class GoogleRouteTask extends
     int old_size=0;
     List<LatLng> route = null;
     GMap gmap;
-    public GoogleRouteTask(GMap gmap,String url) {  
+    public GoogleRouteTask(GMap gmap,String url) {
     	this.gmap = gmap;
         this.url = url;  
     }

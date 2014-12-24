@@ -34,30 +34,29 @@ public class GMap extends MapFragment
     private HashMap<String,String> settings = new HashMap<String, String>();
 	private static final String TAG = "GMap";
 	public String myCountryCode;
-	public Map<String,String> instructionToMp3 = new HashMap<String,String>();
-	public GoogleMap map;
+	public String travelMode;
 	public MainActivity activity;
+	public GoogleMap map;
 	public LatLng myLatLng;
 	public LatLng myLastLatLng;
 	public LocationManager lm;
-	public String travelMode;
-	public Map<String,Marker> markers=new TreeMap<String,Marker>();
-	public TreeMap<String,MarkerPoint> markerpoints=new TreeMap<String,MarkerPoint>();
-	public int markerMaxSeq = 1;
 	public List<SuggestPoint> suggestPoints = new ArrayList<SuggestPoint>();
+	public List<Polyline> routesPolyLines = new ArrayList<Polyline>();
 	public List<Route> routes = new ArrayList<Route>();
 	public List<Step> steps = new ArrayList<Step>();
+	public Map<String,Marker> markers=new TreeMap<String,Marker>();
+	public Map<String,String> instructionToMp3 = new HashMap<String,String>();
+	public TreeMap<String,MarkerPoint> markerpoints=new TreeMap<String,MarkerPoint>();
+	public int markerMaxSeq = 1;
 	public int currentStepIndex = 0;
 	public int previousStepIndex = -1;
-	public List<Polyline> routesPolyLines = new ArrayList<Polyline>();
-	
+
 	public void init(final MainActivity activity){
 		this.activity= activity;
 		initStorage();
 		initMap();
         settings.put("TrafficEnabled", "false");
 	}
-
 	private void initMap() {
 		LocationManager lm=(LocationManager)activity.getSystemService(Context.LOCATION_SERVICE);
 		Location myloc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -97,12 +96,10 @@ public class GMap extends MapFragment
             }
         });
 	}
-
 	private void initStorage() {
 		File folder = new File(Util.baseDir);
 		Util.createFolder(folder);
 	}
-
 	private void updateMarkerSeq() {
 		Iterator<Entry<String, MarkerPoint>> iter = markerpoints.entrySet().iterator();
     	for(int i=1;iter.hasNext();i++){
@@ -113,13 +110,11 @@ public class GMap extends MapFragment
     		}
     	}
 	}
-
 	private Bitmap createSeqBitmap(int seq){
 		Bitmap bmRaw = BitmapFactory.decodeResource(activity.getResources(), R.drawable.marker_blue_32);
 		return Util.generatorSequencedIcon(bmRaw,seq);
 	}
 	public void addMarker(SuggestPoint point){
-		
 		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createSeqBitmap(markerMaxSeq));
     	Marker marker = map.addMarker(new MarkerOptions()
 	        .title(point.getMarkerTitle())
@@ -136,20 +131,18 @@ public class GMap extends MapFragment
 	public void move(LatLng latlng){
 		map.moveCamera(CameraUpdateFactory.newLatLng(latlng));
 	}
-
 	public void move(LatLng latlng, int zoomLevel){
 		map.moveCamera(CameraUpdateFactory.newLatLngZoom(latlng, zoomLevel));
 	}
     public float getZoomLevel(){
     	return map.getCameraPosition().zoom;
     }
-
 	@Override
 	public void onMapLongClick(LatLng point) {
+		//right drawer popup
    	 	GoogleSearchByPointTask task = new GoogleSearchByPointTask(this, point);
 		task.execute();
 	}
-
     public List<LatLng> getWaypoints(){
     	List<LatLng> ll = new ArrayList<LatLng>();
     	Iterator<Entry<String, MarkerPoint>> iter = markerpoints.entrySet().iterator();
@@ -203,7 +196,6 @@ public class GMap extends MapFragment
     		//Toast.makeText(activity, "No Target", Toast.LENGTH_LONG).show();
     	}
 	}
-
 	public void switchSettings(String settingName){
 		if(settings.get(settingName)==null) return;
 		switch(settingName){
@@ -218,8 +210,6 @@ public class GMap extends MapFragment
 				Toast.makeText(activity, "Settings:"+settingName+" not found", Toast.LENGTH_LONG).show();
 		}
 	}
-    
-
 	public void startMyCountryCodeTask(){
 		//TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 	    //String countryCode = tm.getSimCountryIso();
