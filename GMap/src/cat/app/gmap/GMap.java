@@ -38,18 +38,19 @@ public class GMap extends MapFragment
 	public MainActivity activity;
 	public GoogleMap map;
 	public LatLng myLatLng;
-	public LatLng myLastLatLng;
 	public LocationManager lm;
 	public List<SuggestPoint> suggestPoints = new ArrayList<SuggestPoint>();
 	public List<Polyline> routesPolyLines = new ArrayList<Polyline>();
-	public List<Route> routes = new ArrayList<Route>();
+	//public List<Route> routes = new ArrayList<Route>();
 	public List<Step> steps = new ArrayList<Step>();
+	public List<LatLng> startPointOfSteps = new ArrayList<LatLng>();
 	public Map<String,Marker> markers=new TreeMap<String,Marker>();
 	public Map<String,String> instructionToMp3 = new HashMap<String,String>();
 	public TreeMap<String,MarkerPoint> markerpoints=new TreeMap<String,MarkerPoint>();
 	public int markerMaxSeq = 1;
 	public int currentStepIndex = 0;
 	public int previousStepIndex = -1;
+	private boolean hinted=false;
 
 	public void init(final MainActivity activity){
 		this.activity= activity;
@@ -163,7 +164,7 @@ public class GMap extends MapFragment
 	public void refreshRoute(boolean restart) {
 		if(restart){//redraw all routes
 			removePreviousRoute();
-			routes.clear();
+			startPointOfSteps.clear();
 			steps.clear();
 			instructionToMp3.clear();
 			currentStepIndex=0;
@@ -215,28 +216,6 @@ public class GMap extends MapFragment
 	    //String countryCode = tm.getSimCountryIso();
 		(new GoogleCountryCodeTask(activity,myLatLng)).execute();
 	}
-	@Override
-	public void onMyLocationChange(Location arg0) {
-		myLatLng = new LatLng(arg0.getLatitude(),arg0.getLongitude());
-		if(myLastLatLng==null) myLastLatLng=myLatLng;
-		if(myCountryCode==null){
-			startMyCountryCodeTask();
-		}
-		if(Util.getDistance(myLatLng, myLastLatLng)>10){	//more than 10 meters
-			myLastLatLng=myLatLng;
-		}
-		if(routes.size()>0){
-			(new FindMyStepTask(activity)).execute(myLatLng); //currentStepIndex found
-			if(previousStepIndex!=currentStepIndex){
-				String hintHTML = this.steps.get(currentStepIndex).getHtmlInstructions();
-				String hintFile = this.instructionToMp3.get(hintHTML);
-				if(hintFile!=null){
-					Player.play(hintFile);
-				}
-				previousStepIndex=currentStepIndex;
-			}
-		}
-	}
 	public void findNewRouteSpeech(int old_size){
 		Handler handler = new Handler();
         for(int i=old_size;i<steps.size();i++){
@@ -246,5 +225,32 @@ public class GMap extends MapFragment
         	(new TextToSpeechTask(this,hintHTML,hintFile)).execute();	//gMap.instructionToMp3(hint,hintFile)
         }
 	}
-	
+	@Override
+	public void onMyLocationChange(Location arg0) {
+		myLatLng = new LatLng(arg0.getLatitude(),arg0.getLongitude());
+		if(myCountryCode==null){
+			startMyCountryCodeTask();
+		}
+		if(steps.size()>0){
+			if(currentStepIndex>this.previousStepIndex){
+				hinted = false;
+				previousStepIndex=currentStepIndex;
+			}
+			LatLng nextStart = this.startPointOfSteps.get(currentStepIndex+1);
+			boolean near = Util.getDistance(myLatLng, nextStart)<50 ;
+			if((currentStepIndex==0 || near) && !hinted){
+				play();
+			}
+			if(currentStepIndex>0)
+				(new FindMyStepTask(activity)).execute(myLatLng); //currentStepIndex found
+		}
+	}
+	private void play(){
+		String hintHTML = this.steps.get(currentStepIndex).getHtmlInstructions();
+		String hintFile = this.instructionToMp3.get(hintHTML);
+		if(hintFile!=null){
+			Player.play(hintFile);
+			hinted = true;
+		}
+	}
 }

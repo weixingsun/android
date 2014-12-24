@@ -19,6 +19,7 @@ import cat.app.gmap.GMap;
 import cat.app.gmap.Util;
 import cat.app.gmap.nav.Route;
 import cat.app.gmap.nav.RouteParser;
+import cat.app.gmap.nav.Step;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -65,8 +66,11 @@ public class GoogleRouteTask extends
                 JSONObject object = new JSONObject(responseString);
                 if (object.getString("status").equals("OK")) {
                 	Route r = RouteParser.parse(responseString).get(0);
-                	gmap.routes.add(r);
+                	//gmap.routes.add(r);
                 	old_size=gmap.steps.size();
+                	for(Step s:r.getSteps()){
+                    	gmap.startPointOfSteps.add(s.getStartLocation());
+                	}
                 	gmap.steps.addAll(r.getSteps());
                 	route = RouteParser.getWholeRoutePoints(r);
                 } else {
