@@ -3,6 +3,7 @@ package cat.app.gmap.listener;
 import com.google.android.gms.maps.GoogleMap;
 
 import cat.app.gmap.MainActivity;
+import cat.app.gmap.R;
 import cat.app.gmap.Util;
 import android.util.Log;
 import android.view.View;
@@ -28,7 +29,7 @@ public class SubMenuItemClickListener implements OnItemClickListener {
 	private void proceedClickedItem(String text) {
 		switch(text) {
 			case Util.MAP_NORMAL:
-				activity.gMap.map.setMapType(GoogleMap.MAP_TYPE_NORMAL); 
+				activity.gMap.map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 				break;
 			case Util.MAP_SATELLITE:
 				activity.gMap.map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
@@ -41,15 +42,23 @@ public class SubMenuItemClickListener implements OnItemClickListener {
 				break;
 			case Util.NAV_DRIVING:
 				activity.gMap.travelMode=Util.NAV_DRIVING.toLowerCase();
+				activity.iconTravelMode.setImageResource(R.drawable.ic_taxi_64);
+				activity.openPopup(null);
 				break;
 			case Util.NAV_WALKING:
 				activity.gMap.travelMode=Util.NAV_WALKING.toLowerCase();
+				activity.iconTravelMode.setImageResource(R.drawable.ic_walk_64);
+				activity.openPopup(null);
 				break;
 			case Util.NAV_BICYCLING:
 				activity.gMap.travelMode=Util.NAV_BICYCLING.toLowerCase();
+				activity.iconTravelMode.setImageResource(R.drawable.ic_bicycle_64);
+				activity.openPopup(null);
 				break;
 			case Util.NAV_TRANSIT:
 				activity.gMap.travelMode=Util.NAV_TRANSIT.toLowerCase();
+				activity.iconTravelMode.setImageResource(R.drawable.ic_bus_64);
+				activity.openPopup(null);
 				break;
 			default:
 				Toast.makeText(activity, "Function:"+text+" not available yet", Toast.LENGTH_LONG).show();

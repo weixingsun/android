@@ -120,12 +120,12 @@ public class GMap extends MapFragment
 	public void addMarker(SuggestPoint point){
 		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createSeqBitmap(markerMaxSeq));
     	Marker marker = map.addMarker(new MarkerOptions()
-	        .title(point.getMarkerTitle())
-	        .snippet(point.getMarkerSnippet())
-	        .position(point.getLocation())
+	        .title(point.getDetailAddr())
+	        .snippet(point.getPoliticalAddr())
+	        .position(point.getLatLng())
 	        .icon(bd)
         );
-    	MarkerPoint mp = new MarkerPoint(markerMaxSeq,point.getMarkerTitle(),point.getMarkerSnippet(),point.getLocation());
+    	MarkerPoint mp = new MarkerPoint(markerMaxSeq,point.getDetailAddr(),point.getPoliticalAddr(),point.getLatLng());
     	markerpoints.put(marker.getId(), mp);
     	markers.put(marker.getId(), marker);
     	markerMaxSeq++;
@@ -259,6 +259,6 @@ public class GMap extends MapFragment
 	public boolean onMarkerClick(Marker arg0) {
 		MarkerPoint mp = new MarkerPoint(markerMaxSeq,arg0.getTitle(),arg0.getSnippet(),arg0.getPosition());
 		activity.openPopup(mp);
-		return false;
+		return true;
 	}
 }

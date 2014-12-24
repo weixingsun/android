@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent" 
     android:layout_height="wrap_content"
@@ -10,36 +10,46 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content">
 	    <TextView
-			android:layout_weight="1"
+	        android:id="@+id/point_brief"
+			android:layout_weight="2"
 	        android:layout_width="0dp"
 	        android:layout_height="wrap_content"
+	        android:layout_gravity="bottom"
+	        android:background="@color/counter_text_bg"
+	        android:textColor="#000000"
+	        android:textSize="26sp"
 			android:text="@null"
 	        />
 	    <ImageView
-	        android:id="@+id/ic_start_navi"
+	        android:id="@+id/ic_travel_mode"
 			android:layout_weight="1"
 	        android:layout_width="0dp"
 	        android:layout_height="wrap_content"
 	        android:contentDescription="@string/navigate"
-			android:src="@drawable/blue_beetle120"
+			android:src="@drawable/ic_taxi_64"
 	        />
     </LinearLayout>
     <LinearLayout
 	    android:orientation="horizontal"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
+	    android:background="@color/counter_text_bg"
         >
 	    <TextView
-	        android:id="@+id/point_brief"
-			android:layout_weight="1"
-	        android:layout_width="0dp"
-	        android:layout_height="wrap_content"
-	        android:text="@null"/>
-	    <TextView 
 	        android:id="@+id/point_detail"
 			android:layout_weight="1"
 	        android:layout_width="0dp"
 	        android:layout_height="wrap_content"
+	        android:textSize="20sp"
+	        android:textColor="#000000"
+	        android:text="@null"/>
+	    <TextView 
+	        android:id="@+id/point_detail2"
+			android:layout_weight="1"
+	        android:layout_width="0dp"
+	        android:layout_height="wrap_content"
+	        android:textSize="20sp"
+	        android:textColor="#000066"
 	        android:text="@null"/>
     </LinearLayout>
 </LinearLayout>

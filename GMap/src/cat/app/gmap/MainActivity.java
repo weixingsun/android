@@ -10,6 +10,7 @@ import cat.app.gmap.task.GoogleSearchByAddressNameTask;
 import cat.app.gmap.task.Player;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.FragmentActivity;
@@ -44,11 +45,15 @@ public class MainActivity extends FragmentActivity {
 	public ListView listSuggestion;
 	public ListView listVoice ;
 	public EditText inputAddress;
+    public ImageView iconTravelMode;
+    public TextView pointBrief;
+    public TextView pointDetail;
 	private ListView mDrawerListParent;
     private String[] mMainSettings;
     private DrawerLayout mDrawerLayout;
     PopupWindow popup;
 	DisplayMetrics  dm;
+	String mode;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -62,27 +67,25 @@ public class MainActivity extends FragmentActivity {
         super.onDestroy();
         Player.release();
     }
-	@Override
-	public boolean dispatchTouchEvent(MotionEvent event) {
-		//View v = getCurrentFocus();
-	    boolean ret = super.dispatchTouchEvent(event);
-	    if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            float x = event.getX();
-    	    popup.dismiss();
-    	    //popup=null;
-    	    //Log.i(TAG, "dispatchTouchEvent called");
-        }
-	    if(event.getAction() == MotionEvent.ACTION_UP) {}
-		return false;
-	}
+	
 	void showUI() {
 		setText();
-		setButtons();
+		setPopup();
 		setList();
 		setDrawer();
 		setWindow();
+		setImage();
 	}
 
+	private void setImage() {
+		ImageView voiceInput = (ImageView) findViewById(R.id.voiceInput);
+		voiceInput.setOnClickListener(new View.OnClickListener() {
+		    @Override
+		    public void onClick(View v) {
+		    	Voice.promptSpeechInput(MainActivity.this);
+		    }
+		});
+	}
 	private void setWindow() {
 	     dm = new DisplayMetrics();
 	     getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -120,7 +123,7 @@ public class MainActivity extends FragmentActivity {
 				SuggestPoint sp = gMap.suggestPoints.get(position);
 				gMap.addMarker(sp);
 				listSuggestion.setVisibility(View.INVISIBLE);
-				gMap.move(sp.getLocation());
+				gMap.move(sp.getLatLng());
 			}
 		});
 	}
@@ -151,34 +154,31 @@ public class MainActivity extends FragmentActivity {
 		});
 	}
 
-	private void setButtons() {
+	private void setPopup() {
         LayoutInflater inflater = LayoutInflater.from(this);
         View popupLayout = inflater.inflate(R.layout.popup, null);
         popup =new PopupWindow(popupLayout, LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);
-        //popup.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        //popup.setOutsideTouchable(true);
+        popup.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        popup.setOutsideTouchable(true);
         popup.setFocusable(false);
-        ImageView ic_navi = (ImageView) popupLayout.findViewById(R.id.ic_start_navi);
-        ic_navi.setClickable(true);
-		ic_navi.setOnClickListener(new OnClickListener() {
+		iconTravelMode = (ImageView) popupLayout.findViewById(R.id.ic_travel_mode);
+        iconTravelMode.setClickable(true);
+        iconTravelMode.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-            	gMap.refreshRoute(false);
+            	gMap.refreshRoute(true);
             }
         });
-		ImageView voiceInput = (ImageView) findViewById(R.id.voiceInput);
-		voiceInput.setOnClickListener(new View.OnClickListener() {
-		    @Override
-		    public void onClick(View v) {
-		    	Voice.promptSpeechInput(MainActivity.this);
-		    }
-		});
+        pointBrief = (TextView) popupLayout.findViewById(R.id.point_brief);
+        pointDetail = (TextView) popupLayout.findViewById(R.id.point_detail);
 	}
 
     public void openPopup(MarkerPoint mp) {
             popup.setAnimationStyle(R.style.AnimBottom);
             popup.showAtLocation(findViewById(R.id.btn_show), Gravity.BOTTOM, 0, 0);
             //popup.setFocusable(true);
+            pointBrief.setText(mp.getTitle());
+            pointDetail.setText(mp.getComment());
             popup.update();
     }
 
@@ -199,5 +199,29 @@ public class MainActivity extends FragmentActivity {
 			}
 		}
 	}
-	
+
+	/*@Override
+	public boolean dispatchTouchEvent(MotionEvent event) {
+		//View v = getCurrentFocus();
+		Float x1 = (float) 0,y1 = (float) 0,x2,y2;
+	    boolean ret = super.dispatchTouchEvent(event);
+	    if(event.getAction() == MotionEvent.ACTION_DOWN) {
+            x1 = event.getX();
+            y1 = event.getY();
+    	    Log.i(TAG, "ACTION_DOWN called");
+        }
+	    if(event.getAction() == MotionEvent.ACTION_UP) {
+            x2 = event.getX();
+            y2 = event.getY();
+            float distanceX = Math.abs(x1-x2);
+            float distanceY = Math.abs(y1-y2);
+    	    Log.i(TAG, "ACTION_UP x1="+x1+",x2="+x2+",y1="+y1+",y2="+y2);
+            if(distanceX>10 ||distanceY>10){
+            	
+            }else{
+            	//popup.dismiss();
+            }
+        }
+		return false;
+	}*/
 }
