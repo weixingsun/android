@@ -20,11 +20,12 @@ import cat.app.gmap.nav.*;
 import cat.app.gmap.task.*;
 
 import com.google.android.gms.maps.*;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.GoogleMap.*;
 import com.google.android.gms.maps.model.*;
 
 public class GMap extends MapFragment 
-	implements OnMapLongClickListener, OnMyLocationChangeListener {
+	implements OnMapLongClickListener, OnMyLocationChangeListener, OnMarkerClickListener {
 	//GooglePlayServicesClient.ConnectionCallbacks,
     //GooglePlayServicesClient.OnConnectionFailedListener
 
@@ -77,6 +78,7 @@ public class GMap extends MapFragment
     	map.setBuildingsEnabled(true);
     	map.setOnMapLongClickListener(this);
     	map.setOnMyLocationChangeListener(this);
+    	map.setOnMarkerClickListener(this);
         map.setOnInfoWindowClickListener(new OnInfoWindowClickListener(){
 			@Override
 			public void onInfoWindowClick(Marker marker) {
@@ -126,8 +128,8 @@ public class GMap extends MapFragment
     	MarkerPoint mp = new MarkerPoint(markerMaxSeq,point.getMarkerTitle(),point.getMarkerSnippet(),point.getLocation());
     	markerpoints.put(marker.getId(), mp);
     	markers.put(marker.getId(), marker);
-    	refreshRoute(false);
     	markerMaxSeq++;
+    	this.activity.openPopup(mp);
     }
 	public void move(LatLng latlng){
 		map.moveCamera(CameraUpdateFactory.newLatLng(latlng));
@@ -252,5 +254,11 @@ public class GMap extends MapFragment
 			Player.play(hintFile);
 			hinted = true;
 		}
+	}
+	@Override
+	public boolean onMarkerClick(Marker arg0) {
+		MarkerPoint mp = new MarkerPoint(markerMaxSeq,arg0.getTitle(),arg0.getSnippet(),arg0.getPosition());
+		activity.openPopup(mp);
+		return false;
 	}
 }

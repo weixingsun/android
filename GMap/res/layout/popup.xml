@@ -3,12 +3,43 @@
     android:orientation="vertical"
     android:layout_width="match_parent" 
     android:layout_height="wrap_content"
-    android:background="#0000cc" 
     android:layout_gravity="bottom"
-    > 
-    <Button 
-        android:id="@+id/btn_dismiss"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="dismiss"/>
+    >
+    <LinearLayout
+	    android:orientation="horizontal"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content">
+	    <TextView
+			android:layout_weight="1"
+	        android:layout_width="0dp"
+	        android:layout_height="wrap_content"
+			android:text="@null"
+	        />
+	    <ImageView
+	        android:id="@+id/ic_start_navi"
+			android:layout_weight="1"
+	        android:layout_width="0dp"
+	        android:layout_height="wrap_content"
+	        android:contentDescription="@string/navigate"
+			android:src="@drawable/blue_beetle120"
+	        />
+    </LinearLayout>
+    <LinearLayout
+	    android:orientation="horizontal"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+        >
+	    <TextView
+	        android:id="@+id/point_brief"
+			android:layout_weight="1"
+	        android:layout_width="0dp"
+	        android:layout_height="wrap_content"
+	        android:text="@null"/>
+	    <TextView 
+	        android:id="@+id/point_detail"
+			android:layout_weight="1"
+	        android:layout_width="0dp"
+	        android:layout_height="wrap_content"
+	        android:text="@null"/>
+    </LinearLayout>
 </LinearLayout>

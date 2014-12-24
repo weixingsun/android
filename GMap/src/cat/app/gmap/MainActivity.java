@@ -4,6 +4,7 @@ import java.util.List;
 import cat.app.gmap.adapter.VoiceSuggestListAdapter;
 import cat.app.gmap.listener.MenuItemClickListener;
 import cat.app.gmap.listener.Voice;
+import cat.app.gmap.model.MarkerPoint;
 import cat.app.gmap.model.SuggestPoint;
 import cat.app.gmap.task.GoogleSearchByAddressNameTask;
 import cat.app.gmap.task.Player;
@@ -151,25 +152,18 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	private void setButtons() {
-		Button btn_show = (Button) findViewById(R.id.btn_show);
-		btn_show.setVisibility(View.VISIBLE);
-		btn_show.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openMenu();
-            }
-        });
         LayoutInflater inflater = LayoutInflater.from(this);
         View popupLayout = inflater.inflate(R.layout.popup, null);
         popup =new PopupWindow(popupLayout, LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);
         //popup.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
         //popup.setOutsideTouchable(true);
         popup.setFocusable(false);
-		Button btn_dismiss = (Button) popupLayout.findViewById(R.id.btn_dismiss);
-        btn_dismiss.setOnClickListener(new OnClickListener() {
+        ImageView ic_navi = (ImageView) popupLayout.findViewById(R.id.ic_start_navi);
+        ic_navi.setClickable(true);
+		ic_navi.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                openMenu();
+            	gMap.refreshRoute(false);
             }
         });
 		ImageView voiceInput = (ImageView) findViewById(R.id.voiceInput);
@@ -180,13 +174,14 @@ public class MainActivity extends FragmentActivity {
 		    }
 		});
 	}
-    public void openMenu() {
+
+    public void openPopup(MarkerPoint mp) {
             popup.setAnimationStyle(R.style.AnimBottom);
             popup.showAtLocation(findViewById(R.id.btn_show), Gravity.BOTTOM, 0, 0);
             //popup.setFocusable(true);
             popup.update();
     }
-    
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
