@@ -43,7 +43,7 @@ public class MarkerPoint {
 		this.comment = comment;
 	}
 
-	public LatLng getLatlng() {
+	public LatLng getLatLng() {
 		return latlng;
 	}
 

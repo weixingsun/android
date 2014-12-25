@@ -154,10 +154,10 @@
         
         <LinearLayout
 	        android:baselineAligned="false"
-	        android:layout_width="300dp"
+	        android:layout_width="200dp"
 	        android:layout_height="match_parent"
 	        android:layout_gravity="right"
-	        android:background="#333333"
+	        android:background="#33333333"
 	        android:orientation="horizontal">
 		</LinearLayout>
 </android.support.v4.widget.DrawerLayout>

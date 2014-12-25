@@ -6,71 +6,86 @@
     android:background="@color/layout_popup_bg"
     android:orientation="vertical" >
 
-
-    <LinearLayout
-        android:baselineAligned="true"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" >
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/point_brief"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-                android:layout_weight="2"
-                android:layout_width="0dp"
-            android:orientation="vertical" >
-
-	        <TextView
-	            android:id="@+id/point_brief_above"
-	            android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-	            android:text="@null"
-	            android:textColor="#000099"
-	            android:textSize="20sp" />
-            <TextView
-                android:id="@+id/point_brief"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:text="@null"
-                android:textColor="#000099"
-                android:textSize="22sp" />
-			
-            <TextView
-                android:id="@+id/point_detail"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="@null"
-                android:textColor="#000099"
-                android:textSize="18sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:orientation="vertical" >
+            android:text="@null"
+            android:textColor="#000099"
+            android:textSize="22sp" />
 
         <ImageView
             android:id="@+id/ic_travel_mode"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+         	android:layout_marginRight="80dp"
             android:contentDescription="@string/navigate"
             android:src="@drawable/ic_taxi_48" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/point_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@null"
+            android:textColor="#000099"
+            android:textSize="18sp" />
         
-	        <TextView
-	            android:id="@+id/markerid"
-	            android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-	            android:text="@null"
-	            android:textColor="#00000000"
-	            android:textSize="20sp" />
-			<ImageView
-	            android:id="@+id/ic_route_delete"
-	            android:layout_width="match_parent"
-	            android:layout_height="wrap_content"
-	            android:contentDescription="@string/navigate"
-	            android:src="@drawable/ic_black_trash_30" />
+        <TextView
+            android:id="@+id/markerid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             
-        </LinearLayout>
+            android:text="@null"
+            android:textColor="#00000000"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="true"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/ic_police"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/police"
+            android:src="@drawable/ic_police_64" />
+
+        <ImageView
+            android:id="@+id/ic_cctv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/cctv"
+            android:src="@drawable/ic_cctv_64" />
+
+        <ImageView
+            android:id="@+id/ic_medical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/cctv"
+            android:src="@drawable/ic_medical_64" />
+
+        <ImageView
+            android:id="@+id/ic_route_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/delete"
+            android:src="@drawable/ic_black_trash_64" />
     </LinearLayout>
 
 </LinearLayout>

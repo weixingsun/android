@@ -45,11 +45,11 @@ public class GMap extends MapFragment
 	//public List<Route> routes = new ArrayList<Route>();
 	public List<Step> steps = new ArrayList<Step>();
 	//public List<LatLng> startPointOfSteps = new ArrayList<LatLng>();
-	public Map<String,Marker> markers=new TreeMap<String,Marker>();
-	public Map<String,Marker> remindMarkers=new TreeMap<String,Marker>();////////////////////////////for adding some customized hints
+	public Map<String,Marker> routeMarkers=new TreeMap<String,Marker>();
+	public Map<String,Marker> remindMarkers=new TreeMap<String,Marker>();//like police/camera/accident
+	public TreeMap<String,MarkerPoint> routeMarkerpoints=new TreeMap<String,MarkerPoint>();
 	public Map<String,String> instructionToMp3 = new HashMap<String,String>();
 	public List<String> playedMp3 = new ArrayList<String>();
-	public TreeMap<String,MarkerPoint> markerpoints=new TreeMap<String,MarkerPoint>();
 	public int markerMaxSeq = 1;
 	public int currentStepIndex = 0;
 	private boolean hinted=false;
@@ -98,8 +98,8 @@ public class GMap extends MapFragment
 	public void removeMarker(Marker marker){
 		if(marker!=null){
 			marker.remove();
-			markerpoints.remove(marker.getId());
-			markers.remove(marker.getId());
+			routeMarkerpoints.remove(marker.getId());
+			routeMarkers.remove(marker.getId());
 			updateMarkerSeq();
 			//refreshRoute(true);
 			markerMaxSeq--;
@@ -110,12 +110,12 @@ public class GMap extends MapFragment
 		Util.createFolder(folder);
 	}
 	private void updateMarkerSeq() {
-		Iterator<Entry<String, MarkerPoint>> iter = markerpoints.entrySet().iterator();
+		Iterator<Entry<String, MarkerPoint>> iter = routeMarkerpoints.entrySet().iterator();
     	for(int i=1;iter.hasNext();i++){
     		Entry<String,MarkerPoint> entry = iter.next();
     		if(entry.getValue().getSeq()!=i){
     			BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createSeqBitmap(i));
-    			markers.get(entry.getKey()).setIcon(bd);
+    			routeMarkers.get(entry.getKey()).setIcon(bd);
     		}
     	}
 	}
@@ -123,8 +123,8 @@ public class GMap extends MapFragment
 		Bitmap bmRaw = BitmapFactory.decodeResource(activity.getResources(), R.drawable.marker_blue_32);
 		return Util.generatorSequencedIcon(bmRaw,seq);
 	}
-	private Bitmap createBitmap(){
-		Bitmap bmRaw = BitmapFactory.decodeResource(activity.getResources(), R.drawable.red_point);
+	private Bitmap createBitmap(int resId){
+		Bitmap bmRaw = BitmapFactory.decodeResource(activity.getResources(), resId);
 		return bmRaw;
 	}
 	public void addMarker(SuggestPoint point){
@@ -136,20 +136,29 @@ public class GMap extends MapFragment
 	        .icon(bd)
         );
     	MarkerPoint mp = new MarkerPoint(marker.getId(),markerMaxSeq,point.getDetailAddr(),point.getPoliticalAddr(),point.getLatLng());
-    	markerpoints.put(marker.getId(), mp);
-    	markers.put(marker.getId(), marker);
+    	routeMarkerpoints.put(marker.getId(), mp);
+    	routeMarkers.put(marker.getId(), marker);
     	markerMaxSeq++;
     	Log.i(TAG, "id="+marker.getId());
     	this.activity.openPopup(mp);
     }
-	public void addSimpleMarker(SuggestPoint point){
-		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createBitmap());
+	public void addRedPointMarker(SuggestPoint point){
+		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createBitmap(R.drawable.red_point));
     	Marker marker = map.addMarker(new MarkerOptions()
 	        .title(point.getDetailAddr())
 	        .snippet(point.getPoliticalAddr())
 	        .position(point.getLatLng())
 	        .icon(bd)
         );
+    }
+	public void addRemindMarker(MarkerPoint point,int resId){
+		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createBitmap(resId));
+    	Marker marker = this.routeMarkers.get(point.getId());
+    	marker.setIcon(bd);
+    	routeMarkerpoints.remove(marker.getId());
+    	routeMarkers.remove(point.getId());
+    	remindMarkers.put(point.getId(), marker);
+    	markerMaxSeq--;
     }
 	public void move(LatLng latlng){
 		map.moveCamera(CameraUpdateFactory.newLatLng(latlng));
@@ -168,10 +177,10 @@ public class GMap extends MapFragment
 	}
     public List<LatLng> getWaypoints(){
     	List<LatLng> ll = new ArrayList<LatLng>();
-    	Iterator<Entry<String, MarkerPoint>> iter = markerpoints.entrySet().iterator();
+    	Iterator<Entry<String, MarkerPoint>> iter = routeMarkerpoints.entrySet().iterator();
     	while(iter.hasNext()){
     		Entry<String,MarkerPoint> entry = iter.next();
-    		ll.add(entry.getValue().getLatlng());
+    		ll.add(entry.getValue().getLatLng());
     	}
     	//Collections.reverse(ll);
 		return ll;
@@ -192,22 +201,22 @@ public class GMap extends MapFragment
 			currentStepIndex=0;
 			redrawRoutes(myLatLng);
 		}else{ //draw only last route
-			Entry<String,MarkerPoint> lastEntry = markerpoints.pollLastEntry();
-			LatLng end = lastEntry.getValue().getLatlng();
+			Entry<String,MarkerPoint> lastEntry = routeMarkerpoints.pollLastEntry();
+			LatLng end = lastEntry.getValue().getLatLng();
 			LatLng start=null;
-			if(markerpoints.size()==0) {
+			if(routeMarkerpoints.size()==0) {
 				start=myLatLng;
 			}else{
-				start=markerpoints.lastEntry().getValue().getLatlng();
+				start=routeMarkerpoints.lastEntry().getValue().getLatLng();
 			}
 			GoogleRouteTask task = new GoogleRouteTask(this,start,end,travelMode);
             task.execute();
-			markerpoints.put(lastEntry.getKey(), lastEntry.getValue());
+			routeMarkerpoints.put(lastEntry.getKey(), lastEntry.getValue());
 		}
 	}
 	public void redrawRoutes(LatLng loc){
 		//Toast.makeText(activity, "draw lines", Toast.LENGTH_LONG).show();
-		if(markerpoints.size()>0){
+		if(routeMarkerpoints.size()>0){
 			LatLng start = loc;
     		for(LatLng dest:getWaypoints()){
 	            GoogleRouteTask task = new GoogleRouteTask(this,start,dest,travelMode);
@@ -287,7 +296,7 @@ public class GMap extends MapFragment
 		String firstAddress = "Step "+(seq+1)+"/"+steps.size();
 		String fullAddress = firstAddress+","+nextStep.getHtmlInstructions();
 		SuggestPoint sp = new SuggestPoint(nextStep.getStartLocation(), fullAddress);
-		this.addSimpleMarker(sp);
+		this.addRedPointMarker(sp);
 	}
 	public void drawAllStepPoints(){
 		Log.i(TAG, "draw all step points");

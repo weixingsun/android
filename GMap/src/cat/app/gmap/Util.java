@@ -3,6 +3,10 @@ package cat.app.gmap;
 import java.io.File;
 import java.io.IOException;
 
+import cat.app.gmap.model.MarkerPoint;
+import cat.app.gmap.task.GoogleSearchByPointTask;
+import cat.app.gmap.task.UploadTask;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import android.app.Activity;
@@ -88,9 +92,7 @@ public class Util {
     		Log.i("Util", "failed to create dir:"+folder.getAbsolutePath());
     	}
 	}
-	public static void drawAPoint(LatLng point,Color color){
-		
-	}
+
     /*public void showMarkers(){
     	LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
 
@@ -121,5 +123,15 @@ public class Util {
 
 	public static String createHintFileName(int currentStepIndex) {
 		return baseDir+"hint_"+currentStepIndex+".mp3";
+	}
+
+	public static void uploadRemind(MainActivity act,LatLng point,int type, String reporter) {
+		//type(1:police)(2:cctv)
+		
+		(new UploadTask(act, point,type,reporter)).execute();
+		//String url = "http://servicedata.net76.net/insert.php?";  //lat=0&lng=0&type=0&reporter=name
+		//String params= "lat="+lat+"&lng="+lng+"&type="+type+"&reporter=admin";
+		//time auto-gen
+		//Log.i("GMap.Util.upload", url+params);
 	}
 }

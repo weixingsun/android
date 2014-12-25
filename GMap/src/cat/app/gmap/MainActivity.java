@@ -53,6 +53,9 @@ public class MainActivity extends FragmentActivity {
     public TextView pointDetail;
     public TextView markerid;
     public ImageView iconRouteDelete;
+	private ImageView iconPolice;
+	private ImageView iconCCTV;
+	private ImageView iconMedical;
 	private ListView mDrawerListParent;
     private String[] mMainSettings;
     private DrawerLayout mDrawerLayout;
@@ -182,15 +185,50 @@ public class MainActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
             	String id = markerid.getText().toString();
-            	//Log.i(TAG, "id="+id);
-            	Marker m = gMap.markers.get(id);
+            	Marker m = gMap.routeMarkers.get(id);
             	//if(m==null) m=gMap.debugMarkers.get(id);
             	gMap.removeMarker(m);
             	gMap.refreshRoute(true);
             }
         });
+        iconPolice = (ImageView) popupLayout.findViewById(R.id.ic_police);
+        iconPolice.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	String markerId = markerid.getText().toString();
+            	MarkerPoint point = gMap.routeMarkerpoints.get(markerId);
+            	if(point!=null){
+            		gMap.addRemindMarker(point,R.drawable.ic_police_32);
+            		Util.uploadRemind(MainActivity.this,point.getLatLng(),1,null);
+            	}
+            }
+        });
+        iconCCTV = (ImageView) popupLayout.findViewById(R.id.ic_cctv);
+        iconCCTV.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	String markerId = markerid.getText().toString();
+            	MarkerPoint point = gMap.routeMarkerpoints.get(markerId);
+            	if(point!=null){
+            		gMap.addRemindMarker(point,R.drawable.ic_cctv_32);
+            		Util.uploadRemind(MainActivity.this,point.getLatLng(),2,null);
+            	}
+            }
+        });
+        iconMedical= (ImageView) popupLayout.findViewById(R.id.ic_medical);
+        iconMedical.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	String markerId = markerid.getText().toString();
+            	MarkerPoint point = gMap.routeMarkerpoints.get(markerId);
+            	if(point!=null){
+            		gMap.addRemindMarker(point,R.drawable.ic_medical_32);
+            		Util.uploadRemind(MainActivity.this,point.getLatLng(),3,null);
+            	}
+            }
+        });
 	}
-
+	
     public void openPopup(MarkerPoint mp) {
             popup.setAnimationStyle(R.style.AnimBottom);
             popup.showAtLocation(findViewById(R.id.btn_show), Gravity.BOTTOM, 0, 0);
