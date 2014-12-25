@@ -4,19 +4,21 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class MarkerPoint {
 
+	private String id;
 	private int seq;
 	private String title;
 	private String comment;
 	private LatLng latlng;
 	//private Icon icon;
 
-	public MarkerPoint(int seq,String title,String comment,LatLng latlng){
+
+	public MarkerPoint(String id,int seq,String title,String comment,LatLng latlng){
+		this.id=id;
 		this.seq=seq;
 		this.title=title;
 		this.comment=comment;
 		this.latlng=latlng;
 	}
-
 	public int getSeq() {
 		return seq;
 	}
@@ -47,5 +49,13 @@ public class MarkerPoint {
 
 	public void setLatlng(LatLng latlng) {
 		this.latlng = latlng;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	private void setId(String id) {
+		this.id = id;
 	}
 }

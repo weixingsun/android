@@ -1,6 +1,9 @@
 package cat.app.gmap;
 
 import java.util.List;
+
+import com.google.android.gms.maps.model.Marker;
+
 import cat.app.gmap.adapter.VoiceSuggestListAdapter;
 import cat.app.gmap.listener.MenuItemClickListener;
 import cat.app.gmap.listener.Voice;
@@ -48,6 +51,8 @@ public class MainActivity extends FragmentActivity {
     public ImageView iconTravelMode;
     public TextView pointBrief;
     public TextView pointDetail;
+    public TextView markerid;
+    public ImageView iconRouteDelete;
 	private ListView mDrawerListParent;
     private String[] mMainSettings;
     private DrawerLayout mDrawerLayout;
@@ -171,14 +176,36 @@ public class MainActivity extends FragmentActivity {
         });
         pointBrief = (TextView) popupLayout.findViewById(R.id.point_brief);
         pointDetail = (TextView) popupLayout.findViewById(R.id.point_detail);
+        markerid = (TextView) popupLayout.findViewById(R.id.markerid);
+        iconRouteDelete = (ImageView) popupLayout.findViewById(R.id.ic_route_delete);
+        iconRouteDelete.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            	String id = markerid.getText().toString();
+            	//Log.i(TAG, "id="+id);
+            	Marker m = gMap.markers.get(id);
+            	//if(m==null) m=gMap.debugMarkers.get(id);
+            	gMap.removeMarker(m);
+            	gMap.refreshRoute(true);
+            }
+        });
 	}
 
     public void openPopup(MarkerPoint mp) {
             popup.setAnimationStyle(R.style.AnimBottom);
             popup.showAtLocation(findViewById(R.id.btn_show), Gravity.BOTTOM, 0, 0);
             //popup.setFocusable(true);
-            pointBrief.setText(mp.getTitle());
-            pointDetail.setText(mp.getComment());
+            if(mp!=null){
+	            pointBrief.setText(mp.getTitle());
+	            pointDetail.setText(mp.getComment());
+	            markerid.setText(mp.getId());
+	            this.iconRouteDelete.setVisibility(View.VISIBLE);
+            }else{
+            	pointBrief.setText("");
+                pointDetail.setText("");
+                markerid.setText("");
+                this.iconRouteDelete.setVisibility(View.INVISIBLE);
+            }
             popup.update();
     }
 

@@ -44,13 +44,14 @@ public class GMap extends MapFragment
 	public List<Polyline> routesPolyLines = new ArrayList<Polyline>();
 	//public List<Route> routes = new ArrayList<Route>();
 	public List<Step> steps = new ArrayList<Step>();
-	public List<LatLng> startPointOfSteps = new ArrayList<LatLng>();
+	//public List<LatLng> startPointOfSteps = new ArrayList<LatLng>();
 	public Map<String,Marker> markers=new TreeMap<String,Marker>();
+	public Map<String,Marker> remindMarkers=new TreeMap<String,Marker>();////////////////////////////for adding some customized hints
 	public Map<String,String> instructionToMp3 = new HashMap<String,String>();
+	public List<String> playedMp3 = new ArrayList<String>();
 	public TreeMap<String,MarkerPoint> markerpoints=new TreeMap<String,MarkerPoint>();
 	public int markerMaxSeq = 1;
 	public int currentStepIndex = 0;
-	public int previousStepIndex = -1;
 	private boolean hinted=false;
 
 	public void init(final MainActivity activity){
@@ -82,12 +83,7 @@ public class GMap extends MapFragment
         map.setOnInfoWindowClickListener(new OnInfoWindowClickListener(){
 			@Override
 			public void onInfoWindowClick(Marker marker) {
-				marker.remove();
-				markerpoints.remove(marker.getId());
-				markers.remove(marker.getId());
-				updateMarkerSeq();
-				refreshRoute(true);
-				markerMaxSeq--;
+				removeMarker(marker);
 			}
         });
         map.setOnMapClickListener(new OnMapClickListener() {
@@ -98,6 +94,16 @@ public class GMap extends MapFragment
             	Util.closeKeyBoard(activity);
             }
         });
+	}
+	public void removeMarker(Marker marker){
+		if(marker!=null){
+			marker.remove();
+			markerpoints.remove(marker.getId());
+			markers.remove(marker.getId());
+			updateMarkerSeq();
+			//refreshRoute(true);
+			markerMaxSeq--;
+		}
 	}
 	private void initStorage() {
 		File folder = new File(Util.baseDir);
@@ -117,6 +123,10 @@ public class GMap extends MapFragment
 		Bitmap bmRaw = BitmapFactory.decodeResource(activity.getResources(), R.drawable.marker_blue_32);
 		return Util.generatorSequencedIcon(bmRaw,seq);
 	}
+	private Bitmap createBitmap(){
+		Bitmap bmRaw = BitmapFactory.decodeResource(activity.getResources(), R.drawable.red_point);
+		return bmRaw;
+	}
 	public void addMarker(SuggestPoint point){
 		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createSeqBitmap(markerMaxSeq));
     	Marker marker = map.addMarker(new MarkerOptions()
@@ -125,11 +135,21 @@ public class GMap extends MapFragment
 	        .position(point.getLatLng())
 	        .icon(bd)
         );
-    	MarkerPoint mp = new MarkerPoint(markerMaxSeq,point.getDetailAddr(),point.getPoliticalAddr(),point.getLatLng());
+    	MarkerPoint mp = new MarkerPoint(marker.getId(),markerMaxSeq,point.getDetailAddr(),point.getPoliticalAddr(),point.getLatLng());
     	markerpoints.put(marker.getId(), mp);
     	markers.put(marker.getId(), marker);
     	markerMaxSeq++;
+    	Log.i(TAG, "id="+marker.getId());
     	this.activity.openPopup(mp);
+    }
+	public void addSimpleMarker(SuggestPoint point){
+		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createBitmap());
+    	Marker marker = map.addMarker(new MarkerOptions()
+	        .title(point.getDetailAddr())
+	        .snippet(point.getPoliticalAddr())
+	        .position(point.getLatLng())
+	        .icon(bd)
+        );
     }
 	public void move(LatLng latlng){
 		map.moveCamera(CameraUpdateFactory.newLatLng(latlng));
@@ -166,11 +186,10 @@ public class GMap extends MapFragment
 	public void refreshRoute(boolean restart) {
 		if(restart){//redraw all routes
 			removePreviousRoute();
-			startPointOfSteps.clear();
+			//startPointOfSteps.clear();
 			steps.clear();
 			instructionToMp3.clear();
 			currentStepIndex=0;
-			previousStepIndex=-1;
 			redrawRoutes(myLatLng);
 		}else{ //draw only last route
 			Entry<String,MarkerPoint> lastEntry = markerpoints.pollLastEntry();
@@ -234,31 +253,48 @@ public class GMap extends MapFragment
 			startMyCountryCodeTask();
 		}
 		if(steps.size()>0){
-			if(currentStepIndex>this.previousStepIndex){
-				hinted = false;
-				previousStepIndex=currentStepIndex;
-			}
-			LatLng nextStart = this.startPointOfSteps.get(currentStepIndex+1);
-			boolean near = Util.getDistance(myLatLng, nextStart)<50 ;
-			if((currentStepIndex==0 || near) && !hinted){
+			LatLng nextStart = this.steps.get(currentStepIndex+1).getStartLocation();
+			float distance = Util.getDistance(myLatLng, nextStart);
+			//Log.i(TAG, "distance To point "+(currentStepIndex+1)+" ="+distance);
+			//boolean near = distance<150 ;
+			if(!hinted ){
 				play();
 			}
-			if(currentStepIndex>0)
-				(new FindMyStepTask(activity)).execute(myLatLng); //currentStepIndex found
+			(new FindMyStepTask(activity)).execute(myLatLng);
+			if(distance<10) {
+				hinted = false;
+			}
+			//if replan is needed
 		}
 	}
 	private void play(){
 		String hintHTML = this.steps.get(currentStepIndex).getHtmlInstructions();
 		String hintFile = this.instructionToMp3.get(hintHTML);
-		if(hintFile!=null){
+		if(hintFile!=null && !playedMp3.contains(hintFile)){
 			Player.play(hintFile);
+			playedMp3.add(hintFile);
 			hinted = true;
+			Toast.makeText(activity, "Hint:"+hintHTML, Toast.LENGTH_SHORT).show();
 		}
 	}
 	@Override
 	public boolean onMarkerClick(Marker arg0) {
-		MarkerPoint mp = new MarkerPoint(markerMaxSeq,arg0.getTitle(),arg0.getSnippet(),arg0.getPosition());
+		MarkerPoint mp = new MarkerPoint(arg0.getId(),0,arg0.getTitle(),arg0.getSnippet(),arg0.getPosition());
 		activity.openPopup(mp);
 		return true;
 	}
+	public void drawStepPoint(Step nextStep, int seq){
+		String firstAddress = "Step "+(seq+1)+"/"+steps.size();
+		String fullAddress = firstAddress+","+nextStep.getHtmlInstructions();
+		SuggestPoint sp = new SuggestPoint(nextStep.getStartLocation(), fullAddress);
+		this.addSimpleMarker(sp);
+	}
+	public void drawAllStepPoints(){
+		Log.i(TAG, "draw all step points");
+		for (int i=0;i<steps.size();i++){
+			Step s = steps.get(i);
+			drawStepPoint(s,i);
+		}
+	}
 }
+

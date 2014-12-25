@@ -68,9 +68,6 @@ public class GoogleRouteTask extends
                 	Route r = RouteParser.parse(responseString).get(0);
                 	//gmap.routes.add(r);
                 	old_size=gmap.steps.size();
-                	for(Step s:r.getSteps()){
-                    	gmap.startPointOfSteps.add(s.getStartLocation());
-                	}
                 	gmap.steps.addAll(r.getSteps());
                 	route = RouteParser.getWholeRoutePoints(r);
                 } else {
@@ -113,6 +110,7 @@ public class GoogleRouteTask extends
             gmap.routesPolyLines.add(pl);
             gmap.findNewRouteSpeech(old_size);
         }
+        //gmap.drawAllStepPoints();
     }
 	
     /** 

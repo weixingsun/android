@@ -88,6 +88,9 @@ public class Util {
     		Log.i("Util", "failed to create dir:"+folder.getAbsolutePath());
     	}
 	}
+	public static void drawAPoint(LatLng point,Color color){
+		
+	}
     /*public void showMarkers(){
     	LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
 

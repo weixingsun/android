@@ -5,6 +5,7 @@ import com.google.android.gms.maps.GoogleMap;
 import cat.app.gmap.MainActivity;
 import cat.app.gmap.R;
 import cat.app.gmap.Util;
+import cat.app.gmap.model.MarkerPoint;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;

@@ -31,7 +31,7 @@ import android.widget.Toast;
 
 public class GoogleCountryCodeTask extends AsyncTask<LatLng, Void, String> {
 	MainActivity act;
-	private static final String TAG = "GMap.GetAddressTask";
+	private static final String TAG = "GMap.GoogleCountryCodeTask";
 	private String website = "https://maps.googleapis.com/maps/api/geocode/json?latlng=";  //40.714224,-73.961452
 	HttpClient client;
 	LatLng point;
