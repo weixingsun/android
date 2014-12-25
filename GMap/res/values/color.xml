@@ -5,4 +5,5 @@
     <color name="counter_text_bg">#ccc</color>
     <color name="list_background">#eee</color>
     <color name="list_background_pressed">#fff</color>
+    <color name="layout_popup_bg">#998888cc</color>
 </resources>

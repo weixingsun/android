@@ -42,22 +42,22 @@ public class SubMenuItemClickListener implements OnItemClickListener {
 				break;
 			case Util.NAV_DRIVING:
 				activity.gMap.travelMode=Util.NAV_DRIVING.toLowerCase();
-				activity.iconTravelMode.setImageResource(R.drawable.ic_taxi_64);
+				activity.iconTravelMode.setImageResource(R.drawable.ic_taxi_48);
 				activity.openPopup(null);
 				break;
 			case Util.NAV_WALKING:
 				activity.gMap.travelMode=Util.NAV_WALKING.toLowerCase();
-				activity.iconTravelMode.setImageResource(R.drawable.ic_walk_64);
+				activity.iconTravelMode.setImageResource(R.drawable.ic_walk_48);
 				activity.openPopup(null);
 				break;
 			case Util.NAV_BICYCLING:
 				activity.gMap.travelMode=Util.NAV_BICYCLING.toLowerCase();
-				activity.iconTravelMode.setImageResource(R.drawable.ic_bicycle_64);
+				activity.iconTravelMode.setImageResource(R.drawable.ic_bicycle_48);
 				activity.openPopup(null);
 				break;
 			case Util.NAV_TRANSIT:
 				activity.gMap.travelMode=Util.NAV_TRANSIT.toLowerCase();
-				activity.iconTravelMode.setImageResource(R.drawable.ic_bus_64);
+				activity.iconTravelMode.setImageResource(R.drawable.ic_bus_48);
 				activity.openPopup(null);
 				break;
 			default:

@@ -49,7 +49,7 @@ public class SuggestPoint {
 		for(int i=1;i<addr.size();i++){
 			sb.append(addr.get(i));
 			if(i+1<addr.size()){
-				sb.append("\r\n");
+				sb.append(" ");
 			}
 		}
 		return sb.toString();

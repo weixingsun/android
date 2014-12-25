@@ -127,7 +127,7 @@ public class MainActivity extends FragmentActivity {
 			}
 		});
 	}
-	
+
 	private void setText() {
 		inputAddress = (EditText) findViewById(R.id.inputAddress);
 		inputAddress.setTextColor(Color.BLACK);
@@ -199,7 +199,7 @@ public class MainActivity extends FragmentActivity {
 			}
 		}
 	}
-
+	
 	/*@Override
 	public boolean dispatchTouchEvent(MotionEvent event) {
 		//View v = getCurrentFocus();
