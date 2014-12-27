@@ -43,7 +43,7 @@ public class FindMyStepTask extends AsyncTask<LatLng, Void, String> {
 	@Override
 	protected String doInBackground(LatLng... params) {
 		if(steps==null || steps.size()<1){return null;}
-		//isInPointList(step.getPoints(),params[0],30);
+		if(!act.gMap.onRoad) return null;
 		for (int i=act.gMap.currentStepIndex;i<steps.size();i++){
 			if(isInStep(steps.get(i), params[0])){ //如果误差超过10米，会认为不在线路上，继续向下寻找
 				act.gMap.onRoad=true;
@@ -51,7 +51,7 @@ public class FindMyStepTask extends AsyncTask<LatLng, Void, String> {
 				break;
 			}
 			if(i==steps.size()-1 && act.gMap.currentStepIndex<i){
-				Toast.makeText(act, "FindMyStepTask", Toast.LENGTH_LONG).show();
+				return "FindMyStepTask fail to find step";
 			}
 		}//先不考虑重绘线路的情况
 		return null;
@@ -61,5 +61,7 @@ public class FindMyStepTask extends AsyncTask<LatLng, Void, String> {
     protected void onPostExecute(String instruction) {
 		//http://translate.google.com/translate_tts?tl=en&q=Hello%20World
 		//String hint=Html.fromHtml(instruction).toString();
+		if(instruction!=null)
+			Toast.makeText(act, instruction, Toast.LENGTH_LONG).show();
     }
 }

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Calendar;
 
 import cat.app.gmap.model.MarkerPoint;
+import cat.app.gmap.nav.Step;
 import cat.app.gmap.task.GoogleSearchByPointTask;
 import cat.app.gmap.task.UploadTask;
 
@@ -123,8 +124,8 @@ public class Util {
 	}
     */
 
-	public static String createHintFileName(int currentStepIndex) {
-		return baseDir+"hint_"+currentStepIndex+".mp3";
+	public static String createVoiceFileName(String type,int currentStepIndex) {
+		return baseDir+type+"_"+currentStepIndex+".mp3";
 	}
 
 	public static void uploadRemind(MainActivity act,LatLng point,int type, String reporter) {
@@ -146,5 +147,11 @@ public class Util {
 	}
 	public static int getTimezoneOffsetHour(){
 		return getTimezoneOffsetMS()/(1000*60*60);
+	}
+
+	public static String getHint(Step step) {
+    	String hintHTML = step.getHtmlInstructions();
+    	String distance = "in "+step.getDistance().getText()+", ";
+		return distance+Util.removeHTMLTags(hintHTML);
 	}
 }

@@ -196,7 +196,7 @@ public class GMap extends MapFragment
 	public void refreshRoute(boolean restart) {
 		if(restart){//redraw all routes
 			removePreviousRoute();
-			//startPointOfSteps.clear();
+			playedMp3.clear();
 			steps.clear();
 			instructionToMp3.clear();
 			currentStepIndex=0;
@@ -250,35 +250,53 @@ public class GMap extends MapFragment
 		}
 	}
 	public void findNewRouteSpeech(int old_size){
-		Handler handler = new Handler();
         for(int i=old_size;i<steps.size();i++){
-        	String hintFile = Util.createHintFileName(i);//baseDir+/GMap/routes/hint/
-        	String hintHTML = steps.get(i).getHtmlInstructions();
-        	handler.postDelayed(null,10);
-        	(new TextToSpeechTask(this,hintHTML,hintFile)).execute();	//gMap.instructionToMp3(hint,hintFile)
+        	String hintFile = Util.createVoiceFileName("hint",i);//baseDir+/GMap/routes/hint/
+        	String hint = Util.getHint(steps.get(i));
+        	instructionToMp3.put(hint, hintFile);
+        	String maneuver = steps.get(i).getManeuver();
+        	if(maneuver!=null){
+		    	String maneuverFile = Util.createVoiceFileName("maneuver",i);
+		    	instructionToMp3.put(maneuver, maneuverFile);
+        	}
         }
+        (new TextToSpeechTask(this,instructionToMp3)).execute();
 	}
+	
 	@Override
 	public void onMyLocationChange(Location arg0) {
 		myLatLng = new LatLng(arg0.getLatitude(),arg0.getLongitude());
 		startMyCountryCodeTask();
 		if(steps.size()>0){
 			(new FindMyStepTask(activity)).execute(myLatLng);
-			if(onRoad){
-				play(currentStepIndex);
+			double distance = Util.getDistance(myLatLng, steps.get(currentStepIndex).getStartLocation());
+			if(distance<20) {
+				onRoad=true;
+				playTurn(currentStepIndex);
 			}
+			playHint(currentStepIndex);
 			Toast.makeText(activity, "onMyLocationChange.step="+currentStepIndex, Toast.LENGTH_SHORT).show();
 		}
 	}
-	private void play(int nextStepId){
-		String hintHTML = this.steps.get(nextStepId).getHtmlInstructions();
-		String hint = Util.removeHTMLTags(hintHTML);
-		String hintFile = this.instructionToMp3.get(hint);
-		if(hintFile!=null && !playedMp3.contains(hintFile)){
-			Player.play(hintFile);
-			playedMp3.add(hintFile);
+	private void play(String hint){
+		String fileName = this.instructionToMp3.get(hint);
+		if(fileName == null) return ;
+		File file = new File(fileName);
+		if(file.exists() && file.length()>0 && !playedMp3.contains(fileName)){
+			Player.play(fileName);
+			playedMp3.add(fileName);
 			Toast.makeText(activity, hint, Toast.LENGTH_LONG).show();
 		}
+	}
+	
+	private void playHint(int nextStepId){
+		String hint = Util.getHint(steps.get(nextStepId));
+		play(hint);
+	}
+	private void playTurn(int nextStepId){
+		String maneuver = this.steps.get(nextStepId).getManeuver();
+		if(maneuver==null) return ;
+		play(maneuver);
 	}
 	@Override
 	public boolean onMarkerClick(Marker arg0) {
@@ -286,10 +304,11 @@ public class GMap extends MapFragment
 		activity.openPopup(mp);
 		return true;
 	}
-	public void drawStepPoint(Step nextStep, int seq){
+	public void drawStepPoint(Step step, int seq){
 		String firstAddress = "Step "+(seq+1)+"/"+steps.size();
-		String fullAddress = firstAddress+","+Util.removeHTMLTags(nextStep.getHtmlInstructions());
-		SuggestPoint sp = new SuggestPoint(nextStep.getStartLocation(), fullAddress);
+		String fullAddress = firstAddress+","+Util.getHint(step);
+		if(step.getManeuver()!=null) fullAddress+= "\r\n"+step.getManeuver();
+		SuggestPoint sp = new SuggestPoint(step.getStartLocation(), fullAddress);
 		this.addRedPointMarker(sp);
 	}
 	public void drawAllStepPoints(){

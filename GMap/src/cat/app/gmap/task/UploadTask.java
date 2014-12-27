@@ -36,7 +36,7 @@ public class UploadTask extends AsyncTask<LatLng, Void, String> {
 	}
 
     @Override  
-    protected void onPreExecute() {  
+    protected void onPreExecute() {
         client = new DefaultHttpClient();  
         client.getParams().setParameter(  
                 CoreConnectionPNames.CONNECTION_TIMEOUT, 15000);  
@@ -53,7 +53,7 @@ public class UploadTask extends AsyncTask<LatLng, Void, String> {
 		Log.i(TAG, "URL="+url);
 		HttpGet get = new HttpGet(url);
 		try {
-            HttpResponse response = client.execute(get);  
+            HttpResponse response = client.execute(get);
             int statusecode = response.getStatusLine().getStatusCode();
             if (statusecode == 200) {
                 //
