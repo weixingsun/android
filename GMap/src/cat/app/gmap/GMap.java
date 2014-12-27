@@ -20,7 +20,6 @@ import cat.app.gmap.nav.*;
 import cat.app.gmap.task.*;
 
 import com.google.android.gms.maps.*;
-import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.GoogleMap.*;
 import com.google.android.gms.maps.model.*;
 
@@ -51,8 +50,10 @@ public class GMap extends MapFragment
 	public Map<String,String> instructionToMp3 = new HashMap<String,String>();
 	public List<String> playedMp3 = new ArrayList<String>();
 	public int markerMaxSeq = 1;
-	public int currentStepIndex = 0;
-	private boolean hinted=false;
+	public int currentStepIndex = 0;//0 -> instructionToMp3(1), 1 -> instructionToMp3(2)
+	public boolean onRoad =false;
+	
+	
 
 	public void init(final MainActivity activity){
 		this.activity= activity;
@@ -244,7 +245,9 @@ public class GMap extends MapFragment
 	public void startMyCountryCodeTask(){
 		//TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
 	    //String countryCode = tm.getSimCountryIso();
-		(new GoogleCountryCodeTask(activity,myLatLng)).execute();
+		if(myCountryCode==null){
+			(new GoogleCountryCodeTask(activity,myLatLng)).execute();
+		}
 	}
 	public void findNewRouteSpeech(int old_size){
 		Handler handler = new Handler();
@@ -258,32 +261,25 @@ public class GMap extends MapFragment
 	@Override
 	public void onMyLocationChange(Location arg0) {
 		myLatLng = new LatLng(arg0.getLatitude(),arg0.getLongitude());
-		if(myCountryCode==null){
-			startMyCountryCodeTask();
-		}
+		startMyCountryCodeTask();
+		Util.getTimezoneOffsetMS();
 		if(steps.size()>0){
-			LatLng nextStart = this.steps.get(currentStepIndex+1).getStartLocation();
-			float distance = Util.getDistance(myLatLng, nextStart);
-			//Log.i(TAG, "distance To point "+(currentStepIndex+1)+" ="+distance);
-			//boolean near = distance<150 ;
-			if(!hinted ){
-				play();
-			}
 			(new FindMyStepTask(activity)).execute(myLatLng);
-			if(distance<10) {
-				hinted = false;
+			play(currentStepIndex);
+			if(onRoad){
+				play(currentStepIndex+1);
 			}
-			//if replan is needed
+			Toast.makeText(activity, "onMyLocationChange.step="+currentStepIndex, Toast.LENGTH_SHORT).show();
 		}
 	}
-	private void play(){
-		String hintHTML = this.steps.get(currentStepIndex).getHtmlInstructions();
-		String hintFile = this.instructionToMp3.get(hintHTML);
+	private void play(int nextStepId){
+		String hintHTML = this.steps.get(nextStepId).getHtmlInstructions();
+		String hint = Util.removeHTMLTags(hintHTML);
+		String hintFile = this.instructionToMp3.get(hint);
 		if(hintFile!=null && !playedMp3.contains(hintFile)){
 			Player.play(hintFile);
 			playedMp3.add(hintFile);
-			hinted = true;
-			Toast.makeText(activity, "Hint:"+hintHTML, Toast.LENGTH_SHORT).show();
+			Toast.makeText(activity, hint, Toast.LENGTH_LONG).show();
 		}
 	}
 	@Override
@@ -294,7 +290,7 @@ public class GMap extends MapFragment
 	}
 	public void drawStepPoint(Step nextStep, int seq){
 		String firstAddress = "Step "+(seq+1)+"/"+steps.size();
-		String fullAddress = firstAddress+","+nextStep.getHtmlInstructions();
+		String fullAddress = firstAddress+","+Util.removeHTMLTags(nextStep.getHtmlInstructions());
 		SuggestPoint sp = new SuggestPoint(nextStep.getStartLocation(), fullAddress);
 		this.addRedPointMarker(sp);
 	}

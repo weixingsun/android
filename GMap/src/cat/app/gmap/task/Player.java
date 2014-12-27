@@ -21,9 +21,9 @@ public class Player {
 		mp.start();
 	}
 	public static void play(String fileName){
-		if( mp.isPlaying() ){
+		/*if( mp.isPlaying() ){
 			mp.stop();
-		}
+		}*/
 		init(fileName);
 		mp.start();
 	}

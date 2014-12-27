@@ -40,45 +40,28 @@ public class FindMyStepTask extends AsyncTask<LatLng, Void, String> {
 		return PolyUtil.isLocationOnPath(loc, step.getPoints(), geodesic,10); //tolerance=10 meters
 	}
 
-	public boolean isInPolylines(List<Polyline> polylines, LatLng loc){
-		List<LatLng> ll = new ArrayList<LatLng>();
-		for(Polyline pl: polylines){
-			ll.addAll(pl.getPoints());
-		}
-		return isInPointList(ll,loc); //tolerance=10 meters
-	}
-	public boolean isInPolyline(Polyline polyline, LatLng loc){
-		return isInPointList(polyline.getPoints(),loc);
-	}
-	public boolean isInPointList(List<LatLng> points, LatLng loc){
-		boolean geodesic = true;
-		return PolyUtil.isLocationOnPath(loc, points, geodesic,10); //tolerance=10 meters
-	}
-	public boolean isInPointList(List<LatLng> points, LatLng loc,int tolerance){
-		boolean geodesic = true;
-		return PolyUtil.isLocationOnPath(loc, points, geodesic,tolerance); //tolerance=10 meters
-	}
 	@Override
 	protected String doInBackground(LatLng... params) {
-		if(steps==null || steps.size()<1){return null;} 
-		Step step = steps.get(currentStepIndex);
-		boolean isIn= false;
-		if(currentStepIndex==0)
-			isIn = isInPointList(step.getPoints(),params[0],100);
-		else
-			isIn = isInPointList(step.getPoints(),params[0]);
-		
-		if(isIn){
-			//act.gMap.currentStepIndex = this.currentStepIndex;
-			return step.getHtmlInstructions();
-		}else{
-			Log.w(TAG, "Find next step......................");
-			while((step = findNextStep())!=null){
-				if(isInPointList(step.getPoints(),params[0])){
-					act.gMap.currentStepIndex = this.currentStepIndex;
-					return step.getHtmlInstructions();
+		if(steps==null || steps.size()<1){return null;}
+		//isInPointList(step.getPoints(),params[0],30);
+		float to_prev_step_distance = 99999;
+		for (int i=0;i<steps.size();i++){
+			float to_curr_step_distance = Util.getDistance(steps.get(i).getStartLocation(), params[0]);
+			if(to_curr_step_distance>to_prev_step_distance){
+				//Log.i(TAG, "i="+i+",curr="+to_curr_step_distance+", prev="+to_prev_step_distance);
+				if(isInStep(steps.get(i-1), params[0])){ //如果误差超过10米，会认为不在线路上
+					act.gMap.onRoad=true;
+					act.gMap.currentStepIndex=i-1;
+					break;
+				}else{
+					if(act.gMap.onRoad){
+						act.gMap.currentStepIndex=i;
+					}
 				}
+				if(i==1){act.gMap.currentStepIndex=0;}   //起点不用计算误差
+				break;
 			}
+			to_prev_step_distance=to_curr_step_distance;
 		}
 		return null;
 	}

@@ -11,6 +11,7 @@ import java.net.URL;
 
 import cat.app.gmap.GMap;
 import cat.app.gmap.MainActivity;
+import cat.app.gmap.Util;
 
 import android.os.AsyncTask;
 import android.text.Html;
@@ -18,12 +19,12 @@ import android.util.Log;
 
 public class TextToSpeechTask extends AsyncTask<String, Void, String> {
 	GMap gmap;
-	String hintHTML;
+	String hint;
 	String instructionVoiceFile;
 	public TextToSpeechTask(GMap gmap,String hintHTML,String voiceFile) {
 		super();
 		this.gmap = gmap;
-		this.hintHTML = hintHTML;
+		this.hint = Util.removeHTMLTags(hintHTML);
 		this.instructionVoiceFile = voiceFile;
 	}
 	private static final String TAG = "GMap.TextToSpeechTask";
@@ -45,7 +46,7 @@ public class TextToSpeechTask extends AsyncTask<String, Void, String> {
 	protected String doInBackground(String... params) {
 		String parsedValue = null;
 		try {
-			String hint = Html.fromHtml(hintHTML).toString();
+			//String hint = Util.removeHTMLTags(hintHTML);
 			parsedValue = java.net.URLEncoder.encode(hint, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			Log.i(TAG, "URLEncoder.encode exception ");
@@ -76,6 +77,6 @@ public class TextToSpeechTask extends AsyncTask<String, Void, String> {
 	@Override  
     protected void onPostExecute(String filePath) {
         //super.onPostExecute(filePath);
-        gmap.instructionToMp3.put(hintHTML, instructionVoiceFile);
+        gmap.instructionToMp3.put(hint, instructionVoiceFile);
     }
 }

@@ -14,6 +14,7 @@ import org.apache.http.params.CoreConnectionPNames;
 import com.google.android.gms.maps.model.LatLng;
 
 import cat.app.gmap.MainActivity;
+import cat.app.gmap.Util;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -25,6 +26,7 @@ public class UploadTask extends AsyncTask<LatLng, Void, String> {
 	LatLng point;
 	int type;
 	String reporter;
+	//SELECT DATE_SUB(now(), INTERVAL 1 HOUR);  --DATE_ADD/DATE_SUB
 	public UploadTask(MainActivity act,LatLng point,int type, String reporter) {
 		super();
 		this.act = act;
@@ -46,7 +48,9 @@ public class UploadTask extends AsyncTask<LatLng, Void, String> {
 	protected String doInBackground(LatLng... params) {
 		double lat = point.latitude;
 		double lng = point.longitude;
-		String url = website+"lat="+lat+"&lng="+lng+"&type="+type+"&reporter="+reporter;
+		String tz_offset=""+Util.getTimezoneOffsetHour();
+		String url = website+"lat="+lat+"&lng="+lng+"&type="+type+"&reporter="+reporter+"&tz_offset="+tz_offset;
+		Log.i(TAG, "URL="+url);
 		HttpGet get = new HttpGet(url);
 		try {
             HttpResponse response = client.execute(get);  

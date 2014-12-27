@@ -109,8 +109,8 @@ public class GoogleRouteTask extends
             Polyline pl = gmap.map.addPolyline(lineOptions);
             gmap.routesPolyLines.add(pl);
             gmap.findNewRouteSpeech(old_size);
+            gmap.drawAllStepPoints();
         }
-        //gmap.drawAllStepPoints();
     }
 	
     /** 
