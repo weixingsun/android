@@ -128,7 +128,7 @@ public class GMap extends MapFragment
 		Bitmap bmRaw = BitmapFactory.decodeResource(activity.getResources(), resId);
 		return bmRaw;
 	}
-	public void addMarker(SuggestPoint point){
+	public void addRouteMarker(SuggestPoint point){
 		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createSeqBitmap(markerMaxSeq));
     	Marker marker = map.addMarker(new MarkerOptions()
 	        .title(point.getDetailAddr())
@@ -140,7 +140,7 @@ public class GMap extends MapFragment
     	routeMarkerpoints.put(marker.getId(), mp);
     	routeMarkers.put(marker.getId(), marker);
     	markerMaxSeq++;
-    	Log.i(TAG, "id="+marker.getId());
+    	//Log.i(TAG, "id="+marker.getId());
     	this.activity.openPopup(mp);
     }
 	public void addRedPointMarker(SuggestPoint point){
@@ -262,12 +262,10 @@ public class GMap extends MapFragment
 	public void onMyLocationChange(Location arg0) {
 		myLatLng = new LatLng(arg0.getLatitude(),arg0.getLongitude());
 		startMyCountryCodeTask();
-		Util.getTimezoneOffsetMS();
 		if(steps.size()>0){
 			(new FindMyStepTask(activity)).execute(myLatLng);
-			play(currentStepIndex);
 			if(onRoad){
-				play(currentStepIndex+1);
+				play(currentStepIndex);
 			}
 			Toast.makeText(activity, "onMyLocationChange.step="+currentStepIndex, Toast.LENGTH_SHORT).show();
 		}

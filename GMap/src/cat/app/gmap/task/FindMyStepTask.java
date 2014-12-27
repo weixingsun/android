@@ -44,25 +44,16 @@ public class FindMyStepTask extends AsyncTask<LatLng, Void, String> {
 	protected String doInBackground(LatLng... params) {
 		if(steps==null || steps.size()<1){return null;}
 		//isInPointList(step.getPoints(),params[0],30);
-		float to_prev_step_distance = 99999;
-		for (int i=0;i<steps.size();i++){
-			float to_curr_step_distance = Util.getDistance(steps.get(i).getStartLocation(), params[0]);
-			if(to_curr_step_distance>to_prev_step_distance){
-				//Log.i(TAG, "i="+i+",curr="+to_curr_step_distance+", prev="+to_prev_step_distance);
-				if(isInStep(steps.get(i-1), params[0])){ //如果误差超过10米，会认为不在线路上
-					act.gMap.onRoad=true;
-					act.gMap.currentStepIndex=i-1;
-					break;
-				}else{
-					if(act.gMap.onRoad){
-						act.gMap.currentStepIndex=i;
-					}
-				}
-				if(i==1){act.gMap.currentStepIndex=0;}   //起点不用计算误差
+		for (int i=act.gMap.currentStepIndex;i<steps.size();i++){
+			if(isInStep(steps.get(i), params[0])){ //如果误差超过10米，会认为不在线路上，继续向下寻找
+				act.gMap.onRoad=true;
+				act.gMap.currentStepIndex=i;
 				break;
 			}
-			to_prev_step_distance=to_curr_step_distance;
-		}
+			if(i==steps.size()-1 && act.gMap.currentStepIndex<i){
+				Toast.makeText(act, "FindMyStepTask", Toast.LENGTH_LONG).show();
+			}
+		}//先不考虑重绘线路的情况
 		return null;
 	}
 

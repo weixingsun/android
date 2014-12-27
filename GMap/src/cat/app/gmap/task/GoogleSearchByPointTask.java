@@ -119,7 +119,7 @@ public class GoogleSearchByPointTask extends
             //failed to navigate
             Toast.makeText(gmap.activity, "No location found.", Toast.LENGTH_LONG).show();
         } else{
-        	gmap.addMarker(foundPoint);
+        	gmap.addRouteMarker(foundPoint);
         }
     }
     /** 
