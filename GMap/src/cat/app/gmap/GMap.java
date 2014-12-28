@@ -278,7 +278,7 @@ public class GMap extends MapFragment
 				if(toCurrentEnd<Util.hintBeforeTurn)
 					playTurn(currentStepIndex+1);
 			}
-			//Toast.makeText(activity, "myStep="+currentStepIndex+",toCurrentStart="+toCurrentStart+",toNextStart="+toNextStart, Toast.LENGTH_SHORT).show();
+			Toast.makeText(activity, "onRoad="+onRoad+",myStep="+currentStepIndex+",toCurrentStart="+toCurrentStart+",toNextStart="+toCurrentEnd, Toast.LENGTH_SHORT).show();
 			//Log.i(TAG, "myStep="+currentStepIndex+",toCurrentStart="+toCurrentStart+",toCurrentEnd="+toCurrentEnd);
 			//Log.i(TAG, "played hints="+playedMp3.size());
 		}
@@ -288,15 +288,15 @@ public class GMap extends MapFragment
 		if(fileName == null) return ;
 		File file = new File(fileName);
 		if(file.exists() && file.length()>0 && !playedMp3.contains(fileName)){
-			Player.play(fileName);
+			Player.startPlaying(fileName);
 			playedMp3.add(fileName);
 			Toast.makeText(activity, hint, Toast.LENGTH_LONG).show();
 		}
 	}
 	
 	private void playHint(int nextStepId){
-		String hint = Util.getHint(steps.get(nextStepId));
-		play(hint);
+		if(nextStepId<steps.size())
+			play(Util.getHint(steps.get(nextStepId)));
 	}
 	private void playTurn(int nextStepId){
 		String maneuver = this.steps.get(nextStepId).getManeuver();

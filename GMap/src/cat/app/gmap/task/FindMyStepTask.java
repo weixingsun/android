@@ -37,7 +37,7 @@ public class FindMyStepTask extends AsyncTask<LatLng, Void, String> {
 	}
 	public boolean isInStep(Step step, LatLng loc){
 		boolean geodesic = false;
-		return PolyUtil.isLocationOnPath(loc, step.getPoints(), geodesic,10); //tolerance=10 meters
+		return PolyUtil.isLocationOnPath(loc, step.getPoints(), geodesic,20); //tolerance=20 meters
 	}
 
 	@Override
@@ -45,7 +45,7 @@ public class FindMyStepTask extends AsyncTask<LatLng, Void, String> {
 		if(steps==null || steps.size()<1){return null;}
 		if(!act.gMap.onRoad) return null;
 		for (int i=act.gMap.currentStepIndex;i<steps.size();i++){
-			if(isInStep(steps.get(i), params[0])){ //如果误差超过10米，会认为不在线路上，继续向下寻找
+			if(isInStep(steps.get(i), params[0])){ //如果误差超过20米，会认为不在线路上，继续向下寻找
 				act.gMap.onRoad=true;
 				act.gMap.currentStepIndex=i;
 				break;

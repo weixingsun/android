@@ -3,31 +3,39 @@ package cat.app.gmap.task;
 import java.io.IOException;
 
 import android.media.MediaPlayer;
+import android.util.Log;
 
 public class Player {
-	private static MediaPlayer mp = new MediaPlayer();
-	
-	public static void init(String fileName) {
-        try {
-        	
-        	mp.reset();
-	        mp.setDataSource(fileName);
+	private static final String TAG = "GMap.Player";
+	private static MediaPlayer player ;
+
+
+	public static void startPlaying(String fileName) {
+		MediaPlayer mp = new MediaPlayer();
+		try {
+			mp.setDataSource(fileName);
+			mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+				// @Override
+				public void onCompletion(MediaPlayer arg0) {
+					try {
+						arg0.release();
+						arg0=null;
+					} catch (Exception e) {
+						System.out.println("onCompletion ERR:"+e.getMessage());
+					}
+				}
+			});
 			mp.prepare();
+			mp.start();
 		} catch (IOException e) {
-			e.printStackTrace();
+			Log.e(TAG, "prepare() failed");
 		}
 	}
-	public static void play(){
-		mp.start();
-	}
-	public static void play(String fileName){
-		/*if( mp.isPlaying() ){
-			mp.stop();
-		}*/
-		init(fileName);
-		mp.start();
-	}
-	public static void release(){
-		mp.release();
+	private void stopPlaying() {
+		if (player == null) {
+			return;
+		}
+		player.release();
+		player = null;
 	}
 }
