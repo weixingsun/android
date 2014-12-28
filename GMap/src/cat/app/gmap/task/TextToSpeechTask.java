@@ -45,6 +45,11 @@ public class TextToSpeechTask extends AsyncTask<String, Void, String> {
 	protected String doInBackground(String... params) {
 		for	(Map.Entry<String, String> entry : hintToVoiceFile.entrySet()){
 			proceedFile(entry.getKey(),entry.getValue());
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 		return null;
 	}
@@ -60,7 +65,7 @@ public class TextToSpeechTask extends AsyncTask<String, Void, String> {
 			Log.i(TAG, "URLEncoder.encode exception ");
 		}
 		urlStr=site+language+q+parsedValue;
-		Log.i(TAG, "URL TextToSpeechTask: "+urlStr);
+		//Log.i(TAG, "URL TextToSpeechTask: "+urlStr);
 		try {
 			URL url = new URL(urlStr);
 			url.openStream();

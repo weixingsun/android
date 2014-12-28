@@ -48,7 +48,7 @@ import android.widget.Toast;
  */  
 public class GoogleSearchByAddressNameTask extends
         AsyncTask<String, Void, List<SuggestPoint>> {
-    private static final String TAG = "GMap.GoogleMapConverterTask";
+    private static final String TAG = "GMap.GoogleSearchByAddressNameTask";
 	HttpClient client;  
     String url;
     String address;

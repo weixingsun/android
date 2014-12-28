@@ -53,8 +53,6 @@ public class GMap extends MapFragment
 	public int currentStepIndex = 0;//0 -> instructionToMp3(1), 1 -> instructionToMp3(2)
 	public boolean onRoad =false;
 	
-	
-
 	public void init(final MainActivity activity){
 		this.activity= activity;
 		initStorage();
@@ -269,13 +267,20 @@ public class GMap extends MapFragment
 		startMyCountryCodeTask();
 		if(steps.size()>0){
 			(new FindMyStepTask(activity)).execute(myLatLng);
-			double distance = Util.getDistance(myLatLng, steps.get(currentStepIndex).getStartLocation());
-			if(distance<20) {
-				onRoad=true;
-				playTurn(currentStepIndex);
+			if(currentStepIndex==0 ){
+				playHint(0);
 			}
-			playHint(currentStepIndex);
-			Toast.makeText(activity, "onMyLocationChange.step="+currentStepIndex, Toast.LENGTH_SHORT).show();
+			float toCurrentStart = Util.getDistance(myLatLng, steps.get(currentStepIndex).getStartLocation());
+			float toCurrentEnd    = Util.getDistance(myLatLng, steps.get(currentStepIndex).getEndLocation());
+			if(toCurrentStart<Util.hintBeforeTurn){
+				onRoad=true;
+				playHint(currentStepIndex+1);
+				if(toCurrentEnd<Util.hintBeforeTurn)
+					playTurn(currentStepIndex+1);
+			}
+			//Toast.makeText(activity, "myStep="+currentStepIndex+",toCurrentStart="+toCurrentStart+",toNextStart="+toNextStart, Toast.LENGTH_SHORT).show();
+			//Log.i(TAG, "myStep="+currentStepIndex+",toCurrentStart="+toCurrentStart+",toCurrentEnd="+toCurrentEnd);
+			//Log.i(TAG, "played hints="+playedMp3.size());
 		}
 	}
 	private void play(String hint){

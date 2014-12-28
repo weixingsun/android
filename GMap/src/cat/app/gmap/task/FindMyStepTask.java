@@ -50,7 +50,8 @@ public class FindMyStepTask extends AsyncTask<LatLng, Void, String> {
 				act.gMap.currentStepIndex=i;
 				break;
 			}
-			if(i==steps.size()-1 && act.gMap.currentStepIndex<i){
+			Log.i(TAG, "finding in step "+(i+1));
+			if(i==steps.size()-1 && act.gMap.currentStepIndex<i-1){
 				return "FindMyStepTask fail to find step";
 			}
 		}//先不考虑重绘线路的情况
@@ -62,6 +63,6 @@ public class FindMyStepTask extends AsyncTask<LatLng, Void, String> {
 		//http://translate.google.com/translate_tts?tl=en&q=Hello%20World
 		//String hint=Html.fromHtml(instruction).toString();
 		if(instruction!=null)
-			Toast.makeText(act, instruction, Toast.LENGTH_LONG).show();
+			Toast.makeText(act, instruction, Toast.LENGTH_SHORT).show();
     }
 }

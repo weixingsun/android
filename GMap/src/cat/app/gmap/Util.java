@@ -46,6 +46,8 @@ public class Util {
 	public static final String ROAD_MEDICAL_EMERGENCY = "Medical Emergency";
 
 	public static final long LOCATION_UPDATE_INTERVAL = 1000 * 10; //10 seconds
+
+	public static final double hintBeforeTurn = 20;
 	static String baseDir = Environment.getExternalStorageDirectory() + "/GMap/routes/hint/";
 	
 	/**

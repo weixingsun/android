@@ -52,7 +52,7 @@ public class GoogleRouteTask extends
     public GoogleRouteTask(GMap gmap, LatLng start, LatLng dest,String mode) {
     	this.gmap = gmap;
         this.url = getDirectionsUrl(start,dest,"json",mode);
-        Log.i(TAG, "url="+url);
+        //Log.i(TAG, "url="+url);
 	}
 	@Override  
     protected List<LatLng> doInBackground(String... params) {
