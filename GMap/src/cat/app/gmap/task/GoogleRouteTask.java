@@ -18,6 +18,7 @@ import org.json.JSONObject;
 import cat.app.gmap.GMap;
 import cat.app.gmap.Util;
 import cat.app.gmap.model.SuggestPoint;
+import cat.app.gmap.nav.Leg;
 import cat.app.gmap.nav.Route;
 import cat.app.gmap.nav.RouteParser;
 import cat.app.gmap.nav.Step;
@@ -66,8 +67,13 @@ public class GoogleRouteTask extends
                 //Log.i(TAG,"Route JSON:"+responseString);
                 JSONObject object = new JSONObject(responseString);
                 if (object.getString("status").equals("OK")) {
+                	if(responseString.length()<100){
+                		return null;
+                	}
                 	Route r = RouteParser.parse(responseString).get(0);
-                	gmap.startPoint = new SuggestPoint(r.getLegs().get(0).getStartLocation(),r.getLegs().get(0).getStartAddress());
+                	Leg l = r.getLegs().get(0);
+                	if(l.getStartAddress()!=null)
+                		gmap.startPoint = new SuggestPoint(r.getLegs().get(0).getStartLocation(),r.getLegs().get(0).getStartAddress());
                 	old_size=gmap.steps.size();
                 	gmap.steps.addAll(r.getSteps());
                 	route = RouteParser.getWholeRoutePoints(r);
@@ -111,7 +117,7 @@ public class GoogleRouteTask extends
             gmap.routesPolyLines.add(pl);
             Util.reOrgHints(gmap.steps);
             gmap.findNewRouteSpeech(old_size);
-            gmap.drawAllStepPoints();
+            //gmap.drawAllStepPoints();
         }
     }
 	

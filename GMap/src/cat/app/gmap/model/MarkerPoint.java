@@ -1,6 +1,7 @@
 package cat.app.gmap.model;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 public class MarkerPoint {
 
@@ -18,6 +19,13 @@ public class MarkerPoint {
 		this.title=title;
 		this.comment=comment;
 		this.latlng=latlng;
+	}
+	public MarkerPoint(Marker mk){
+		this.id=mk.getId();
+		this.seq=0;
+		this.title=mk.getTitle();
+		this.comment=mk.getSnippet();
+		this.latlng=mk.getPosition();
 	}
 	public int getSeq() {
 		return seq;

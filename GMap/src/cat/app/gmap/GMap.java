@@ -41,8 +41,9 @@ public class GMap extends MapFragment
 	//public List<Route> routes = new ArrayList<Route>();
 	public List<Step> steps = new ArrayList<Step>();
 	public SuggestPoint startPoint;
+	public MarkerPoint selectedMarker;
 	public Map<String,Marker> routeMarkers=new TreeMap<String,Marker>();
-	public Map<String,Marker> remindMarkers=new TreeMap<String,Marker>();//like police/camera/accident
+	public Map<String,MarkerPoint> remindMarkers=new TreeMap<String,MarkerPoint>();//like police/camera/accident
 	public TreeMap<String,MarkerPoint> routeMarkerpoints=new TreeMap<String,MarkerPoint>();
 	public SparseArray<String> startHintMp3 = new SparseArray<String>();
 	public SparseArray<String> endHintMp3 = new SparseArray<String>();
@@ -52,11 +53,13 @@ public class GMap extends MapFragment
 	public int currentStepIndex = 0;//0 -> instructionToMp3(1), 1 -> instructionToMp3(2)
 	public boolean onRoad =false;
 	private boolean StepChanged=false;
+	LatLngBounds bounds;
 	
 	public void init(final MainActivity activity){
 		this.activity= activity;
 		initStorage();
 		initMap();
+		bounds = map.getProjection().getVisibleRegion().latLngBounds;
         settings.put("TrafficEnabled", "false");
 	}
 	private void initMap() {
@@ -150,13 +153,26 @@ public class GMap extends MapFragment
 	        .icon(bd)
         );
     }
+	public void addRemindMarker(SuggestPoint point,int type){
+		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createBitmap(Util.getResByType(type)));
+    	//Marker marker = this.routeMarkers.get(point.getId());
+		//Log.i(TAG, "=============="+type+","+Util.getResByType(type)+", "+point.getDetailAddr()+", "+point.getPoliticalAddr()+", "+point.getLatLng());
+    	Marker marker = map.addMarker(new MarkerOptions()
+	        .title(point.getDetailAddr())
+	        .snippet(point.getPoliticalAddr())
+	        .position(point.getLatLng())
+	        .icon(bd)
+    	);
+    	marker.setIcon(bd);
+    	remindMarkers.put(marker.getId(), new MarkerPoint(marker));
+    }
 	public void addRemindMarker(MarkerPoint point,int resId){
 		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createBitmap(resId));
     	Marker marker = this.routeMarkers.get(point.getId());
     	marker.setIcon(bd);
     	routeMarkerpoints.remove(marker.getId());
     	routeMarkers.remove(point.getId());
-    	remindMarkers.put(point.getId(), marker);
+    	remindMarkers.put(point.getId(), point);
     	markerMaxSeq--;
     }
 	public void move(LatLng latlng){
@@ -201,6 +217,12 @@ public class GMap extends MapFragment
 		currentStepIndex=0;
     }
 	public void refreshRoute(boolean restart) {
+		if(this.remindMarkers.containsKey(this.selectedMarker.getId())){
+			clearRoute();
+			GoogleRouteTask task = new GoogleRouteTask(this,this.myLatLng,selectedMarker.getLatLng(),travelMode);
+            task.execute();
+			return;
+		}
 		if(restart){//redraw all routes
 			clearRoute();
 			redrawRoutes(myLatLng);
@@ -217,6 +239,7 @@ public class GMap extends MapFragment
             task.execute();
 			routeMarkerpoints.put(lastEntry.getKey(), lastEntry.getValue());
 		}
+		
 	}
 	public void redrawRoutes(LatLng loc){
 		//Toast.makeText(activity, "draw lines", Toast.LENGTH_LONG).show();
@@ -325,8 +348,8 @@ public class GMap extends MapFragment
 	}
 	@Override
 	public boolean onMarkerClick(Marker arg0) {
-		MarkerPoint mp = new MarkerPoint(arg0.getId(),0,arg0.getTitle(),arg0.getSnippet(),arg0.getPosition());
-		activity.openPopup(mp);
+		selectedMarker = new MarkerPoint(arg0.getId(),0,arg0.getTitle(),arg0.getSnippet(),arg0.getPosition());
+		activity.openPopup(selectedMarker);
 		return true;
 	}
 	public void drawStepPoint(Step step, int seq){

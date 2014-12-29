@@ -25,6 +25,8 @@ import android.location.Location;
 import android.os.Environment;
 import android.text.Html;
 import android.util.Log;
+import android.util.SparseArray;
+import android.util.SparseIntArray;
 import android.view.inputmethod.InputMethodManager;
 
 public class Util {
@@ -56,6 +58,19 @@ public class Util {
 	public static String startHint="start";
 	public static String endHint="end";
 	
+	public static SparseIntArray typeToRes;
+	
+	public static void init(){
+		typeToRes = new SparseIntArray ();
+		typeToRes.append(1, R.drawable.ic_police_32);
+		typeToRes.append(2, R.drawable.ic_cctv_32);
+		typeToRes.append(3, R.drawable.ic_medical_32);
+		typeToRes.append(4, R.drawable.ic_police_32);
+	}
+	
+	public static int getResByType(int type){
+		return typeToRes.get(type);
+	}
 	/**
      * 在给定的图片的右上角加上联系人数量。数量用红色表示
      * @param icon 给定的图片

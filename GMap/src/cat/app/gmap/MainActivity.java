@@ -2,6 +2,7 @@ package cat.app.gmap;
 
 import java.util.List;
 
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 
 import cat.app.gmap.adapter.VoiceSuggestListAdapter;
@@ -9,6 +10,7 @@ import cat.app.gmap.listener.MenuItemClickListener;
 import cat.app.gmap.listener.Voice;
 import cat.app.gmap.model.MarkerPoint;
 import cat.app.gmap.model.SuggestPoint;
+import cat.app.gmap.task.FectchUserDataTask;
 import cat.app.gmap.task.GoogleSearchByAddressNameTask;
 import cat.app.gmap.task.Player;
 import android.content.Intent;
@@ -62,11 +64,12 @@ public class MainActivity extends FragmentActivity {
     PopupWindow popup;
 	DisplayMetrics  dm;
 	String mode;
-
+	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.main);
+		Util.init();
 		gMap.init(this);
 		showUI();
 	}
@@ -82,8 +85,14 @@ public class MainActivity extends FragmentActivity {
 		setDrawer();
 		setWindow();
 		setImage();
+		findMarkers();
 	}
 
+	private void findMarkers() {
+		FectchUserDataTask task = new FectchUserDataTask(
+				gMap, gMap.bounds.northeast,gMap.bounds.southwest );
+		task.execute();
+	}
 	private void setImage() {
 		ImageView voiceInput = (ImageView) findViewById(R.id.voiceInput);
 		voiceInput.setOnClickListener(new View.OnClickListener() {
@@ -138,7 +147,7 @@ public class MainActivity extends FragmentActivity {
 	private void setText() {
 		inputAddress = (EditText) findViewById(R.id.inputAddress);
 		inputAddress.setTextColor(Color.BLACK);
-		inputAddress.addTextChangedListener(new DelayedTextWatcher(1500) {
+		inputAddress.addTextChangedListener(new DelayedTextWatcher(2000) {
 			@Override
 			public void afterTextChangedDelayed(Editable s) {
 				GoogleSearchByAddressNameTask task = new GoogleSearchByAddressNameTask(
@@ -230,7 +239,7 @@ public class MainActivity extends FragmentActivity {
 	
     public void openPopup(MarkerPoint mp) {
             popup.setAnimationStyle(R.style.AnimBottom);
-            popup.showAtLocation(findViewById(R.id.btn_show), Gravity.BOTTOM, 0, 0);
+            popup.showAtLocation(findViewById(R.id.btn_show), Gravity.BOTTOM, 0, 0); //leaked window
             //popup.setFocusable(true);
             if(mp!=null){
 	            pointBrief.setText(mp.getTitle());
@@ -245,11 +254,11 @@ public class MainActivity extends FragmentActivity {
             }
             popup.update();
     }
-    public void openPopupDebug(String text){
+    //public void openPopupDebug(String text){
     	//if(!popup.isShowing())
     	//	popup.update();
-    	pointBrief.setText(text);
-    }
+    	//pointBrief.setText(text);
+    //}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {

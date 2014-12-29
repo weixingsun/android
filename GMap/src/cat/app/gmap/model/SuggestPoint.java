@@ -26,15 +26,15 @@ public class SuggestPoint {
 	public void setLatLng(LatLng latlng) {
 		this.latlng = latlng;
 	}
-	public String getTypes() {
-		return types;
+	public int getType() {
+		return type;
 	}
-	public void setTypes(String types) {
-		this.types = types;
+	public void setType(int type) {
+		this.type = type;
 	}
 	private String formatted_address; //"10A Elizabeth Street, Riccarton, Christchurch 8011, New Zealand"
 	private LatLng latlng;	// [ "lat" : -43.5344743, "lng" : 172.6039153 ]
-	private String types; //[ "street_address" ]
+	private int type; // 1 police, 2 camera, 3 medical
 	//private String detail; // 10A Elizabeth Street
 	private String political; //Riccarton, Christchurch 8011, New Zealand
 	private List<String> addr ;
@@ -54,14 +54,14 @@ public class SuggestPoint {
 		}
 		return sb.toString();
 	}
-	public SuggestPoint(LatLng location, String formatted_address, String types){
+	public SuggestPoint(LatLng location, String formatted_address, int types){
 		this.latlng = location;
 		this.formatted_address=formatted_address;
-		this.types=types;
+		this.type=types;
 		addr = Arrays.asList(formatted_address.split(","));
 		political=createPoliticalAddr();
 	}
 	public SuggestPoint(LatLng location, String formatted_address) {
-		this(location,formatted_address,null);
+		this(location,formatted_address,0);
 	}
 }
