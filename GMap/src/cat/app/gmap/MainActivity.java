@@ -237,14 +237,14 @@ public class MainActivity extends FragmentActivity {
         });
 	}
 	
-    public void openPopup(MarkerPoint mp) {
+    public void openPopup(Marker m) {
             popup.setAnimationStyle(R.style.AnimBottom);
             popup.showAtLocation(findViewById(R.id.btn_show), Gravity.BOTTOM, 0, 0); //leaked window
             //popup.setFocusable(true);
-            if(mp!=null){
-	            pointBrief.setText(mp.getTitle());
-	            pointDetail.setText(mp.getComment());
-	            markerid.setText(mp.getId());
+            if(m!=null){
+	            pointBrief.setText(m.getTitle());
+	            pointDetail.setText(m.getSnippet());
+	            markerid.setText(m.getId());
 	            this.iconRouteDelete.setVisibility(View.VISIBLE);
             }else{
             	pointBrief.setText("");

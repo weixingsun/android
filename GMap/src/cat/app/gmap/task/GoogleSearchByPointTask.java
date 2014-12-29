@@ -23,6 +23,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import cat.app.gmap.GMap;
+import cat.app.gmap.model.MarkerPoint;
 import cat.app.gmap.model.SuggestPoint;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -55,10 +56,16 @@ public class GoogleSearchByPointTask extends
     LatLng position;
     SuggestPoint foundPoint;
     GMap gmap;
+    Marker marker;
     public GoogleSearchByPointTask(GMap gmap,LatLng position) {
     	this.position=position;
     	this.gmap = gmap;
         this.url = getLocationURL(position);
+    }
+    public GoogleSearchByPointTask(GMap gmap,Marker point) {
+    	this.marker=point;
+    	this.gmap = gmap;
+        this.url = getLocationURL(marker.getPosition());
     }
     @Override  
     public List<SuggestPoint> doInBackground(String... params) {
@@ -115,11 +122,16 @@ public class GoogleSearchByPointTask extends
     @Override  
     protected void onPostExecute(List<SuggestPoint> points) {
         super.onPostExecute(points);  
-        if (foundPoint == null) {  
+        if (foundPoint == null) {
             //failed to navigate
             Toast.makeText(gmap.activity, "No location found.", Toast.LENGTH_LONG).show();
         } else{
-        	gmap.addRouteMarker(foundPoint);
+        	if(marker==null)
+        		gmap.addRouteMarker(foundPoint);
+        	else{
+        		gmap.updateMarker(marker,foundPoint);
+        		gmap.activity.openPopup(marker);
+        	}
         }
     }
     /** 

@@ -142,8 +142,14 @@ public class GMap extends MapFragment
     	routeMarkers.put(marker.getId(), marker);
     	markerMaxSeq++;
     	//Log.i(TAG, "id="+marker.getId());
-    	this.activity.openPopup(mp);
+    	this.activity.openPopup(marker);
     }
+	public void updateMarker(Marker marker, SuggestPoint point){
+		if(marker.getSnippet().length()==0||marker.getTitle().length()==0){
+			marker.setTitle(point.getMarkerTitle());
+			marker.setSnippet(" "+marker.getTitle()+point.getMarkerSnippet());
+		}
+	}
 	public void addRedPointMarker(SuggestPoint point){
 		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createBitmap(R.drawable.red_point));
     	Marker marker = map.addMarker(new MarkerOptions()
@@ -156,8 +162,7 @@ public class GMap extends MapFragment
 	public void addRemindMarker(SuggestPoint point,int type){
 		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createBitmap(Util.getResByType(type)));
     	//Marker marker = this.routeMarkers.get(point.getId());
-		//Log.i(TAG, "=============="+type+","+Util.getResByType(type)+", "+point.getDetailAddr()+", "+point.getPoliticalAddr()+", "+point.getLatLng());
-    	Marker marker = map.addMarker(new MarkerOptions()
+		Marker marker = map.addMarker(new MarkerOptions()
 	        .title(point.getDetailAddr())
 	        .snippet(point.getPoliticalAddr())
 	        .position(point.getLatLng())
@@ -184,12 +189,6 @@ public class GMap extends MapFragment
     public float getZoomLevel(){
     	return map.getCameraPosition().zoom;
     }
-	@Override
-	public void onMapLongClick(LatLng point) {
-		//right drawer popup
-   	 	GoogleSearchByPointTask task = new GoogleSearchByPointTask(this, point);
-		task.execute();
-	}
     public List<LatLng> getWaypoints(){
     	List<LatLng> ll = new ArrayList<LatLng>();
     	Iterator<Entry<String, MarkerPoint>> iter = routeMarkerpoints.entrySet().iterator();
@@ -282,16 +281,7 @@ public class GMap extends MapFragment
         }
         (new TextToSpeechTask(this,startHintMp3,endHintMp3)).execute();
 	}
-	
-	@Override
-	public void onMyLocationChange(Location arg0) {
-		myLatLng = new LatLng(arg0.getLatitude(),arg0.getLongitude());
-		startMyCountryCodeTask();
-		if(steps.size()>0){
-			this.hintDetect();
-			this.endDetect();
-		}
-	}
+
 	
 	private void hintDetect() {
 		float toCurrentStart = Util.getDistance(myLatLng, steps.get(currentStepIndex).getStartLocation());
@@ -346,10 +336,31 @@ public class GMap extends MapFragment
 			}
 		}
 	}
+
+	@Override
+	public void onMapLongClick(LatLng point) {
+		//right drawer popup
+   	 	GoogleSearchByPointTask task = new GoogleSearchByPointTask(this, point);
+		task.execute();
+	}
+	@Override
+	public void onMyLocationChange(Location arg0) {
+		myLatLng = new LatLng(arg0.getLatitude(),arg0.getLongitude());
+		startMyCountryCodeTask();
+		if(steps.size()>0){
+			this.hintDetect();
+			this.endDetect();
+		}
+	}
+	
 	@Override
 	public boolean onMarkerClick(Marker arg0) {
+		if(arg0.getSnippet().length()==0 || arg0.getTitle().length()==0) {
+	   	 	GoogleSearchByPointTask task = new GoogleSearchByPointTask(this, arg0);
+			task.execute();
+		}
 		selectedMarker = new MarkerPoint(arg0.getId(),0,arg0.getTitle(),arg0.getSnippet(),arg0.getPosition());
-		activity.openPopup(selectedMarker);
+		activity.openPopup(arg0);
 		return true;
 	}
 	public void drawStepPoint(Step step, int seq){
