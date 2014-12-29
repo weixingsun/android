@@ -17,14 +17,17 @@ import cat.app.gmap.Util;
 import android.os.AsyncTask;
 import android.text.Html;
 import android.util.Log;
+import android.util.SparseArray;
 
 public class TextToSpeechTask extends AsyncTask<String, Void, String> {
 	GMap gmap;
-	Map<String,String> hintToVoiceFile;
-	public TextToSpeechTask(GMap gmap,Map<String,String> hintToVoiceFile) {
+	SparseArray<String> startHintFile;
+	SparseArray<String> endHintFile;
+	public TextToSpeechTask(GMap gmap,SparseArray<String> startHintFile,SparseArray<String> endHintFile) {
 		super();
 		this.gmap = gmap;
-		this.hintToVoiceFile = hintToVoiceFile;
+		this.startHintFile = startHintFile;
+		this.endHintFile = endHintFile;
 	}
 	private static final String TAG = "GMap.TextToSpeechTask";
 	//http://translate.google.com/translate_tts? tl=en &q=Hello%20World
@@ -43,15 +46,24 @@ public class TextToSpeechTask extends AsyncTask<String, Void, String> {
     }  
 	@Override
 	protected String doInBackground(String... params) {
-		for	(Map.Entry<String, String> entry : hintToVoiceFile.entrySet()){
-			proceedFile(entry.getKey(),entry.getValue());
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		int key = 0;
+		for(int i = 0; i < startHintFile.size(); i++) {
+		   key = startHintFile.keyAt(i);
+		   proceedFile(startHintFile.get(key),Util.getVoiceFileName(Util.startHint, key));//hint,path
+		   sleep(300);
+		}
+		for(int i = 0; i < endHintFile.size(); i++) {
+		   key = endHintFile.keyAt(i);
+		   proceedFile(endHintFile.get(key),Util.getVoiceFileName(Util.endHint, key));//hint,path
+		   sleep(300);
 		}
 		return null;
+	}
+	private void sleep(int second){
+		try {
+			Thread.sleep(second);
+		} catch (InterruptedException e) {
+		}
 	}
 	@Override  
     protected void onPostExecute(String filePath) {

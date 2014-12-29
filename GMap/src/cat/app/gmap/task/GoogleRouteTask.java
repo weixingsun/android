@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import cat.app.gmap.GMap;
 import cat.app.gmap.Util;
+import cat.app.gmap.model.SuggestPoint;
 import cat.app.gmap.nav.Route;
 import cat.app.gmap.nav.RouteParser;
 import cat.app.gmap.nav.Step;
@@ -66,7 +67,7 @@ public class GoogleRouteTask extends
                 JSONObject object = new JSONObject(responseString);
                 if (object.getString("status").equals("OK")) {
                 	Route r = RouteParser.parse(responseString).get(0);
-                	//gmap.routes.add(r);
+                	gmap.startPoint = new SuggestPoint(r.getLegs().get(0).getStartLocation(),r.getLegs().get(0).getStartAddress());
                 	old_size=gmap.steps.size();
                 	gmap.steps.addAll(r.getSteps());
                 	route = RouteParser.getWholeRoutePoints(r);

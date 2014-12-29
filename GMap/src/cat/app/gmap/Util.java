@@ -48,10 +48,13 @@ public class Util {
 
 	public static final long LOCATION_UPDATE_INTERVAL = 1000 * 10; //10 seconds
 
-	public static final double hintBeforeTurn = 20;
+	public static final double hintBeforeTurn = 30;
 
 	private static final String TAG = "Util";
 	static String baseDir = Environment.getExternalStorageDirectory() + "/GMap/routes/hint/";
+
+	public static String startHint="start";
+	public static String endHint="end";
 	
 	/**
      * 在给定的图片的右上角加上联系人数量。数量用红色表示
@@ -128,8 +131,8 @@ public class Util {
 		return key;
 	}
     */
-
-	public static String createVoiceFileName(String type,int currentStepIndex) {
+	//baseDir+/GMap/routes/hint/
+	public static String getVoiceFileName(String type,int currentStepIndex) {
 		return baseDir+type+"_"+currentStepIndex+".mp3";
 	}
 
@@ -154,15 +157,6 @@ public class Util {
 		return getTimezoneOffsetMS()/(1000*60*60);
 	}
 
-/*	public static String getHint(Step step) {
-    	String hintHTML = step.getHtmlInstructions();
-		return getDistanceHint(step)+Util.removeHTMLTags(hintHTML);
-	}*/
-	public static String getHint(List<Step> steps, int index) {
-		if(index==steps.size()){return "";}
-    	String currHintHTML = steps.get(index).getHtmlInstructions();
-		return getDistanceHint(steps,index)+Util.removeHTMLTags(currHintHTML);
-	}
 	public static String getDistanceHint(List<Step> steps, int index) {
     	String distance = "in "+steps.get(index).getDistance().getText()+", ";
 		return distance;
@@ -179,8 +173,11 @@ public class Util {
     		}else{ //proceed last step
     			String hint = Util.removeHTMLTags(steps.get(i).getHtmlInstructions());
     			str+=getDestination(hint);
-    			String endHint = steps.get(i).getManeuver()==null?hint:steps.get(i).getManeuver();
-    			s.setEndHint(getDestination(endHint));
+    			String endHint = getDestination(hint);
+    			if(!endHint.contains("Destination")){
+    				endHint="Destination is arrived";
+    			}
+    			s.setEndHint(endHint.replace("will be", "is"));
     		}
     		s.setStartHint(str);
     	}
@@ -201,18 +198,4 @@ public class Util {
 			return hint;
 		}
 	}
-	/*
-
-    	//Destination
-    	Step lastStep = steps.get(steps.size()-1);
-    	String hint = Util.removeHTMLTags(lastStep.getHtmlInstructions());
-    	int index = hint.indexOf("Destination");
-    	//Log.i(TAG, "lastStep.html"+lastStep.getHtmlInstructions());
-    	if(index>0){
-    		Step prev = steps.get(steps.size()-2);
-    		prev.setStartHint(prev.getStartHint().substring(0,prev.getStartHint().indexOf("Destination")));
-	    	String lastHint = lastStep.getHtmlInstructions().substring(index);
-	    	lastStep.setStartHint(lastStep.getStartHint()+lastHint);
-    	}
-	 * */
 }
