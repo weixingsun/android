@@ -245,6 +245,11 @@ public class MainActivity extends FragmentActivity {
             }
             popup.update();
     }
+    public void openPopupDebug(String text){
+    	//if(!popup.isShowing())
+    	//	popup.update();
+    	pointBrief.setText(text);
+    }
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {

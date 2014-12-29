@@ -3,6 +3,7 @@ package cat.app.gmap;
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.List;
 
 import cat.app.gmap.model.MarkerPoint;
 import cat.app.gmap.nav.Step;
@@ -48,6 +49,8 @@ public class Util {
 	public static final long LOCATION_UPDATE_INTERVAL = 1000 * 10; //10 seconds
 
 	public static final double hintBeforeTurn = 20;
+
+	private static final String TAG = "Util";
 	static String baseDir = Environment.getExternalStorageDirectory() + "/GMap/routes/hint/";
 	
 	/**
@@ -151,9 +154,65 @@ public class Util {
 		return getTimezoneOffsetMS()/(1000*60*60);
 	}
 
-	public static String getHint(Step step) {
+/*	public static String getHint(Step step) {
     	String hintHTML = step.getHtmlInstructions();
-    	String distance = "in "+step.getDistance().getText()+", ";
-		return distance+Util.removeHTMLTags(hintHTML);
+		return getDistanceHint(step)+Util.removeHTMLTags(hintHTML);
+	}*/
+	public static String getHint(List<Step> steps, int index) {
+		if(index==steps.size()){return "";}
+    	String currHintHTML = steps.get(index).getHtmlInstructions();
+		return getDistanceHint(steps,index)+Util.removeHTMLTags(currHintHTML);
 	}
+	public static String getDistanceHint(List<Step> steps, int index) {
+    	String distance = "in "+steps.get(index).getDistance().getText()+", ";
+		return distance;
+	}
+	public static void reOrgHints(List<Step> steps) {
+    	for(int i=0;i<steps.size();i++){
+    		Step s =steps.get(i);
+    		String str = "in "+s.getDistance().getText()+ " , ";
+    		if(i<steps.size()-1) {
+    			String hint = Util.removeHTMLTags(steps.get(i+1).getHtmlInstructions());
+    			str+=removeDestination(hint);
+    			String endHint = steps.get(i+1).getManeuver()==null?hint:steps.get(i+1).getManeuver();
+    			s.setEndHint(endHint);
+    		}else{ //proceed last step
+    			String hint = Util.removeHTMLTags(steps.get(i).getHtmlInstructions());
+    			str+=getDestination(hint);
+    			String endHint = steps.get(i).getManeuver()==null?hint:steps.get(i).getManeuver();
+    			s.setEndHint(getDestination(endHint));
+    		}
+    		s.setStartHint(str);
+    	}
+	}
+	private static String getDestination(String hint){
+		int index = hint.indexOf("Destination");
+		if(index>0){
+			return hint.substring(index).trim();
+		}else{
+			return hint;
+		}
+	}
+	private static String removeDestination(String hint){
+		int index = hint.indexOf("Destination");
+		if(index>0){
+			return hint.substring(0,index).trim();
+		}else{
+			return hint;
+		}
+	}
+	/*
+
+    	//Destination
+    	Step lastStep = steps.get(steps.size()-1);
+    	String hint = Util.removeHTMLTags(lastStep.getHtmlInstructions());
+    	int index = hint.indexOf("Destination");
+    	//Log.i(TAG, "lastStep.html"+lastStep.getHtmlInstructions());
+    	if(index>0){
+    		Step prev = steps.get(steps.size()-2);
+    		prev.setStartHint(prev.getStartHint().substring(0,prev.getStartHint().indexOf("Destination")));
+	    	String lastHint = lastStep.getHtmlInstructions().substring(index);
+	    	lastStep.setStartHint(lastStep.getStartHint()+lastHint);
+    	}
+	 * */
 }

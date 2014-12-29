@@ -250,7 +250,7 @@ public class GMap extends MapFragment
 	public void findNewRouteSpeech(int old_size){
         for(int i=old_size;i<steps.size();i++){
         	String hintFile = Util.createVoiceFileName("hint",i);//baseDir+/GMap/routes/hint/
-        	String hint = Util.getHint(steps.get(i));
+        	String hint = steps.get(i).getStartHint();
         	instructionToMp3.put(hint, hintFile);
         	String maneuver = steps.get(i).getManeuver();
         	if(maneuver!=null){
@@ -267,18 +267,18 @@ public class GMap extends MapFragment
 		startMyCountryCodeTask();
 		if(steps.size()>0){
 			(new FindMyStepTask(activity)).execute(myLatLng);
-			if(currentStepIndex==0 ){
-				playHint(0);
-			}
+			playStartHint(currentStepIndex);
 			float toCurrentStart = Util.getDistance(myLatLng, steps.get(currentStepIndex).getStartLocation());
-			float toCurrentEnd    = Util.getDistance(myLatLng, steps.get(currentStepIndex).getEndLocation());
+			float toCurrentEnd   = Util.getDistance(myLatLng, steps.get(currentStepIndex).getEndLocation());
 			if(toCurrentStart<Util.hintBeforeTurn){
 				onRoad=true;
-				playHint(currentStepIndex+1);
-				if(toCurrentEnd<Util.hintBeforeTurn)
-					playTurn(currentStepIndex+1);
 			}
-			Toast.makeText(activity, "onRoad="+onRoad+",myStep="+currentStepIndex+",toCurrentStart="+toCurrentStart+",toNextStart="+toCurrentEnd, Toast.LENGTH_SHORT).show();
+			if(toCurrentEnd<Util.hintBeforeTurn)
+				playEndHint(currentStepIndex);
+			
+			//String text = "onRoad="+onRoad+"("+this.playedMp3.size()+"),myStep="+currentStepIndex+",toStart="+(int)(toCurrentStart)+",toEnd="+(int)toCurrentEnd;
+			//Toast.makeText(activity, null, Toast.LENGTH_SHORT).show();
+			//activity.openPopupDebug(text);
 			//Log.i(TAG, "myStep="+currentStepIndex+",toCurrentStart="+toCurrentStart+",toCurrentEnd="+toCurrentEnd);
 			//Log.i(TAG, "played hints="+playedMp3.size());
 		}
@@ -294,14 +294,11 @@ public class GMap extends MapFragment
 		}
 	}
 	
-	private void playHint(int nextStepId){
-		if(nextStepId<steps.size())
-			play(Util.getHint(steps.get(nextStepId)));
+	private void playStartHint(int stepId){
+		play(steps.get(stepId).getStartHint());
 	}
-	private void playTurn(int nextStepId){
-		String maneuver = this.steps.get(nextStepId).getManeuver();
-		if(maneuver==null) return ;
-		play(maneuver);
+	private void playEndHint(int stepId){
+		play(steps.get(stepId).getEndHint());
 	}
 	@Override
 	public boolean onMarkerClick(Marker arg0) {
@@ -311,8 +308,8 @@ public class GMap extends MapFragment
 	}
 	public void drawStepPoint(Step step, int seq){
 		String firstAddress = "Step "+(seq+1)+"/"+steps.size();
-		String fullAddress = firstAddress+","+Util.getHint(step);
-		if(step.getManeuver()!=null) fullAddress+= "\r\n"+step.getManeuver();
+		String fullAddress = firstAddress+", "+step.getStartHint();
+		fullAddress+= "\r\n"+step.getEndHint();
 		SuggestPoint sp = new SuggestPoint(step.getStartLocation(), fullAddress);
 		this.addRedPointMarker(sp);
 	}

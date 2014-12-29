@@ -63,6 +63,8 @@ public class TextToSpeechTask extends AsyncTask<String, Void, String> {
 			parsedValue = java.net.URLEncoder.encode(instruction, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			Log.i(TAG, "URLEncoder.encode exception ");
+		} catch (Exception e){
+			return ;
 		}
 		urlStr=site+language+q+parsedValue;
 		//Log.i(TAG, "URL TextToSpeechTask: "+urlStr);

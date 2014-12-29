@@ -17,6 +17,8 @@ public class Step {
     private String maneuver;
     private String travelMode;
     private List<LatLng> points;
+    private String startHint;
+    private String endHint;
 
     public List<LatLng> getPoints() {
         return points;
@@ -80,5 +82,21 @@ public class Step {
 
 	public void setManeuver(String maneuver) {
 		this.maneuver = maneuver;
+	}
+
+	public String getStartHint() {
+		return startHint;
+	}
+
+	public void setStartHint(String startHint) {
+		this.startHint = startHint;
+	}
+
+	public String getEndHint() {
+		return endHint;
+	}
+
+	public void setEndHint(String endHint) {
+		this.endHint = endHint;
 	}
 }

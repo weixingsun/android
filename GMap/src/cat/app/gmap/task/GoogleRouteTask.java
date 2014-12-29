@@ -108,6 +108,7 @@ public class GoogleRouteTask extends
             lineOptions.color(Color.BLUE);
             Polyline pl = gmap.map.addPolyline(lineOptions);
             gmap.routesPolyLines.add(pl);
+            Util.reOrgHints(gmap.steps);
             gmap.findNewRouteSpeech(old_size);
             gmap.drawAllStepPoints();
         }
