@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -75,21 +76,22 @@ public class FectchUserDataTask extends
             	sb.append(line);
             }
             int statusecode = response.getStatusLine().getStatusCode();
-            //Log.i(TAG,"response:" + sb.toString());
+            //
             if (statusecode == 200 ) {
             	List<SuggestPoint> points = new ArrayList<SuggestPoint> ();
             	JSONArray posArray = new JSONObject(sb.toString()).getJSONArray("results");
-            	for(int i=0;i<posArray.length()&&i<2;i++){
+            	//Log.i(TAG, sb.toString());
+            	Log.i(TAG,"Array.length():" + posArray.length());
+            	for(int i=0;i<posArray.length()-1;i++){
 	            	JSONObject row = posArray.getJSONObject(i);
-	            	//JSONObject location = addressFull.getJSONObject("geometry").getJSONObject("location");
-	            	int id = row.getInt("ID");
+	            	//int id = row.getInt("ID");
 	            	String report_time = row.getString("report_time");
 	            	//String tz_offset_hour = row.getString("tz_offset_hour");
-	            	double lat = row.getDouble("Lat");
-	            	double lng = row.getDouble("Lng");
-	            	int type = row.getInt("Type");
+	            	double lat = row.getDouble("lat");
+	            	double lng = row.getDouble("lng");
+	            	int type = row.getInt("type");
 	            	//String reporter = row.getString("reporter");
-	            	String comment = row.getString("comment");
+	            	//String comment = row.getString("comment");
 	            	String title="";
 	            	this.foundPoint = new SuggestPoint(new LatLng(lat,lng),"Time:"+report_time,type);
 	            	points.add(foundPoint);
