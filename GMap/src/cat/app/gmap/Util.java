@@ -43,10 +43,9 @@ public class Util {
 	public static final String MAP_TRAFFIC    = "Traffic";
 	public static final String MAP_NORMAL     = "Normal";
 	
-	public static final String ROAD_POLICE_CAR     = "Police Car";
-	public static final String ROAD_MONITOR_CAMERA = "Monitor Camera";
-	public static final String ROAD_CLOSED_ROAD    = "Closed Road";
+	public static final String ROAD_POLICE_CAMERA     = "Police Camera";
 	public static final String ROAD_MEDICAL_EMERGENCY = "Medical Emergency";
+	public static final String ROAD_HELP    		  = "Help";
 
 	public static final long LOCATION_UPDATE_INTERVAL = 1000 * 10; //10 seconds
 

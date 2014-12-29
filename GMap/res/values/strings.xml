@@ -37,9 +37,8 @@
     </string-array>
     
     <string-array name="find_road_items">
-        <item >Police</item>
-        <item >Rada Camera</item>
-        <item >Closed Road</item>
+        <item >Police Camera</item>
+        <item >Medical</item>
         <item >Help</item>
     </string-array>
     
