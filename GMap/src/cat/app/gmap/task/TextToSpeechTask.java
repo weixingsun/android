@@ -57,7 +57,7 @@ public class TextToSpeechTask extends AsyncTask<String, Void, String> {
 		   proceedFile(endHintFile.get(key),Util.getVoiceFileName(Util.endHint, key));//hint,path
 		   sleep(300);
 		}
-		return null;
+		return startHintFile.size()+endHintFile.size()+"";
 	}
 	private void sleep(int second){
 		try {
@@ -66,8 +66,9 @@ public class TextToSpeechTask extends AsyncTask<String, Void, String> {
 		}
 	}
 	@Override  
-    protected void onPostExecute(String filePath) {
+    protected void onPostExecute(String totalFileNumber) {
         //super.onPostExecute(filePath);
+		Log.i(TAG, "files="+totalFileNumber);
     }
 	private void proceedFile(String instruction, String fileName){
 		String parsedValue = null;

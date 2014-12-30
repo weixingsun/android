@@ -57,15 +57,17 @@ public class GoogleSearchByPointTask extends
     SuggestPoint foundPoint;
     GMap gmap;
     Marker marker;
+    int type;
     public GoogleSearchByPointTask(GMap gmap,LatLng position) {
     	this.position=position;
     	this.gmap = gmap;
         this.url = getLocationURL(position);
     }
-    public GoogleSearchByPointTask(GMap gmap,Marker point) {
+    public GoogleSearchByPointTask(GMap gmap,Marker point,int type) {
     	this.marker=point;
     	this.gmap = gmap;
         this.url = getLocationURL(marker.getPosition());
+        this.type=type;
     }
     @Override  
     public List<SuggestPoint> doInBackground(String... params) {
@@ -126,11 +128,12 @@ public class GoogleSearchByPointTask extends
             //failed to navigate
             Toast.makeText(gmap.activity, "No location found.", Toast.LENGTH_LONG).show();
         } else{
-        	if(marker==null)
+        	if(marker==null){
         		gmap.addRouteMarker(foundPoint);
-        	else{
+        	}else{
+        		foundPoint.setType(type);
         		gmap.updateMarker(marker,foundPoint);
-        		gmap.activity.openPopup(marker);
+        		gmap.activity.openPopup(marker,type);
         	}
         }
     }

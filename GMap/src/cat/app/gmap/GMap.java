@@ -41,10 +41,11 @@ public class GMap extends MapFragment
 	//public List<Route> routes = new ArrayList<Route>();
 	public List<Step> steps = new ArrayList<Step>();
 	public SuggestPoint startPoint;
-	public MarkerPoint selectedMarker;
+	public Marker selectedMarker;
 	public Map<String,Marker> routeMarkers=new TreeMap<String,Marker>();
-	public Map<String,MarkerPoint> remindMarkers=new TreeMap<String,MarkerPoint>();//like police/camera/accident
-	public TreeMap<String,MarkerPoint> routeMarkerpoints=new TreeMap<String,MarkerPoint>();
+	public Map<String,Marker> remindMarkers=new TreeMap<String,Marker>();
+	public Map<String,MarkerPoint> remindMarkerPoints=new TreeMap<String,MarkerPoint>();//like police/camera/accident
+	public TreeMap<String,MarkerPoint> routeMarkerPoints=new TreeMap<String,MarkerPoint>();
 	public SparseArray<String> startHintMp3 = new SparseArray<String>();
 	public SparseArray<String> endHintMp3 = new SparseArray<String>();
 	public SparseArray<String> playedStartMp3 = new SparseArray<String>();
@@ -82,29 +83,36 @@ public class GMap extends MapFragment
     	map.setOnMapLongClickListener(this);
     	map.setOnMyLocationChangeListener(this);
     	map.setOnMarkerClickListener(this);
-        map.setOnInfoWindowClickListener(new OnInfoWindowClickListener(){
+        /*map.setOnInfoWindowClickListener(new OnInfoWindowClickListener(){
 			@Override
 			public void onInfoWindowClick(Marker marker) {
 				removeMarker(marker);
 			}
-        });
+        });*/
         map.setOnMapClickListener(new OnMapClickListener() {
             @Override
             public void onMapClick(LatLng arg0) {
             	activity.listSuggestion.setVisibility(View.INVISIBLE);
             	activity.listVoice.setVisibility(View.INVISIBLE);
+            	//selectedMarker=null;
             	Util.closeKeyBoard(activity);
             }
         });
 	}
-	public void removeMarker(Marker marker){
+	public void removeMarker(Marker marker,int type){
 		if(marker!=null){
 			marker.remove();
-			routeMarkerpoints.remove(marker.getId());
-			routeMarkers.remove(marker.getId());
-			updateMarkerSeq();
-			//refreshRoute(true);
-			markerMaxSeq--;
+			if(type>0){
+				this.remindMarkers.remove(marker.getId());
+				this.remindMarkerPoints.remove(marker.getId());
+				(new UserDataDeleteTask(this.activity, marker.getPosition(),Util.USER_ADMIN)).execute();
+			}else{
+				routeMarkerPoints.remove(marker.getId());
+				routeMarkers.remove(marker.getId());
+				updateMarkerSeq();
+				//refreshRoute(true);
+				markerMaxSeq--;
+			}
 		}
 	}
 	private void initStorage() {
@@ -112,7 +120,7 @@ public class GMap extends MapFragment
 		Util.createFolder(folder);
 	}
 	private void updateMarkerSeq() {
-		Iterator<Entry<String, MarkerPoint>> iter = routeMarkerpoints.entrySet().iterator();
+		Iterator<Entry<String, MarkerPoint>> iter = routeMarkerPoints.entrySet().iterator();
     	for(int i=1;iter.hasNext();i++){
     		Entry<String,MarkerPoint> entry = iter.next();
     		if(entry.getValue().getSeq()!=i){
@@ -137,17 +145,20 @@ public class GMap extends MapFragment
 	        .position(point.getLatLng())
 	        .icon(bd)
         );
+		selectedMarker=marker;
     	MarkerPoint mp = new MarkerPoint(marker.getId(),markerMaxSeq,point.getDetailAddr(),point.getPoliticalAddr(),point.getLatLng());
-    	routeMarkerpoints.put(marker.getId(), mp);
+    	routeMarkerPoints.put(marker.getId(), mp);
     	routeMarkers.put(marker.getId(), marker);
     	markerMaxSeq++;
     	//Log.i(TAG, "id="+marker.getId());
-    	this.activity.openPopup(marker);
+    	this.activity.openPopup(marker,0);
     }
 	public void updateMarker(Marker marker, SuggestPoint point){
 		if(marker.getSnippet().length()==0||marker.getTitle().length()==0){
-			marker.setTitle(point.getMarkerTitle());
-			marker.setSnippet(" "+marker.getTitle()+point.getMarkerSnippet());
+			String title=Util.getTitlePrefixFromType(point.getType());
+			String time = marker.getTitle();
+			marker.setTitle(title+" ("+time+")");
+			marker.setSnippet(point.getMarkerTitle()+", "+point.getMarkerSnippet() );
 		}
 	}
 	public void addRedPointMarker(SuggestPoint point){
@@ -169,15 +180,19 @@ public class GMap extends MapFragment
 	        .icon(bd)
     	);
     	marker.setIcon(bd);
-    	remindMarkers.put(marker.getId(), new MarkerPoint(marker));
+    	remindMarkerPoints.put(marker.getId(), new MarkerPoint(marker,type));
+    	remindMarkers.put(marker.getId(), marker);
     }
-	public void addRemindMarker(MarkerPoint point,int resId){
+	public void addRemindMarker(MarkerPoint mp,int type){
+		int resId = Util.getResByType(type);
 		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createBitmap(resId));
-    	Marker marker = this.routeMarkers.get(point.getId());
+    	Marker marker = this.routeMarkers.get(mp.getId());
     	marker.setIcon(bd);
-    	routeMarkerpoints.remove(marker.getId());
-    	routeMarkers.remove(point.getId());
-    	remindMarkers.put(point.getId(), point);
+    	routeMarkerPoints.remove(marker.getId());
+    	routeMarkers.remove(mp.getId());
+    	mp.setSeq(type);
+    	remindMarkerPoints.put(mp.getId(), mp);
+    	remindMarkers.put(marker.getId(), marker);
     	markerMaxSeq--;
     }
 	public void move(LatLng latlng){
@@ -191,7 +206,7 @@ public class GMap extends MapFragment
     }
     public List<LatLng> getWaypoints(){
     	List<LatLng> ll = new ArrayList<LatLng>();
-    	Iterator<Entry<String, MarkerPoint>> iter = routeMarkerpoints.entrySet().iterator();
+    	Iterator<Entry<String, MarkerPoint>> iter = routeMarkerPoints.entrySet().iterator();
     	while(iter.hasNext()){
     		Entry<String,MarkerPoint> entry = iter.next();
     		ll.add(entry.getValue().getLatLng());
@@ -216,9 +231,9 @@ public class GMap extends MapFragment
 		currentStepIndex=0;
     }
 	public void refreshRoute(boolean restart) {
-		if(this.remindMarkers.containsKey(this.selectedMarker.getId())){
+		if(this.remindMarkerPoints.containsKey(this.selectedMarker.getId())){
 			clearRoute();
-			GoogleRouteTask task = new GoogleRouteTask(this,this.myLatLng,selectedMarker.getLatLng(),travelMode);
+			GoogleRouteTask task = new GoogleRouteTask(this,this.myLatLng,selectedMarker.getPosition(),travelMode);
             task.execute();
 			return;
 		}
@@ -226,23 +241,23 @@ public class GMap extends MapFragment
 			clearRoute();
 			redrawRoutes(myLatLng);
 		}else{ //draw only last route
-			Entry<String,MarkerPoint> lastEntry = routeMarkerpoints.pollLastEntry();
+			Entry<String,MarkerPoint> lastEntry = routeMarkerPoints.pollLastEntry();
 			LatLng end = lastEntry.getValue().getLatLng();
 			LatLng start=null;
-			if(routeMarkerpoints.size()==0) {
+			if(routeMarkerPoints.size()==0) {
 				start=myLatLng;
 			}else{
-				start=routeMarkerpoints.lastEntry().getValue().getLatLng();
+				start=routeMarkerPoints.lastEntry().getValue().getLatLng();
 			}
 			GoogleRouteTask task = new GoogleRouteTask(this,start,end,travelMode);
             task.execute();
-			routeMarkerpoints.put(lastEntry.getKey(), lastEntry.getValue());
+			routeMarkerPoints.put(lastEntry.getKey(), lastEntry.getValue());
 		}
 		
 	}
 	public void redrawRoutes(LatLng loc){
 		//Toast.makeText(activity, "draw lines", Toast.LENGTH_LONG).show();
-		if(routeMarkerpoints.size()>0){
+		if(routeMarkerPoints.size()>0){
 			LatLng start = loc;
     		for(LatLng dest:getWaypoints()){
 	            GoogleRouteTask task = new GoogleRouteTask(this,start,dest,travelMode);
@@ -340,6 +355,7 @@ public class GMap extends MapFragment
 	@Override
 	public void onMapLongClick(LatLng point) {
 		//right drawer popup
+		
    	 	GoogleSearchByPointTask task = new GoogleSearchByPointTask(this, point);
 		task.execute();
 	}
@@ -355,12 +371,19 @@ public class GMap extends MapFragment
 	
 	@Override
 	public boolean onMarkerClick(Marker arg0) {
+		int type = 0;
+		MarkerPoint mp = routeMarkerPoints.get(arg0.getId());
+		if(mp==null){
+			mp = remindMarkerPoints.get(arg0.getId());
+			type = mp.getSeq();
+		}
+		Log.i(TAG, "onMarkerClick.type="+type);
 		if(arg0.getSnippet().length()==0 || arg0.getTitle().length()==0) {
-	   	 	GoogleSearchByPointTask task = new GoogleSearchByPointTask(this, arg0);
+	   	 	GoogleSearchByPointTask task = new GoogleSearchByPointTask(this, arg0,type);
 			task.execute();
 		}
-		selectedMarker = new MarkerPoint(arg0.getId(),0,arg0.getTitle(),arg0.getSnippet(),arg0.getPosition());
-		activity.openPopup(arg0);
+		selectedMarker = arg0;
+		activity.openPopup(arg0,type);
 		return true;
 	}
 	public void drawStepPoint(Step step, int seq){

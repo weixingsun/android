@@ -8,7 +8,7 @@ import java.util.List;
 import cat.app.gmap.model.MarkerPoint;
 import cat.app.gmap.nav.Step;
 import cat.app.gmap.task.GoogleSearchByPointTask;
-import cat.app.gmap.task.UploadTask;
+import cat.app.gmap.task.UserDataUploadTask;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -27,11 +27,13 @@ import android.text.Html;
 import android.util.Log;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 public class Util {
 
 	public static final int REQ_CODE_SPEECH_INPUT = 2;
+	
 	
 	public static final String NAV_DRIVING   = "Driving";
 	public static final String NAV_WALKING   = "Walking";
@@ -52,6 +54,11 @@ public class Util {
 	public static final double hintBeforeTurn = 30;
 
 	private static final String TAG = "Util";
+
+	public static final String CAMERA = "Camera at ";
+
+
+	public static final String USER_ADMIN = "admin";
 	static String baseDir = Environment.getExternalStorageDirectory() + "/GMap/routes/hint/";
 
 	public static String startHint="start";
@@ -152,7 +159,7 @@ public class Util {
 
 	public static void uploadRemind(MainActivity act,LatLng point,int type, String reporter) {
 		//type(1:police)(2:cctv)
-		(new UploadTask(act, point,type,reporter)).execute();
+		(new UserDataUploadTask(act, point,type,reporter)).execute();
 		//String url = "http://servicedata.net76.net/insert.php?";  //lat=0&lng=0&type=0&reporter=name
 		//String params= "lat="+lat+"&lng="+lng+"&type="+type+"&reporter=admin";
 		//time auto-gen
@@ -210,6 +217,31 @@ public class Util {
 			return hint.substring(0,index).trim();
 		}else{
 			return hint;
+		}
+	}
+
+	public static String getTitlePrefixFromType(int type) {
+		String str="default ";
+		switch(type){
+		case 1:str= "Police "; break;
+		case 2:str= "Camera "; break;
+		case 3:str= "Medical ";break;
+		
+		}
+		Log.i(TAG, "type="+type);
+		return str;
+	}
+
+	public static void hideIcons(MainActivity act, int type) {
+		if(type>0){
+		act.iconPolice.setVisibility(View.INVISIBLE);
+		act.iconCCTV.setVisibility(View.INVISIBLE);
+		act.iconMedical.setVisibility(View.INVISIBLE);
+		//act.iconPolice.setVisibility(View.INVISIBLE);
+		}else{
+			act.iconPolice.setVisibility(View.VISIBLE);
+			act.iconCCTV.setVisibility(View.VISIBLE);
+			act.iconMedical.setVisibility(View.VISIBLE);
 		}
 	}
 }

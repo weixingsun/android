@@ -139,10 +139,10 @@ int id grayscale 0x7f0a0012
 int id holo_dark 0x7f0a0005
 int id holo_light 0x7f0a0006
 int id hybrid 0x7f0a0000
-int id ic_cctv 0x7f0a0026
-int id ic_medical 0x7f0a0027
-int id ic_police 0x7f0a0025
-int id ic_route_delete 0x7f0a0028
+int id ic_cctv 0x7f0a0027
+int id ic_medical 0x7f0a0028
+int id ic_police 0x7f0a0026
+int id ic_route_delete 0x7f0a0029
 int id ic_travel_mode 0x7f0a0022
 int id inputAddress 0x7f0a0018
 int id left_drawer_child 0x7f0a0020
@@ -151,6 +151,7 @@ int id listSuggestion 0x7f0a001b
 int id listVoiceSuggestion 0x7f0a001c
 int id map 0x7f0a0016
 int id markerid 0x7f0a0024
+int id markertype 0x7f0a0025
 int id match_parent 0x7f0a000c
 int id monochrome 0x7f0a0013
 int id none 0x7f0a0001

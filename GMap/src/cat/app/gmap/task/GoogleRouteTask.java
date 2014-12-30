@@ -60,7 +60,7 @@ public class GoogleRouteTask extends
     protected List<LatLng> doInBackground(String... params) {
         HttpGet get = new HttpGet(url);
         try {
-            HttpResponse response = client.execute(get);  
+            HttpResponse response = client.execute(get);
             int statusecode = response.getStatusLine().getStatusCode();
             if (statusecode == 200) {
                 String responseString = EntityUtils.toString(response.getEntity());

@@ -6,7 +6,7 @@ import com.google.android.gms.maps.model.Marker;
 public class MarkerPoint {
 
 	private String id;
-	private int seq;
+	private int seq;  //during navigation, it's map sequence; when adding markers, it's user defined type.
 	private String title;
 	private String comment;
 	private LatLng latlng;
@@ -20,9 +20,9 @@ public class MarkerPoint {
 		this.comment=comment;
 		this.latlng=latlng;
 	}
-	public MarkerPoint(Marker mk){
+	public MarkerPoint(Marker mk,int type){
 		this.id=mk.getId();
-		this.seq=0;
+		this.seq=type;
 		this.title=mk.getTitle();
 		this.comment=mk.getSnippet();
 		this.latlng=mk.getPosition();

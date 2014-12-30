@@ -10,7 +10,7 @@ import cat.app.gmap.listener.MenuItemClickListener;
 import cat.app.gmap.listener.Voice;
 import cat.app.gmap.model.MarkerPoint;
 import cat.app.gmap.model.SuggestPoint;
-import cat.app.gmap.task.FectchUserDataTask;
+import cat.app.gmap.task.UserDataFectchTask;
 import cat.app.gmap.task.GoogleSearchByAddressNameTask;
 import cat.app.gmap.task.Player;
 import android.content.Intent;
@@ -54,10 +54,11 @@ public class MainActivity extends FragmentActivity {
     public TextView pointBrief;
     public TextView pointDetail;
     public TextView markerid;
-    public ImageView iconRouteDelete;
-	private ImageView iconPolice;
-	private ImageView iconCCTV;
-	private ImageView iconMedical;
+    public TextView markertype;
+    public ImageView iconDelete;
+    public ImageView iconPolice;
+    public ImageView iconCCTV;
+    public ImageView iconMedical;
 	private ListView mDrawerListParent;
     private String[] mMainSettings;
     private DrawerLayout mDrawerLayout;
@@ -89,7 +90,7 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	private void findMarkers() {
-		FectchUserDataTask task = new FectchUserDataTask(
+		UserDataFectchTask task = new UserDataFectchTask(
 				gMap, gMap.bounds.northeast,gMap.bounds.southwest );
 		task.execute();
 	}
@@ -188,14 +189,18 @@ public class MainActivity extends FragmentActivity {
         pointBrief = (TextView) popupLayout.findViewById(R.id.point_brief);
         pointDetail = (TextView) popupLayout.findViewById(R.id.point_detail);
         markerid = (TextView) popupLayout.findViewById(R.id.markerid);
-        iconRouteDelete = (ImageView) popupLayout.findViewById(R.id.ic_route_delete);
-        iconRouteDelete.setOnClickListener(new OnClickListener() {
+        markertype = (TextView) popupLayout.findViewById(R.id.markertype);
+        iconDelete = (ImageView) popupLayout.findViewById(R.id.ic_route_delete);
+        iconDelete.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
             	String id = markerid.getText().toString();
             	Marker m = gMap.routeMarkers.get(id);
-            	//if(m==null) m=gMap.debugMarkers.get(id);
-            	gMap.removeMarker(m);
+            	if(m==null) {
+            		m=gMap.remindMarkers.get(id);
+            	}
+            	int type=Integer.valueOf(markertype.getText().toString());
+            	gMap.removeMarker(m,type);
             	gMap.refreshRoute(true);
             }
         });
@@ -203,41 +208,34 @@ public class MainActivity extends FragmentActivity {
         iconPolice.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-            	String markerId = markerid.getText().toString();
-            	MarkerPoint point = gMap.routeMarkerpoints.get(markerId);
-            	if(point!=null){
-            		gMap.addRemindMarker(point,R.drawable.ic_police_32);
-            		Util.uploadRemind(MainActivity.this,point.getLatLng(),1,null);
-            	}
+            	firstClick(1);
             }
         });
         iconCCTV = (ImageView) popupLayout.findViewById(R.id.ic_cctv);
         iconCCTV.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-            	String markerId = markerid.getText().toString();
-            	MarkerPoint point = gMap.routeMarkerpoints.get(markerId);
-            	if(point!=null){
-            		gMap.addRemindMarker(point,R.drawable.ic_cctv_32);
-            		Util.uploadRemind(MainActivity.this,point.getLatLng(),2,null);
-            	}
+            	firstClick(2);
             }
         });
         iconMedical= (ImageView) popupLayout.findViewById(R.id.ic_medical);
         iconMedical.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-            	String markerId = markerid.getText().toString();
-            	MarkerPoint point = gMap.routeMarkerpoints.get(markerId);
-            	if(point!=null){
-            		gMap.addRemindMarker(point,R.drawable.ic_medical_32);
-            		Util.uploadRemind(MainActivity.this,point.getLatLng(),3,null);
-            	}
+            	firstClick(3);
             }
         });
 	}
-	
-    public void openPopup(Marker m) {
+
+	private void firstClick(int i) {
+		String markerId = markerid.getText().toString();
+    	MarkerPoint point = gMap.routeMarkerPoints.get(markerId);
+    	if(point!=null){
+    		gMap.addRemindMarker(point,i);
+    		Util.uploadRemind(MainActivity.this,point.getLatLng(),i,null);
+    	}
+	}
+    public void openPopup(Marker m, int type) {
             popup.setAnimationStyle(R.style.AnimBottom);
             popup.showAtLocation(findViewById(R.id.btn_show), Gravity.BOTTOM, 0, 0); //leaked window
             //popup.setFocusable(true);
@@ -245,21 +243,18 @@ public class MainActivity extends FragmentActivity {
 	            pointBrief.setText(m.getTitle());
 	            pointDetail.setText(m.getSnippet());
 	            markerid.setText(m.getId());
-	            this.iconRouteDelete.setVisibility(View.VISIBLE);
+	            markertype.setText(type+"");
+	            this.iconDelete.setVisibility(View.VISIBLE);
             }else{
             	pointBrief.setText("");
                 pointDetail.setText("");
                 markerid.setText("");
-                this.iconRouteDelete.setVisibility(View.INVISIBLE);
+                this.iconDelete.setVisibility(View.INVISIBLE);
             }
+            Util.hideIcons(MainActivity.this,type);
             popup.update();
     }
-    //public void openPopupDebug(String text){
-    	//if(!popup.isShowing())
-    	//	popup.update();
-    	//pointBrief.setText(text);
-    //}
-
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
