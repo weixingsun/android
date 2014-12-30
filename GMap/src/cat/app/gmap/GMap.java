@@ -52,6 +52,7 @@ public class GMap extends MapFragment
 	public SparseArray<String> playedEndMp3 = new SparseArray<String>();
 	public int markerMaxSeq = 1;
 	public int currentStepIndex = 0;//0 -> instructionToMp3(1), 1 -> instructionToMp3(2)
+	public int previousStepIndex = -1;
 	public boolean onRoad =false;
 	private boolean StepChanged=false;
 	LatLngBounds bounds;
@@ -299,11 +300,15 @@ public class GMap extends MapFragment
 
 	
 	private void hintDetect() {
-		float toCurrentStart = Util.getDistance(myLatLng, steps.get(currentStepIndex).getStartLocation());
-		float toCurrentEnd = Util.getDistance(myLatLng, steps.get(currentStepIndex).getEndLocation());
-		if(toCurrentStart>Util.hintBeforeTurn && !StepChanged){
+		Step s = steps.get(currentStepIndex);
+		float toCurrentStart = Util.getDistance(myLatLng, s.getStartLocation());
+		float toCurrentEnd   = Util.getDistance(myLatLng, s.getEndLocation());
+		if(onRoad && !StepChanged && toCurrentStart>Util.hintBeforeTurn && toCurrentEnd>Util.hintBeforeTurn){
 			(new FindMyStepTask(activity)).execute(myLatLng);
-			this.StepChanged=true;
+			if(currentStepIndex>previousStepIndex){
+				this.StepChanged=true;
+				previousStepIndex=currentStepIndex;
+			}
 		}
 		if(toCurrentStart<Util.hintBeforeTurn){
 			playStartHint(currentStepIndex);
@@ -354,8 +359,6 @@ public class GMap extends MapFragment
 
 	@Override
 	public void onMapLongClick(LatLng point) {
-		//right drawer popup
-		
    	 	GoogleSearchByPointTask task = new GoogleSearchByPointTask(this, point);
 		task.execute();
 	}
