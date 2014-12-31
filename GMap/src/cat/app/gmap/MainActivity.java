@@ -105,7 +105,7 @@ public class MainActivity extends FragmentActivity {
 		findUserData();
 	}
 
-	private void findUserData() {
+	public void findUserData() {
 		UserDataFectchTask task = new UserDataFectchTask(
 				gMap, gMap.bounds.northeast,gMap.bounds.southwest );
 		task.execute();

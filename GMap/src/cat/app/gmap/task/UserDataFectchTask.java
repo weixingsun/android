@@ -147,9 +147,11 @@ public class UserDataFectchTask extends
             Toast.makeText(gmap.activity, "No reminder found.", Toast.LENGTH_LONG).show();
         } else{
         	for(SuggestPoint sp:points){
-        		gmap.addRemindMarker(sp,sp.getType());
+        		gmap.addOrUpdateRemindMarker(sp,sp.getType());
                 //Log.i(TAG, "FetchUserData.type:"+sp.getType());
         	}
+    		Log.i(TAG, "markers.size="+gmap.remindMarkers.size()+"markerpoints.size="+gmap.remindMarkerPoints.size());
+    		Toast.makeText(gmap.activity, "markers.size="+gmap.remindMarkers.size()+"points.size="+gmap.remindMarkerPoints.size(), Toast.LENGTH_LONG).show();
         }
     }
     /** 

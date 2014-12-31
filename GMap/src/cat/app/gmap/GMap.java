@@ -49,7 +49,7 @@ public class GMap extends MapFragment
 	private static final String TAG = "GMap";
 
 	public MainActivity activity;
-	private NaviSVC naviSvc ;
+	//private NaviSVC naviSvc ;
 	public String myCountryCode;
 	public String travelMode;
 	public GoogleMap map;
@@ -191,10 +191,35 @@ public class GMap extends MapFragment
 	        .position(point.getLatLng())
 	        .icon(bd)
     	);
-    	marker.setIcon(bd);
+    	//marker.setIcon(bd);
     	remindMarkerPoints.put(marker.getId(), new MarkerPoint(marker,type));
     	remindMarkers.put(marker.getId(), marker);
     }
+	public void updateRemindMarker(Marker m, SuggestPoint p,int type){
+		m.setTitle(p.getDetailAddr());
+    }
+	public void addOrUpdateRemindMarker(SuggestPoint sp, int type) {
+		if(remindMarkerPoints.size()<1) {
+			addRemindMarker(sp,type);
+			return;
+		}
+	    Iterator<Map.Entry<String, MarkerPoint>> iterator = remindMarkerPoints.entrySet().iterator();
+	    while (iterator.hasNext()) {
+	        Map.Entry<String, MarkerPoint> entry = iterator.next();
+	        String key = entry.getKey();
+	        MarkerPoint mp = entry.getValue();
+		    if(sp.getLatLng().latitude == mp.getLatLng().latitude &&
+		    		sp.getLatLng().longitude == mp.getLatLng().longitude){
+		    	Marker m = remindMarkers.get(key);
+		    	updateRemindMarker(m, sp,type);
+		    	Log.i(TAG, "lat="+sp.getLatLng().latitude+", lng="+mp.getLatLng().latitude);
+		    }else{
+		    	addRemindMarker(sp,type);
+		    	Log.i(TAG, "lat="+sp.getLatLng().latitude+", lng="+mp.getLatLng().latitude);
+		    }
+	        iterator.remove();
+	    }
+	}
 	public void addRemindMarker(MarkerPoint mp,int type){
 		int resId = Util.getResByType(type);
 		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createBitmap(resId));
@@ -380,43 +405,27 @@ public class GMap extends MapFragment
 		activity.openPopup(arg0,type);
 		return true;
 	}
-/*	public void drawStepPoint(Step step, int seq){
-	String firstAddress = "Step "+(seq+1)+"/"+steps.size();
-	String fullAddress = firstAddress+", "+step.getStartHint();
-	fullAddress+= "\r\n"+step.getEndHint();
-	SuggestPoint sp = new SuggestPoint(step.getStartLocation(), fullAddress);
-	this.addRedPointMarker(sp);
-}
-public void drawAllStepPoints(){
-	Log.i(TAG, "draw all step points");
-	for (int i=0;i<steps.size();i++){
-		Step s = steps.get(i);
-		drawStepPoint(s,i);
-	}
-}*/
-/*
-public void addRedPointMarker(SuggestPoint point){
-BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createBitmap(R.drawable.red_point));
-Marker marker = map.addMarker(new MarkerOptions()
-    .title(point.getDetailAddr())
-    .snippet(point.getPoliticalAddr())
-    .position(point.getLatLng())
-    .icon(bd)
-);
-}*/
+
 	////////////////////////////////////////////////////////////////////////////////////////////////
 	Runnable backgroundR = new Runnable() {
+		int counter = 0;
 		@Override
 		public void run() {
 			/*
 			 * Message message = new Message(); message.what = DisplayMessage;
 			 * MainView.myHandler.sendMessage(message);
 			 */
+			if(counter>Util.USER_DATA_UPDATE_INTERVAL){
+				activity.findUserData();
+				counter = 0;
+				Log.i(TAG, "UserDataFetch");
+			}
 			if(steps.size()>0){
 				moveNavi();
 				hintDetect();
 				endDetect();
 			}
+			counter++;
 			Log.i(TAG, "bg thread running");
 		}
 	};
@@ -530,5 +539,6 @@ Marker marker = map.addMarker(new MarkerOptions()
 			(new GoogleCountryCodeTask(activity,myLatLng)).execute();
 		}
 	}
+	
 }
 

@@ -35,8 +35,8 @@ public class Util {
 	public static final int REQ_CODE_SPEECH_INPUT = 2;
 	public static final int REQUEST_RESOLVE_ERROR = 1001;
 	public static final String DIALOG_ERROR = "dialog_error";
-	public static final long THREAD_UPDATE_INTERVAL = 1000;
-	public static final long USER_DATA_UPDATE_INTERVAL = 10000;
+	public static final long THREAD_UPDATE_INTERVAL = 2000;
+	public static final long USER_DATA_UPDATE_INTERVAL = 10;
 	
 	
 	public static final String NAV_DRIVING   = "Driving";
