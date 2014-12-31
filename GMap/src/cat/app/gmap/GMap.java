@@ -4,38 +4,58 @@ import java.io.File;
 import java.util.*;
 import java.util.Map.Entry;
 
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentSender.SendIntentException;
 import android.graphics.*;
 import android.location.*;
+import android.os.Bundle;
+import android.os.Handler;
 import android.util.*;
 import android.view.View;
 import android.widget.Toast;
 
 import cat.app.gmap.model.*;
 import cat.app.gmap.nav.*;
+import cat.app.gmap.svc.NaviSVC;
 import cat.app.gmap.task.*;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+import com.google.android.gms.drive.Drive;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.GoogleMap.*;
 import com.google.android.gms.maps.model.*;
 
 public class GMap extends MapFragment 
-	implements OnMapLongClickListener, OnMyLocationChangeListener, OnMarkerClickListener {
-	//GooglePlayServicesClient.ConnectionCallbacks,
-    //GooglePlayServicesClient.OnConnectionFailedListener
+	implements OnMapLongClickListener, OnMarkerClickListener, ConnectionCallbacks, OnConnectionFailedListener, LocationListener  {
 
 	//https://maps.googleapis.com/maps/api/place/search/json?
 	//location=-33.8670522,151.1957362&radius=500&types=grocery_or_supermarket
 	//&sensor=true&key=AIzaSyApl-_heZUCRD6bJ5TltYPn4gcSCy1LY3A
+	BackgroundTimerTask btt = new BackgroundTimerTask();
+	
     private HashMap<String,String> settings = new HashMap<String, String>();
 	private static final String TAG = "GMap";
+
+	public MainActivity activity;
+	private NaviSVC naviSvc ;
 	public String myCountryCode;
 	public String travelMode;
-	public MainActivity activity;
 	public GoogleMap map;
 	public LatLng myLatLng;
 	public LocationManager lm;
+	GoogleApiClient mGoogleApiClient;
 	public List<SuggestPoint> suggestPoints = new ArrayList<SuggestPoint>();
 	public List<Polyline> routesPolyLines = new ArrayList<Polyline>();
 	//public List<Route> routes = new ArrayList<Route>();
@@ -57,23 +77,23 @@ public class GMap extends MapFragment
 	private boolean StepChanged=false;
 	LatLngBounds bounds;
 	
+	private boolean mResolvingError = false;
+
+	
 	public void init(final MainActivity activity){
 		this.activity= activity;
 		initStorage();
 		initMap();
 		bounds = map.getProjection().getVisibleRegion().latLngBounds;
         settings.put("TrafficEnabled", "false");
+        //this.naviSvc = new NaviSVC(activity);
 	}
 	private void initMap() {
-		LocationManager lm=(LocationManager)activity.getSystemService(Context.LOCATION_SERVICE);
-		Location myloc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+		//LocationManager lm=(LocationManager)activity.getSystemService(Context.LOCATION_SERVICE);
+		//Location myloc = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 		FragmentManager myFM = activity.getFragmentManager();
 		MapFragment fragment = (MapFragment) myFM.findFragmentById(R.id.map);
 		map = fragment.getMap();
-		if (myloc != null) {
-			myLatLng = new LatLng(myloc.getLatitude(),myloc.getLongitude());
-	        move(myLatLng,13);
-	    }
 		map.getUiSettings().setCompassEnabled(false);
 		map.getUiSettings().setRotateGesturesEnabled(false);
 		map.setMyLocationEnabled(true);
@@ -82,7 +102,6 @@ public class GMap extends MapFragment
     	//map.setIndoorEnabled(true);
     	map.setBuildingsEnabled(true);
     	map.setOnMapLongClickListener(this);
-    	map.setOnMyLocationChangeListener(this);
     	map.setOnMarkerClickListener(this);
         /*map.setOnInfoWindowClickListener(new OnInfoWindowClickListener(){
 			@Override
@@ -162,15 +181,7 @@ public class GMap extends MapFragment
 			marker.setSnippet(point.getMarkerTitle()+", "+point.getMarkerSnippet() );
 		}
 	}
-	public void addRedPointMarker(SuggestPoint point){
-		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createBitmap(R.drawable.red_point));
-    	Marker marker = map.addMarker(new MarkerOptions()
-	        .title(point.getDetailAddr())
-	        .snippet(point.getPoliticalAddr())
-	        .position(point.getLatLng())
-	        .icon(bd)
-        );
-    }
+	
 	public void addRemindMarker(SuggestPoint point,int type){
 		BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createBitmap(Util.getResByType(type)));
     	//Marker marker = this.routeMarkers.get(point.getId());
@@ -234,7 +245,7 @@ public class GMap extends MapFragment
 	public void refreshRoute(boolean restart) {
 		if(this.remindMarkerPoints.containsKey(this.selectedMarker.getId())){
 			clearRoute();
-			GoogleRouteTask task = new GoogleRouteTask(this,this.myLatLng,selectedMarker.getPosition(),travelMode);
+			GoogleRouteTask task = new GoogleRouteTask(this,myLatLng,selectedMarker.getPosition(),travelMode);
             task.execute();
 			return;
 		}
@@ -283,13 +294,7 @@ public class GMap extends MapFragment
 				Toast.makeText(activity, "Settings:"+settingName+" not found", Toast.LENGTH_LONG).show();
 		}
 	}
-	public void startMyCountryCodeTask(){
-		//TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-	    //String countryCode = tm.getSimCountryIso();
-		if(myCountryCode==null){
-			(new GoogleCountryCodeTask(activity,myLatLng)).execute();
-		}
-	}
+
 	public void findNewRouteSpeech(int old_size){
         for(int i=old_size;i<steps.size();i++){
         	startHintMp3.append(i, steps.get(i).getStartHint());
@@ -319,11 +324,6 @@ public class GMap extends MapFragment
 			playEndHint(currentStepIndex);
 			this.StepChanged=false;
 		}
-		if(onRoad) this.move(myLatLng);
-		//String text = "onRoad="+onRoad+",StepChanged="+StepChanged+". toStart="+(int)toCurrentStart+", toEnd="+(int)toCurrentEnd;
-		//text+=",startHintFile="+startHintMp3.size()+",endHintFile="+endHintMp3.size();
-		//activity.openPopupDebug(text);
-		
 	}
 	private void endDetect() {
 		if(currentStepIndex<steps.size()-1) return;
@@ -362,15 +362,6 @@ public class GMap extends MapFragment
    	 	GoogleSearchByPointTask task = new GoogleSearchByPointTask(this, point);
 		task.execute();
 	}
-	@Override
-	public void onMyLocationChange(Location arg0) {
-		myLatLng = new LatLng(arg0.getLatitude(),arg0.getLongitude());
-		startMyCountryCodeTask();
-		if(steps.size()>0){
-			this.hintDetect();
-			this.endDetect();
-		}
-	}
 	
 	@Override
 	public boolean onMarkerClick(Marker arg0) {
@@ -389,18 +380,154 @@ public class GMap extends MapFragment
 		activity.openPopup(arg0,type);
 		return true;
 	}
-	public void drawStepPoint(Step step, int seq){
-		String firstAddress = "Step "+(seq+1)+"/"+steps.size();
-		String fullAddress = firstAddress+", "+step.getStartHint();
-		fullAddress+= "\r\n"+step.getEndHint();
-		SuggestPoint sp = new SuggestPoint(step.getStartLocation(), fullAddress);
-		this.addRedPointMarker(sp);
+/*	public void drawStepPoint(Step step, int seq){
+	String firstAddress = "Step "+(seq+1)+"/"+steps.size();
+	String fullAddress = firstAddress+", "+step.getStartHint();
+	fullAddress+= "\r\n"+step.getEndHint();
+	SuggestPoint sp = new SuggestPoint(step.getStartLocation(), fullAddress);
+	this.addRedPointMarker(sp);
+}
+public void drawAllStepPoints(){
+	Log.i(TAG, "draw all step points");
+	for (int i=0;i<steps.size();i++){
+		Step s = steps.get(i);
+		drawStepPoint(s,i);
 	}
-	public void drawAllStepPoints(){
-		Log.i(TAG, "draw all step points");
-		for (int i=0;i<steps.size();i++){
-			Step s = steps.get(i);
-			drawStepPoint(s,i);
+}*/
+/*
+public void addRedPointMarker(SuggestPoint point){
+BitmapDescriptor bd = BitmapDescriptorFactory.fromBitmap(createBitmap(R.drawable.red_point));
+Marker marker = map.addMarker(new MarkerOptions()
+    .title(point.getDetailAddr())
+    .snippet(point.getPoliticalAddr())
+    .position(point.getLatLng())
+    .icon(bd)
+);
+}*/
+	////////////////////////////////////////////////////////////////////////////////////////////////
+	Runnable backgroundR = new Runnable() {
+		@Override
+		public void run() {
+			/*
+			 * Message message = new Message(); message.what = DisplayMessage;
+			 * MainView.myHandler.sendMessage(message);
+			 */
+			if(steps.size()>0){
+				moveNavi();
+				hintDetect();
+				endDetect();
+			}
+			Log.i(TAG, "bg thread running");
+		}
+	};
+	Handler myHandler = new Handler();
+	private class BackgroundTimerTask extends TimerTask {
+		@Override
+		public void run() {
+			myHandler.post(backgroundR);
+		}
+	}
+
+	public void setupBGThreads() {
+		Timer timer = new Timer(true);
+		timer.schedule(btt, 1000, Util.THREAD_UPDATE_INTERVAL);
+	}
+	protected void moveNavi() {
+		if(onRoad)
+			move(myLatLng);
+	}
+	//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	@Override
+	public void onConnectionFailed(ConnectionResult result) {
+		String errMsg = "Connect Failed to Google GMS:";
+		Toast.makeText(activity, errMsg, Toast.LENGTH_LONG).show();
+		if (result.getErrorCode() == ConnectionResult.API_UNAVAILABLE) {
+	        // The Android Wear app is not installed
+			Toast.makeText(activity, errMsg+" API_UNAVAILABLE", Toast.LENGTH_LONG).show();
+	    }
+		if (mResolvingError) {
+            // Already attempting to resolve an error.
+            return;
+        } else if (result.hasResolution()) {
+            try {
+                mResolvingError = true;
+                result.startResolutionForResult(activity, Util.REQUEST_RESOLVE_ERROR);
+            } catch (SendIntentException e) {
+                // There was an error with the resolution intent. Try again.
+                mGoogleApiClient.connect();
+            }
+        } else {
+            // Show dialog using GooglePlayServicesUtil.getErrorDialog()
+            activity.showErrorDialog(result.getErrorCode());
+            mResolvingError = true;
+        }
+	}
+	@Override
+	public void onConnected(Bundle arg0) {
+		//Toast.makeText(activity, "Connected to Google GMS!", Toast.LENGTH_SHORT).show();
+		Location loc = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (loc != null) {
+    		myLatLng=new LatLng(loc.getLatitude(),loc.getLongitude());
+    		move(myLatLng,13);
+        }
+        startLocationUpdates();
+	}
+	@Override
+	public void onConnectionSuspended(int arg0) {
+		//Toast.makeText(activity, "Connection suspended to Google GMS!", Toast.LENGTH_LONG).show();
+		//mGoogleApiClient.connect();
+	}
+	
+    public static class ErrorDialogFragment extends DialogFragment {
+        public ErrorDialogFragment() { }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Get the error code and retrieve the appropriate dialog
+            int errorCode = this.getArguments().getInt(Util.DIALOG_ERROR);
+            return GooglePlayServicesUtil.getErrorDialog(errorCode,
+                    this.getActivity(), Util.REQUEST_RESOLVE_ERROR);
+        }
+
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            //((MainActivity)getActivity()).onDialogDismissed();
+        }
+    }
+    protected LocationRequest createLocationRequest() {
+        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10000);
+        mLocationRequest.setFastestInterval(2000);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        return mLocationRequest;
+    }
+    protected void startLocationUpdates() {
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                mGoogleApiClient, createLocationRequest(), this);
+    }
+    protected synchronized void buildGoogleApiClient() {
+    	mGoogleApiClient = new GoogleApiClient.Builder(activity, this, this)
+    	.addConnectionCallbacks(this)
+    	.addOnConnectionFailedListener(this)
+    	.addApi(LocationServices.API)
+    	.build();
+    	}
+	@Override
+	public void onLocationChanged(Location loc) {
+		myLatLng = new LatLng(loc.getLatitude(),loc.getLongitude());
+		startMyCountryCodeTask();
+		//Log.i(TAG, "onLocationChanged");
+		//Intent i = new Intent(activity, NaviSVC.class);
+		//i.putExtra("lat", loc.getLatitude());
+		//i.putExtra("lng", loc.getLongitude());
+		//activity.startService(i);
+	}
+	public void startMyCountryCodeTask(){
+		//TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+	    //String countryCode = tm.getSimCountryIso();
+		if( myCountryCode==null){
+			(new GoogleCountryCodeTask(activity,myLatLng)).execute();
 		}
 	}
 }

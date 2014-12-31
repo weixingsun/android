@@ -56,6 +56,7 @@ public class UserDataFectchTask extends
     String url;
     SuggestPoint foundPoint;
     GMap gmap;
+    String errMsg =null;
     public UserDataFectchTask(GMap gmap,LatLng lu,LatLng rd) {
     	this.gmap = gmap;
         this.url = getLocationURL(lu,rd);
@@ -110,11 +111,19 @@ public class UserDataFectchTask extends
                 return null;
             }
         } catch (ClientProtocolException e) {  
-            Log.i(TAG, "ClientProtocolException:"+e.getMessage());
+        	errMsg= "ClientProtocolException:"+e.getMessage();
+            Log.i(TAG, errMsg);
         } catch (JSONException e) {
-			e.printStackTrace();
+        	errMsg="JSONException:"+e.getMessage();
+        	if(sb.toString().startsWith("<!DOCTYPE")){
+        		errMsg="Server temporary unavailable.";
+        	}
+            Log.i(TAG, errMsg);
+            //Log.i(TAG, sb.toString());
+			//e.printStackTrace();
 		} catch(IOException e){
-			e.printStackTrace();
+			errMsg = "IOException:"+e.getMessage();
+            Log.i(TAG, errMsg);
 		}
         return gmap.suggestPoints;  
     }  
@@ -131,14 +140,15 @@ public class UserDataFectchTask extends
     @Override  
     protected void onPostExecute(List<SuggestPoint> points) {
         super.onPostExecute(points);  
-        if (foundPoint == null) {  
+        if(errMsg!=null)
+        	Toast.makeText(gmap.activity, errMsg, Toast.LENGTH_LONG).show();
+        else if (foundPoint == null) {  
             //failed to navigate
-            Toast.makeText(gmap.activity, "No location found.", Toast.LENGTH_LONG).show();
+            Toast.makeText(gmap.activity, "No reminder found.", Toast.LENGTH_LONG).show();
         } else{
         	for(SuggestPoint sp:points){
         		gmap.addRemindMarker(sp,sp.getType());
                 //Log.i(TAG, "FetchUserData.type:"+sp.getType());
-        		
         	}
         }
     }
@@ -152,7 +162,7 @@ public class UserDataFectchTask extends
         //String sensor = "&sensor=false";
         String format = "json";
         String url = "http://www.servicedata.net76.net/select_dl.php?"
-        		    +"?latlng1="+lu.latitude+","+lu.longitude+"&latlng2="+rd.latitude+","+rd.longitude;
+        		    +"latlng1="+lu.latitude+","+lu.longitude+"&latlng2="+rd.latitude+","+rd.longitude;
         //http://www.servicedata.net76.net/select_dl.php??latlng1=1,2&latlng2=3,4
         return url;
     }

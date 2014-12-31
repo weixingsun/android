@@ -1,7 +1,10 @@
 package cat.app.gmap;
 
 import java.util.List;
+import java.util.Timer;
 
+import com.google.android.gms.common.ErrorDialogFragment;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 
@@ -13,6 +16,9 @@ import cat.app.gmap.model.SuggestPoint;
 import cat.app.gmap.task.UserDataFectchTask;
 import cat.app.gmap.task.GoogleSearchByAddressNameTask;
 import cat.app.gmap.task.Player;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -40,10 +46,16 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 
 //http://servicedata.net76.net/select.php
 public class MainActivity extends FragmentActivity {
+    // Request code to use when launching the resolution activity
+    private static final int REQUEST_RESOLVE_ERROR = 1001;
+    // Unique tag for the error dialog fragment
+    //private static final String DIALOG_ERROR = "dialog_error";
+    //private boolean mResolvingError = false;
 
 	private final String TAG = "GMap.MainActivity";
 	public GMap gMap = new GMap();
@@ -72,24 +84,28 @@ public class MainActivity extends FragmentActivity {
 		setContentView(R.layout.main);
 		Util.init();
 		gMap.init(this);
-		showUI();
+		setupUI();
+		gMap.setupBGThreads();
+		gMap.buildGoogleApiClient();
 	}
+
 	@Override
     protected void onDestroy() {
+        Log.i(TAG, "onDestroy()");
         super.onDestroy();
     }
 	
-	void showUI() {
+	void setupUI() {
 		setText();
 		setPopup();
 		setList();
 		setDrawer();
 		setWindow();
 		setImage();
-		findMarkers();
+		findUserData();
 	}
 
-	private void findMarkers() {
+	private void findUserData() {
 		UserDataFectchTask task = new UserDataFectchTask(
 				gMap, gMap.bounds.northeast,gMap.bounds.southwest );
 		task.execute();
@@ -270,9 +286,24 @@ public class MainActivity extends FragmentActivity {
 				}
 				break;
 			}
+			case Util.REQUEST_RESOLVE_ERROR: {
+				//mResolvingError = false;
+		        if (resultCode == RESULT_OK) {
+		            // Make sure the app is not already connected or attempting to connect
+		            if (!gMap.mGoogleApiClient.isConnecting() &&
+		                    !gMap.mGoogleApiClient.isConnected()) {
+		            	gMap.mGoogleApiClient.connect();
+		            }
+		        }
+
+			}
 		}
 	}
-	
+    
+    /* Called from ErrorDialogFragment when the dialog is dismissed. */
+    public void onDialogDismissed() {
+        //mResolvingError = false;
+    }
 	/*@Override
 	public boolean dispatchTouchEvent(MotionEvent event) {
 		//View v = getCurrentFocus();
@@ -297,4 +328,29 @@ public class MainActivity extends FragmentActivity {
         }
 		return false;
 	}*/
+    @Override
+	public void onStart() {
+        super.onStart();
+        gMap.mGoogleApiClient.connect();
+    }
+
+    @Override
+	public void onStop() {
+        super.onStop();
+        //if (gMap.mGoogleApiClient.isConnected()) {
+        //	gMap.mGoogleApiClient.disconnect();
+        //}
+        Log.i(TAG, "onStp()");
+    }
+
+    /* Creates a dialog for an error message */
+    public void showErrorDialog(int errorCode) {
+        // Create a fragment for the error dialog
+        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
+        // Pass the error that should be displayed
+        Bundle args = new Bundle();
+        args.putInt(Util.DIALOG_ERROR, errorCode);
+        dialogFragment.setArguments(args);
+        dialogFragment.show(getFragmentManager(), "errordialog");
+    }
 }
