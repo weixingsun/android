@@ -203,8 +203,7 @@ public class GMap extends MapFragment
 			addRemindMarker(sp,type);
 			return;
 		}
-		//int found=0;
-	    Iterator<Map.Entry<String, MarkerPoint>> iterator = remindMarkerPoints.entrySet().iterator();
+		Iterator<Map.Entry<String, MarkerPoint>> iterator = remindMarkerPoints.entrySet().iterator();
 	    while (iterator.hasNext()) {
 	        Map.Entry<String, MarkerPoint> entry = iterator.next();
 	        String key = entry.getKey();
@@ -213,15 +212,14 @@ public class GMap extends MapFragment
 		    	MathUtil.compare(sp.getLatLng().longitude, mp.getLatLng().longitude)	){
 		    	Marker m = remindMarkers.get(key);
 		    	updateRemindMarker(m, sp,type);
-		    	Log.i(TAG, "Update: lat="+sp.getLatLng().latitude+", lng="+sp.getLatLng().latitude);
+		    	//Log.i(TAG, "Update: lat="+sp.getLatLng().latitude+", lng="+sp.getLatLng().latitude);
 		    	return;
 		    }
-	        iterator.remove();
+	        //iterator.remove();
 	    }
 	    
     	addRemindMarker(sp,type);
-    	Log.i(TAG, "Add: lat="+sp.getLatLng().latitude+", lng="+sp.getLatLng().latitude);
-	    
+    	//Log.i(TAG, "Add: lat="+sp.getLatLng().latitude+", lng="+sp.getLatLng().latitude);
 	}
 	public void addRemindMarker(MarkerPoint mp,int type){
 		int resId = Util.getResByType(type);
@@ -421,7 +419,7 @@ public class GMap extends MapFragment
 			if(counter>Util.USER_DATA_UPDATE_INTERVAL){
 				activity.findUserData();
 				counter = 0;
-				Log.i(TAG, "UserDataFetch");
+				//Log.i(TAG, "UserDataFetch");
 			}
 			if(steps.size()>0){
 				moveNavi();

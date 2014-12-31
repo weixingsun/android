@@ -150,8 +150,8 @@ public class UserDataFectchTask extends
         		gmap.addOrUpdateRemindMarker(sp,sp.getType());
                 //Log.i(TAG, "FetchUserData.type:"+sp.getType());
         	}
-    		Log.i(TAG, "markers.size="+gmap.remindMarkers.size()+"markerpoints.size="+gmap.remindMarkerPoints.size());
-    		Toast.makeText(gmap.activity, "markers.size="+gmap.remindMarkers.size()+"points.size="+gmap.remindMarkerPoints.size(), Toast.LENGTH_LONG).show();
+    		//Log.i(TAG, "markers.size="+gmap.remindMarkers.size()+"markerpoints.size="+gmap.remindMarkerPoints.size());
+    		//Toast.makeText(gmap.activity, "markers.size="+gmap.remindMarkers.size()+"points.size="+gmap.remindMarkerPoints.size(), Toast.LENGTH_LONG).show();
         }
     }
     /** 
