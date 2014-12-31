@@ -112,4 +112,12 @@ public class MathUtil {
     public static double havDistance(double lat1, double lat2, double dLng) {
         return hav(lat1 - lat2) + hav(dLng) * cos(lat1) * cos(lat2);
     }
+    
+    public static boolean compare(double a, double b){
+    	double epsilon = 0.0000000000001;
+	    if(Math.abs(a - b) < epsilon){
+	    	return true;
+	    }
+	    return false;
+    }
 }

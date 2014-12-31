@@ -203,22 +203,25 @@ public class GMap extends MapFragment
 			addRemindMarker(sp,type);
 			return;
 		}
+		//int found=0;
 	    Iterator<Map.Entry<String, MarkerPoint>> iterator = remindMarkerPoints.entrySet().iterator();
 	    while (iterator.hasNext()) {
 	        Map.Entry<String, MarkerPoint> entry = iterator.next();
 	        String key = entry.getKey();
 	        MarkerPoint mp = entry.getValue();
-		    if(sp.getLatLng().latitude == mp.getLatLng().latitude &&
-		    		sp.getLatLng().longitude == mp.getLatLng().longitude){
+		    if(MathUtil.compare(sp.getLatLng().latitude, mp.getLatLng().latitude) &&
+		    	MathUtil.compare(sp.getLatLng().longitude, mp.getLatLng().longitude)	){
 		    	Marker m = remindMarkers.get(key);
 		    	updateRemindMarker(m, sp,type);
-		    	Log.i(TAG, "lat="+sp.getLatLng().latitude+", lng="+mp.getLatLng().latitude);
-		    }else{
-		    	addRemindMarker(sp,type);
-		    	Log.i(TAG, "lat="+sp.getLatLng().latitude+", lng="+mp.getLatLng().latitude);
+		    	Log.i(TAG, "Update: lat="+sp.getLatLng().latitude+", lng="+sp.getLatLng().latitude);
+		    	return;
 		    }
 	        iterator.remove();
 	    }
+	    
+    	addRemindMarker(sp,type);
+    	Log.i(TAG, "Add: lat="+sp.getLatLng().latitude+", lng="+sp.getLatLng().latitude);
+	    
 	}
 	public void addRemindMarker(MarkerPoint mp,int type){
 		int resId = Util.getResByType(type);
@@ -426,7 +429,7 @@ public class GMap extends MapFragment
 				endDetect();
 			}
 			counter++;
-			Log.i(TAG, "bg thread running");
+			//Log.i(TAG, "bg thread running");
 		}
 	};
 	Handler myHandler = new Handler();
