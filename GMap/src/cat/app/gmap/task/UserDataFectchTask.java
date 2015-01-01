@@ -24,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import cat.app.gmap.GMap;
+import cat.app.gmap.Util;
 import cat.app.gmap.model.MarkerPoint;
 import cat.app.gmap.model.SuggestPoint;
 
@@ -163,7 +164,7 @@ public class UserDataFectchTask extends
     public String getLocationURL(LatLng lu,LatLng rd) {
         //String sensor = "&sensor=false";
         String format = "json";
-        String url = "http://www.servicedata.net76.net/select_dl.php?"
+        String url = "http://"+Util.WEB_SERVICE_HOST+"/select_dl.php?"
         		    +"latlng1="+lu.latitude+","+lu.longitude+"&latlng2="+rd.latitude+","+rd.longitude;
         //http://www.servicedata.net76.net/select_dl.php??latlng1=1,2&latlng2=3,4
         return url;

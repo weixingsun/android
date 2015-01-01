@@ -149,7 +149,7 @@ public class GoogleSearchByPointTask extends
         String format = "json";
         String url = "https://maps.googleapis.com/maps/api/geocode/"+format+"?latlng="+position.latitude+","+position.longitude+"&sensor=false&Accept-Language:zh-CN";
         //http://maps.google.com/maps/api/geocode/json?latlng=-43.5320544,172.6362254&sensor=false&ion=cn
-        //Log.i(TAG,"getLocationURL--->: " + url);
+        Log.i(TAG,"getLocationURL--->: " + url);
         return url;  
     }
 }

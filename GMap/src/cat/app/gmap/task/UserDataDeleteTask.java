@@ -21,7 +21,8 @@ import android.util.Log;
 public class UserDataDeleteTask extends AsyncTask<LatLng, Void, String> {
 	MainActivity act;
 	private static final String TAG = "GMap.UploadTask";
-	private String website = "http://servicedata.net76.net/delete.php?";  //lat=0&lng=0&reporter=name
+	
+	private String website = "http://"+Util.WEB_SERVICE_HOST+"/delete.php?";  //lat=0&lng=0&reporter=name
 	HttpClient client;
 	LatLng point;
 	String reporter;

@@ -357,7 +357,7 @@ public class GMap extends MapFragment
 		float toEnd = Util.getDistance(myLatLng, last);
 		if(toEnd<Util.hintBeforeTurn){ 
 			clearRoute();
-			activity.inputAddress.setText(this.startPoint.getFormatted_address());
+			//activity.inputAddress.setText(this.startPoint.getFormatted_address());
 		}
 	}
 	private void playStartHint(int stepId){
@@ -397,10 +397,16 @@ public class GMap extends MapFragment
 			mp = remindMarkerPoints.get(arg0.getId());
 			type = mp.getSeq();
 		}
-		Log.i(TAG, "onMarkerClick.type="+type);
+		//Log.i(TAG, "onMarkerClick.type="+type);
+		//Log.i(TAG, "title="+arg0.getTitle()+",snippet="+arg0.getSnippet());
+		//snippet is "" if user defined marker.
 		if(arg0.getSnippet().length()==0 || arg0.getTitle().length()==0) {
 	   	 	GoogleSearchByPointTask task = new GoogleSearchByPointTask(this, arg0,type);
 			task.execute();
+		}else if(arg0.getTitle().indexOf("(")<0){
+			String title=Util.getTitlePrefixFromType(type);
+			String time = arg0.getTitle();
+			arg0.setTitle(title+" ("+time+")");
 		}
 		selectedMarker = arg0;
 		activity.openPopup(arg0,type);

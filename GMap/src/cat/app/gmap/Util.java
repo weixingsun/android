@@ -35,8 +35,8 @@ public class Util {
 	public static final int REQ_CODE_SPEECH_INPUT = 2;
 	public static final int REQUEST_RESOLVE_ERROR = 1001;
 	public static final String DIALOG_ERROR = "dialog_error";
-	public static final long THREAD_UPDATE_INTERVAL = 2000;
-	public static final long USER_DATA_UPDATE_INTERVAL = 10;
+	public static final long THREAD_UPDATE_INTERVAL = 1000;
+	public static final long USER_DATA_UPDATE_INTERVAL = 30;
 	
 	
 	public static final String NAV_DRIVING   = "Driving";
@@ -63,12 +63,15 @@ public class Util {
 
 
 	public static final String USER_ADMIN = "admin";
-	static String baseDir = Environment.getExternalStorageDirectory() + "/GMap/routes/hint/";
-
 	public static String startHint="start";
 	public static String endHint="end";
 	
 	public static SparseIntArray typeToRes;
+	public static String WEB_SERVICE_HOST_NET76 = "servicedata.net76.net";
+	public static String WEB_SERVICE_HOST_VHOST = "servicedata.vhostall.com";
+	public static final String WEB_SERVICE_HOST = WEB_SERVICE_HOST_VHOST;
+
+	static String baseDir = Environment.getExternalStorageDirectory() + "/GMap/routes/hint/";
 	
 	public static void init(){
 		typeToRes = new SparseIntArray ();

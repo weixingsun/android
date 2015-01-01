@@ -72,8 +72,8 @@ public class GoogleRouteTask extends
                 	}
                 	Route r = RouteParser.parse(responseString).get(0);
                 	Leg l = r.getLegs().get(0);
-                	if(l.getStartAddress()!=null)
-                		gmap.startPoint = new SuggestPoint(r.getLegs().get(0).getStartLocation(),r.getLegs().get(0).getStartAddress());
+                	//if(l.getStartAddress()!=null)
+                		//gmap.startPoint = new SuggestPoint(r.getLegs().get(0).getStartLocation(),r.getLegs().get(0).getStartAddress());
                 	old_size=gmap.steps.size();
                 	gmap.steps.addAll(r.getSteps());
                 	route = RouteParser.getWholeRoutePoints(r);
