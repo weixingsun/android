@@ -248,7 +248,7 @@ public class MainActivity extends FragmentActivity {
     	MarkerPoint point = gMap.routeMarkerPoints.get(markerId);
     	if(point!=null){
     		gMap.addRemindMarker(point,i);
-    		Util.uploadRemind(MainActivity.this,point.getLatLng(),i,null);
+    		Util.uploadRemind(MainActivity.this,point.getLatLng(),i,Util.USER_ADMIN);
     	}
 	}
     public void openPopup(Marker m, int type) {

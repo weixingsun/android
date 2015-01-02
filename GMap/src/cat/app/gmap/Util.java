@@ -165,12 +165,7 @@ public class Util {
 	}
 
 	public static void uploadRemind(MainActivity act,LatLng point,int type, String reporter) {
-		//type(1:police)(2:cctv)
 		(new UserDataUploadTask(act, point,type,reporter)).execute();
-		//String url = "http://servicedata.net76.net/insert.php?";  //lat=0&lng=0&type=0&reporter=name
-		//String params= "lat="+lat+"&lng="+lng+"&type="+type+"&reporter=admin";
-		//time auto-gen
-		//Log.i("GMap.Util.upload", url+params);
 	}
 	public static String removeHTMLTags(String html){
 		return Html.fromHtml(html).toString().trim();
@@ -235,7 +230,7 @@ public class Util {
 		case 3:str= "Medical ";break;
 		
 		}
-		Log.i(TAG, "type="+type);
+		//Log.i(TAG, "type="+type);
 		return str;
 	}
 

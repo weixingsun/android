@@ -105,60 +105,18 @@
         android:layout_gravity="left"
         android:background="#0000FF"
         android:orientation="horizontal">
-			<LinearLayout
-	            android:layout_width="0dp"
-	            android:layout_weight=".50"
-	            android:layout_height="match_parent"
-	            android:background="#0000FF"
-	            android:orientation="vertical">
-	            <TextView
-	                android:id="@+id/tvsettings"
-	                android:layout_width="match_parent"
-	                android:layout_height="30dp"
-	                android:background="#000000"
-	                android:gravity="center"
-	                android:text="@string/settings"
-	                android:textSize="20sp" />
-	
-	            <ListView
-	                android:id="@+id/left_drawer_parent"
-	                android:layout_width="match_parent"
-	                android:layout_height="match_parent"
-	                android:background="#000000"
-	                android:choiceMode="singleChoice"/>
-			</LinearLayout>
-			<LinearLayout
-	            android:layout_width="0dp"
-	            android:layout_weight=".50"
-	            android:layout_height="match_parent"
-	            android:background="#0000FF"
-	            android:orientation="vertical">
-	            <TextView
-	                android:id="@+id/tvsubsettings"
-	                android:layout_width="match_parent"
-	                android:layout_height="30dp"
-	                android:background="#888888"
-	                android:gravity="center"
-	                android:text="@string/subsettings"
-	                android:textSize="20sp" />
-	
-	            <ListView
-	                android:id="@+id/left_drawer_child"
-	                android:layout_width="match_parent"
-	                android:layout_height="match_parent"
-	                android:background="#888888"
-	                android:choiceMode="singleChoice" >
-	            </ListView>
-	        </LinearLayout>
+			<include layout="@layout/left_drawer"/>
         </LinearLayout>
         
         <LinearLayout
 	        android:baselineAligned="false"
-	        android:layout_width="200dp"
+	        android:layout_width="300dp"
 	        android:layout_height="match_parent"
 	        android:layout_gravity="right"
-	        android:background="#33333333"
-	        android:orientation="horizontal">
+	        android:orientation="vertical">
+			
+			<include layout="@layout/right_drawer"/>
+	        
 		</LinearLayout>
 </android.support.v4.widget.DrawerLayout>
 

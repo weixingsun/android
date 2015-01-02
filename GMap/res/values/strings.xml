@@ -13,6 +13,10 @@
     <string name="delete">Delete</string>
     <string name="police">Police</string>
     <string name="cctv">CCTV</string>
+    <string name="email">Email:</string>
+    <string name="password">Password:</string>
+    <string name="submit">Submit</string>
+    <string name="register">New User Register</string>
      
     <!-- Main Nav Drawer Menu Items -->
     <string-array name="menu_items">
