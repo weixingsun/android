@@ -38,6 +38,9 @@ public class SubMenuItemClickListener implements OnItemClickListener {
 			case Util.MAP_TERRAIN:
 				activity.gMap.map.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
 				break;
+			case Util.MAP_HYBRID:
+				activity.gMap.map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+				break;
 			case Util.MAP_TRAFFIC:
 				activity.gMap.switchSettings("TrafficEnabled");
 				break;

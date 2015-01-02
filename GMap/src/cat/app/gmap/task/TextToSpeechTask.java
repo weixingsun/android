@@ -22,12 +22,14 @@ import android.util.SparseArray;
 public class TextToSpeechTask extends AsyncTask<String, Void, String> {
 	GMap gmap;
 	SparseArray<String> startHintFile;
+	SparseArray<String> end500HintFile;
 	SparseArray<String> endHintFile;
-	public TextToSpeechTask(GMap gmap,SparseArray<String> startHintFile,SparseArray<String> endHintFile) {
+	public TextToSpeechTask(GMap gmap,SparseArray<String> startHintFile,SparseArray<String> endHintFile,SparseArray<String> end500HintFile) {
 		super();
 		this.gmap = gmap;
 		this.startHintFile = startHintFile;
 		this.endHintFile = endHintFile;
+		this.end500HintFile = end500HintFile;
 	}
 	private static final String TAG = "GMap.TextToSpeechTask";
 	//http://translate.google.com/translate_tts? tl=en &q=Hello%20World
@@ -57,6 +59,11 @@ public class TextToSpeechTask extends AsyncTask<String, Void, String> {
 		   proceedFile(endHintFile.get(key),Util.getVoiceFileName(Util.endHint, key));//hint,path
 		   sleep(300);
 		}
+		for(int i = 0; i < end500HintFile.size(); i++) {
+			   key = end500HintFile.keyAt(i);
+			   proceedFile(end500HintFile.get(key),Util.getVoiceFileName(Util.end500Hint, key));//hint,path
+			   sleep(300);
+			}
 		return startHintFile.size()+endHintFile.size()+"";
 	}
 	private void sleep(int second){

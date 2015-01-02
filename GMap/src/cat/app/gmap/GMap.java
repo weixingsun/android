@@ -67,6 +67,7 @@ public class GMap extends MapFragment
 	public Map<String,MarkerPoint> remindMarkerPoints=new TreeMap<String,MarkerPoint>();//like police/camera/accident
 	public TreeMap<String,MarkerPoint> routeMarkerPoints=new TreeMap<String,MarkerPoint>();
 	public SparseArray<String> startHintMp3 = new SparseArray<String>();
+	public SparseArray<String> end500HintMp3 = new SparseArray<String>();
 	public SparseArray<String> endHintMp3 = new SparseArray<String>();
 	public SparseArray<String> playedStartMp3 = new SparseArray<String>();
 	public SparseArray<String> playedEndMp3 = new SparseArray<String>();
@@ -266,6 +267,7 @@ public class GMap extends MapFragment
 		steps.clear();
 		this.startHintMp3.clear();
 		this.endHintMp3.clear();
+		this.end500HintMp3.clear();
 		currentStepIndex=0;
     }
 	public void refreshRoute(boolean restart) {
@@ -323,43 +325,56 @@ public class GMap extends MapFragment
 
 	public void findNewRouteSpeech(int old_size){
         for(int i=old_size;i<steps.size();i++){
-        	startHintMp3.append(i, steps.get(i).getStartHint());
-		    endHintMp3.append(i, steps.get(i).getEndHint());
+        	Step s = steps.get(i);
+        	startHintMp3.append(i, s.getStartHint());
+		    endHintMp3.append(i, s.getEndHint());
+		    if(s.getDistance().getValue()>500){
+			    end500HintMp3.append(i, "in 500 m, "+s.getEndHint());
+		    }
         }
-        (new TextToSpeechTask(this,startHintMp3,endHintMp3)).execute();
+        (new TextToSpeechTask(this,startHintMp3,endHintMp3,end500HintMp3)).execute();
 	}
 
 	
-	private void hintDetect() {
+	private void hint50Detect() {
 		Step s = steps.get(currentStepIndex);
 		float toCurrentStart = Util.getDistance(myLatLng, s.getStartLocation());
 		float toCurrentEnd   = Util.getDistance(myLatLng, s.getEndLocation());
-		if(onRoad && !StepChanged && toCurrentStart>Util.hintBeforeTurn && toCurrentEnd>Util.hintBeforeTurn){
+		if(onRoad && !StepChanged && toCurrentStart>Util.hint50BeforeTurn && toCurrentEnd>Util.hint50BeforeTurn){
 			(new FindMyStepTask(activity)).execute(myLatLng);
 			if(currentStepIndex>previousStepIndex){
 				this.StepChanged=true;
 				previousStepIndex=currentStepIndex;
 			}
 		}
-		if(toCurrentStart<Util.hintBeforeTurn){
+		if(toCurrentStart<Util.hint50BeforeTurn){
 			playStartHint(currentStepIndex);
 			this.onRoad=true;
 			this.StepChanged=false;
 		}
-		if(toCurrentEnd<Util.hintBeforeTurn){
+		if(toCurrentEnd<Util.hint50BeforeTurn){
 			playEndHint(currentStepIndex);
 			this.StepChanged=false;
+		}
+	}
+	private void hint500Detect() {
+		Step s = steps.get(currentStepIndex);
+		//float toCurrentStart = Util.getDistance(myLatLng, s.getStartLocation());
+		float toCurrentEnd   = Util.getDistance(myLatLng, s.getEndLocation());
+		if(toCurrentEnd<Util.hint500BeforeTurn){
+			playEnd500Hint(currentStepIndex);
 		}
 	}
 	private void endDetect() {
 		if(currentStepIndex<steps.size()-1) return;
 		LatLng last = steps.get(steps.size()-1).getEndLocation();
 		float toEnd = Util.getDistance(myLatLng, last);
-		if(toEnd<Util.hintBeforeTurn){ 
+		if(toEnd<Util.hint50BeforeTurn){
 			clearRoute();
 			//activity.inputAddress.setText(this.startPoint.getFormatted_address());
 		}
 	}
+
 	private void playStartHint(int stepId){
 		if(playedStartMp3.get(stepId)==null){
 			String fileName = Util.getVoiceFileName(Util.startHint, stepId);  //this.startHintMp3.get(stepId);
@@ -382,7 +397,17 @@ public class GMap extends MapFragment
 			}
 		}
 	}
-
+	private void playEnd500Hint(int stepId){
+		if(playedEndMp3.get(stepId)==null){
+			String fileName = Util.getVoiceFileName(Util.end500Hint, stepId);
+			File file = new File(fileName);
+			if(file.exists() && file.length()>0 ){
+				Player.startPlaying(fileName);
+				playedEndMp3.append(stepId, fileName);
+				Toast.makeText(activity, steps.get(stepId).getEndHint(), Toast.LENGTH_LONG).show();
+			}
+		}
+	}
 	@Override
 	public void onMapLongClick(LatLng point) {
    	 	GoogleSearchByPointTask task = new GoogleSearchByPointTask(this, point);
@@ -428,8 +453,9 @@ public class GMap extends MapFragment
 				//Log.i(TAG, "UserDataFetch");
 			}
 			if(steps.size()>0){
-				moveNavi();
-				hintDetect();
+				moveCamera();
+				hint50Detect();
+				hint500Detect();
 				endDetect();
 			}
 			counter++;
@@ -448,7 +474,7 @@ public class GMap extends MapFragment
 		Timer timer = new Timer(true);
 		timer.schedule(btt, 1000, Util.THREAD_UPDATE_INTERVAL);
 	}
-	protected void moveNavi() {
+	protected void moveCamera() {
 		if(onRoad)
 			move(myLatLng);
 	}

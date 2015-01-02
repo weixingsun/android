@@ -47,7 +47,8 @@ public class Util {
 	public static final String MAP_SATELLITE  = "Satellite";
 	public static final String MAP_TERRAIN    = "Terrain";
 	public static final String MAP_TRAFFIC    = "Traffic";
-	public static final String MAP_NORMAL     = "Normal";
+	public static final String MAP_HYBRID     = "Hybrid";
+	public static final String MAP_NORMAL     = "Roadmap";
 	
 	public static final String ROAD_POLICE_CAMERA     = "Police Camera";
 	public static final String ROAD_MEDICAL_EMERGENCY = "Medical Emergency";
@@ -55,7 +56,8 @@ public class Util {
 
 	public static final long LOCATION_UPDATE_INTERVAL = 1000 * 10; //10 seconds
 
-	public static final double hintBeforeTurn = 30;
+	public static final double hint500BeforeTurn = 500;
+	public static final double hint50BeforeTurn = 50;
 
 	private static final String TAG = "Util";
 
@@ -64,6 +66,7 @@ public class Util {
 
 	public static final String USER_ADMIN = "admin";
 	public static String startHint="start";
+	public static String end500Hint="end500";
 	public static String endHint="end";
 	
 	public static SparseIntArray typeToRes;
@@ -159,7 +162,7 @@ public class Util {
 		return key;
 	}
     */
-	//baseDir+/GMap/routes/hint/
+	//baseDir="baseDir/GMap/routes/hint/"
 	public static String getVoiceFileName(String type,int currentStepIndex) {
 		return baseDir+type+"_"+currentStepIndex+".mp3";
 	}
