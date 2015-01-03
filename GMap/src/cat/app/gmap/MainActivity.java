@@ -3,6 +3,9 @@ package cat.app.gmap;
 import java.util.List;
 import java.util.Timer;
 
+import org.acra.ACRA;
+import org.acra.annotation.ReportsCrashes;
+
 import com.google.android.gms.common.ErrorDialogFragment;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -16,6 +19,7 @@ import cat.app.gmap.model.SuggestPoint;
 import cat.app.gmap.task.UserDataFectchTask;
 import cat.app.gmap.task.GoogleSearchByAddressNameTask;
 import cat.app.gmap.task.Player;
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
@@ -49,15 +53,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 
-//http://servicedata.net76.net/select.php
-public class MainActivity extends FragmentActivity {
-    // Request code to use when launching the resolution activity
-    private static final int REQUEST_RESOLVE_ERROR = 1001;
-    // Unique tag for the error dialog fragment
-    //private static final String DIALOG_ERROR = "dialog_error";
-    //private boolean mResolvingError = false;
+@ReportsCrashes(
+		formKey = "", 
+		mailTo = "sun.app.service@gmail.com"
+		)
+//formUri = "http://servicedata.vhostall.com/reportcrash"
+public class MainActivity extends Activity {
 
-	private final String TAG = "GMap.MainActivity";
+	private final String TAG = this.getClass().getSimpleName();
 	public GMap gMap = new GMap();
 	public ListView listSuggestion;
 	public ListView listVoice ;
@@ -78,8 +81,10 @@ public class MainActivity extends FragmentActivity {
 	DisplayMetrics  dm;
 	String mode;
 	
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		ACRA.init(this.getApplication());
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.main);
 		Util.init();
