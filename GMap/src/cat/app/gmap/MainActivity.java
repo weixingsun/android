@@ -53,15 +53,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 
-@ReportsCrashes(
-		formKey = "", 
-		mailTo = "sun.app.service@gmail.com"
-		)
-//formUri = "http://servicedata.vhostall.com/reportcrash"
+
 public class MainActivity extends Activity {
 
 	private final String TAG = this.getClass().getSimpleName();
-	public GMap gMap = new GMap();
+	public GMap gMap;
 	public ListView listSuggestion;
 	public ListView listVoice ;
 	public EditText inputAddress;
@@ -84,11 +80,10 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		ACRA.init(this.getApplication());
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.main);
 		Util.init();
-		gMap.init(this);
+		gMap = GMap.getInstance(this);
 		setupUI();
 		gMap.setupBGThreads();
 		gMap.buildGoogleApiClient();
@@ -97,6 +92,7 @@ public class MainActivity extends Activity {
 	@Override
     protected void onDestroy() {
         Log.i(TAG, "onDestroy()");
+        gMap.cleanGoogleApiClient();
         super.onDestroy();
     }
 	

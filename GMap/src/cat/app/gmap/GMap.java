@@ -49,7 +49,7 @@ public class GMap extends MapFragment
 	private static final String TAG = "GMap";
 
 	public MainActivity activity;
-	//private NaviSVC naviSvc ;
+	private static GMap gmap;
 	public String myCountryCode;
 	public String travelMode;
 	public GoogleMap map;
@@ -80,8 +80,11 @@ public class GMap extends MapFragment
 	
 	private boolean mResolvingError = false;
 
-	
-	public void init(final MainActivity activity){
+	public static GMap getInstance(MainActivity act){
+		if(gmap==null)  gmap=new GMap(act);
+		return gmap;
+	}
+	private GMap( MainActivity activity){
 		this.activity= activity;
 		initStorage();
 		initMap();
@@ -554,6 +557,10 @@ public class GMap extends MapFragment
     	.addOnConnectionFailedListener(this)
     	.addApi(LocationServices.API)
     	.build();
+    	}
+    protected synchronized void cleanGoogleApiClient() {
+    	mGoogleApiClient.disconnect();
+    	mGoogleApiClient=null;
     	}
 	@Override
 	public void onLocationChanged(Location loc) {
