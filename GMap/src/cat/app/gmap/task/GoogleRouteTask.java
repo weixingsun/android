@@ -74,8 +74,8 @@ public class GoogleRouteTask extends
                 	Leg l = r.getLegs().get(0);
                 	//if(l.getStartAddress()!=null)
                 		//gmap.startPoint = new SuggestPoint(r.getLegs().get(0).getStartLocation(),r.getLegs().get(0).getStartAddress());
-                	old_size=gmap.steps.size();
-                	gmap.steps.addAll(r.getSteps());
+                	old_size=gmap.pos.steps.size();
+                	gmap.pos.steps.addAll(r.getSteps());
                 	route = RouteParser.getWholeRoutePoints(r);
                 } else {
                     return null;
@@ -115,7 +115,7 @@ public class GoogleRouteTask extends
             lineOptions.color(Color.BLUE);
             Polyline pl = gmap.map.addPolyline(lineOptions);
             gmap.routesPolyLines.add(pl);
-            Util.reOrgHints(gmap.steps);
+            Util.reOrgHints(gmap.pos.steps);
             gmap.findNewRouteSpeech(old_size);
             //gmap.drawAllStepPoints();
         }

@@ -18,11 +18,11 @@ import com.google.android.gms.maps.model.Polyline;
 
 public class FindMyStepTask extends AsyncTask<LatLng, Void, String> {
 	MainActivity act;
-	private static final String TAG = "GMap.NaviTask";
+	private static final String TAG = FindMyStepTask.class.getSimpleName();
 	public FindMyStepTask(MainActivity act) {
 		super();
 		this.act = act;
-		this.steps = act.gMap.steps;
+		this.steps = act.gMap.pos.steps;
 		currentStepIndex=0;
 	}
 	public int currentStepIndex;
@@ -44,14 +44,15 @@ public class FindMyStepTask extends AsyncTask<LatLng, Void, String> {
 	protected String doInBackground(LatLng... params) {
 		if(steps==null || steps.size()<1){return null;}
 		if(!act.gMap.onRoad) return null;
-		for (int i=act.gMap.currentStepIndex;i<steps.size();i++){
+		for (int i=act.gMap.pos.getCurrentStepIndex();i<steps.size();i++){
 			if(isInStep(steps.get(i), params[0])){ //如果误差超过20米，会认为不在线路上，继续向下寻找
 				act.gMap.onRoad=true;
-				act.gMap.currentStepIndex=i;
+				act.gMap.pos.setCurrentStepIndex(i);
 				break;
 			}
 			Log.i(TAG, "finding in step "+(i+1));
-			if(i==steps.size()-1 && act.gMap.currentStepIndex<i-1){
+			if(i==steps.size()-1 && act.gMap.pos.getCurrentStepIndex()<i-1){
+				act.gMap.onRoad=false;
 				return "FindMyStepTask fail to find step";
 			}
 		}//先不考虑重绘线路的情况
@@ -62,7 +63,8 @@ public class FindMyStepTask extends AsyncTask<LatLng, Void, String> {
     protected void onPostExecute(String instruction) {
 		//http://translate.google.com/translate_tts?tl=en&q=Hello%20World
 		//String hint=Html.fromHtml(instruction).toString();
-		if(instruction!=null)
-			Toast.makeText(act, instruction, Toast.LENGTH_SHORT).show();
+		if(instruction!=null){
+			Toast.makeText(act, "onRoad="+act.gMap.onRoad+":"+instruction, Toast.LENGTH_SHORT).show();
+		}
     }
 }

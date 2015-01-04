@@ -32,11 +32,12 @@ import android.view.inputmethod.InputMethodManager;
 
 public class Util {
 
+	private static final String TAG = Util.class.getSimpleName();
 	public static final int REQ_CODE_SPEECH_INPUT = 2;
 	public static final int REQUEST_RESOLVE_ERROR = 1001;
 	public static final String DIALOG_ERROR = "dialog_error";
 	public static final long THREAD_UPDATE_INTERVAL = 1000;
-	public static final long USER_DATA_UPDATE_INTERVAL = 30;
+	public static final long USER_DATA_UPDATE_INTERVAL = 60;
 	
 	
 	public static final String NAV_DRIVING   = "Driving";
@@ -56,10 +57,11 @@ public class Util {
 
 	public static final long LOCATION_UPDATE_INTERVAL = 1000 * 10; //10 seconds
 
-	public static final double hint500BeforeTurn = 500;
+	public static final double hint600BeforeTurn = 600;
+	public static final double hint400BeforeTurn = 400;
 	public static final double hint50BeforeTurn = 50;
+	public static final double hint20BeforeTurn = 20;
 
-	private static final String TAG = "Util";
 
 	public static final String CAMERA = "Camera at ";
 
@@ -74,7 +76,7 @@ public class Util {
 	public static String WEB_SERVICE_HOST_VHOST = "servicedata.vhostall.com";
 	public static final String WEB_SERVICE_HOST = WEB_SERVICE_HOST_VHOST;
 
-	static String baseDir = Environment.getExternalStorageDirectory() + "/GMap/routes/hint/";
+	static String baseHintDir = Environment.getExternalStorageDirectory() + "/GMap/routes/hint/";
 	
 	public static void init(){
 		typeToRes = new SparseIntArray ();
@@ -164,7 +166,7 @@ public class Util {
     */
 	//baseDir="baseDir/GMap/routes/hint/"
 	public static String getVoiceFileName(String type,int currentStepIndex) {
-		return baseDir+type+"_"+currentStepIndex+".mp3";
+		return baseHintDir+type+"_"+currentStepIndex+".mp3";
 	}
 
 	public static void uploadRemind(MainActivity act,LatLng point,int type, String reporter) {
@@ -248,5 +250,15 @@ public class Util {
 			act.iconCCTV.setVisibility(View.VISIBLE);
 			act.iconMedical.setVisibility(View.VISIBLE);
 		}
+	}
+
+	public static void removeOldHintFiles() {
+		File dir = new File(baseHintDir); 
+		if (dir.isDirectory()) {
+	        String[] children = dir.list();
+	        for (int i = 0; i < children.length; i++) {
+	            new File(dir, children[i]).delete();
+	        }
+	    }
 	}
 }

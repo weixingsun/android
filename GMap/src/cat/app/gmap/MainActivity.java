@@ -16,16 +16,19 @@ import cat.app.gmap.listener.MenuItemClickListener;
 import cat.app.gmap.listener.Voice;
 import cat.app.gmap.model.MarkerPoint;
 import cat.app.gmap.model.SuggestPoint;
+import cat.app.gmap.svc.Player;
 import cat.app.gmap.task.UserDataFectchTask;
 import cat.app.gmap.task.GoogleSearchByAddressNameTask;
-import cat.app.gmap.task.Player;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.AudioManager;
+import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.FragmentActivity;
@@ -53,11 +56,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 
-
 public class MainActivity extends Activity {
 
 	private final String TAG = this.getClass().getSimpleName();
+
 	public GMap gMap;
+	public Player player=new Player();
+	AudioManager am;
 	public ListView listSuggestion;
 	public ListView listVoice ;
 	public EditText inputAddress;
@@ -87,12 +92,30 @@ public class MainActivity extends Activity {
 		setupUI();
 		gMap.setupBGThreads();
 		gMap.buildGoogleApiClient();
+		audioInit();
+	}
+
+	private void audioInit() {
+		am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+		int result = am.requestAudioFocus(player, AudioManager.STREAM_MUSIC,
+				    AudioManager.AUDIOFOCUS_GAIN);
+		if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+			    Log.w(TAG, "Could not get audio focus.");
+		}
+	}
+	public void playMusicIntent(String fileName){
+
+		Intent playbackIntent = new Intent(this, Player.class);
+		playbackIntent.putExtra("file", fileName);
+		startService(playbackIntent);
 	}
 
 	@Override
     protected void onDestroy() {
         Log.i(TAG, "onDestroy()");
         gMap.cleanGoogleApiClient();
+        player.cleanup();
+        am.abandonAudioFocus(player);
         super.onDestroy();
     }
 	
@@ -332,6 +355,7 @@ public class MainActivity extends Activity {
     @Override
 	public void onStart() {
         super.onStart();
+        if(gMap.mGoogleApiClient.isConnected() || gMap.mGoogleApiClient.isConnecting()) return;
         gMap.mGoogleApiClient.connect();
     }
 
@@ -354,4 +378,5 @@ public class MainActivity extends Activity {
         dialogFragment.setArguments(args);
         dialogFragment.show(getFragmentManager(), "errordialog");
     }
+
 }

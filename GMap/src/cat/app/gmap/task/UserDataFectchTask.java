@@ -141,11 +141,13 @@ public class UserDataFectchTask extends
     @Override  
     protected void onPostExecute(List<SuggestPoint> points) {
         super.onPostExecute(points);  
-        if(errMsg!=null)
-        	Toast.makeText(gmap.activity, errMsg, Toast.LENGTH_LONG).show();
-        else if (foundPoint == null) {  
+        if(errMsg!=null){
+        	//Toast.makeText(gmap.activity, errMsg, Toast.LENGTH_LONG).show();
+        	Log.i(TAG, errMsg);
+        }else if (foundPoint == null) {  
             //failed to navigate
-            Toast.makeText(gmap.activity, "No reminder found.", Toast.LENGTH_LONG).show();
+            //Toast.makeText(gmap.activity, "No reminder found.", Toast.LENGTH_LONG).show();
+        	Log.i(TAG, "No reminder found.");
         } else{
         	for(SuggestPoint sp:points){
         		gmap.addOrUpdateRemindMarker(sp,sp.getType());

@@ -35,5 +35,6 @@
         </activity>
         
         <service android:name="cat.app.gmap.svc.NaviSVC"/>
+        <service android:name="cat.app.gmap.svc.Player"/>
     </application>
 </manifest>
