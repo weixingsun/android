@@ -22,7 +22,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import cat.app.gmap.GMap;
+import cat.app.gmap.MapContent;
+import cat.app.gmap.MainActivity;
 import cat.app.gmap.model.MarkerPoint;
 import cat.app.gmap.model.SuggestPoint;
 
@@ -55,23 +56,23 @@ public class GoogleSearchByPointTask extends
     String url;
     LatLng position;
     SuggestPoint foundPoint;
-    GMap gmap;
     Marker marker;
     int type;
-    public GoogleSearchByPointTask(GMap gmap,LatLng position) {
+    MainActivity activity;
+    public GoogleSearchByPointTask(MainActivity activity,LatLng position) {
     	this.position=position;
-    	this.gmap = gmap;
+    	this.activity = activity;
         this.url = getLocationURL(position);
     }
-    public GoogleSearchByPointTask(GMap gmap,Marker point,int type) {
+    public GoogleSearchByPointTask(MainActivity activity,Marker point,int type) {
     	this.marker=point;
-    	this.gmap = gmap;
+    	this.activity = activity;
         this.url = getLocationURL(marker.getPosition());
         this.type=type;
     }
     @Override  
     public List<SuggestPoint> doInBackground(String... params) {
-    	gmap.suggestPoints.clear();
+    	activity.gMap.suggestPoints.clear();
     	StringBuilder sb = new StringBuilder();
         HttpGet get = new HttpGet(url);
         try {
@@ -109,7 +110,7 @@ public class GoogleSearchByPointTask extends
 			e.printStackTrace();
 		}  
         //Log.i(TAG,"doInBackground:"+routes);
-        return gmap.suggestPoints;  
+        return activity.gMap.suggestPoints;  
     }  
   
     @Override  
@@ -126,14 +127,14 @@ public class GoogleSearchByPointTask extends
         super.onPostExecute(points);  
         if (foundPoint == null) {
             //failed to navigate
-            Toast.makeText(gmap.activity, "No location found.", Toast.LENGTH_LONG).show();
+            Toast.makeText(activity, "No location found.", Toast.LENGTH_LONG).show();
         } else{
         	if(marker==null){
-        		gmap.addRouteMarker(foundPoint);
+        		activity.gMap.addRouteMarker(foundPoint);
         	}else{
         		foundPoint.setType(type);
-        		gmap.updateMarker(marker,foundPoint);
-        		gmap.activity.openPopup(marker,type);
+        		activity.gMap.updateMarker(marker,foundPoint);
+        		activity.gMap.activity.openPopup(marker,type);
         	}
         }
     }

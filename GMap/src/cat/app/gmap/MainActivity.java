@@ -51,6 +51,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -61,7 +62,7 @@ public class MainActivity extends Activity {
 
 	private final String TAG = this.getClass().getSimpleName();
 
-	public GMap gMap;
+	public MapContent gMap;
 	public Player player;
 	public ListView listSuggestion;
 	public ListView listVoice ;
@@ -78,6 +79,10 @@ public class MainActivity extends Activity {
 	private ListView mDrawerListParent;
     private String[] mMainSettings;
     private DrawerLayout mDrawerLayout;
+    
+    private LinearLayout mapLayout;
+	private View mapLayoutView;
+	
     PopupWindow popup;
 	DisplayMetrics  dm;
 	String mode;
@@ -87,8 +92,11 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.main);
+		mapLayoutView = View.inflate(this, R.layout.map_google, null);
+		mapLayout = (LinearLayout)findViewById(R.id.map);
+		mapLayout.addView(mapLayoutView);
 		Util.init();
-		gMap = GMap.getInstance(this);
+		gMap = MapContent.getInstance(this);
 		setupUI();
 		gMap.setupBGThreads();
 		gMap.buildGoogleApiClient();

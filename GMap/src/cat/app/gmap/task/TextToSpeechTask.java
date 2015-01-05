@@ -10,7 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
-import cat.app.gmap.GMap;
+import cat.app.gmap.MapContent;
 import cat.app.gmap.MainActivity;
 import cat.app.gmap.Util;
 import cat.app.gmap.svc.Player;
@@ -21,13 +21,11 @@ import android.util.Log;
 import android.util.SparseArray;
 
 public class TextToSpeechTask extends AsyncTask<String, Void, String> {
-	GMap gmap;
 	SparseArray<String> startHintString;
 	SparseArray<String> end500HintString;
 	SparseArray<String> endHintString;
-	public TextToSpeechTask(GMap gmap, Player player) {
+	public TextToSpeechTask(Player player) {
 		super();
-		this.gmap = gmap;
 		this.startHintString = player.startHintMp3;
 		this.endHintString = player.endHintMp3;
 		this.end500HintString = player.end500HintMp3;

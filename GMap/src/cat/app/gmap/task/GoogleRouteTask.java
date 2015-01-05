@@ -15,7 +15,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import cat.app.gmap.GMap;
+import cat.app.gmap.MapContent;
+import cat.app.gmap.MainActivity;
 import cat.app.gmap.Util;
 import cat.app.gmap.model.SuggestPoint;
 import cat.app.gmap.nav.Leg;
@@ -46,13 +47,13 @@ public class GoogleRouteTask extends
     String url;  
     int old_size=0;
     List<LatLng> route = null;
-    GMap gmap;
-    public GoogleRouteTask(GMap gmap,String url) {
-    	this.gmap = gmap;
+    MainActivity activity;
+    public GoogleRouteTask(MainActivity activity,String url) {
+    	this.activity = activity;
         this.url = url;  
     }
-    public GoogleRouteTask(GMap gmap, LatLng start, LatLng dest,String mode) {
-    	this.gmap = gmap;
+    public GoogleRouteTask(MainActivity activity, LatLng start, LatLng dest,String mode) {
+    	this.activity = activity;
         this.url = getDirectionsUrl(start,dest,"json",mode);
         //Log.i(TAG, "url="+url);
 	}
@@ -74,8 +75,8 @@ public class GoogleRouteTask extends
                 	Leg l = r.getLegs().get(0);
                 	//if(l.getStartAddress()!=null)
                 		//gmap.startPoint = new SuggestPoint(r.getLegs().get(0).getStartLocation(),r.getLegs().get(0).getStartAddress());
-                	old_size=gmap.pos.steps.size();
-                	gmap.pos.steps.addAll(r.getSteps());
+                	old_size=activity.gMap.pos.steps.size();
+                	activity.gMap.pos.steps.addAll(r.getSteps());
                 	route = RouteParser.getWholeRoutePoints(r);
                 } else {
                     return null;
@@ -106,17 +107,17 @@ public class GoogleRouteTask extends
     protected void onPostExecute(List<LatLng> route) {
         super.onPostExecute(route);  
         if (route == null) {
-            Toast.makeText(gmap.activity, "No route found.", Toast.LENGTH_LONG).show();
+            Toast.makeText(activity, "No route found.", Toast.LENGTH_LONG).show();
         }  
         else{
             PolylineOptions lineOptions = new PolylineOptions();
             lineOptions.addAll(route);
             lineOptions.width(10);
             lineOptions.color(Color.BLUE);
-            Polyline pl = gmap.map.addPolyline(lineOptions);
-            gmap.routesPolyLines.add(pl);
-            Util.reOrgHints(gmap.pos.steps);
-            gmap.findNewRouteSpeech(old_size);
+            Polyline pl = activity.gMap.map.addPolyline(lineOptions);
+            activity.gMap.routesPolyLines.add(pl);
+            Util.reOrgHints(activity.gMap.pos.steps);
+            activity.gMap.findNewRouteSpeech(old_size);
             //gmap.drawAllStepPoints();
         }
     }

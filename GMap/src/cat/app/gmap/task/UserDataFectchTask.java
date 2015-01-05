@@ -23,7 +23,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import cat.app.gmap.GMap;
+import cat.app.gmap.MapContent;
 import cat.app.gmap.Util;
 import cat.app.gmap.model.MarkerPoint;
 import cat.app.gmap.model.SuggestPoint;
@@ -56,9 +56,9 @@ public class UserDataFectchTask extends
 	HttpClient client;  
     String url;
     SuggestPoint foundPoint;
-    GMap gmap;
+    MapContent gmap;
     String errMsg =null;
-    public UserDataFectchTask(GMap gmap,LatLng lu,LatLng rd) {
+    public UserDataFectchTask(MapContent gmap,LatLng lu,LatLng rd) {
     	this.gmap = gmap;
         this.url = getLocationURL(lu,rd);
         Log.i(TAG, url);

@@ -23,7 +23,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import cat.app.gmap.GMap;
+import cat.app.gmap.MapContent;
 import cat.app.gmap.adapter.SuggestListAdapter;
 import cat.app.gmap.model.SuggestPoint;
 
@@ -52,8 +52,8 @@ public class GoogleSearchByAddressNameTask extends
 	HttpClient client;  
     String url;
     String address;
-    GMap gmap;
-    public GoogleSearchByAddressNameTask(GMap gmap,String address) {
+    MapContent gmap;
+    public GoogleSearchByAddressNameTask(MapContent gmap,String address) {
     	this.address=address;
     	this.gmap = gmap;
         this.url = getLocationURL(address);
