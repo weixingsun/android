@@ -37,7 +37,7 @@ public class FindMyStepTask extends AsyncTask<LatLng, Void, String> {
 	}
 	public boolean isInStep(Step step, LatLng loc){
 		boolean geodesic = false;
-		return PolyUtil.isLocationOnPath(loc, step.getPoints(), geodesic,20); //tolerance=20 meters
+		return PolyUtil.isLocationOnPath(loc, step.getPoints(), geodesic,Util.GPS_TOLERANCE); //tolerance=20 meters
 	}
 
 	@Override

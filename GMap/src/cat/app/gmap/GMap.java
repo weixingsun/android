@@ -66,16 +66,12 @@ public class GMap extends MapFragment
 	public Map<String,Marker> remindMarkers=new TreeMap<String,Marker>();
 	public Map<String,MarkerPoint> remindMarkerPoints=new TreeMap<String,MarkerPoint>();//like police/camera/accident
 	public TreeMap<String,MarkerPoint> routeMarkerPoints=new TreeMap<String,MarkerPoint>();
-	public SparseArray<String> startHintMp3 = new SparseArray<String>();
-	public SparseArray<String> end500HintMp3 = new SparseArray<String>();
-	public SparseArray<String> endHintMp3 = new SparseArray<String>();
-	public SparseArray<String> playedStartMp3 = new SparseArray<String>();
-	public SparseArray<String> playedEndMp3 = new SparseArray<String>();
+	
 	public int markerMaxSeq = 1;
 	//public int currentStepIndex = 0;//0 -> instructionToMp3(1), 1 -> instructionToMp3(2)
 	public int previousStepIndex = -1;
 	public boolean onRoad =false;
-	private boolean enteringNextStep=true;
+	private boolean inTurn=true;
 	LatLngBounds bounds;
 	
 	private boolean mResolvingError = false;
@@ -98,6 +94,9 @@ public class GMap extends MapFragment
 		FragmentManager myFM = activity.getFragmentManager();
 		MapFragment fragment = (MapFragment) myFM.findFragmentById(R.id.map);
 		map = fragment.getMap();
+		if(map == null){
+			Log.e(TAG, "Failed to initialize the google map, try to install google play service package.");
+		}
 		map.getUiSettings().setCompassEnabled(false);
 		map.getUiSettings().setRotateGesturesEnabled(false);
 		map.setMyLocationEnabled(true);
@@ -266,11 +265,7 @@ public class GMap extends MapFragment
 	}
     private void clearRoute(){
 		removePreviousRoute();
-		playedStartMp3.clear();
-		playedEndMp3.clear();
-		this.startHintMp3.clear();
-		this.endHintMp3.clear();
-		this.end500HintMp3.clear();
+		activity.player.arraysClear();
 		//currentStepIndex=0;
 		pos.clear();
     }
@@ -330,39 +325,46 @@ public class GMap extends MapFragment
 	public void findNewRouteSpeech(int old_size){
         for(int i=old_size;i<pos.steps.size();i++){
         	Step s = pos.steps.get(i);
-        	startHintMp3.append(i, s.getStartHint());
-		    endHintMp3.append(i, s.getEndHint());
+        	activity.player.startHintMp3.append(i, s.getStartHint());
+        	activity.player.endHintMp3.append(i, s.getEndHint());
 		    if(s.getDistance().getValue()>500){
-			    end500HintMp3.append(i, "in 500 m, "+s.getEndHint());
+		    	activity.player.end500HintMp3.append(i, "in 500 m, "+s.getEndHint());
 		    }
         }
-        (new TextToSpeechTask(this,startHintMp3,endHintMp3,end500HintMp3)).execute();
+        (new TextToSpeechTask(this,activity.player)).execute();
 	}
 
-	private void hintStartDetect(){
+	private boolean hintStartDetect(){
 		//Log.i(TAG, "hintStartDetect():toStart="+pos.getToCurrentStart());
-		if(pos.getToCurrentStart()<Util.hint20BeforeTurn){
-			playStartHint(pos.getCurrentStepIndex());
-			Log.i(TAG, "playStartHint");
-			onRoad=true;
-			enteringNextStep=true;
+		if(pos.getToCurrentStart()<Util.hint30BeforeTurn){
+			activity.player.playStartHint(pos.getCurrentStepIndex());
+			
+			//Toast.makeText(activity, "hintStartDetect ", Toast.LENGTH_SHORT).show();
+			return true;
 		}
+		return false;
 	}
-	private void hintEnd50Detect() {
-		if(pos.getCurrentStepIndex()>previousStepIndex){
-			this.enteringNextStep=false;
-			previousStepIndex=pos.getCurrentStepIndex();
-		}
+	private boolean hintEnd50Detect() {
 		if(pos.getToCurrentEnd()<Util.hint50BeforeTurn){
-			playEndHint(pos.getCurrentStepIndex());
-			enteringNextStep=true;
+			activity.player.playEndHint(pos.getCurrentStepIndex());
+			inTurn=true;
 			Log.i(TAG, "hintEnd50Detect()");
+			Toast.makeText(activity, "hintEnd50Detect ", Toast.LENGTH_SHORT).show();
+			return true;
 		}
+		return false;
 	}
 	private void hintEnd500Detect() {
 		if(pos.getToCurrentEnd()<Util.hint600BeforeTurn && pos.getToCurrentEnd()>Util.hint400BeforeTurn){
-			playEnd500Hint(pos.getCurrentStepIndex());
+			activity.player.playEnd500Hint(pos.getCurrentStepIndex());
 			Log.i(TAG, "hintEnd500Detect()");
+			Toast.makeText(activity, "hintEnd500Detect ", Toast.LENGTH_SHORT).show();
+		}
+	}
+	private void test(){
+		if(pos.getCurrentStepIndex()>previousStepIndex){
+			previousStepIndex=pos.getCurrentStepIndex();
+			Toast.makeText(activity, "changed to step "+previousStepIndex, Toast.LENGTH_LONG).show();
 		}
 	}
 	private void endDetect() {
@@ -373,39 +375,11 @@ public class GMap extends MapFragment
 		}
 		Log.i(TAG, "endDetect()");
 	}
-
-	private void playStartHint(int stepId){
-		if(playedStartMp3.get(stepId)==null){
-			String fileName = Util.getVoiceFileName(Util.startHint, stepId);  //this.startHintMp3.get(stepId);
-			File file = new File(fileName);
-			if(file.exists() && file.length()>0){
-				activity.playMusicIntent(fileName);
-				playedStartMp3.append(stepId, fileName);
-				Toast.makeText(activity, pos.steps.get(stepId).getStartHint(), Toast.LENGTH_LONG).show();
-			}
-		}
-	}
-	private void playEndHint(int stepId){
-		if(playedEndMp3.get(stepId)==null){
-			String fileName = Util.getVoiceFileName(Util.endHint, stepId);
-			File file = new File(fileName);
-			if(file.exists() && file.length()>0 ){
-				activity.playMusicIntent(fileName);
-				playedEndMp3.append(stepId, fileName);
-				Toast.makeText(activity, pos.steps.get(stepId).getEndHint(), Toast.LENGTH_LONG).show();
-			}
-		}
-	}
-	private void playEnd500Hint(int stepId){
-		if(playedEndMp3.get(stepId)==null){
-			String fileName = Util.getVoiceFileName(Util.end500Hint, stepId);
-			File file = new File(fileName);
-			if(file.exists() && file.length()>0 ){
-				activity.playMusicIntent(fileName);
-				playedEndMp3.append(stepId, fileName);
-				Toast.makeText(activity, pos.steps.get(stepId).getEndHint(), Toast.LENGTH_LONG).show();
-			}
-		}
+	protected boolean inIntersection() {
+		if(pos.getToCurrentEnd()<Util.hint50BeforeTurn || pos.getToCurrentStart()<Util.hint50BeforeTurn)
+			return true;
+		else
+			return false;
 	}
 	@Override
 	public void onMapLongClick(LatLng point) {
@@ -453,15 +427,21 @@ public class GMap extends MapFragment
 			}
 			if(pos.steps.size()>0){
 				pos.updateDistances();
-				hintStartDetect();
 				if(onRoad){
-					hintEnd50Detect();
-					hintEnd500Detect();
-					endDetect();
+					inTurn=inIntersection();
+					if(!hintStartDetect()){
+						if(hintEnd50Detect()){
+							endDetect();	//clearRoute on screen
+						}else{
+							hintEnd500Detect();
+						}
+					}
 					moveCamera();
-					if(onRoad && enteringNextStep) {
+					if(!inTurn) {
 						(new FindMyStepTask(activity)).execute(pos.getMyLatLng());
 					}
+				}else{
+					onRoad=hintStartDetect();
 				}
 			}
 			counter++;
@@ -480,6 +460,7 @@ public class GMap extends MapFragment
 		Timer timer = new Timer(true);
 		timer.schedule(btt, 1000, Util.THREAD_UPDATE_INTERVAL);
 	}
+
 	protected void moveCamera() {
 		if(onRoad)
 			move(pos.getMyLatLng());

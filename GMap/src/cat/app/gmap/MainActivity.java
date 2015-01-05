@@ -17,6 +17,7 @@ import cat.app.gmap.listener.Voice;
 import cat.app.gmap.model.MarkerPoint;
 import cat.app.gmap.model.SuggestPoint;
 import cat.app.gmap.svc.Player;
+import cat.app.gmap.svc.PlayerService;
 import cat.app.gmap.task.UserDataFectchTask;
 import cat.app.gmap.task.GoogleSearchByAddressNameTask;
 import android.app.Activity;
@@ -61,8 +62,7 @@ public class MainActivity extends Activity {
 	private final String TAG = this.getClass().getSimpleName();
 
 	public GMap gMap;
-	public Player player=new Player();
-	AudioManager am;
+	public Player player;
 	public ListView listSuggestion;
 	public ListView listVoice ;
 	public EditText inputAddress;
@@ -92,19 +92,11 @@ public class MainActivity extends Activity {
 		setupUI();
 		gMap.setupBGThreads();
 		gMap.buildGoogleApiClient();
-		audioInit();
+		player=new Player(this);
 	}
 
-	private void audioInit() {
-		am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-		int result = am.requestAudioFocus(player, AudioManager.STREAM_MUSIC,
-				    AudioManager.AUDIOFOCUS_GAIN);
-		if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-			    Log.w(TAG, "Could not get audio focus.");
-		}
-	}
 	public void playMusicIntent(String fileName){
-
+    	player.initMediaPlayer(fileName);
 		Intent playbackIntent = new Intent(this, Player.class);
 		playbackIntent.putExtra("file", fileName);
 		startService(playbackIntent);
@@ -115,7 +107,6 @@ public class MainActivity extends Activity {
         Log.i(TAG, "onDestroy()");
         gMap.cleanGoogleApiClient();
         player.cleanup();
-        am.abandonAudioFocus(player);
         super.onDestroy();
     }
 	

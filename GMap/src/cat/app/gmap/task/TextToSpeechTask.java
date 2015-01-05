@@ -13,6 +13,7 @@ import java.util.Map;
 import cat.app.gmap.GMap;
 import cat.app.gmap.MainActivity;
 import cat.app.gmap.Util;
+import cat.app.gmap.svc.Player;
 
 import android.os.AsyncTask;
 import android.text.Html;
@@ -21,15 +22,15 @@ import android.util.SparseArray;
 
 public class TextToSpeechTask extends AsyncTask<String, Void, String> {
 	GMap gmap;
-	SparseArray<String> startHintFile;
-	SparseArray<String> end500HintFile;
-	SparseArray<String> endHintFile;
-	public TextToSpeechTask(GMap gmap,SparseArray<String> startHintFile,SparseArray<String> endHintFile,SparseArray<String> end500HintFile) {
+	SparseArray<String> startHintString;
+	SparseArray<String> end500HintString;
+	SparseArray<String> endHintString;
+	public TextToSpeechTask(GMap gmap, Player player) {
 		super();
 		this.gmap = gmap;
-		this.startHintFile = startHintFile;
-		this.endHintFile = endHintFile;
-		this.end500HintFile = end500HintFile;
+		this.startHintString = player.startHintMp3;
+		this.endHintString = player.endHintMp3;
+		this.end500HintString = player.end500HintMp3;
 	}
 	private static final String TAG = "GMap.TextToSpeechTask";
 	//http://translate.google.com/translate_tts? tl=en &q=Hello%20World
@@ -48,23 +49,23 @@ public class TextToSpeechTask extends AsyncTask<String, Void, String> {
     }  
 	@Override
 	protected String doInBackground(String... params) {
-		int key = 0;
-		for(int i = 0; i < startHintFile.size(); i++) {
-		   key = startHintFile.keyAt(i);
-		   proceedFile(startHintFile.get(key),Util.getVoiceFileName(Util.startHint, key));//hint,path
+		int stepdId = 0;
+		for(int i = 0; i < startHintString.size(); i++) {
+		   stepdId = startHintString.keyAt(i);
+		   proceedFile(startHintString.get(stepdId),Util.getVoiceFileName(Util.startHint, stepdId));//hint,path
 		   sleep(300);
 		}
-		for(int i = 0; i < endHintFile.size(); i++) {
-		   key = endHintFile.keyAt(i);
-		   proceedFile(endHintFile.get(key),Util.getVoiceFileName(Util.endHint, key));//hint,path
+		for(int i = 0; i < endHintString.size(); i++) {
+			stepdId = endHintString.keyAt(i);
+		   proceedFile(endHintString.get(stepdId),Util.getVoiceFileName(Util.endHint, stepdId));//hint,path
 		   sleep(300);
 		}
-		for(int i = 0; i < end500HintFile.size(); i++) {
-			   key = end500HintFile.keyAt(i);
-			   proceedFile(end500HintFile.get(key),Util.getVoiceFileName(Util.end500Hint, key));//hint,path
+		for(int i = 0; i < end500HintString.size(); i++) {
+			stepdId = end500HintString.keyAt(i);
+			   proceedFile(end500HintString.get(stepdId),Util.getVoiceFileName(Util.end500Hint, stepdId));//hint,path
 			   sleep(300);
 			}
-		return startHintFile.size()+endHintFile.size()+"";
+		return startHintString.size()+endHintString.size()+"";
 	}
 	private void sleep(int second){
 		try {

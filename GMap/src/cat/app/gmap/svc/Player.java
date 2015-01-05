@@ -1,9 +1,14 @@
 package cat.app.gmap.svc;
 
+import java.io.File;
 import java.io.IOException;
+
+import cat.app.gmap.MainActivity;
+import cat.app.gmap.Util;
 
 import android.app.IntentService;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
@@ -12,39 +17,66 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
+import android.util.SparseArray;
+import android.widget.Toast;
 
-public class Player extends Service implements MediaPlayer.OnPreparedListener,OnAudioFocusChangeListener{
+public class Player extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, OnAudioFocusChangeListener{
 	//private static final String ACTION_PLAY = "cat.app.action.PLAY";
 
 	private final static String TAG = "GMap.Player";
-
+	MainActivity activity;
+	AudioManager am;
 	String fileName;
 	private final int MSG_MP_RELEASE = 999;
 	private final int TIME_TO_WAIT = 5000;
-	private MediaPlayer player;
+	private static MediaPlayer player;
+	public SparseArray<String> startHintMp3 = new SparseArray<String>();
+	public SparseArray<String> end500HintMp3 = new SparseArray<String>();
+	public SparseArray<String> endHintMp3 = new SparseArray<String>();
 	
-	@Override
-	public int onStartCommand(Intent intent, int flags, int startId) {
-        //if (intent.getAction().equals(ACTION_PLAY)) {
-		Log.i(TAG, "onStartCommand");
-		fileName = intent.getStringExtra("file");
-        	initMediaPlayer(fileName);
-        	player.setOnPreparedListener(this);
-        	player.prepareAsync(); // prepare async to not block main thread
-        //}
-    		Log.i(TAG, "onStartCommand");
-		return startId;
-    }
-
-	private void initMediaPlayer(String fileName) {
+	public SparseArray<String> playedStartMp3 = new SparseArray<String>();
+	public SparseArray<String> playedEndMp3 = new SparseArray<String>();
+	//public SparseArray<String> playedEnd500Mp3 = new SparseArray<String>();
+	
+	public Player(MainActivity activity) {
+		this.activity = activity;
+		audioInit();
+	}
+	public Player() {
+		//audioInit();
+	}
+	public void audioInit() {
+		am = (AudioManager) activity.getSystemService(Context.AUDIO_SERVICE);
+		int result = am.requestAudioFocus(this, AudioManager.STREAM_MUSIC,
+				    AudioManager.AUDIOFOCUS_GAIN);
+		if (result != AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+			    Log.w(TAG, "Could not get audio focus.");
+		}
 		player = new MediaPlayer();
 		player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+		player.setOnPreparedListener(this);
+	}
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		fileName = intent.getStringExtra("file");
+    	initMediaPlayer(fileName);
+    	player.setOnPreparedListener(this);
+    	//player.prepareAsync();
+		Log.i(TAG, "onStartCommand");
+		return startId;
+    }
+	public void initMediaPlayer(String fileName) {
+		if(player==null)
+		player = new MediaPlayer();
+    	
 		try {
 			player.setDataSource(fileName);
-		} catch (IllegalArgumentException | SecurityException
-				| IllegalStateException | IOException e) {
+			player.prepareAsync();
+		} catch (IllegalArgumentException | SecurityException | IOException e) {
 			e.printStackTrace();
 			Log.i(TAG, "Error: MediaPlayer.setDataSource("+fileName+")");
+		} catch (IllegalStateException e){
+			//player.prepareAsync();
 		}
 		/*player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
 			@Override
@@ -69,16 +101,9 @@ public class Player extends Service implements MediaPlayer.OnPreparedListener,On
 		}
 		player.release();
 		player = null;
-	}
-	@Override
-	public void onPrepared(MediaPlayer mp) {
-		player.start();
-		Log.i(TAG, "onPrepared");
-	}
-	@Override
-	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
-		return null;
+
+        am.abandonAudioFocus(this);
+        arraysClear();
 	}
 
 	@Override
@@ -111,5 +136,64 @@ public class Player extends Service implements MediaPlayer.OnPreparedListener,On
             break;
 	    }
 
+	}
+
+	public void arraysClear() {
+		// TODO Auto-generated method stub
+		startHintMp3.clear();
+		endHintMp3.clear();
+		end500HintMp3.clear();
+		playedStartMp3.clear();
+		playedEndMp3.clear();
+		//playedEnd500Mp3.clear();
+	}
+
+	public void playStartHint(int stepId){
+		if(playedStartMp3.get(stepId)==null){
+			String fileName = Util.getVoiceFileName(Util.startHint, stepId);  //this.startHintMp3.get(stepId);
+			File file = new File(fileName);
+			if(file.exists() && file.length()>0){
+				activity.playMusicIntent(fileName);
+				playedStartMp3.append(stepId, fileName);
+				Toast.makeText(activity, activity.gMap.pos.steps.get(stepId).getStartHint(), Toast.LENGTH_LONG).show();
+			}
+			Log.i(TAG, "playStartHint:"+fileName);
+		}
+	}
+	public void playEndHint(int stepId){
+		if(playedEndMp3.get(stepId)==null){
+			String fileName = Util.getVoiceFileName(Util.endHint, stepId);
+			File file = new File(fileName);
+			if(file.exists() && file.length()>0 ){
+				activity.playMusicIntent(fileName);
+				playedEndMp3.append(stepId, fileName);
+				Toast.makeText(activity, activity.gMap.pos.steps.get(stepId).getEndHint(), Toast.LENGTH_LONG).show();
+			}
+		}
+	}
+	public void playEnd500Hint(int stepId){
+		if(playedEndMp3.get(stepId)==null){
+			String fileName = Util.getVoiceFileName(Util.end500Hint, stepId);
+			File file = new File(fileName);
+			if(file.exists() && file.length()>0 ){
+				activity.playMusicIntent(fileName);
+				playedEndMp3.append(stepId, fileName);
+				Toast.makeText(activity, activity.gMap.pos.steps.get(stepId).getEndHint(), Toast.LENGTH_LONG).show();
+			}
+		}
+	}
+	@Override
+	public void onPrepared(MediaPlayer mp) {
+		mp.start();
+	}
+	@Override
+	public IBinder onBind(Intent intent) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public void onCompletion(MediaPlayer mp) {
+		mp.stop();
+        mp.reset();
 	}
 }

@@ -60,6 +60,7 @@ public class Util {
 	public static final double hint600BeforeTurn = 600;
 	public static final double hint400BeforeTurn = 400;
 	public static final double hint50BeforeTurn = 50;
+	public static final double hint30BeforeTurn = 30;
 	public static final double hint20BeforeTurn = 20;
 
 
@@ -75,6 +76,7 @@ public class Util {
 	public static String WEB_SERVICE_HOST_NET76 = "servicedata.net76.net";
 	public static String WEB_SERVICE_HOST_VHOST = "servicedata.vhostall.com";
 	public static final String WEB_SERVICE_HOST = WEB_SERVICE_HOST_VHOST;
+	public static final double GPS_TOLERANCE = 30;
 
 	static String baseHintDir = Environment.getExternalStorageDirectory() + "/GMap/routes/hint/";
 	
