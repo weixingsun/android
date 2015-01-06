@@ -28,6 +28,7 @@ public class LOC implements LocationListener {
         myPos = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if(myPos!=null) {
         	osm.setDefaultCenter(new GeoPoint(myPos));
+        	osm.myLoc=myPos;
         }
 	}
 	@Override
