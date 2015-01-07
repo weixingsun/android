@@ -30,6 +30,8 @@ public class MapOptions {
 	public static final String MAP_CYCLEMAP = "CycleMap";
 	public static final String MAP_PUBLIC_TRANSPORT_OSM = "OSMPublicTransport";
 	
+	public static final int REQ_CODE_SPEECH_INPUT = 2;
+	
 	public static void changeTileProvider(String provider) {
 		osm.refreshTileSource(provider);
 	}

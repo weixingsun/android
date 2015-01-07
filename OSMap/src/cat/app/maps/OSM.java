@@ -21,12 +21,18 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.OverlayItem;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnLongClickListener;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.AdapterView.OnItemClickListener;
 
 import cat.app.map.markers.InfoWindow;
 import cat.app.navi.Route;
@@ -70,6 +76,7 @@ public class OSM {
 		// workaround for:OpenGLRenderer(3672): 
 		// Path too large to be rendered into a texture
 		mapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+		
 		MapEventsReceiver mReceive = new MapEventsReceiver() {
 			@Override
 			public boolean longPressHelper(GeoPoint arg0) {
@@ -87,7 +94,7 @@ public class OSM {
 
 			@Override
 			public boolean singleTapConfirmedHelper(GeoPoint arg0) {
-				Log.d("debug", "SingleTap:(" + arg0.getLatitude() + "," + arg0.getLongitude() + ")");
+				closeAllList();
 				return false;
 			}
 		};
@@ -95,6 +102,23 @@ public class OSM {
 				act.getBaseContext(), mReceive);
 		mapView.getOverlays().add(OverlayEventos);
 		mapView.invalidate();
+	}
+
+	protected void closeAllList() {
+		ListView listSuggestion = (ListView) act.findViewById(R.id.listSuggestion);
+		listSuggestion.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				//SuggestPoint sp = map.suggestPoints.get(position);
+				//map.addRouteMarker(sp);
+				//listSuggestion.setVisibility(View.INVISIBLE);
+				//map.move(sp.getLatLng());
+			}
+		});
+    	listSuggestion.setVisibility(View.INVISIBLE);
+    	ListView listVoice = (ListView) act.findViewById(R.id.listVoiceSuggestion);
+    	listVoice.setVisibility(View.INVISIBLE);
+    	closeKeyBoard();
 	}
 
 	private void initMarker() {
@@ -221,5 +245,10 @@ public void addMarker(Road road,int seq){
 	public void refreshTileSource(String name){
 		switchTileSource(name);
 		mapView.invalidate();
+	}
+	public void closeKeyBoard() {
+		EditText inputAddress = (EditText) act.findViewById(R.id.inputAddress);
+		InputMethodManager imm = (InputMethodManager) act.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(inputAddress.getWindowToken(), 0);
 	}
 }
