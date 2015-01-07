@@ -1,6 +1,7 @@
 package cat.app.navi;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.Polyline;
@@ -21,7 +22,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
-public class RoutePolylineTask extends AsyncTask<ArrayList<GeoPoint>, String, Polyline>{
+public class RoutePolylineTask extends AsyncTask<GeoPoint, String, Polyline>{
 
 	private static final String TAG = RoutePolylineTask.class.getSimpleName();
 	RoadManager roadManager = new OSRMRoadManager();
@@ -35,10 +36,10 @@ public class RoutePolylineTask extends AsyncTask<ArrayList<GeoPoint>, String, Po
 	}
 
 	@Override
-	protected Polyline doInBackground(ArrayList<GeoPoint>... params) {
-		road = roadManager.getRoad(params[0]);
+	protected Polyline doInBackground(GeoPoint... params) {
+		ArrayList<GeoPoint> list = new ArrayList<GeoPoint>(Arrays.asList(params));
+		road = roadManager.getRoad(list);
 		//roadManager.addRequestOption("routeType=bicycle");
-		//
 		Polyline pl = RoadManager.buildRoadOverlay(road, act);
 		pl.setColor(Color.BLUE);
 		pl.setWidth(10);

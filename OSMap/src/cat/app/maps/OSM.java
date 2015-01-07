@@ -13,7 +13,9 @@ import org.osmdroid.bonuspack.overlays.Marker.OnMarkerClickListener;
 import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadNode;
+import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.tileprovider.util.CloudmadeUtil;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.OverlayItem;
@@ -56,17 +58,18 @@ public class OSM {
 	private void setMap() {
 		// mapView.getOverlay().remove(view);
 		// mapView.removeView(view);
+		MapOptions opt = MapOptions.getInstance(this);
+		initTileSources();
 		mapView.setBuiltInZoomControls(true);
 		mapView.setMultiTouchControls(true);
 		mapView.setClickable(true);
 		mapView.setLongClickable(true);
 		// mapView.setUseDataConnection(false);
-		mapView.setTileSource(TileSourceFactory.MAPQUESTOSM);
 		mapView.setMinZoomLevel(4);
-		//mapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null); 
+		switchTileSource(MapOptions.MAP_MAPQUESTOSM);
 		// workaround for:OpenGLRenderer(3672): 
 		// Path too large to be rendered into a texture
-		// mapView.setTileSource(TileSourceFactory.MAPNIK);
+		mapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 		MapEventsReceiver mReceive = new MapEventsReceiver() {
 			@Override
 			public boolean longPressHelper(GeoPoint arg0) {
@@ -77,15 +80,14 @@ public class OSM {
 					return false;
 				points.add(new GeoPoint(myLoc));
 				points.add(arg0);
-				(new RoutePolylineTask(act, OSM.this, null)).execute(points);
+				GeoPoint[] arr = points.toArray(new GeoPoint[points.size()]);
+				(new RoutePolylineTask(act, OSM.this, null)).execute(arr);
 				return false;
 			}
 
 			@Override
 			public boolean singleTapConfirmedHelper(GeoPoint arg0) {
-				Log.d("debug",
-						"SingleTap:(" + arg0.getLatitude() + ","
-								+ arg0.getLongitude() + ")");
+				Log.d("debug", "SingleTap:(" + arg0.getLatitude() + "," + arg0.getLongitude() + ")");
 				return false;
 			}
 		};
@@ -145,6 +147,7 @@ public class OSM {
 	}
 	public void drawSteps(Road road) { // called from tasks
 		removeAllMarkers();
+		removePrevPolyline();
 		for (int i = 0; i < road.mNodes.size(); i++) {
 			addMarker(road,i);
 		}
@@ -157,8 +160,7 @@ public void addMarker(Road road,int seq){
 	nodeMarker.setIcon(nodeIcon);
 	nodeMarker.setTitle("Step " + seq);
 	nodeMarker.setSnippet(node.mInstructions);
-	nodeMarker.setSubDescription(Road.getLengthDurationText(
-			node.mLength, node.mDuration));
+	nodeMarker.setSubDescription(Road.getLengthDurationText(node.mLength, node.mDuration));
 	int resId = InfoWindow.getIconByManeuver(node.mManeuverType);
 	Drawable icon = act.getResources().getDrawable(resId);
 	nodeMarker.setImage(icon);
@@ -180,6 +182,44 @@ public void addMarker(Road road,int seq){
 		for (Marker mk : markers) {
 			mapView.getOverlays().remove(mk);
 		}
-
+	}
+	/*
+	 * Mapnik, CycleMap, OSMPublicTransport, MapquestOSM, MapquestAerial, 
+	 * Google Maps, Google Maps Satellite, Google Maps Terrain, 
+	 * Yahoo Maps, Yahoo Maps Satellite, 
+	 * Microsoft Maps, Microsoft Earth, Microsoft Hybrid
+	 */
+	private void initTileSources(){
+		CloudmadeUtil.retrieveCloudmadeKey(act.getApplicationContext());
+		ArrayList<ITileSource> list = TileSourceFactory.getTileSources();
+        final int size = list.size();
+        TileSourceFactory.addTileSource(new OSMMapGoogleRenderer(MapOptions.MAP_GOOGLE_ROADMAP, ResourceProxy.string.unknown, 0, 20, 256, ".png",size, "http://mt0.google.com/vt/lyrs=m@127&"));
+        TileSourceFactory.addTileSource(new OSMMapGoogleRenderer(MapOptions.MAP_GOOGLE_SATELLITE, ResourceProxy.string.unknown, 0, 20, 256, ".png",size+1, "http://mt0.google.com/vt/lyrs=s@127,h@127&"));
+        TileSourceFactory.addTileSource(new OSMMapGoogleRenderer(MapOptions.MAP_GOOGLE_TERRAIN, ResourceProxy.string.unknown, 0, 20, 256, ".jpg",size+2, "http://mt0.google.com/vt/lyrs=t@127,r@127&"));
+        
+        //TileSourceFactory.addTileSource(new OSMMapYahooRenderer(MapOptions.MAP_YAHOO_ROADMAP,ResourceProxy.string.unknown,0,17,256,".jpg",size + 3,"http://maps.yimg.com/hw/tile?"));
+        //TileSourceFactory.addTileSource(new OSMMapYahooRenderer(MapOptions.MAP_YAHOO_SATELLITE,ResourceProxy.string.unknown,0,17,256,".jpg",size + 4,"http://maps.yimg.com/ae/ximg?"));
+        
+        TileSourceFactory.addTileSource(new OSMMapMicrosoftRenderer(MapOptions.MAP_MS_ROADMAP,ResourceProxy.string.unknown,0,19,256,".png",size + 5,"http://r0.ortho.tiles.virtualearth.net/tiles/r"));
+        TileSourceFactory.addTileSource(new OSMMapMicrosoftRenderer(MapOptions.MAP_MS_EARTH,ResourceProxy.string.unknown,0,19,256,".jpg",size + 6,"http://a0.ortho.tiles.virtualearth.net/tiles/a"));
+        TileSourceFactory.addTileSource(new OSMMapMicrosoftRenderer(MapOptions.MAP_MS_HYBRID,ResourceProxy.string.unknown,0,19,256,".jpg",size + 7,"http://h0.ortho.tiles.virtualearth.net/tiles/h"));
+        
+        //TileSourceFactory.addTileSource(new OSMMapGoogleRenderer("Google Maps Hybrid", ResourceProxy.string.unknown, 0, 19, 256, ".jpg", size+8, "http://mt0.google.com/vt/lyrs=m@127,s@127,h@127,r@127&"));  //mt0.google.com/vt/lyrs=h@159000000&hl=ru
+        /*String s = "";
+        for(ITileSource its:list){
+        	s+=its.name()+", ";
+        }
+        Log.i(tag, s);*/
+	}
+	private ITileSource getTileSource(String name){
+		return TileSourceFactory.getTileSource(name);
+	}
+	public void switchTileSource(String name) {
+		ITileSource its = getTileSource(name);
+		mapView.setTileSource(its);
+	}
+	public void refreshTileSource(String name){
+		switchTileSource(name);
+		mapView.invalidate();
 	}
 }
