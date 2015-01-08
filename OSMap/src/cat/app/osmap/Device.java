@@ -3,12 +3,15 @@ package cat.app.osmap;
 import java.util.Locale;
 
 import cat.app.maps.MapOptions;
+import cat.app.maps.OSM;
 import cat.app.osmap.ui.DelayedTextWatcher;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
+import android.os.Message;
 import android.speech.RecognizerIntent;
 import android.text.Editable;
 import android.view.KeyEvent;
@@ -25,9 +28,10 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class Device {
 	Activity act;
-	
-	public void init(Activity act){
+	OSM osm;
+	public void init(Activity act, OSM osm){
 		this.act=act;
+		this.osm=osm;
 		setText();
 		closeKeyBoard();
 		setImage();
@@ -40,7 +44,13 @@ public class Device {
 		    	promptSpeechInput();
 		    }
 		});
-
+		ImageView myloc = (ImageView) act.findViewById(R.id.my_loc);
+		myloc.setOnClickListener(new View.OnClickListener() {
+		    @Override
+		    public void onClick(View v) {
+		    	osm.setCenter();
+		    }
+		});
 		final ListView listVoice = (ListView) act.findViewById(R.id.listVoiceSuggestion);
 		listVoice.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -51,6 +61,7 @@ public class Device {
 				listVoice.setVisibility(View.INVISIBLE);
 			}
 		});
+		
 	}
 	private void setText() {
 		EditText inputAddress = (EditText) act.findViewById(R.id.inputAddress);
@@ -92,6 +103,22 @@ public class Device {
 				Toast.makeText(act.getApplicationContext(),act.getString(R.string.speech_not_supported),Toast.LENGTH_SHORT).show();
 			}
 		}
-		
+		public void closeAllList() {
+			ListView listSuggestion = (ListView) act.findViewById(R.id.listSuggestion);
+			listSuggestion.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					//SuggestPoint sp = map.suggestPoints.get(position);
+					//map.addRouteMarker(sp);
+					//listSuggestion.setVisibility(View.INVISIBLE);
+					//map.move(sp.getLatLng());
+				}
+			});
+	    	listSuggestion.setVisibility(View.INVISIBLE);
+	    	ListView listVoice = (ListView) act.findViewById(R.id.listVoiceSuggestion);
+	    	listVoice.setVisibility(View.INVISIBLE);
+	    	closeKeyBoard();
+		}
+
 		
 }

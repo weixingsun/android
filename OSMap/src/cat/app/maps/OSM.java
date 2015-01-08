@@ -25,6 +25,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnLongClickListener;
@@ -35,14 +37,19 @@ import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import cat.app.map.markers.InfoWindow;
-import cat.app.navi.Route;
-import cat.app.navi.RoutePolylineTask;
+import cat.app.navi.RouteOptions;
+import cat.app.navi.RouteTask;
+import cat.app.osmap.Device;
 import cat.app.osmap.LOC;
 import cat.app.osmap.MyItemizedOverlay;
 import cat.app.osmap.R;
 
 public class OSM {
 	protected static final String tag = OSM.class.getSimpleName();
+	public LOC loc = new LOC();
+	public Device dv = new Device();
+	MapOptions mo;
+	RouteOptions ro;
 	Activity act;
 	MapView mapView;
 	IMapController mapController;
@@ -50,27 +57,30 @@ public class OSM {
 	OverlayItem myLocationMarker;
 	// Route route;
 	Polyline routePolyline;
-	public Location myLoc;
+	//public Location myLoc;
 	public ArrayList<Marker> markers = new ArrayList<Marker>();
 
-	public void onCreate(Activity act) {
+	public void init(Activity act) {
 		this.act = act;
 		mapView = (MapView) act.findViewById(R.id.osmap);
 		mapController = mapView.getController();
 		setMap();
 		initMarker();
+        loc.init(act,this);
+        dv.init(act,this);
 	}
 
 	private void setMap() {
 		// mapView.getOverlay().remove(view);
 		// mapView.removeView(view);
-		MapOptions opt = MapOptions.getInstance(this);
+		mo = MapOptions.getInstance(this);
+		ro = RouteOptions.getInstance(this);
 		initTileSources();
 		mapView.setBuiltInZoomControls(true);
 		mapView.setMultiTouchControls(true);
 		mapView.setClickable(true);
 		mapView.setLongClickable(true);
-		// mapView.setUseDataConnection(false);
+		mapView.setUseDataConnection(false);
 		mapView.setMinZoomLevel(4);
 		switchTileSource(MapOptions.MAP_MAPQUESTOSM);
 		// workaround for:OpenGLRenderer(3672): 
@@ -83,18 +93,19 @@ public class OSM {
 				// Log.d("debug",
 				// "LongPress:("+arg0.getLatitude()+","+arg0.getLongitude()+")");
 				ArrayList<GeoPoint> points = new ArrayList<GeoPoint>();
-				if (myLoc == null)
+				if (loc.myPos == null)
 					return false;
-				points.add(new GeoPoint(myLoc));
+				points.add(new GeoPoint(loc.myPos));
 				points.add(arg0);
-				GeoPoint[] arr = points.toArray(new GeoPoint[points.size()]);
-				(new RoutePolylineTask(act, OSM.this, null)).execute(arr);
+				//GeoPoint[] arr = points.toArray(new GeoPoint[points.size()]);
+				ro.setWayPoints(points);
+				(new RouteTask(act, OSM.this, ro)).execute();
 				return false;
 			}
 
 			@Override
 			public boolean singleTapConfirmedHelper(GeoPoint arg0) {
-				closeAllList();
+				dv.closeAllList();
 				return false;
 			}
 		};
@@ -103,24 +114,6 @@ public class OSM {
 		mapView.getOverlays().add(OverlayEventos);
 		mapView.invalidate();
 	}
-
-	protected void closeAllList() {
-		ListView listSuggestion = (ListView) act.findViewById(R.id.listSuggestion);
-		listSuggestion.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				//SuggestPoint sp = map.suggestPoints.get(position);
-				//map.addRouteMarker(sp);
-				//listSuggestion.setVisibility(View.INVISIBLE);
-				//map.move(sp.getLatLng());
-			}
-		});
-    	listSuggestion.setVisibility(View.INVISIBLE);
-    	ListView listVoice = (ListView) act.findViewById(R.id.listVoiceSuggestion);
-    	listVoice.setVisibility(View.INVISIBLE);
-    	closeKeyBoard();
-	}
-
 	private void initMarker() {
 		Drawable img = act.getResources().getDrawable(R.drawable.blue_point_16);
 		int markerWidth = img.getIntrinsicWidth();
@@ -130,7 +123,6 @@ public class OSM {
 				act.getApplicationContext());
 		myItemizedOverlay = new MyItemizedOverlay(img, resourceProxy);
 		mapView.getOverlays().add(myItemizedOverlay);
-		// mapView.getOverlays().remove(myItemizedOverlay);
 	}
 
 	public void addMarker(GeoPoint gp) {
@@ -142,13 +134,18 @@ public class OSM {
 		myItemizedOverlay.removeItem(item);
 	}
 
-	public void setDefaultCenter(GeoPoint gp) {
+	public void setCenter(GeoPoint gp) {
 		if (mapView.getZoomLevel() < 13) {
 			mapController.setZoom(13);
-			mapController.setCenter(gp);
 		}
+		mapController.setCenter(gp);
+		loc.gps_fired = true;
+		Log.i(tag, "gps fired");
 	}
-
+	public void setCenter() {
+		GeoPoint gp = new GeoPoint(loc.myPos);
+		mapController.setCenter(gp);
+	}
 	public int getMarkerSize() {
 		return myItemizedOverlay.size();
 	}
@@ -159,7 +156,6 @@ public class OSM {
 	}
 
 	public void addPolyline(Polyline pl) {
-
 		mapView.getOverlays().add(pl);
 		mapView.invalidate();
 		routePolyline = pl;
@@ -169,9 +165,11 @@ public class OSM {
 			mapView.getOverlays().remove(routePolyline);
 		}
 	}
-	public void drawSteps(Road road) { // called from tasks
+	public void removeAllRouteMarkers(){
 		removeAllMarkers();
 		removePrevPolyline();
+	}
+	public void drawSteps(Road road) { // called from tasks
 		for (int i = 0; i < road.mNodes.size(); i++) {
 			addMarker(road,i);
 		}
@@ -229,13 +227,10 @@ public void addMarker(Road road,int seq){
         TileSourceFactory.addTileSource(new OSMMapMicrosoftRenderer(MapOptions.MAP_MS_HYBRID,ResourceProxy.string.unknown,0,19,256,".jpg",size + 7,"http://h0.ortho.tiles.virtualearth.net/tiles/h"));
         
         //TileSourceFactory.addTileSource(new OSMMapGoogleRenderer("Google Maps Hybrid", ResourceProxy.string.unknown, 0, 19, 256, ".jpg", size+8, "http://mt0.google.com/vt/lyrs=m@127,s@127,h@127,r@127&"));  //mt0.google.com/vt/lyrs=h@159000000&hl=ru
-        /*String s = "";
-        for(ITileSource its:list){
-        	s+=its.name()+", ";
-        }
-        Log.i(tag, s);*/
+        //TileSourceFactory.addTileSource(getTileSource("MapquestOSM"));
 	}
 	private ITileSource getTileSource(String name){
+		
 		return TileSourceFactory.getTileSource(name);
 	}
 	public void switchTileSource(String name) {
@@ -250,5 +245,8 @@ public void addMarker(Road road,int seq){
 		EditText inputAddress = (EditText) act.findViewById(R.id.inputAddress);
 		InputMethodManager imm = (InputMethodManager) act.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(inputAddress.getWindowToken(), 0);
+	}
+	public void setTravelMode(String mode){
+		
 	}
 }

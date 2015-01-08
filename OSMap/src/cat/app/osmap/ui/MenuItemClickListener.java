@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cat.app.maps.MapOptions;
+import cat.app.navi.RouteOptions;
 import cat.app.osmap.R;
 
 import android.app.Activity;
@@ -51,7 +52,12 @@ public class MenuItemClickListener implements OnItemClickListener {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				TextView tv = (TextView)view;
-				MapOptions.changeTileProvider(tv.getText().toString());
+				String name=tv.getText().toString();
+				if(MapOptions.MAP_TILES.containsKey(name)){
+					MapOptions.changeTileProvider(MapOptions.MAP_TILES.get(name));
+				}else if(RouteOptions.TRAVEL_MODES.containsKey(name)){
+					RouteOptions.changeTravelMode(RouteOptions.TRAVEL_MODES.get(name));
+				}
 			}
 		});
 	}

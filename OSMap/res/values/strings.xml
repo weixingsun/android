@@ -18,22 +18,23 @@
      
     <!-- Main Nav Drawer Menu Items -->
     <string-array name="menu_items">
-        <item >Travel Mode</item>
-        <item >Map Type</item>
+        <item >Mode</item>
+        <item >Maps</item>
         <item >On Road</item>
         <item >What\'s Hot</item>
     </string-array>
      
     <string-array name="nav_type_items">
-        <item >Driving</item>
-        <item >Walking</item>
-        <item >Bicycling</item>
-        <item >Transit</item>
+        <item >Fast</item>
+        <item >Short</item>
+        <item >Walk</item>
+        <item >Bike</item>
+        <item >Bus</item>
     </string-array>
     
     <string-array name="map_type_items">
-        <item >MapquestOSM</item>
-        <item >MapquestAerial</item>
+        <item >Open Street Map</item>
+        <item >OSM Satellite</item>
         <item >Mapnik</item>
         <item >Google Roadmap</item>
         <item >Google Satellite</item>
@@ -42,7 +43,7 @@
         <item >Microsoft Earth</item>
         <item >Microsoft Hybrid</item>
         <item >CycleMap</item>
-        <item >OSMPublicTransport</item>
+        <item >OSM Bus</item>
         <!-- <item >Yahoo Roadmap</item> -->
         <!-- <item >Yahoo Satellite</item> -->
     </string-array>

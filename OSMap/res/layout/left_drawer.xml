@@ -38,7 +38,7 @@
                android:layout_height="30dp"
                android:background="#888888"
                android:gravity="center"
-               android:text="@string/subsettings"
+               android:text="@null"
                android:textSize="20sp" />
 
            <ListView

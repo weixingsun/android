@@ -1,5 +1,7 @@
 package cat.app.maps;
 
+import java.util.HashMap;
+
 import android.util.Log;
 
 public class MapOptions {
@@ -30,11 +32,26 @@ public class MapOptions {
 	public static final String MAP_CYCLEMAP = "CycleMap";
 	public static final String MAP_PUBLIC_TRANSPORT_OSM = "OSMPublicTransport";
 	
+	public static HashMap<String, String> MAP_TILES = new HashMap<String,String>();
+	static{
+		MAP_TILES.put(MAP_GOOGLE_ROADMAP, MAP_GOOGLE_ROADMAP);
+		MAP_TILES.put(MAP_GOOGLE_SATELLITE, MAP_GOOGLE_SATELLITE);
+		MAP_TILES.put(MAP_GOOGLE_TERRAIN, MAP_GOOGLE_TERRAIN);
+		MAP_TILES.put(MAP_MS_ROADMAP, MAP_MS_ROADMAP);
+		MAP_TILES.put(MAP_MS_EARTH, MAP_MS_EARTH);
+		MAP_TILES.put(MAP_MS_HYBRID, MAP_MS_HYBRID);
+		MAP_TILES.put(MAP_MAPNIK, MAP_MAPNIK);
+		MAP_TILES.put("Open Street Map", MAP_MAPQUESTOSM);
+		MAP_TILES.put("OSM Satellite", MAP_MAPQUEST_AERIAL);
+		MAP_TILES.put("OSM Bus", MAP_PUBLIC_TRANSPORT_OSM);
+	}
 	public static final int REQ_CODE_SPEECH_INPUT = 2;
+	public static final int REQ_CODE_MOVE_INPUT = 3;
 	
 	public static void changeTileProvider(String provider) {
 		osm.refreshTileSource(provider);
 	}
+
 	/*
     Google Maps: Road, Aerial, Hybrid, Terrain, Korea
     OpenStreetMap¡± Classic, Cycle, Transport, Osmarender, OpenPiste
