@@ -2,6 +2,7 @@ package cat.app.osmap;
 
 import java.util.ArrayList;
 
+import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IMapView;
 import org.osmdroid.util.GeoPoint;
@@ -18,7 +19,6 @@ public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> {
 	 public MyItemizedOverlay(Drawable pDefaultMarker,
 	   ResourceProxy pResourceProxy) {
 	  super(pDefaultMarker, pResourceProxy);
-	  // TODO Auto-generated constructor stub
 	 }
 	  
 	 public void addItem(GeoPoint p, String title, String snippet){
@@ -37,19 +37,16 @@ public class MyItemizedOverlay extends ItemizedOverlay<OverlayItem> {
 	 }
 	 @Override
 	 public boolean onSnapToItem(int arg0, int arg1, Point arg2, IMapView arg3) {
-	  // TODO Auto-generated method stub
 	  return false;
 	 }
 	 
 	 @Override
 	 protected OverlayItem createItem(int arg0) {
-	  // TODO Auto-generated method stub
 	  return overlayItemList.get(arg0);
 	 }
 	 
 	 @Override
 	 public int size() {
-	  // TODO Auto-generated method stub
 	  return overlayItemList.size();
 	 }
 

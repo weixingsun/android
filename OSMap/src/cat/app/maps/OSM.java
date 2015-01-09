@@ -39,7 +39,9 @@ import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
 import cat.app.map.markers.InfoWindow;
+import cat.app.navi.GeoOptions;
 import cat.app.navi.RouteOptions;
+import cat.app.navi.google.Step;
 import cat.app.navi.task.GeocoderTask;
 import cat.app.navi.task.OSMRouteTask;
 import cat.app.osmap.Device;
@@ -54,10 +56,13 @@ public class OSM {
 	public Activity act;
 	MapOptions mo;
 	RouteOptions ro;
+	GeoOptions go;
 	MapView mapView;
 	IMapController mapController;
-	MyItemizedOverlay myItemizedOverlay;
+	MyItemizedOverlay myLocOverlay;
 	OverlayItem myLocationMarker;
+	MyItemizedOverlay routeOverlay;
+	OverlayItem routeMarker;
 	// Route route;
 	Polyline routePolyline;
 	public List<Address> suggestPoints;
@@ -68,17 +73,16 @@ public class OSM {
 		mapView = (MapView) act.findViewById(R.id.osmap);
 		mapController = mapView.getController();
 		setMap();
-		initMarker();
+		initMylocMarker();
+		initRouteMarker();
         loc.init(act,this);
         dv.init(act,this);
 	}
 
 	private void setMap() {
-		// mapView.getOverlay().remove(view);
-		// mapView.removeView(view);
 		mo = MapOptions.getInstance(this);
 		ro = RouteOptions.getInstance(this);
-		initTileSources();
+		mo.initTileSources(act);
 		mapView.setBuiltInZoomControls(true);
 		mapView.setMultiTouchControls(true);
 		mapView.setClickable(true);
@@ -88,54 +92,51 @@ public class OSM {
 		switchTileSource(MapOptions.MAP_MAPQUESTOSM);
 		// workaround for:OpenGLRenderer(3672): 
 		// Path too large to be rendered into a texture
-		mapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+		mapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);  //hardware process faulty
 		
 		MapEventsReceiver mReceive = new MapEventsReceiver() {
 			@Override
 			public boolean longPressHelper(GeoPoint p) {
-				// Log.d("debug",
-				// "LongPress:("+arg0.getLatitude()+","+arg0.getLongitude()+")");
+				if (loc.myPos == null) return false;
+				OSM.this.startTask("geo", GeoOptions.getGeocoder(), new GeoPoint(p));
 				ArrayList<GeoPoint> points = new ArrayList<GeoPoint>();
-				if (loc.myPos == null)
-					return false;
 				points.add(new GeoPoint(loc.myPos));
 				points.add(p);
 				ro.setWayPoints(points);
-				(new OSMRouteTask(act, OSM.this, ro)).execute();
+				OSM.this.startTask("route", GeoOptions.getGeocoder(), new GeoPoint(p));
 				return false;
 			}
-
 			@Override
 			public boolean singleTapConfirmedHelper(GeoPoint arg0) {
 				dv.closeAllList();
 				return false;
 			}
 		};
-		MapEventsOverlay OverlayEventos = new MapEventsOverlay(
-				act.getBaseContext(), mReceive);
+		MapEventsOverlay OverlayEventos = new MapEventsOverlay(act.getBaseContext(), mReceive);
 		mapView.getOverlays().add(OverlayEventos);
 		mapView.invalidate();
 	}
-	private void initMarker() {
+	private void initMylocMarker() {
 		Drawable img = act.getResources().getDrawable(R.drawable.blue_point_16);
 		int markerWidth = img.getIntrinsicWidth();
 		int markerHeight = img.getIntrinsicHeight();
 		img.setBounds(0, markerHeight, markerWidth, 0);
 		ResourceProxy resourceProxy = new DefaultResourceProxyImpl(
 				act.getApplicationContext());
-		myItemizedOverlay = new MyItemizedOverlay(img, resourceProxy);
-		mapView.getOverlays().add(myItemizedOverlay);
+		myLocOverlay = new MyItemizedOverlay(img, resourceProxy);
+		mapView.getOverlays().add(myLocOverlay);
 	}
 
-	public void addMarker(GeoPoint gp) {
-		myLocationMarker = new OverlayItem("me", "me", gp);
-		myItemizedOverlay.addItem(myLocationMarker);
+	private void initRouteMarker() {
+		Drawable img = act.getResources().getDrawable(R.drawable.marker_blue);
+		int markerWidth = img.getIntrinsicWidth();
+		int markerHeight = img.getIntrinsicHeight();
+		img.setBounds(0, markerHeight, markerWidth, 0);
+		ResourceProxy resourceProxy = new DefaultResourceProxyImpl(
+				act.getApplicationContext());
+		routeOverlay = new MyItemizedOverlay(img, resourceProxy);
+		mapView.getOverlays().add(routeOverlay);
 	}
-
-	public void removeMarker(OverlayItem item) {
-		myItemizedOverlay.removeItem(item);
-	}
-
 	public void setDefaultZoomLevel(){
 		if (mapView.getZoomLevel() < 13) {
 			mapController.setZoom(13);
@@ -155,15 +156,20 @@ public class OSM {
 		GeoPoint gp = new GeoPoint(loc.myPos);
 		move(gp);
 	}
-	public int getMarkerSize() {
-		return myItemizedOverlay.size();
-	}
 
 	public void updateMyLocationMarker(GeoPoint loc) {
-		removeMarker(myLocationMarker);
-		addMarker(loc);
+		myLocOverlay.removeItem(myLocationMarker);
+		myLocationMarker = new OverlayItem("me", "me", loc);
+		myLocOverlay.addItem(myLocationMarker);
 	}
-
+	public void updateRouteMarker(Address addr) {
+		GeoPoint gp = new GeoPoint(addr.getLatitude(),addr.getLongitude());
+		routeOverlay.removeItem(routeMarker);
+		String detailAddress = addr.getFeatureName()+", "+addr.getThoroughfare();
+		String briefAddress = addr.getLocality()+", "+addr.getCountryName();
+		routeMarker = new OverlayItem(detailAddress, briefAddress, gp);
+		routeOverlay.addItem(routeMarker);
+	}
 	public void addPolyline(Polyline pl) {
 		mapView.getOverlays().add(pl);
 		mapView.invalidate();
@@ -178,36 +184,6 @@ public class OSM {
 		removeAllMarkers();
 		removePrevPolyline();
 	}
-	public void drawSteps(Road road) { // called from tasks
-		for (int i = 0; i < road.mNodes.size(); i++) {
-			addMarker(road,i);
-		}
-	}
-public void addMarker(Road road,int seq){
-	RoadNode node = road.mNodes.get(seq);
-	Marker nodeMarker = new Marker(mapView);
-	nodeMarker.setPosition(node.mLocation);
-	Drawable nodeIcon = act.getResources().getDrawable(R.drawable.red_point_16);
-	nodeMarker.setIcon(nodeIcon);
-	nodeMarker.setTitle("Step " + seq);
-	nodeMarker.setSnippet(node.mInstructions);
-	nodeMarker.setSubDescription(Road.getLengthDurationText(node.mLength, node.mDuration));
-	int resId = InfoWindow.getIconByManeuver(node.mManeuverType);
-	Drawable icon = act.getResources().getDrawable(resId);
-	nodeMarker.setImage(icon);
-	mapView.getOverlays().add(nodeMarker);
-	markers.add(nodeMarker);
-	/*
-	 * nodeMarker.setOnMarkerClickListener(new OnMarkerClickListener(){
-	 * 
-	 * @Override public boolean onMarkerClick(Marker arg0, MapView arg1)
-	 * { Log.i(tag, "marker clicked"); //arg0.closeInfoWindow(); return
-	 * true; } });
-	 */
-}
-	public void switchTravelMode() {
-
-	}
 
 	private void removeAllMarkers() {
 		for (Marker mk : markers) {
@@ -220,30 +196,8 @@ public void addMarker(Road road,int seq){
 	 * Yahoo Maps, Yahoo Maps Satellite, 
 	 * Microsoft Maps, Microsoft Earth, Microsoft Hybrid
 	 */
-	private void initTileSources(){
-		CloudmadeUtil.retrieveCloudmadeKey(act.getApplicationContext());
-		ArrayList<ITileSource> list = TileSourceFactory.getTileSources();
-        final int size = list.size();
-        TileSourceFactory.addTileSource(new OSMMapGoogleRenderer(MapOptions.MAP_GOOGLE_ROADMAP, ResourceProxy.string.unknown, 0, 20, 256, ".png",size, "http://mt0.google.com/vt/lyrs=m@127&"));
-        TileSourceFactory.addTileSource(new OSMMapGoogleRenderer(MapOptions.MAP_GOOGLE_SATELLITE, ResourceProxy.string.unknown, 0, 20, 256, ".png",size+1, "http://mt0.google.com/vt/lyrs=s@127,h@127&"));
-        TileSourceFactory.addTileSource(new OSMMapGoogleRenderer(MapOptions.MAP_GOOGLE_TERRAIN, ResourceProxy.string.unknown, 0, 20, 256, ".jpg",size+2, "http://mt0.google.com/vt/lyrs=t@127,r@127&"));
-        
-        //TileSourceFactory.addTileSource(new OSMMapYahooRenderer(MapOptions.MAP_YAHOO_ROADMAP,ResourceProxy.string.unknown,0,17,256,".jpg",size + 3,"http://maps.yimg.com/hw/tile?"));
-        //TileSourceFactory.addTileSource(new OSMMapYahooRenderer(MapOptions.MAP_YAHOO_SATELLITE,ResourceProxy.string.unknown,0,17,256,".jpg",size + 4,"http://maps.yimg.com/ae/ximg?"));
-        
-        TileSourceFactory.addTileSource(new OSMMapMicrosoftRenderer(MapOptions.MAP_MS_ROADMAP,ResourceProxy.string.unknown,0,19,256,".png",size + 5,"http://r0.ortho.tiles.virtualearth.net/tiles/r"));
-        TileSourceFactory.addTileSource(new OSMMapMicrosoftRenderer(MapOptions.MAP_MS_EARTH,ResourceProxy.string.unknown,0,19,256,".jpg",size + 6,"http://a0.ortho.tiles.virtualearth.net/tiles/a"));
-        TileSourceFactory.addTileSource(new OSMMapMicrosoftRenderer(MapOptions.MAP_MS_HYBRID,ResourceProxy.string.unknown,0,19,256,".jpg",size + 7,"http://h0.ortho.tiles.virtualearth.net/tiles/h"));
-        
-        //TileSourceFactory.addTileSource(new OSMMapGoogleRenderer("Google Maps Hybrid", ResourceProxy.string.unknown, 0, 19, 256, ".jpg", size+8, "http://mt0.google.com/vt/lyrs=m@127,s@127,h@127,r@127&"));  //mt0.google.com/vt/lyrs=h@159000000&hl=ru
-        //TileSourceFactory.addTileSource(getTileSource("MapquestOSM"));
-	}
-	private ITileSource getTileSource(String name){
-		
-		return TileSourceFactory.getTileSource(name);
-	}
 	public void switchTileSource(String name) {
-		ITileSource its = getTileSource(name);
+		ITileSource its = MapOptions.getTileSource(name);
 		mapView.setTileSource(its);
 	}
 	public void refreshTileSource(String name){
@@ -266,7 +220,57 @@ public void addMarker(Road road,int seq){
 		if(type.equals("geo")){
 			GeocoderTask task = new GeocoderTask(this, provider, point);
 			task.execute();
+		}else if(type.equals("route")){
+			OSMRouteTask task = new OSMRouteTask(act, OSM.this, ro);
+			task.execute();
 		}
 	}
+
+	public void drawSteps(Road road) { // called from tasks
+		for (int i = 0; i < road.mNodes.size(); i++) {
+			addWayPointMarker(road,i);
+		}
+	}
+	public void drawSteps(List<Step> steps) { // called from tasks
+		for (Step step: steps) {
+			addWayPointMarker(step);
+		}
+	}
+	private void addWayPointMarker(Step step) {
+		Marker nodeMarker = new Marker(mapView);
+		nodeMarker.setPosition(step.getStartLocation());
+		Drawable nodeIcon = act.getResources().getDrawable(R.drawable.red_point_16);
+		nodeMarker.setIcon(nodeIcon);
+		nodeMarker.setTitle("Step ");
+		nodeMarker.setSnippet(step.getHtmlInstructions());
+		nodeMarker.setSubDescription(Road.getLengthDurationText(step.getDistance().getValue(), step.getDuration().getValue()));
+		//int resId = InfoWindow.getIconByManeuver(step.getManeuver());
+		Drawable icon = act.getResources().getDrawable(R.drawable.ic_empty);
+		nodeMarker.setImage(icon);
+		mapView.getOverlays().add(nodeMarker);
+		markers.add(nodeMarker);
+	}
+public void addWayPointMarker(Road road,int seq){
+	RoadNode node = road.mNodes.get(seq);
+	Marker nodeMarker = new Marker(mapView);
+	nodeMarker.setPosition(node.mLocation);
+	Drawable nodeIcon = act.getResources().getDrawable(R.drawable.red_point_16);
+	nodeMarker.setIcon(nodeIcon);
+	nodeMarker.setTitle("Step " + seq);
+	nodeMarker.setSnippet(node.mInstructions);
+	nodeMarker.setSubDescription(Road.getLengthDurationText(node.mLength, node.mDuration));
+	int resId = InfoWindow.getIconByManeuver(node.mManeuverType);
+	Drawable icon = act.getResources().getDrawable(resId);
+	nodeMarker.setImage(icon);
+	mapView.getOverlays().add(nodeMarker);
+	markers.add(nodeMarker);
+	/*
+	 * nodeMarker.setOnMarkerClickListener(new OnMarkerClickListener(){
+	 *  public boolean onMarkerClick(Marker arg0, MapView arg1) {
+	 *    Log.i(tag, "marker clicked"); //arg0.closeInfoWindow(); return true; 
+	 *  } 
+	 * });
+	 */
+}
 
 }

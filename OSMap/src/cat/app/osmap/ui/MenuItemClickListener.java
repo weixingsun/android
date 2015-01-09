@@ -24,10 +24,10 @@ import android.widget.TextView;
 public class MenuItemClickListener implements OnItemClickListener {
 
 	int[] subMenus = {
-			R.array.geocoder_type_items,
-			R.array.nav_type_items,
 			R.array.map_type_items,
-			R.array.find_road_items,
+			R.array.nav_type_items,
+			R.array.geocoder_type_items,
+			R.array.on_road_items,
 			R.array.whats_hot_items
 			};
 	private static final String TAG = MenuItemClickListener.class.getSimpleName();

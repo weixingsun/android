@@ -61,7 +61,7 @@ public class Device {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Address addr = osm.suggestPoints.get(position);
-				//osm.addRouteMarker(sp);
+				osm.updateRouteMarker(addr);
 				listSuggest.setVisibility(View.INVISIBLE);
 				osm.move(addr.getLatitude(),addr.getLongitude());
 				osm.setDefaultZoomLevel();
@@ -139,7 +139,7 @@ public class Device {
 	    private ArrayList<Map<String, String>> buildData(List<Address> addrs) {
 	        ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
 	        for(Address a:addrs){
-	        	list.add(putData(a.getFeatureName()+", "+a.getLocality()+", "+a.getCountryName()));
+	        	list.add(putData(a.getFeatureName()+", "+a.getThoroughfare()+", "+a.getLocality()+", "+a.getCountryName()));
 	        }
 	        return list;
 	      }

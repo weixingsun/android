@@ -63,7 +63,7 @@ public class LOC implements LocationListener {
 	public void onLocationChanged(Location location) {
 		myPos = location;
 		if (this.countryCode == null) {
-			osm.startTask("geo", GeoOptions.getGeocoder(), new GeoPoint(location));////////////////////////////
+			osm.startTask("geo", GeoOptions.getGeocoder(), new GeoPoint(location));
 		}
 		if(!this.gps_fired){
 		 gps_fired = true;

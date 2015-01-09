@@ -53,12 +53,13 @@ public class OSMRouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 		road = roadManager.getRoad(ro.list);
 		Polyline pl = RoadManager.buildRoadOverlay(road, act);
 		pl.setWidth(10);
+		pl.setColor(RouteOptions.getColor());
 		return pl;
 	}
 	@Override
     protected void onPostExecute(Polyline pl) {
-		pl.setColor(RouteOptions.getColor());
 		map.removeAllRouteMarkers();
+		if(road==null) return;
 		map.addPolyline(pl);
 		map.drawSteps(road);
     }

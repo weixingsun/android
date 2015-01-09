@@ -1,5 +1,5 @@
 package cat.app.navi.task;
-/*
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,22 +15,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.api.IGeoPoint;
+import org.osmdroid.bonuspack.overlays.Polyline;
+import org.osmdroid.util.GeoPoint;
 
-import cat.app.gmap.MapContent;
-import cat.app.gmap.MainActivity;
-import cat.app.gmap.Util;
-import cat.app.gmap.model.SuggestPoint;
-import cat.app.gmap.nav.Leg;
-import cat.app.gmap.nav.Route;
-import cat.app.gmap.nav.RouteParser;
-import cat.app.gmap.nav.Step;
+import cat.app.maps.OSM;
+import cat.app.navi.RouteOptions;
+import cat.app.navi.google.Leg;
+import cat.app.navi.google.Route;
+import cat.app.navi.google.RouteParser;
+import cat.app.navi.google.Step;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 
+import android.app.Activity;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.text.Html;
@@ -38,25 +34,23 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.widget.Toast;
 
-public class GoogleRouteTask extends  
-        AsyncTask<String, Void, List<IGeoPoint>> {
-    private static final String TAG = "GMap.GoogleMapRouteTask";
-	HttpClient client;  
-    String url;  
+public class GoogleRouteTask extends AsyncTask<String, Void, Polyline> {
+    private static final String TAG = GoogleRouteTask.class.getSimpleName();
+	HttpClient client;
+    String url;
     int old_size=0;
-    List<IGeoPoint> route = null;
-    MainActivity activity;
-    public GoogleRouteTask(MainActivity activity,String url) {
-    	this.activity = activity;
-        this.url = url;  
-    }
-    public GoogleRouteTask(MainActivity activity, LatLng start, LatLng dest,String mode) {
-    	this.activity = activity;
+    List<GeoPoint> route = null;
+    Activity activity;
+    OSM osm;
+    List<Step> steps = new ArrayList<Step>();
+    public GoogleRouteTask(Activity act, OSM osm , GeoPoint start, GeoPoint dest,String mode) {
+    	this.activity = act;
+    	this.osm = osm;
         this.url = getDirectionsUrl(start,dest,"json",mode);
         //Log.i(TAG, "url="+url);
 	}
 	@Override  
-    protected List<IGeoPoint> doInBackground(String... params) {
+    protected Polyline doInBackground(String... params) {
         HttpGet get = new HttpGet(url);
         try {
             HttpResponse response = client.execute(get);
@@ -66,16 +60,15 @@ public class GoogleRouteTask extends
                 //Log.i(TAG,"Route JSON:"+responseString);
                 JSONObject object = new JSONObject(responseString);
                 if (object.getString("status").equals("OK")) {
-                	if(responseString.length()<100){
-                		return null;
-                	}
+                	if(responseString.length()<100) return null;
                 	Route r = RouteParser.parse(responseString).get(0);
-                	Leg l = r.getLegs().get(0);
-                	//if(l.getStartAddress()!=null)
-                		//gmap.startPoint = new SuggestPoint(r.getLegs().get(0).getStartLocation(),r.getLegs().get(0).getStartAddress());
-                	old_size=activity.map.pos.steps.size();
-                	activity.map.pos.steps.addAll(r.getSteps());
+                	steps.addAll(r.getSteps());
                 	route = RouteParser.getWholeRoutePoints(r);
+                    Polyline pl = new Polyline(activity);
+                    pl.setColor(RouteOptions.getColor());
+                    pl.setWidth(10);
+                    pl.setPoints(route);
+                    return pl;
                 } else {
                     return null;
                 }
@@ -89,7 +82,7 @@ public class GoogleRouteTask extends
         } catch (JSONException e) {
         	Log.i(TAG, "JSONException:"+e.getMessage());
 		}
-        return route;  
+        return null;  
     }  
   
     @Override  
@@ -102,31 +95,25 @@ public class GoogleRouteTask extends
     }  
   
     @Override  
-    protected void onPostExecute(List<IGeoPoint> route) {
-        super.onPostExecute(route);  
+    protected void onPostExecute(Polyline pl) {
+        super.onPostExecute(pl);  
         if (route == null) {
             Toast.makeText(activity, "No route found.", Toast.LENGTH_LONG).show();
-        }  
-        else{
-            //PolylineOptions lineOptions = new PolylineOptions();
-        	//lineOptions.addAll(route);
-        	//lineOptions.width(10);
-        	//lineOptions.color(Color.BLUE);
-            org.osmdroid.api.Polyline pl = new org.osmdroid.api.Polyline()
-            .color(Color.BLUE)
-            .width(10)
-            .points(route);
-            int pl1 = activity.map.map.addPolyline(pl);
-            activity.map.routesPolyLines.add(pl);
-            Util.reOrgHints(activity.map.pos.steps);
-            activity.map.findNewRouteSpeech(old_size);
+        }else{
+        	osm.removeAllRouteMarkers();
+        	if(route==null) return;
+        	osm.addPolyline(pl);
+        	osm.drawSteps(steps);
+            //activity.map.routesPolyLines.add(pl);
+            //Util.reOrgHints(activity.map.pos.steps);
+            //activity.map.findNewRouteSpeech(old_size);
             //gmap.drawAllStepPoints();
         }
     }
 	
-    public static String getDirectionsUrl(LatLng origin, LatLng dest, String format, String travelMode) {
-        String str_origin = "?origin=" + origin.latitude + "," + origin.longitude;
-        String str_dest = "&destination=" + dest.latitude + "," + dest.longitude;  
+    public static String getDirectionsUrl(GeoPoint origin, GeoPoint dest, String format, String travelMode) {
+        String str_origin = "?origin=" + origin.getLatitude() + "," + origin.getLongitude();
+        String str_dest = "&destination=" + dest.getLatitude() + "," + dest.getLongitude();  
         String sensor = "&sensor=false";
         String mode = "&mode="+travelMode;
         // String waypointLatLng = "waypoints="+"40.036675"+","+"116.32885"; // 如果使用途径点，需要添加此字段
@@ -138,5 +125,6 @@ public class GoogleRouteTask extends
         //Log.i(TAG,"getDerectionsURL--->: " + url);
         return url;  
     }
+    
+    
 }
-*/

@@ -45,10 +45,10 @@ public class GeocoderTask extends
     public String doInBackground(String... params) {
     	if(mode.equals(searchByName)){
 			list = gc.getFromLocationName("google",this.address);
-			Log.i(TAG, provider+",found_list.size="+list.size());
+			//Log.i(TAG, provider+",found_list.size="+list.size());
 		}else if (mode.equals(searchByPoint)){
 			foundAddr = gc.getFromLocation("google",position);
-			Log.i(TAG, provider+",foundAddr="+foundAddr);
+			//Log.i(TAG, provider+",foundAddr="+foundAddr);
 		}
         return null;
     }
@@ -67,9 +67,12 @@ public class GeocoderTask extends
     			osm.loc.countryCode=foundAddr.getCountryCode();
     			Log.i(TAG, "==================country_code="+osm.loc.countryCode);
     		}
-    		if(foundAddr == null){
-    			Log.i(TAG, "address from Point not found");
+    		else if(foundAddr != null){
+    			foundAddr.setLatitude(position.getLatitude());
+    			foundAddr.setLongitude(position.getLongitude());
+    			osm.updateRouteMarker(foundAddr);
     		}
+			//Log.i(TAG, "GeoCoderTask.foundAddr="+foundAddr.getFeatureName());
         }
     }
    

@@ -18,9 +18,9 @@
      
     <!-- Main Nav Drawer Menu Items -->
     <string-array name="menu_items">
-        <item >Geocoding</item>
-        <item >Mode</item>
         <item >Maps</item>
+        <item >Travel</item>
+        <item >Navigate</item>
         <item >On Road</item>
         <item >What\'s Hot</item>
     </string-array>
@@ -52,7 +52,7 @@
         <!-- <item >Yahoo Satellite</item> -->
     </string-array>
     
-    <string-array name="find_road_items">
+    <string-array name="on_road_items">
         <item >Police Camera</item>
         <item >Medical</item>
         <item >Help</item>
