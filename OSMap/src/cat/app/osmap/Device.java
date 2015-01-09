@@ -1,17 +1,21 @@
 package cat.app.osmap;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import cat.app.maps.MapOptions;
 import cat.app.maps.OSM;
+import cat.app.navi.GeoOptions;
 import cat.app.osmap.ui.DelayedTextWatcher;
+import cat.app.osmap.ui.SuggestListAdapter;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Bundle;
-import android.os.Message;
+import android.location.Address;
 import android.speech.RecognizerIntent;
 import android.text.Editable;
 import android.view.KeyEvent;
@@ -22,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
@@ -29,12 +34,39 @@ import android.widget.AdapterView.OnItemClickListener;
 public class Device {
 	Activity act;
 	OSM osm;
+	EditText inputAddress;
+	ListView listVoice;
+	ListView listSuggest;
 	public void init(Activity act, OSM osm){
 		this.act=act;
 		this.osm=osm;
+		inputAddress = (EditText) act.findViewById(R.id.inputAddress);
+		listVoice = (ListView) act.findViewById(R.id.listVoiceSuggestion);
+		listSuggest = (ListView) act.findViewById(R.id.listSuggestion);
 		setText();
 		closeKeyBoard();
 		setImage();
+		setList();
+	}
+	private void setList() {
+		listVoice.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				TextView tv = (TextView)view;
+				inputAddress.setText(tv.getText());
+				listVoice.setVisibility(View.INVISIBLE);
+			}
+		});
+		listSuggest.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				Address addr = osm.suggestPoints.get(position);
+				//osm.addRouteMarker(sp);
+				listSuggest.setVisibility(View.INVISIBLE);
+				osm.move(addr.getLatitude(),addr.getLongitude());
+				osm.setDefaultZoomLevel();
+			}
+		});
 	}
 	private void setImage() {
 		ImageView voiceInput = (ImageView) act.findViewById(R.id.voiceInput);
@@ -48,36 +80,23 @@ public class Device {
 		myloc.setOnClickListener(new View.OnClickListener() {
 		    @Override
 		    public void onClick(View v) {
-		    	osm.setCenter();
+		    	osm.move();
 		    }
 		});
-		final ListView listVoice = (ListView) act.findViewById(R.id.listVoiceSuggestion);
-		listVoice.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				TextView tv = (TextView)view;
-				EditText inputAddress = (EditText) act.findViewById(R.id.inputAddress);
-				inputAddress.setText(tv.getText());
-				listVoice.setVisibility(View.INVISIBLE);
-			}
-		});
-		
 	}
+
 	private void setText() {
-		EditText inputAddress = (EditText) act.findViewById(R.id.inputAddress);
 		inputAddress.addTextChangedListener(new DelayedTextWatcher(2000) {
 			@Override
 			public void afterTextChangedDelayed(Editable s) {
-				//GoogleSearchByAddressNameTask task = new GoogleSearchByAddressNameTask(map, inputAddress.getText().toString());
-				//task.execute();
+				osm.startTask("geo",GeoOptions.getGeocoder(),inputAddress.getText().toString());
 			}
 		});
 		inputAddress.setOnKeyListener(new OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (keyCode == 66) { // Enter
-					//GoogleSearchByAddressNameTask task = new GoogleSearchByAddressNameTask(map, inputAddress.getText().toString());
-					//task.execute();
+					osm.startTask("geo",GeoOptions.getGeocoder(),inputAddress.getText().toString());
 					closeKeyBoard();
 				}
 				return false;
@@ -104,21 +123,30 @@ public class Device {
 			}
 		}
 		public void closeAllList() {
-			ListView listSuggestion = (ListView) act.findViewById(R.id.listSuggestion);
-			listSuggestion.setOnItemClickListener(new OnItemClickListener() {
-				@Override
-				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					//SuggestPoint sp = map.suggestPoints.get(position);
-					//map.addRouteMarker(sp);
-					//listSuggestion.setVisibility(View.INVISIBLE);
-					//map.move(sp.getLatLng());
-				}
-			});
-	    	listSuggestion.setVisibility(View.INVISIBLE);
-	    	ListView listVoice = (ListView) act.findViewById(R.id.listVoiceSuggestion);
+	    	listSuggest.setVisibility(View.INVISIBLE);
 	    	listVoice.setVisibility(View.INVISIBLE);
 	    	closeKeyBoard();
 		}
-
+	    public void fillList(List<Address> addrs){
+	        ArrayList<Map<String, String>> list = buildData(addrs);
+	        String[] from = { "name"};
+	        int[] to = { android.R.id.text1 };
+	        SimpleAdapter adapter = new SuggestListAdapter(osm.act, list,
+	            android.R.layout.simple_list_item_2, from, to);
+	        listSuggest.setAdapter(adapter);
+	        listSuggest.setVisibility(View.VISIBLE);
+	    }
+	    private ArrayList<Map<String, String>> buildData(List<Address> addrs) {
+	        ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
+	        for(Address a:addrs){
+	        	list.add(putData(a.getFeatureName()+", "+a.getLocality()+", "+a.getCountryName()));
+	        }
+	        return list;
+	      }
+	      private HashMap<String, String> putData(String name) {
+	          HashMap<String, String> item = new HashMap<String, String>();
+	          item.put("name", name);
+	          return item;
+	        }
 		
 }

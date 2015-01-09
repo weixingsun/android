@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cat.app.maps.MapOptions;
+import cat.app.navi.GeoOptions;
 import cat.app.navi.RouteOptions;
 import cat.app.osmap.R;
 
@@ -23,6 +24,7 @@ import android.widget.TextView;
 public class MenuItemClickListener implements OnItemClickListener {
 
 	int[] subMenus = {
+			R.array.geocoder_type_items,
 			R.array.nav_type_items,
 			R.array.map_type_items,
 			R.array.find_road_items,
@@ -57,6 +59,8 @@ public class MenuItemClickListener implements OnItemClickListener {
 					MapOptions.changeTileProvider(MapOptions.MAP_TILES.get(name));
 				}else if(RouteOptions.TRAVEL_MODES.containsKey(name)){
 					RouteOptions.changeTravelMode(RouteOptions.TRAVEL_MODES.get(name));
+				}else if(GeoOptions.GEO_CODERS.containsKey(name)){
+					GeoOptions.changeGeocoder(GeoOptions.GEO_CODERS.get(name));
 				}
 			}
 		});

@@ -18,12 +18,16 @@
      
     <!-- Main Nav Drawer Menu Items -->
     <string-array name="menu_items">
+        <item >Geocoding</item>
         <item >Mode</item>
         <item >Maps</item>
         <item >On Road</item>
         <item >What\'s Hot</item>
     </string-array>
-     
+    <string-array name="geocoder_type_items">
+        <item >OSM</item>
+        <item >Google</item>
+    </string-array>
     <string-array name="nav_type_items">
         <item >Fast</item>
         <item >Short</item>

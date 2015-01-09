@@ -1,4 +1,4 @@
-package cat.app.navi;
+package cat.app.navi.task;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,6 +15,7 @@ import org.osmdroid.views.MapView;
 
 import cat.app.maps.MapOptions;
 import cat.app.maps.OSM;
+import cat.app.navi.RouteOptions;
 
 import android.app.Activity;
 import android.app.IntentService;
@@ -25,15 +26,15 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
-public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
+public class OSMRouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 
-	private static final String TAG = RouteTask.class.getSimpleName();
+	private static final String TAG = OSMRouteTask.class.getSimpleName();
 	RoadManager roadManager;
 	Activity act;
 	OSM map;
 	Road road;
 	RouteOptions ro;
-	public RouteTask(Activity act ,OSM map , RouteOptions ro) {
+	public OSMRouteTask(Activity act ,OSM map , RouteOptions ro) {
 		super();
 		this.act = act;
 		this.map = map;
@@ -42,14 +43,13 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 
 	@Override
 	protected Polyline doInBackground(GeoPoint... params) {
-		//if(RouteOptions.travelMode!=null){
-			roadManager = new MapQuestRoadManager(MapOptions.MAPQUEST_API_KEY);
-			roadManager.addRequestOption("routeType="+RouteOptions.travelMode);
-			Log.i(TAG, "Special API request:mode="+RouteOptions.travelMode);
-		//}else{
-			//roadManager = new OSRMRoadManager();
-			//Log.i(TAG, "Default API request:mode="+RouteOptions.travelMode);
-		//}
+		if(RouteOptions.travelMode==null){
+			RouteOptions.travelMode="fastest";
+		}
+		//roadManager = new OSRMRoadManager();
+		roadManager = new MapQuestRoadManager(MapOptions.MAPQUEST_API_KEY);
+		roadManager.addRequestOption("routeType="+RouteOptions.travelMode);
+		//Log.i(TAG, "Special API request:mode="+RouteOptions.travelMode);
 		road = roadManager.getRoad(ro.list);
 		Polyline pl = RoadManager.buildRoadOverlay(road, act);
 		pl.setWidth(10);

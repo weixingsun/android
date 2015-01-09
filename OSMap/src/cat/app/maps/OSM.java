@@ -1,6 +1,7 @@
 package cat.app.maps;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
@@ -24,6 +25,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Message;
@@ -38,7 +40,8 @@ import android.widget.AdapterView.OnItemClickListener;
 
 import cat.app.map.markers.InfoWindow;
 import cat.app.navi.RouteOptions;
-import cat.app.navi.RouteTask;
+import cat.app.navi.task.GeocoderTask;
+import cat.app.navi.task.OSMRouteTask;
 import cat.app.osmap.Device;
 import cat.app.osmap.LOC;
 import cat.app.osmap.MyItemizedOverlay;
@@ -48,16 +51,16 @@ public class OSM {
 	protected static final String tag = OSM.class.getSimpleName();
 	public LOC loc = new LOC();
 	public Device dv = new Device();
+	public Activity act;
 	MapOptions mo;
 	RouteOptions ro;
-	Activity act;
 	MapView mapView;
 	IMapController mapController;
 	MyItemizedOverlay myItemizedOverlay;
 	OverlayItem myLocationMarker;
 	// Route route;
 	Polyline routePolyline;
-	//public Location myLoc;
+	public List<Address> suggestPoints;
 	public ArrayList<Marker> markers = new ArrayList<Marker>();
 
 	public void init(Activity act) {
@@ -80,7 +83,7 @@ public class OSM {
 		mapView.setMultiTouchControls(true);
 		mapView.setClickable(true);
 		mapView.setLongClickable(true);
-		mapView.setUseDataConnection(false);
+		//mapView.setUseDataConnection(false); //disable network
 		mapView.setMinZoomLevel(4);
 		switchTileSource(MapOptions.MAP_MAPQUESTOSM);
 		// workaround for:OpenGLRenderer(3672): 
@@ -89,17 +92,16 @@ public class OSM {
 		
 		MapEventsReceiver mReceive = new MapEventsReceiver() {
 			@Override
-			public boolean longPressHelper(GeoPoint arg0) {
+			public boolean longPressHelper(GeoPoint p) {
 				// Log.d("debug",
 				// "LongPress:("+arg0.getLatitude()+","+arg0.getLongitude()+")");
 				ArrayList<GeoPoint> points = new ArrayList<GeoPoint>();
 				if (loc.myPos == null)
 					return false;
 				points.add(new GeoPoint(loc.myPos));
-				points.add(arg0);
-				//GeoPoint[] arr = points.toArray(new GeoPoint[points.size()]);
+				points.add(p);
 				ro.setWayPoints(points);
-				(new RouteTask(act, OSM.this, ro)).execute();
+				(new OSMRouteTask(act, OSM.this, ro)).execute();
 				return false;
 			}
 
@@ -134,17 +136,24 @@ public class OSM {
 		myItemizedOverlay.removeItem(item);
 	}
 
-	public void setCenter(GeoPoint gp) {
+	public void setDefaultZoomLevel(){
 		if (mapView.getZoomLevel() < 13) {
 			mapController.setZoom(13);
 		}
-		mapController.setCenter(gp);
-		loc.gps_fired = true;
-		Log.i(tag, "gps fired");
 	}
-	public void setCenter() {
-		GeoPoint gp = new GeoPoint(loc.myPos);
+	public void setZoomLevel(int level) {
+		mapController.setZoom(level);
+	}
+	public void move(double lat,double lng) {
+		GeoPoint gp = new GeoPoint(lat,lng);
 		mapController.setCenter(gp);
+	}
+	public void move(GeoPoint gp) {
+		mapController.setCenter(gp);
+	}
+	public void move() {
+		GeoPoint gp = new GeoPoint(loc.myPos);
+		move(gp);
 	}
 	public int getMarkerSize() {
 		return myItemizedOverlay.size();
@@ -246,7 +255,18 @@ public void addMarker(Road road,int seq){
 		InputMethodManager imm = (InputMethodManager) act.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(inputAddress.getWindowToken(), 0);
 	}
-	public void setTravelMode(String mode){
-		
+
+	public void startTask(String type,String provider,String address){
+		if(type.equals("geo")){
+			GeocoderTask task = new GeocoderTask(this,provider, address);
+			task.execute();
+		}
 	}
+	public void startTask(String type,String provider,GeoPoint point){
+		if(type.equals("geo")){
+			GeocoderTask task = new GeocoderTask(this, provider, point);
+			task.execute();
+		}
+	}
+
 }

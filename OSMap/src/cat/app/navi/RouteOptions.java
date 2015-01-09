@@ -14,7 +14,7 @@ import cat.app.maps.OSM;
 
 public class RouteOptions {
 
-	private static final String TAG = null;
+	private static final String TAG = RouteOptions.class.getSimpleName();
 	static OSM osm;
 	static RouteOptions opt;
 	private RouteOptions(){
