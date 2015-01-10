@@ -9,7 +9,7 @@
     android:layout_height="match_parent"
     tools:context="${relativePackage}.${activityClass}" >
 	
-	<org.osmdroid.views.MapView
+	<org.osmdroid.bonuspack.mapsforge.GenericMapView
         android:id="@+id/osmap"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

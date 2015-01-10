@@ -19,7 +19,7 @@ public class RouteOptions {
 	public static final String GOOGLE = "Google";
 	public static final String MAPQUEST = "MapQuest";
 	public static final String GISGRAPHY = "Gisgraphy";		//not used
-	public static final String GRAPHHOPPER = "GraphHopper"; //not used
+	public static final String GRAPHHOPPER = "GraphHopper"; //no API key,geocoding still not a product
 	public static final String OSM = "OSM";
 	private static String provider;
 	public static HashMap<String, String> ROUTERS = new HashMap<String,String>();
@@ -120,3 +120,13 @@ Unpaved
 Seasonal Closure - Approximate. Season roads might not be relected with 100% accuracy.
 Country Crossing
 */
+/*
+ On a 350km trip (in France, Rennes-Paris), the duration of an end-to-end route retrieval (including full parsing of server response) is, on an average of 5 requests:
+
+    With MapQuest Open API: 6 seconds (5s min, 7s max)
+    With Google Directions API: 1.6s (1.5s min, 1.9s max)
+    With OSRM demo service: 0.8s (0.4s min, 1.2s max)
+    With GraphHopper service: not measured yet, but seems similar to OSRM 
+
+Yes, OSRM and GraphHopper are really fast! 
+ * */

@@ -1,14 +1,25 @@
 package cat.app.maps;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.osmdroid.ResourceProxy;
+import org.osmdroid.bonuspack.cachemanager.CacheManager;
+import org.osmdroid.bonuspack.mapsforge.MapsForgeTileProvider;
+import org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.util.CloudmadeUtil;
+import org.osmdroid.tileprovider.util.SimpleRegisterReceiver;
+import org.osmdroid.views.MapView;
+
+import cat.app.maps.vendor.OSMMapGoogleRenderer;
+import cat.app.maps.vendor.OSMMapMicrosoftRenderer;
+import cat.app.osmap.R;
 
 import android.app.Activity;
+import android.os.Environment;
 import android.util.Log;
 
 public class MapOptions {
@@ -22,7 +33,8 @@ public class MapOptions {
 		return opt;
 	}
 	private static final String tag = MapOptions.class.getSimpleName();
-	
+
+	public static final String MAP_MAPSFORGE = "MapsForge";
 	public static final String MAP_GOOGLE_ROADMAP = "Google Roadmap";
 	public static final String MAP_GOOGLE_SATELLITE = "Google Satellite";
 	public static final String MAP_GOOGLE_TERRAIN = "Google Terrain";
@@ -40,6 +52,7 @@ public class MapOptions {
 	
 	public static HashMap<String, String> MAP_TILES = new HashMap<String,String>();
 	static{
+		MAP_TILES.put(MAP_MAPSFORGE, MAP_MAPSFORGE);
 		MAP_TILES.put(MAP_GOOGLE_ROADMAP, MAP_GOOGLE_ROADMAP);
 		MAP_TILES.put(MAP_GOOGLE_SATELLITE, MAP_GOOGLE_SATELLITE);
 		MAP_TILES.put(MAP_GOOGLE_TERRAIN, MAP_GOOGLE_TERRAIN);
@@ -50,6 +63,7 @@ public class MapOptions {
 		MAP_TILES.put("Open Street Map", MAP_MAPQUESTOSM);
 		MAP_TILES.put("OSM Satellite", MAP_MAPQUEST_AERIAL);
 		MAP_TILES.put("OSM Bus", MAP_PUBLIC_TRANSPORT_OSM);
+		//getMapsForgeMap(Activity act)
 	}
 	public static final int REQ_CODE_SPEECH_INPUT = 2;
 	public static final int REQ_CODE_MOVE_INPUT = 3;
@@ -74,6 +88,9 @@ public class MapOptions {
         
         //TileSourceFactory.addTileSource(new OSMMapGoogleRenderer("Google Maps Hybrid", ResourceProxy.string.unknown, 0, 19, 256, ".jpg", size+8, "http://mt0.google.com/vt/lyrs=m@127,s@127,h@127,r@127&"));  //mt0.google.com/vt/lyrs=h@159000000&hl=ru
         //TileSourceFactory.addTileSource(getTileSource("MapquestOSM"));
+        //AssetsTileProvider atp = new AssetsTileProvider();
+        //File str = OpenStreetMapTileProviderConstants.OSMDROID_PATH;
+        //CacheManager cm = new CacheManager (null);
 	}
 	/*
     Google Maps: Road, Aerial, Hybrid, Terrain, Korea
@@ -93,5 +110,24 @@ public class MapOptions {
 */
 	public static ITileSource getTileSource(String name) {
 		return TileSourceFactory.getTileSource(name);
+	}
+	public static MapView getMapsForgeMap(Activity act){
+		String path = Environment.getExternalStorageDirectory().getPath()+"/mapsforge/";
+		File folder = new File(path);
+		File[] listOfFiles = folder.listFiles();
+		if (listOfFiles == null)
+			return null;
+		File mapFile = null;
+		for (File file:listOfFiles){
+			if (file.isFile() && file.getName().endsWith(".map")){
+				mapFile = file;
+			}
+		}
+		if (mapFile == null)
+			return null;
+		MapsForgeTileProvider mfProvider = new MapsForgeTileProvider(new SimpleRegisterReceiver(act), mapFile);
+		org.osmdroid.bonuspack.mapsforge.GenericMapView genericMap = (org.osmdroid.bonuspack.mapsforge.GenericMapView) act.findViewById(R.id.osmap);
+		genericMap.setTileProvider(mfProvider);
+		return genericMap.getMapView();
 	}
 }

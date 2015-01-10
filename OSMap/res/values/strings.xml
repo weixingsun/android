@@ -41,6 +41,7 @@
     <string-array name="map_type_items">
         <item >Open Street Map</item>
         <item >OSM Satellite</item>
+        <item >MapsForge</item>
         <item >Mapnik</item>
         <item >Google Roadmap</item>
         <item >Google Satellite</item>

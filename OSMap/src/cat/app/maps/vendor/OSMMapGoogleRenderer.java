@@ -1,4 +1,4 @@
-package cat.app.maps;
+package cat.app.maps.vendor;
 
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.ResourceProxy.string;
