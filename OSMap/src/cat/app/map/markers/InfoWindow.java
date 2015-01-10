@@ -1,8 +1,11 @@
 package cat.app.map.markers;
 
+import android.util.Log;
 import cat.app.osmap.R;
 
 public class InfoWindow {
+	private static final String tag = InfoWindow.class.getSimpleName();
+
 	public static int getIconByManeuver(int mId){
 		switch(mId){
 		case Maneuver.EXIT_LEFT:
@@ -21,6 +24,7 @@ public class InfoWindow {
 		case Maneuver.ROUNDABOUT3:  
 		case Maneuver.ROUNDABOUT4:  return R.drawable.ic_roundabout;
 default:
+	Log.i(tag, "ManeuverID="+mId);
 	return R.drawable.ic_empty;
 		}
 	}

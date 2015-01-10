@@ -89,14 +89,14 @@ public class Device {
 		inputAddress.addTextChangedListener(new DelayedTextWatcher(2000) {
 			@Override
 			public void afterTextChangedDelayed(Editable s) {
-				osm.startTask("geo",GeoOptions.getGeocoder(),inputAddress.getText().toString());
+				osm.startTask("geo",inputAddress.getText().toString());
 			}
 		});
 		inputAddress.setOnKeyListener(new OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (keyCode == 66) { // Enter
-					osm.startTask("geo",GeoOptions.getGeocoder(),inputAddress.getText().toString());
+					osm.startTask("geo",inputAddress.getText().toString());
 					closeKeyBoard();
 				}
 				return false;

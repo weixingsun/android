@@ -57,10 +57,11 @@ public class MenuItemClickListener implements OnItemClickListener {
 				String name=tv.getText().toString();
 				if(MapOptions.MAP_TILES.containsKey(name)){
 					MapOptions.changeTileProvider(MapOptions.MAP_TILES.get(name));
-				}else if(RouteOptions.TRAVEL_MODES.containsKey(name)){
-					RouteOptions.changeTravelMode(RouteOptions.TRAVEL_MODES.get(name));
+				}else if(RouteOptions.MAPQUEST_TRAVEL_MODES.containsKey(name)){
+					RouteOptions.changeTravelMode(name);
 				}else if(GeoOptions.GEO_CODERS.containsKey(name)){
 					GeoOptions.changeGeocoder(GeoOptions.GEO_CODERS.get(name));
+					RouteOptions.changeProvider(RouteOptions.ROUTERS.get(name));
 				}
 			}
 		});

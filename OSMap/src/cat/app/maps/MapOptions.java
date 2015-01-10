@@ -22,7 +22,6 @@ public class MapOptions {
 		return opt;
 	}
 	private static final String tag = MapOptions.class.getSimpleName();
-	public static final String MAPQUEST_API_KEY = "Fmjtd%7Cluu8296znl%2Crg%3Do5-9w1xdz";
 	
 	public static final String MAP_GOOGLE_ROADMAP = "Google Roadmap";
 	public static final String MAP_GOOGLE_SATELLITE = "Google Satellite";

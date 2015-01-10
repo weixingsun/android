@@ -43,7 +43,7 @@ import cat.app.navi.GeoOptions;
 import cat.app.navi.RouteOptions;
 import cat.app.navi.google.Step;
 import cat.app.navi.task.GeocoderTask;
-import cat.app.navi.task.OSMRouteTask;
+import cat.app.navi.task.RouteTask;
 import cat.app.osmap.Device;
 import cat.app.osmap.LOC;
 import cat.app.osmap.MyItemizedOverlay;
@@ -98,12 +98,12 @@ public class OSM {
 			@Override
 			public boolean longPressHelper(GeoPoint p) {
 				if (loc.myPos == null) return false;
-				OSM.this.startTask("geo", GeoOptions.getGeocoder(), new GeoPoint(p));
+				OSM.this.startTask("geo", new GeoPoint(p));
 				ArrayList<GeoPoint> points = new ArrayList<GeoPoint>();
 				points.add(new GeoPoint(loc.myPos));
 				points.add(p);
 				ro.setWayPoints(points);
-				OSM.this.startTask("route", GeoOptions.getGeocoder(), new GeoPoint(p));
+				OSM.this.startTask("route", new GeoPoint(p));
 				return false;
 			}
 			@Override
@@ -210,18 +210,18 @@ public class OSM {
 		imm.hideSoftInputFromWindow(inputAddress.getWindowToken(), 0);
 	}
 
-	public void startTask(String type,String provider,String address){
+	public void startTask(String type,String address){
 		if(type.equals("geo")){
-			GeocoderTask task = new GeocoderTask(this,provider, address);
+			GeocoderTask task = new GeocoderTask(this, address);
 			task.execute();
 		}
 	}
-	public void startTask(String type,String provider,GeoPoint point){
+	public void startTask(String type,GeoPoint point){
 		if(type.equals("geo")){
-			GeocoderTask task = new GeocoderTask(this, provider, point);
+			GeocoderTask task = new GeocoderTask(this, point);
 			task.execute();
 		}else if(type.equals("route")){
-			OSMRouteTask task = new OSMRouteTask(act, OSM.this, ro);
+			RouteTask task = new RouteTask(act, OSM.this, ro);
 			task.execute();
 		}
 	}
@@ -231,7 +231,7 @@ public class OSM {
 			addWayPointMarker(road,i);
 		}
 	}
-	public void drawSteps(List<Step> steps) { // called from tasks
+/*	public void drawSteps(List<Step> steps) { // called from tasks
 		for (Step step: steps) {
 			addWayPointMarker(step);
 		}
@@ -249,7 +249,7 @@ public class OSM {
 		nodeMarker.setImage(icon);
 		mapView.getOverlays().add(nodeMarker);
 		markers.add(nodeMarker);
-	}
+	}*/
 public void addWayPointMarker(Road road,int seq){
 	RoadNode node = road.mNodes.get(seq);
 	Marker nodeMarker = new Marker(mapView);

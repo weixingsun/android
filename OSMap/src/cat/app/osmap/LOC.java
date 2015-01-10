@@ -35,7 +35,7 @@ public class LOC implements LocationListener {
 			myPos = lm.getLastKnownLocation(provider);
 			startGPSLocation(); 
 			Log.i(tag, myPos.toString());
-			osm.startTask("geo", GeoOptions.getGeocoder(), new GeoPoint(myPos));
+			osm.startTask("geo", new GeoPoint(myPos));
 			osm.setDefaultZoomLevel();
 			osm.move();
 		}
@@ -63,7 +63,7 @@ public class LOC implements LocationListener {
 	public void onLocationChanged(Location location) {
 		myPos = location;
 		if (this.countryCode == null) {
-			osm.startTask("geo", GeoOptions.getGeocoder(), new GeoPoint(location));
+			osm.startTask("geo", new GeoPoint(location));
 		}
 		if(!this.gps_fired){
 		 gps_fired = true;

@@ -15,6 +15,33 @@ import cat.app.maps.OSM;
 public class RouteOptions {
 
 	private static final String TAG = RouteOptions.class.getSimpleName();
+
+	public static final String GOOGLE = "Google";
+	public static final String MAPQUEST = "MapQuest";
+	public static final String GISGRAPHY = "Gisgraphy";		//not used
+	public static final String GRAPHHOPPER = "GraphHopper"; //not used
+	public static final String OSM = "OSM";
+	private static String provider;
+	public static HashMap<String, String> ROUTERS = new HashMap<String,String>();
+	static{
+		provider=OSM;
+		ROUTERS.put(GOOGLE, GOOGLE);
+		ROUTERS.put(MAPQUEST, MAPQUEST);
+		ROUTERS.put(GISGRAPHY, GISGRAPHY);
+		ROUTERS.put(GRAPHHOPPER,GRAPHHOPPER);
+		ROUTERS.put(OSM, OSM);
+	}
+	public static void changeProvider(String r) {
+		setProvider(r);
+	}
+	public static String getProvider() {
+		if(provider==null) provider=RouteOptions.OSM;
+		return provider;
+	}
+	public static void setProvider(String router) {
+		if(!ROUTERS.containsKey(router)) RouteOptions.provider=OSM;
+		else RouteOptions.provider = router;
+	}
 	static OSM osm;
 	static RouteOptions opt;
 	private RouteOptions(){
@@ -24,35 +51,54 @@ public class RouteOptions {
 		if(opt==null) opt = new RouteOptions();
 		return opt;
 	}
-	public static HashMap<String, String> TRAVEL_MODES = new HashMap<String,String>();
+	public static HashMap<String, String> MAPQUEST_TRAVEL_MODES = new HashMap<String,String>();
+	public static HashMap<String, String> GOOGLE_TRAVEL_MODES = new HashMap<String,String>();
 	static{
-	TRAVEL_MODES.put("Fast", "fastest");
-	TRAVEL_MODES.put("Short", "shortest");
-	TRAVEL_MODES.put("Walk", "pedestrian");
-	TRAVEL_MODES.put("Bike", "bicycle");
-	TRAVEL_MODES.put("Bus", "multimodal");
+		MAPQUEST_TRAVEL_MODES.put("Fast",  "fastest");
+		MAPQUEST_TRAVEL_MODES.put("Short", "shortest");
+		MAPQUEST_TRAVEL_MODES.put("Walk",  "pedestrian");
+		MAPQUEST_TRAVEL_MODES.put("Bike",  "bicycle");
+		MAPQUEST_TRAVEL_MODES.put("Bus",   "multimodal");
 	}
+	static{
+		GOOGLE_TRAVEL_MODES.put("Fast",  "driving");
+		GOOGLE_TRAVEL_MODES.put("Short", "driving");
+		GOOGLE_TRAVEL_MODES.put("Walk",  "walking");
+		GOOGLE_TRAVEL_MODES.put("Bike",  "bicycling");
+		GOOGLE_TRAVEL_MODES.put("Bus",   "transit");
+	}
+
 	public ArrayList<GeoPoint> list ;
 	String MAPQUEST_API_KEY = "Fmjtd%7Cluu8296znl%2Crg%3Do5-9w1xdz";
 
-	public static String travelMode;
+	private static String travelMode;//Fast
+	public static String getTravelMode(String provider){
+		if(travelMode==null) travelMode="Fast";
+		switch (provider) {
+	    case GOOGLE:   return GOOGLE_TRAVEL_MODES.get(travelMode);
+	    case MAPQUEST: return MAPQUEST_TRAVEL_MODES.get(travelMode);
+	    case GISGRAPHY:
+	    case GRAPHHOPPER:  return null;
+	    case OSM:   return null;
+	    default:      return "Fast";
+		}
+	}
 	public void setWayPoints(ArrayList<GeoPoint> points) {
 		this.list=points;
 	}
-	/*String bicycle = "routeType=bicycle";		//bike
-	String multimodal = "routeType=multimodal"; //bus+walk
-	String pedestrian = "routeType=pedestrian"; //walk
-	String fastest = "routeType=fastest";		//car
-	String shortest = "routeType=shortest";		//car
-*/
 	public static void changeTravelMode(String mode) {
 		travelMode=mode;
 	}
 	public static int getColor() {
-		if(travelMode==null || travelMode.equals("fastest")|| travelMode.equals("shortest")){return Color.BLUE;}
-		if(travelMode.equals("pedestrian")|| travelMode.equals("shortest")){return Color.YELLOW;}
-		if(travelMode.equals("multimodal")){return Color.RED;}
-		return -1;
+		if(travelMode==null) return  Color.BLUE;
+	    switch (travelMode) {
+	    case "Fast":
+	    case "Short": return Color.BLUE;
+	    case "Bike":
+	    case "Walk":  return Color.YELLOW;
+	    case "Bus":   return Color.RED;
+	    default:      return -1;
+	    }
 	}
 }
 /*
@@ -67,7 +113,6 @@ ManeuverType: DESTINATION	Link: PA-443				Arrive at GREEN POINT, PA
 */
 
 /*
-
 Limited Access - Highways
 Toll Road
 Ferry
