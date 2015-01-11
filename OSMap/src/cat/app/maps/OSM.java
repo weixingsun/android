@@ -75,6 +75,7 @@ public class OSM {
 	public ArrayList<Marker> markers = new ArrayList<Marker>();
 	private MapView mapView;
 	public MapTileProviderBase mapProvider;
+	private boolean switchTileProvider=false;
 
 	public void init(Activity act) {
 		this.act = act;
@@ -83,6 +84,7 @@ public class OSM {
 		mo.initTileSources(act);
 		genericMapView = (GenericMapView) act.findViewById(R.id.osmap);
 		MapTileProviderBase mtpb = new MapTileProviderBasic(act.getApplicationContext());
+		switchTileProvider=true;
 		setMap(mtpb);
 		initMylocMarker();
 		initRouteMarker();
@@ -100,13 +102,13 @@ public class OSM {
 		mapView.setLongClickable(true);
 		//mapView.setUseDataConnection(false); //disable network
 		mapView.setMinZoomLevel(4);
-		// workaround for:OpenGLRenderer(3672): 
-		// Path too large to be rendered into a texture  //seems that hardware process fault was fixed by latest version
-		mapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+		//mapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 		mapView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 		    @Override
 		    public void onGlobalLayout() {
+		    	if(switchTileProvider)
 		    	 move();						//make sure setCenter() is called after mapview is loaded.
+		    	switchTileProvider=false;
 		    }
 		});
 		MapEventsReceiver mReceive = new MapEventsReceiver() {
@@ -212,6 +214,7 @@ public class OSM {
 	public void refreshTileSource(String name){
 		MapOptions.switchTileProvider(this,name);
 		mapView.invalidate();
+		switchTileProvider=true;
 	}
 	public void closeKeyBoard() {
 		EditText inputAddress = (EditText) act.findViewById(R.id.inputAddress);

@@ -28,6 +28,7 @@ public class LOC implements LocationListener {
 	// public static boolean gps_fired = false;
 	public String countryCode = null;
 	String provider;
+	private boolean navigating = false;
 
 	public void init(Activity act, OSM osm) {
 		this.act = act;
@@ -64,7 +65,8 @@ public class LOC implements LocationListener {
 		if (this.countryCode == null) {
 			osm.startTask("geo", new GeoPoint(location));
 		}
-		MapOptions.move();
+		if(navigating )
+			MapOptions.move();
 		speed = (int) (location.getSpeed() * 3.6);
 		GeoPoint gp = new GeoPoint(location.getLatitude(),
 				location.getLongitude());
