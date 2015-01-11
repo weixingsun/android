@@ -64,7 +64,6 @@ public class Device {
 				osm.updateRouteMarker(addr);
 				listSuggest.setVisibility(View.INVISIBLE);
 				osm.move(addr.getLatitude(),addr.getLongitude());
-				osm.setDefaultZoomLevel();
 			}
 		});
 	}

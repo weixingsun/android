@@ -37,8 +37,8 @@ public class LOC implements LocationListener {
 			provider = this.getProvider();
 			myPos = lm.getLastKnownLocation(provider);
 			startGPSLocation();
+			if(myPos!=null)
 			osm.startTask("geo", new GeoPoint(myPos));
-			osm.setDefaultZoomLevel();
 		}
 	}
 

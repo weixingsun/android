@@ -80,7 +80,6 @@ public class OSM {
 	public void init(Activity act) {
 		this.act = act;
 		mo = MapOptions.getInstance(this);
-		mo=null;
 		ro = RouteOptions.getInstance(this);
 		mo.initTileSources(act);
 		genericMapView = (GenericMapView) act.findViewById(R.id.osmap);
@@ -96,7 +95,7 @@ public class OSM {
 		genericMapView.setTileProvider(mtpb);
 		mapView = genericMapView.getMapView();
 		mapController = mapView.getController();
-		
+		mapController.setZoom(13);
 		mapView.setBuiltInZoomControls(true);
 		mapView.setMultiTouchControls(true);
 		mapView.setClickable(true);
@@ -154,12 +153,6 @@ public class OSM {
 				act.getApplicationContext());
 		routeOverlay = new MyItemizedOverlay(img, resourceProxy);
 		mapView.getOverlays().add(routeOverlay);
-	}
-	public void setDefaultZoomLevel(){
-		if (mapView.getZoomLevel() < 13) {
-			mapController.setZoom(13);
-		}
-		mapController.setZoom(13);
 	}
 	public void setZoomLevel(int level) {
 		mapController.setZoom(level);
