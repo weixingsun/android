@@ -2,6 +2,7 @@ package cat.app.navi;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.osmdroid.util.GeoPoint;
 
@@ -22,14 +23,14 @@ public class RouteOptions {
 	public static final String GRAPHHOPPER = "GraphHopper"; //no API key,geocoding still not a product
 	public static final String OSM = "OSM";
 	private static String provider;
-	public static HashMap<String, String> ROUTERS = new HashMap<String,String>();
+	public static LinkedHashMap<String, String> ROUTERS = new LinkedHashMap<String,String>();
 	static{
 		provider=OSM;
+		ROUTERS.put(OSM, OSM);
 		ROUTERS.put(GOOGLE, GOOGLE);
 		ROUTERS.put(MAPQUEST, MAPQUEST);
 		ROUTERS.put(GISGRAPHY, GISGRAPHY);
 		ROUTERS.put(GRAPHHOPPER,GRAPHHOPPER);
-		ROUTERS.put(OSM, OSM);
 	}
 	public static void changeRouteProvider(String r) {
 		setProvider(r);
@@ -51,8 +52,8 @@ public class RouteOptions {
 		if(opt==null) opt = new RouteOptions();
 		return opt;
 	}
-	public static HashMap<String, String> MAPQUEST_TRAVEL_MODES = new HashMap<String,String>();
-	public static HashMap<String, String> GOOGLE_TRAVEL_MODES = new HashMap<String,String>();
+	public static LinkedHashMap<String, String> MAPQUEST_TRAVEL_MODES = new LinkedHashMap<String,String>();
+	public static LinkedHashMap<String, String> GOOGLE_TRAVEL_MODES = new LinkedHashMap<String,String>();
 	static{
 		MAPQUEST_TRAVEL_MODES.put("Fast",  "fastest");
 		MAPQUEST_TRAVEL_MODES.put("Short", "shortest");

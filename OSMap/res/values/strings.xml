@@ -25,10 +25,10 @@
         <item >What\'s Hot</item>
     </string-array>
     <string-array name="geocoder_type_items">
+        <item >OSM</item>
         <item >Google</item>
         <item >MapQuest</item>
         <!-- <item >Gisgraphy</item> -->
-        <item >OSM</item>
     </string-array>
     <string-array name="nav_type_items">
         <item >Fast</item>
@@ -41,6 +41,7 @@
     <string-array name="map_type_items">
         <item >Open Street Map</item>
         <item >OSM Satellite</item>
+        <item >OSM Bus</item>
         <item >MapsForge</item>
         <item >Mapnik</item>
         <item >Google Roadmap</item>
@@ -49,14 +50,12 @@
         <item >Microsoft Maps</item>
         <item >Microsoft Earth</item>
         <item >Microsoft Hybrid</item>
-        <item >CycleMap</item>
-        <item >OSM Bus</item>
         <!-- <item >Yahoo Roadmap</item> -->
         <!-- <item >Yahoo Satellite</item> -->
     </string-array>
     
     <string-array name="on_road_items">
-        <item >Police Camera</item>
+        <item >Police</item>
         <item >Medical</item>
         <item >Help</item>
     </string-array>

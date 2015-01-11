@@ -1,6 +1,7 @@
 package cat.app.navi;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class GeoOptions {
 
@@ -10,13 +11,13 @@ public class GeoOptions {
 	public static final String OSM = "OSM";
 	
 	private static String geocoder;
-	public static HashMap<String, String> GEO_CODERS = new HashMap<String,String>();
+	public static LinkedHashMap<String, String> GEO_CODERS = new LinkedHashMap<String,String>();
 	static{
 		geocoder=OSM;
+		GEO_CODERS.put(OSM, OSM);
 		GEO_CODERS.put(GOOGLE, GOOGLE);
 		GEO_CODERS.put(MAPQUEST, MAPQUEST);
 		GEO_CODERS.put(GISGRAPHY, GISGRAPHY);
-		GEO_CODERS.put(OSM, OSM);
 	}
 	public static void changeGeocoder(String geo) {
 		setGeocoder(geo);

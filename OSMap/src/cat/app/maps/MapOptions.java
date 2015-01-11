@@ -3,6 +3,7 @@ package cat.app.maps;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.bonuspack.cachemanager.CacheManager;
@@ -58,19 +59,19 @@ public class MapOptions {
 	public static final String MAP_CYCLEMAP = "CycleMap";
 	public static final String MAP_PUBLIC_TRANSPORT_OSM = "OSMPublicTransport";
 	
-	public static HashMap<String, String> MAP_TILES = new HashMap<String,String>();
+	public static LinkedHashMap<String, String> MAP_TILES = new LinkedHashMap<String,String>();
 	static{
+		MAP_TILES.put("Open Street Map", MAP_MAPQUESTOSM);
+		MAP_TILES.put("OSM Satellite", MAP_MAPQUEST_AERIAL);
+		MAP_TILES.put("OSM Bus", MAP_PUBLIC_TRANSPORT_OSM);
 		MAP_TILES.put(MAP_MAPSFORGE, MAP_MAPSFORGE);
+		MAP_TILES.put(MAP_MAPNIK, MAP_MAPNIK);
 		MAP_TILES.put(MAP_GOOGLE_ROADMAP, MAP_GOOGLE_ROADMAP);
 		MAP_TILES.put(MAP_GOOGLE_SATELLITE, MAP_GOOGLE_SATELLITE);
 		MAP_TILES.put(MAP_GOOGLE_TERRAIN, MAP_GOOGLE_TERRAIN);
 		MAP_TILES.put(MAP_MS_ROADMAP, MAP_MS_ROADMAP);
 		MAP_TILES.put(MAP_MS_EARTH, MAP_MS_EARTH);
 		MAP_TILES.put(MAP_MS_HYBRID, MAP_MS_HYBRID);
-		MAP_TILES.put(MAP_MAPNIK, MAP_MAPNIK);
-		MAP_TILES.put("Open Street Map", MAP_MAPQUESTOSM);
-		MAP_TILES.put("OSM Satellite", MAP_MAPQUEST_AERIAL);
-		MAP_TILES.put("OSM Bus", MAP_PUBLIC_TRANSPORT_OSM);
 		//getMapsForgeMap(Activity act)
 	}
 	public static final int REQ_CODE_SPEECH_INPUT = 2;

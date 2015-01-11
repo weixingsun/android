@@ -7,6 +7,7 @@ import cat.app.maps.MapOptions;
 import cat.app.navi.GeoOptions;
 import cat.app.navi.RouteOptions;
 import cat.app.osmap.R;
+import cat.app.osmap.SavedOptions;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -41,15 +42,22 @@ public class MenuItemClickListener implements OnItemClickListener {
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
-		changeSubMenu(subMenus[position]);
+		TextView tv = (TextView) view;
+		String name = tv.getText().toString();
+		changeSubMenu(subMenus[position],name);
 	}
 
-	private void changeSubMenu(int arrayId){
-		String[] subSettings = activity.getResources().getStringArray(arrayId);
-		ArrayAdapter<String> childAdapter = new ArrayAdapter<String>(activity,R.layout.drawer_list_item, subSettings);
-		ListView listChild = (ListView) activity.findViewById(R.id.left_drawer_child);
-		listChild.setAdapter(childAdapter);
-		listChild.setOnItemClickListener(new OnItemClickListener(){
+	private void changeSubMenu(int arrayId, String settingsName){  //Maps
+		String[] subSettingsStr = activity.getResources().getStringArray(arrayId);
+		ArrayAdapter<String> childAdapter = new ArrayAdapter<String>(activity,R.layout.drawer_list_item, subSettingsStr);
+		ListView subSettings = (ListView) activity.findViewById(R.id.left_drawer_child);
+		subSettings.setAdapter(childAdapter);
+		String selectedSubsettingsName = SavedOptions.getSubsettingsSelectedMenuName(settingsName);
+		if(selectedSubsettingsName==null) return;
+		int order = SavedOptions.getIndex(settingsName,selectedSubsettingsName);
+		if(order<0) return;
+		subSettings.setItemChecked(order, true);
+		subSettings.setOnItemClickListener(new OnItemClickListener(){
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
@@ -57,11 +65,15 @@ public class MenuItemClickListener implements OnItemClickListener {
 				String name=tv.getText().toString();
 				if(MapOptions.MAP_TILES.containsKey(name)){
 					MapOptions.changeTileProvider(MapOptions.MAP_TILES.get(name));
+					SavedOptions.selectedMap = name;
 				}else if(RouteOptions.MAPQUEST_TRAVEL_MODES.containsKey(name)){
 					RouteOptions.changeTravelMode(name);
+					SavedOptions.selectedTravelMode = name;
 				}else if(GeoOptions.GEO_CODERS.containsKey(name)){
 					GeoOptions.changeGeocoder(GeoOptions.GEO_CODERS.get(name));
 					RouteOptions.changeRouteProvider(RouteOptions.ROUTERS.get(name));
+					SavedOptions.geocodingProvider = name;
+					SavedOptions.routingProvider = name;
 				}
 			}
 		});
