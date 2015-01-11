@@ -52,7 +52,7 @@ public class SavedOptions {
 		case "On Road": subsettingsSelectedName = SavedOptions.selectedOnRoad ;
 		break;
 		}
-		Log.i(tag, "getSubsettingsSelectedMenuName="+settingsName);
+		//Log.i(tag, "getSubsettingsSelectedMenuName="+settingsName);
 		return subsettingsSelectedName;
 	}
 }

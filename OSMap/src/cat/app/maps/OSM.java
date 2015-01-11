@@ -80,6 +80,7 @@ public class OSM {
 	public void init(Activity act) {
 		this.act = act;
 		mo = MapOptions.getInstance(this);
+		mo=null;
 		ro = RouteOptions.getInstance(this);
 		mo.initTileSources(act);
 		genericMapView = (GenericMapView) act.findViewById(R.id.osmap);
@@ -173,6 +174,7 @@ public class OSM {
 		Log.i(tag, "moved to my location: ");
 	}
 	public void move() {
+		if(loc.myPos==null) return;
 		GeoPoint gp = new GeoPoint(loc.myPos);
 		move(gp);
 	}

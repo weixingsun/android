@@ -14,7 +14,7 @@ public class OSMapApp extends Application{
 
 	@Override
 	public void onCreate(){
-		super.onCreate();
 		ACRA.init(this);
+		super.onCreate();
 	}
 }
