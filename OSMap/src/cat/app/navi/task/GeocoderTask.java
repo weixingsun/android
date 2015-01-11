@@ -45,10 +45,10 @@ public class GeocoderTask extends
     public String doInBackground(String... params) {
     	if(mode.equals(searchByName)){
 			list = gc.getFromLocationName(provider,this.address);
-			Log.i(TAG, provider+",found_list.size="+list.size());
+			//Log.i(TAG, provider+",found_list.size="+list.size());
 		}else if (mode.equals(searchByPoint)){
 			foundAddr = gc.getFromLocation(provider,position);
-			Log.i(TAG, provider+",foundAddr="+foundAddr);
+			//Log.i(TAG, provider+",foundAddr="+foundAddr);
 		}
         return null;
     }

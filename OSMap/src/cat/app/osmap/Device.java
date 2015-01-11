@@ -80,7 +80,7 @@ public class Device {
 		myloc.setOnClickListener(new View.OnClickListener() {
 		    @Override
 		    public void onClick(View v) {
-		    	osm.move();
+		    	MapOptions.move();
 		    }
 		});
 	}

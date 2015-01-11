@@ -8,6 +8,7 @@ import org.osmdroid.ResourceProxy;
 import org.osmdroid.api.IGeoPoint;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.mapsforge.GenericMapView;
+import org.osmdroid.bonuspack.mapsforge.MapsForgeTileProvider;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
 import org.osmdroid.bonuspack.overlays.Marker;
@@ -15,6 +16,7 @@ import org.osmdroid.bonuspack.overlays.Marker.OnMarkerClickListener;
 import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadNode;
+import org.osmdroid.tileprovider.MapTileProviderBase;
 import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -70,24 +72,23 @@ public class OSM {
 	public List<Address> suggestPoints;
 	public ArrayList<Marker> markers = new ArrayList<Marker>();
 	private MapView mapView;
+	private MapTileProviderBase mapProvider;
 
 	public void init(Activity act) {
 		this.act = act;
-		setMap();
+		mo = MapOptions.getInstance(this);
+		ro = RouteOptions.getInstance(this);
+		mo.initTileSources(act);
+		genericMapView = (GenericMapView) act.findViewById(R.id.osmap);
+		MapTileProviderBase mtpb = new MapTileProviderBasic(act);
+		setMap(mtpb);
 		initMylocMarker();
 		initRouteMarker();
         loc.init(act,this);
         dv.init(act,this);
 	}
-
-	private void setMap() {
-		
-		mo = MapOptions.getInstance(this);
-		ro = RouteOptions.getInstance(this);
-		mo.initTileSources(act);
-		genericMapView = (org.osmdroid.bonuspack.mapsforge.GenericMapView) act.findViewById(R.id.osmap);
-		MapTileProviderBasic bitmapProvider = new MapTileProviderBasic(act.getApplicationContext());
-		genericMapView.setTileProvider(bitmapProvider);
+	private void setMap(MapTileProviderBase mtpb) {
+		genericMapView.setTileProvider(mtpb);
 		mapView = genericMapView.getMapView();
 		mapController = mapView.getController();
 		
@@ -97,8 +98,6 @@ public class OSM {
 		mapView.setLongClickable(true);
 		//mapView.setUseDataConnection(false); //disable network
 		mapView.setMinZoomLevel(4);
-		switchTileSource(MapOptions.MAP_MAPQUESTOSM);
-		
 		// workaround for:OpenGLRenderer(3672): 
 		// Path too large to be rendered into a texture
 		mapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);  //hardware process faulty
@@ -164,6 +163,7 @@ public class OSM {
 	public void move() {
 		GeoPoint gp = new GeoPoint(loc.myPos);
 		move(gp);
+		//Log.i(tag, "moved to my location="+loc.myPos);
 	}
 
 	public void updateMyLocationMarker(GeoPoint loc) {
@@ -205,17 +205,19 @@ public class OSM {
 	 * Yahoo Maps, Yahoo Maps Satellite, 
 	 * Microsoft Maps, Microsoft Earth, Microsoft Hybrid
 	 */
-	public void switchTileSource(String name) {
+	public void switchTileProvider(String name) {
+		loc.gps_fired=false;
 		if(name.equals(MapOptions.MAP_MAPSFORGE)){//mapsforge offline data need recreate a mapview
-			this.mapView=MapOptions.getMapsForgeMap(act);
-		}
-		else{									//others refresh with tilesource
-			ITileSource its = MapOptions.getTileSource(name);
+			this.mapProvider=MapOptions.getForgeMapTileProvider(act);
+		}else{									  //others refresh with tilesource
+			this.mapProvider=new MapTileProviderBasic(act);
+			ITileSource its = TileSourceFactory.getTileSource(name);
 			mapView.setTileSource(its);
 		}
+		this.setMap(this.mapProvider);
 	}
 	public void refreshTileSource(String name){
-		switchTileSource(name);
+		switchTileProvider(name);
 		mapView.invalidate();
 	}
 	public void closeKeyBoard() {

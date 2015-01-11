@@ -6,7 +6,10 @@ import java.util.HashMap;
 
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.bonuspack.cachemanager.CacheManager;
+import org.osmdroid.bonuspack.mapsforge.GenericMapView;
 import org.osmdroid.bonuspack.mapsforge.MapsForgeTileProvider;
+import org.osmdroid.tileprovider.MapTileProviderBase;
+import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.tileprovider.constants.OpenStreetMapTileProviderConstants;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -33,7 +36,10 @@ public class MapOptions {
 		return opt;
 	}
 	private static final String tag = MapOptions.class.getSimpleName();
-
+	public static final String URL_MAPSFORGE_WEB = "http://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/";
+	public static final String URL_MAPSFORGE_FTP = "ftp-stud.hs-esslingen.de";
+	public static final String URL_MAPSFORGE_FTP_FOLDER = "/pub/Mirrors/download.mapsforge.org/maps/";
+	
 	public static final String MAP_MAPSFORGE = "MapsForge";
 	public static final String MAP_GOOGLE_ROADMAP = "Google Roadmap";
 	public static final String MAP_GOOGLE_SATELLITE = "Google Satellite";
@@ -70,6 +76,10 @@ public class MapOptions {
 	
 	public static void changeTileProvider(String provider) {
 		osm.refreshTileSource(provider);
+	}
+	public static void move() {
+		osm.move();
+		Log.i(tag, "moved to my location="+osm.loc.myPos);
 	}
 	public void initTileSources(Activity act){
 		CloudmadeUtil.retrieveCloudmadeKey(act.getApplicationContext());
@@ -108,10 +118,7 @@ public class MapOptions {
     Maps+ (Switzerland): Topography, Terrain
     NearMap (Australia): PhotoMap, StreetMap, Terrain
 */
-	public static ITileSource getTileSource(String name) {
-		return TileSourceFactory.getTileSource(name);
-	}
-	public static MapView getMapsForgeMap(Activity act){
+	public static MapTileProviderBase getForgeMapTileProvider(Activity act){
 		String path = Environment.getExternalStorageDirectory().getPath()+"/mapsforge/";
 		File folder = new File(path);
 		File[] listOfFiles = folder.listFiles();
@@ -126,8 +133,9 @@ public class MapOptions {
 		if (mapFile == null)
 			return null;
 		MapsForgeTileProvider mfProvider = new MapsForgeTileProvider(new SimpleRegisterReceiver(act), mapFile);
-		org.osmdroid.bonuspack.mapsforge.GenericMapView genericMap = (org.osmdroid.bonuspack.mapsforge.GenericMapView) act.findViewById(R.id.osmap);
-		genericMap.setTileProvider(mfProvider);
-		return genericMap.getMapView();
+		return mfProvider;
+		//GenericMapView genericMap = (GenericMapView) act.findViewById(R.id.osmap);
+		//genericMap.setTileProvider(mfProvider);
+		//return genericMap.getMapView();
 	}
 }

@@ -32,7 +32,7 @@ public class Routers {
 		switch(provider){
 			case RouteOptions.GOOGLE: {
 				roadManager = new GoogleRoadManager();
-				roadManager.addRequestOption("mode="+RouteOptions.getTravelMode(RouteOptions.getProvider()));
+				roadManager.addRequestOption("mode="+RouteOptions.getTravelMode(RouteOptions.getRouteProvider()));
 				Log.i(tag, "GOOGLE route");
 				break;
 			}

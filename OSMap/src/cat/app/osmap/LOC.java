@@ -2,6 +2,7 @@ package cat.app.osmap;
 
 import org.osmdroid.util.GeoPoint;
 
+import cat.app.maps.MapOptions;
 import cat.app.maps.OSM;
 import cat.app.navi.GeoOptions;
 
@@ -21,9 +22,10 @@ public class LOC implements LocationListener {
 	private static final String tag = LOC.class.getSimpleName();
 	private LocationManager lm;
 	public Location myPos;
+	private int speed;
 	Activity act;
 	OSM osm;
-	public boolean gps_fired = false;
+	public static boolean gps_fired = false;
 	public String countryCode = null;
 	String provider;
 
@@ -39,7 +41,7 @@ public class LOC implements LocationListener {
 			osm.setDefaultZoomLevel();
 			osm.move();
 		}
-		Log.i(tag, "mypos=" + myPos);
+		Log.d(tag, "mypos=" + myPos);
 	}
 
 	private boolean openGPSEnabled() {
@@ -65,14 +67,15 @@ public class LOC implements LocationListener {
 		if (this.countryCode == null) {
 			osm.startTask("geo", new GeoPoint(location));
 		}
-		if(!this.gps_fired){
+		if(!gps_fired){
 		 gps_fired = true;
-		 osm.move();
+		 MapOptions.move();
 		}
+		speed = (int)  (location.getSpeed() * 3.6);
 		GeoPoint gp = new GeoPoint(location.getLatitude(),
 				location.getLongitude());
 		osm.updateMyLocationMarker(gp);
-		// Log.i(tag, "markers.size="+osm.getMarkerSize());
+		Log.i(tag, "speed="+speed);
 	}
 
 	@Override
@@ -97,5 +100,13 @@ public class LOC implements LocationListener {
 		criteria.setCostAllowed(true);
 		criteria.setPowerRequirement(Criteria.POWER_LOW);//
 		return lm.getBestProvider(criteria, true);
+	}
+
+	public int getSpeed() {
+		return speed;
+	}
+
+	public void setSpeed(int speed) {
+		this.speed = speed;
 	}
 }

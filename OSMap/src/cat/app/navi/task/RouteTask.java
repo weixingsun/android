@@ -45,7 +45,7 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 
 	@Override
 	protected Polyline doInBackground(GeoPoint... params) {
-		roadManager = Routers.getRoadManager(RouteOptions.getProvider());
+		roadManager = Routers.getRoadManager(RouteOptions.getRouteProvider());
 		road = roadManager.getRoad(ro.list);
 		Log.i(TAG, "roadManager="+roadManager+",road="+road.mNodes.size());
 		Polyline pl = RoadManager.buildRoadOverlay(road, act);

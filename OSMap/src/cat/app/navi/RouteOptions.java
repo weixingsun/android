@@ -31,10 +31,10 @@ public class RouteOptions {
 		ROUTERS.put(GRAPHHOPPER,GRAPHHOPPER);
 		ROUTERS.put(OSM, OSM);
 	}
-	public static void changeProvider(String r) {
+	public static void changeRouteProvider(String r) {
 		setProvider(r);
 	}
-	public static String getProvider() {
+	public static String getRouteProvider() {
 		if(provider==null) provider=RouteOptions.OSM;
 		return provider;
 	}
