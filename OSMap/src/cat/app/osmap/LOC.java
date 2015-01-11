@@ -25,36 +25,33 @@ public class LOC implements LocationListener {
 	private int speed;
 	Activity act;
 	OSM osm;
-	public static boolean gps_fired = false;
+	// public static boolean gps_fired = false;
 	public String countryCode = null;
 	String provider;
 
 	public void init(Activity act, OSM osm) {
 		this.act = act;
 		this.osm = osm;
-		if(openGPSEnabled()){
-			provider=this.getProvider();
+		if (openGPSEnabled()) {
+			provider = this.getProvider();
 			myPos = lm.getLastKnownLocation(provider);
-			startGPSLocation(); 
-			Log.i(tag, myPos.toString());
+			startGPSLocation();
 			osm.startTask("geo", new GeoPoint(myPos));
 			osm.setDefaultZoomLevel();
-			osm.move();
 		}
-		Log.d(tag, "mypos=" + myPos);
 	}
 
 	private boolean openGPSEnabled() {
 		lm = (LocationManager) act.getSystemService(Context.LOCATION_SERVICE);
-	        if (lm.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER)) {
-	        	//||lm.isProviderEnabled(android.location.LocationManager.NETWORK_PROVIDER)
-	           Log.i(tag, "GPS enabled");
-	            return true;
-	        }
-	        Toast.makeText(act, "Please enable GPS.", Toast.LENGTH_SHORT).show();
-	        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-	       act.startActivityForResult(intent,0);
-	       return false;
+		if (lm.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER)) {
+			// ||lm.isProviderEnabled(android.location.LocationManager.NETWORK_PROVIDER)
+			// Log.i(tag, "GPS enabled");
+			return true;
+		}
+		Toast.makeText(act, "Please enable GPS.", Toast.LENGTH_SHORT).show();
+		Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+		act.startActivityForResult(intent, 0);
+		return false;
 	}
 
 	private void startGPSLocation() {
@@ -67,15 +64,12 @@ public class LOC implements LocationListener {
 		if (this.countryCode == null) {
 			osm.startTask("geo", new GeoPoint(location));
 		}
-		if(!gps_fired){
-		 gps_fired = true;
-		 MapOptions.move();
-		}
-		speed = (int)  (location.getSpeed() * 3.6);
+		MapOptions.move();
+		speed = (int) (location.getSpeed() * 3.6);
 		GeoPoint gp = new GeoPoint(location.getLatitude(),
 				location.getLongitude());
 		osm.updateMyLocationMarker(gp);
-		Log.i(tag, "speed="+speed);
+		Log.i(tag, "speed=" + speed);
 	}
 
 	@Override

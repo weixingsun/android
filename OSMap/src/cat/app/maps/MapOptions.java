@@ -19,9 +19,11 @@ import org.osmdroid.views.MapView;
 
 import cat.app.maps.vendor.OSMMapGoogleRenderer;
 import cat.app.maps.vendor.OSMMapMicrosoftRenderer;
+import cat.app.osmap.LOC;
 import cat.app.osmap.R;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
@@ -73,13 +75,27 @@ public class MapOptions {
 	}
 	public static final int REQ_CODE_SPEECH_INPUT = 2;
 	public static final int REQ_CODE_MOVE_INPUT = 3;
-	
+	/*
+	 * Mapnik, CycleMap, OSMPublicTransport, MapquestOSM, MapquestAerial, 
+	 * Google Maps, Google Maps Satellite, Google Maps Terrain, 
+	 * Yahoo Maps, Yahoo Maps Satellite, 
+	 * Microsoft Maps, Microsoft Earth, Microsoft Hybrid
+	 */
+	public static void switchTileProvider(OSM osm, String name) {
+		//LOC.gps_fired=false;
+		if(name.equals(MapOptions.MAP_MAPSFORGE)){//mapsforge offline data need recreate a mapview
+			osm.mapProvider=MapOptions.getForgeMapTileProvider(osm.act);
+		}else{									  //others refresh with tilesource
+			osm.mapProvider=new MapTileProviderBasic(osm.act);
+			osm.mapProvider.setTileSource(TileSourceFactory.getTileSource(name));
+		}
+		osm.setMap(osm.mapProvider);
+	}
 	public static void changeTileProvider(String provider) {
 		osm.refreshTileSource(provider);
 	}
 	public static void move() {
 		osm.move();
-		Log.i(tag, "moved to my location="+osm.loc.myPos);
 	}
 	public void initTileSources(Activity act){
 		CloudmadeUtil.retrieveCloudmadeKey(act.getApplicationContext());
@@ -118,7 +134,7 @@ public class MapOptions {
     Maps+ (Switzerland): Topography, Terrain
     NearMap (Australia): PhotoMap, StreetMap, Terrain
 */
-	public static MapTileProviderBase getForgeMapTileProvider(Activity act){
+	public static MapTileProviderBase getForgeMapTileProvider(Context act){
 		String path = Environment.getExternalStorageDirectory().getPath()+"/mapsforge/";
 		File folder = new File(path);
 		File[] listOfFiles = folder.listFiles();

@@ -31,11 +31,13 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnLongClickListener;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
@@ -72,7 +74,7 @@ public class OSM {
 	public List<Address> suggestPoints;
 	public ArrayList<Marker> markers = new ArrayList<Marker>();
 	private MapView mapView;
-	private MapTileProviderBase mapProvider;
+	public MapTileProviderBase mapProvider;
 
 	public void init(Activity act) {
 		this.act = act;
@@ -80,14 +82,14 @@ public class OSM {
 		ro = RouteOptions.getInstance(this);
 		mo.initTileSources(act);
 		genericMapView = (GenericMapView) act.findViewById(R.id.osmap);
-		MapTileProviderBase mtpb = new MapTileProviderBasic(act);
+		MapTileProviderBase mtpb = new MapTileProviderBasic(act.getApplicationContext());
 		setMap(mtpb);
 		initMylocMarker();
 		initRouteMarker();
         loc.init(act,this);
         dv.init(act,this);
 	}
-	private void setMap(MapTileProviderBase mtpb) {
+	public void setMap(MapTileProviderBase mtpb) {
 		genericMapView.setTileProvider(mtpb);
 		mapView = genericMapView.getMapView();
 		mapController = mapView.getController();
@@ -99,9 +101,14 @@ public class OSM {
 		//mapView.setUseDataConnection(false); //disable network
 		mapView.setMinZoomLevel(4);
 		// workaround for:OpenGLRenderer(3672): 
-		// Path too large to be rendered into a texture
-		mapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);  //hardware process faulty
-		
+		// Path too large to be rendered into a texture  //seems that hardware process fault was fixed by latest version
+		mapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+		mapView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+		    @Override
+		    public void onGlobalLayout() {
+		    	 move();						//make sure setCenter() is called after mapview is loaded.
+		    }
+		});
 		MapEventsReceiver mReceive = new MapEventsReceiver() {
 			@Override
 			public boolean longPressHelper(GeoPoint p) {
@@ -149,21 +156,23 @@ public class OSM {
 		if (mapView.getZoomLevel() < 13) {
 			mapController.setZoom(13);
 		}
+		mapController.setZoom(13);
 	}
 	public void setZoomLevel(int level) {
 		mapController.setZoom(level);
 	}
 	public void move(double lat,double lng) {
 		GeoPoint gp = new GeoPoint(lat,lng);
-		mapController.setCenter(gp);
+		move(gp);
 	}
 	public void move(GeoPoint gp) {
+		//mapController.animateTo(gp);
 		mapController.setCenter(gp);
+		Log.i(tag, "moved to my location: ");
 	}
 	public void move() {
 		GeoPoint gp = new GeoPoint(loc.myPos);
 		move(gp);
-		//Log.i(tag, "moved to my location="+loc.myPos);
 	}
 
 	public void updateMyLocationMarker(GeoPoint loc) {
@@ -199,25 +208,9 @@ public class OSM {
 			mapView.getOverlays().remove(mk);
 		}
 	}
-	/*
-	 * Mapnik, CycleMap, OSMPublicTransport, MapquestOSM, MapquestAerial, 
-	 * Google Maps, Google Maps Satellite, Google Maps Terrain, 
-	 * Yahoo Maps, Yahoo Maps Satellite, 
-	 * Microsoft Maps, Microsoft Earth, Microsoft Hybrid
-	 */
-	public void switchTileProvider(String name) {
-		loc.gps_fired=false;
-		if(name.equals(MapOptions.MAP_MAPSFORGE)){//mapsforge offline data need recreate a mapview
-			this.mapProvider=MapOptions.getForgeMapTileProvider(act);
-		}else{									  //others refresh with tilesource
-			this.mapProvider=new MapTileProviderBasic(act);
-			ITileSource its = TileSourceFactory.getTileSource(name);
-			mapView.setTileSource(its);
-		}
-		this.setMap(this.mapProvider);
-	}
+	
 	public void refreshTileSource(String name){
-		switchTileProvider(name);
+		MapOptions.switchTileProvider(this,name);
 		mapView.invalidate();
 	}
 	public void closeKeyBoard() {

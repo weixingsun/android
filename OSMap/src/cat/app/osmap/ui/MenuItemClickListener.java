@@ -63,7 +63,6 @@ public class MenuItemClickListener implements OnItemClickListener {
 					GeoOptions.changeGeocoder(GeoOptions.GEO_CODERS.get(name));
 					RouteOptions.changeRouteProvider(RouteOptions.ROUTERS.get(name));
 				}
-				MapOptions.move();
 			}
 		});
 	}
