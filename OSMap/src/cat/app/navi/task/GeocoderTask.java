@@ -8,6 +8,7 @@ import org.osmdroid.util.GeoPoint;
 
 import cat.app.maps.OSM;
 import cat.app.navi.GeoOptions;
+import cat.app.osmap.LOC;
 import android.location.Address;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -63,15 +64,15 @@ public class GeocoderTask extends
         		//activity.map.activity.openPopup(marker,type);
         		//activity.map.addRouteMarker(foundPoint);
         }else if(mode.equals(searchByPoint)){
-    		if(osm.loc.countryCode == null){
+    		if(LOC.countryCode == null){
     			if(foundAddr!=null)
-    				osm.loc.countryCode=foundAddr.getCountryCode();
-    			Log.i(TAG, "==================country_code="+osm.loc.countryCode);
+    				LOC.countryCode=foundAddr.getCountryCode();
+    			Log.i(TAG, "==================country_code="+LOC.countryCode);
     		}
-    		else if(foundAddr != null){
+    		if(foundAddr != null && LOC.countryCode!=null){
     			foundAddr.setLatitude(position.getLatitude());
     			foundAddr.setLongitude(position.getLongitude());
-    			osm.updateRouteMarker(foundAddr);
+    			osm.mks.updateRouteMarker(foundAddr);
     		}
 			//Log.i(TAG, "GeoCoderTask.foundAddr="+foundAddr.getFeatureName());
         }

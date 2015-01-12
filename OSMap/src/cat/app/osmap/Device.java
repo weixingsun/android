@@ -61,7 +61,7 @@ public class Device {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Address addr = osm.suggestPoints.get(position);
-				osm.updateRouteMarker(addr);
+				osm.mks.updateRouteMarker(addr);
 				listSuggest.setVisibility(View.INVISIBLE);
 				osm.move(addr.getLatitude(),addr.getLongitude());
 			}

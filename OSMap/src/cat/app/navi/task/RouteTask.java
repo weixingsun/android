@@ -2,6 +2,7 @@ package cat.app.navi.task;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.Polyline;
@@ -32,13 +33,11 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 
 	private static final String TAG = RouteTask.class.getSimpleName();
 	RoadManager roadManager;
-	Activity act;
 	OSM map;
 	Road road;
 	RouteOptions ro;
-	public RouteTask(Activity act ,OSM map , RouteOptions ro) {
+	public RouteTask(OSM map , RouteOptions ro) {
 		super();
-		this.act = act;
 		this.map = map;
 		this.ro = ro;
 	}
@@ -48,18 +47,19 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 		roadManager = Routers.getRoadManager(RouteOptions.getRouteProvider());
 		road = roadManager.getRoad(ro.list);
 		if(road==null || road.mNodes==null) return null;
-		Log.i(TAG, "roadManager="+roadManager+",road="+road.mNodes.size());
-		Polyline pl = RoadManager.buildRoadOverlay(road, act);
+		Log.i(TAG, "road="+road.mNodes.size());
+		Polyline pl = RoadManager.buildRoadOverlay(road, map.act);
 		pl.setWidth(10);
 		pl.setColor(RouteOptions.getColor());
 		return pl;
 	}
 	@Override
     protected void onPostExecute(Polyline pl) {
-		map.removeAllRouteMarkers();
+		map.mks.removeAllRouteMarkers();
+		map.mks.removePrevPolyline();
 		if(road==null) return;
-		map.addPolyline(pl);
-		map.drawSteps(road);
+		map.mks.addPolyline(pl);
+		map.mks.drawStepsPoint(road);
     }
 
 }

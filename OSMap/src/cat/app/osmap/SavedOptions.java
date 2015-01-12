@@ -2,6 +2,7 @@ package cat.app.osmap;
 
 import java.util.LinkedHashMap;
 
+import android.os.Environment;
 import android.util.Log;
 
 import cat.app.maps.MapOptions;
@@ -10,6 +11,10 @@ import cat.app.navi.RouteOptions;
 
 public class SavedOptions {
 	private static final String tag = SavedOptions.class.getSimpleName();
+	private static String sdcard = Environment.getExternalStorageDirectory().getPath();
+	public static String MAPSFORGE_FILE_PATH = sdcard +"/osmdroid/maps/";	//	/sdcard/osmdroid/maps/nz.map
+	public static String GH_ROUTE_DATA_PATH = sdcard + "/osmdroid/routes/" + "nz/";	//	/sdcard/osmdroid/routes/nz.zip
+	
 	//default=Open Street Map
 	public static String selectedMap = MapOptions.MAP_MAPQUESTOSM;
 	public static String selectedTravelMode = "Fast";

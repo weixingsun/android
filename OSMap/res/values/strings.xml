@@ -28,7 +28,7 @@
         <item >OSM</item>
         <item >Google</item>
         <item >MapQuest</item>
-        <!-- <item >Gisgraphy</item> -->
+        <item >GraphHopper</item>
     </string-array>
     <string-array name="nav_type_items">
         <item >Fast</item>

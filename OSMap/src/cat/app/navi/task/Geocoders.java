@@ -2,11 +2,13 @@ package cat.app.navi.task;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import org.osmdroid.bonuspack.location.GeocoderNominatim;
 import org.osmdroid.util.GeoPoint;
 
 import cat.app.navi.GeoOptions;
+import cat.app.osmap.LOC;
 
 import com.gisgraphy.gisgraphoid.GisgraphyGeocoder;
 
@@ -29,9 +31,10 @@ public class Geocoders {
 		try{
 		switch(provider){
 			case GeoOptions.GOOGLE: {
-				android.location.Geocoder gc = new android.location.Geocoder(act); 			
+				android.location.Geocoder gc = new android.location.Geocoder(act);
 				return gc.getFromLocationName(name, 3);
 			}
+			case GeoOptions.GRAPHHOPPER:	//use OSM temporary
 			case GeoOptions.OSM: {
 				org.osmdroid.bonuspack.location.GeocoderNominatim gn = new org.osmdroid.bonuspack.location.GeocoderNominatim(act);  //nominatim.openstreetmap.org/
 				return gn.getFromLocationName(name, 3);
@@ -62,6 +65,7 @@ public class Geocoders {
 				android.location.Geocoder gc = new android.location.Geocoder(act); 
 				return gc.getFromLocation(lat,lng, 1).get(0);
 			}
+			case GeoOptions.GRAPHHOPPER:	//use OSM temporary
 			case GeoOptions.OSM: {
 				org.osmdroid.bonuspack.location.GeocoderNominatim gn = new org.osmdroid.bonuspack.location.GeocoderNominatim(act); 
 				return gn.getFromLocation(lat,lng, 1).get(0);

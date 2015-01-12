@@ -34,7 +34,8 @@ public class GenericMapView extends FrameLayout {
 			this.removeView(mMapView);
 		}
 		ResourceProxy resourceProxy = new DefaultResourceProxyImpl(this.getContext());
-		MapView newMapView = new MapView(this.getContext(), aTileProvider.getTileSource().getTileSizePixels(), resourceProxy, aTileProvider);
+		int tileSizePixels=aTileProvider.getTileSource().getTileSizePixels();
+		MapView newMapView = new MapView(this.getContext(), tileSizePixels, resourceProxy, aTileProvider);
 		
 		if (mMapView != null){
 			//restore as much parameters as possible from previous map:

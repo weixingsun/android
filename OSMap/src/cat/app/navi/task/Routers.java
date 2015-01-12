@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.bonuspack.routing.GoogleRoadManager;
-import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 import org.osmdroid.bonuspack.routing.MapQuestRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -12,6 +11,7 @@ import org.osmdroid.util.GeoPoint;
 
 import cat.app.maps.APIOptions;
 import cat.app.navi.GeoOptions;
+import cat.app.navi.GraphHopperOfflineRoadManager;
 import cat.app.navi.RouteOptions;
 
 import android.app.Activity;
@@ -27,12 +27,13 @@ public class Routers {
 		this.act = act;
 	}
 	public static RoadManager getRoadManager(String provider) {
-		RoadManager  roadManager = null;
+		RoadManager roadManager = null;
+		Log.i(tag, "getRoadManager().provider="+provider);
 		try{
 		switch(provider){
 			case RouteOptions.GOOGLE: {
 				roadManager = new GoogleRoadManager();
-				roadManager.addRequestOption("mode="+RouteOptions.getTravelMode(RouteOptions.getRouteProvider()));
+				roadManager.addRequestOption("mode="+RouteOptions.getTravelMode(provider));
 				Log.i(tag, "GOOGLE route");
 				break;
 			}
@@ -54,10 +55,9 @@ public class Routers {
 				break;
 			}
 			case RouteOptions.GRAPHHOPPER: {
-				roadManager = new GraphHopperRoadManager("");
-				roadManager.addRequestOption("routeType="+RouteOptions.getTravelMode(""));
-				Log.i(tag, "GRAPHHOPPER route");
-				return null;
+				roadManager = new GraphHopperOfflineRoadManager(RouteOptions.GH_ROUTE_DATA_PATH);
+				Log.i(tag, "GRAPHHOPPER Offline route");
+				break;
 			}
 				
 			default: 

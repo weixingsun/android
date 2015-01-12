@@ -22,11 +22,13 @@ import cat.app.maps.vendor.OSMMapGoogleRenderer;
 import cat.app.maps.vendor.OSMMapMicrosoftRenderer;
 import cat.app.osmap.LOC;
 import cat.app.osmap.R;
+import cat.app.osmap.SavedOptions;
 
 import android.app.Activity;
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.Toast;
 
 public class MapOptions {
 	static OSM osm;
@@ -39,6 +41,9 @@ public class MapOptions {
 		return opt;
 	}
 	private static final String tag = MapOptions.class.getSimpleName();
+
+	static String path = SavedOptions.MAPSFORGE_FILE_PATH;
+	
 	public static final String URL_MAPSFORGE_WEB = "http://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/";
 	public static final String URL_MAPSFORGE_FTP = "ftp-stud.hs-esslingen.de";
 	public static final String URL_MAPSFORGE_FTP_FOLDER = "/pub/Mirrors/download.mapsforge.org/maps/";
@@ -86,6 +91,10 @@ public class MapOptions {
 		//LOC.gps_fired=false;
 		if(name.equals(MapOptions.MAP_MAPSFORGE)){//mapsforge offline data need recreate a mapview
 			osm.mapProvider=MapOptions.getForgeMapTileProvider(osm.act);
+			if(osm.mapProvider==null) {
+				Toast.makeText(osm.act, "You need offline map.", Toast.LENGTH_SHORT).show();
+				return;//no map file.
+			}
 		}else{									  //others refresh with tilesource
 			osm.mapProvider=new MapTileProviderBasic(osm.act);
 			osm.mapProvider.setTileSource(TileSourceFactory.getTileSource(name));
@@ -136,14 +145,13 @@ public class MapOptions {
     NearMap (Australia): PhotoMap, StreetMap, Terrain
 */
 	public static MapTileProviderBase getForgeMapTileProvider(Context act){
-		String path = Environment.getExternalStorageDirectory().getPath()+"/mapsforge/";
 		File folder = new File(path);
 		File[] listOfFiles = folder.listFiles();
 		if (listOfFiles == null)
 			return null;
 		File mapFile = null;
 		for (File file:listOfFiles){
-			if (file.isFile() && file.getName().endsWith(".map")){
+			if (file.isFile() && file.getName().endsWith(".map")){  //mapsforge format
 				mapFile = file;
 			}
 		}

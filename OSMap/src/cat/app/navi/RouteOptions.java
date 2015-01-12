@@ -7,21 +7,25 @@ import java.util.LinkedHashMap;
 import org.osmdroid.util.GeoPoint;
 
 import android.graphics.Color;
+import android.os.Environment;
 import android.util.Log;
 
 import cat.app.maps.MapOptions;
 import cat.app.maps.OSM;
+import cat.app.osmap.SavedOptions;
 
 
 public class RouteOptions {
 
 	private static final String TAG = RouteOptions.class.getSimpleName();
+	//GraphHopperRouter
+	public static String GH_ROUTE_DATA_PATH = SavedOptions.GH_ROUTE_DATA_PATH;
 
+	public static final String OSM = "OSM";
 	public static final String GOOGLE = "Google";
 	public static final String MAPQUEST = "MapQuest";
+	public static final String GRAPHHOPPER = "GraphHopper"; //offline routing, geocoding still not a product
 	public static final String GISGRAPHY = "Gisgraphy";		//not used
-	public static final String GRAPHHOPPER = "GraphHopper"; //no API key,geocoding still not a product
-	public static final String OSM = "OSM";
 	private static String provider;
 	public static LinkedHashMap<String, String> ROUTERS = new LinkedHashMap<String,String>();
 	static{
@@ -29,8 +33,8 @@ public class RouteOptions {
 		ROUTERS.put(OSM, OSM);
 		ROUTERS.put(GOOGLE, GOOGLE);
 		ROUTERS.put(MAPQUEST, MAPQUEST);
-		ROUTERS.put(GISGRAPHY, GISGRAPHY);
 		ROUTERS.put(GRAPHHOPPER,GRAPHHOPPER);
+		//ROUTERS.put(GISGRAPHY, GISGRAPHY);
 	}
 	public static void changeRouteProvider(String r) {
 		setProvider(r);
@@ -40,8 +44,14 @@ public class RouteOptions {
 		return provider;
 	}
 	public static void setProvider(String router) {
-		if(!ROUTERS.containsKey(router)) RouteOptions.provider=OSM;
-		else RouteOptions.provider = router;
+
+		Log.i(TAG, "setProvider="+router);
+		if(!ROUTERS.containsKey(router)) {
+			RouteOptions.provider=OSM;
+		} else {
+			RouteOptions.provider = router;
+		}
+		//Log.i(TAG, "RouteOptions.provider="+provider);
 	}
 	static OSM osm;
 	static RouteOptions opt;
@@ -78,7 +88,7 @@ public class RouteOptions {
 		switch (provider) {
 	    case GOOGLE:   return GOOGLE_TRAVEL_MODES.get(travelMode);
 	    case MAPQUEST: return MAPQUEST_TRAVEL_MODES.get(travelMode);
-	    case GISGRAPHY:
+	    //case GISGRAPHY: 
 	    case GRAPHHOPPER:  return null;
 	    case OSM:   return null;
 	    default:      return "Fast";
