@@ -11,6 +11,7 @@ import org.osmdroid.tileprovider.MapTileProviderBase;
 import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MinimapOverlay;
 
 import android.app.Activity;
 import android.content.Context;
@@ -37,7 +38,7 @@ public class OSM {
 	MapOptions mo;
 	RouteOptions ro;
 	GeoOptions go;
-	org.osmdroid.bonuspack.mapsforge.GenericMapView genericMapView;
+	GenericMapView genericMapView;
 	IMapController mapController;
 	public Markers mks;
 	// Route route;
@@ -65,7 +66,7 @@ public class OSM {
 		genericMapView.setTileProvider(mtpb);
 		mapView = genericMapView.getMapView();
 		mapController = mapView.getController();
-		mapController.setZoom(13);
+		mapController.setZoom(16);
 		mapView.setBuiltInZoomControls(true);
 		mapView.setMultiTouchControls(true);
 		mapView.setClickable(true);
@@ -97,7 +98,6 @@ public class OSM {
 		mapView.invalidate();
 	}
 
-
 	public void setZoomLevel(int level) {
 		mapController.setZoom(level);
 	}
@@ -121,11 +121,6 @@ public class OSM {
 		mapView.invalidate();
 		switchTileProvider=true;
 	}
-	public void closeKeyBoard() {
-		EditText inputAddress = (EditText) act.findViewById(R.id.inputAddress);
-		InputMethodManager imm = (InputMethodManager) act.getSystemService(Context.INPUT_METHOD_SERVICE);
-		imm.hideSoftInputFromWindow(inputAddress.getWindowToken(), 0);
-	}
 
 	public void startTask(String type,String address){
 		if(type.equals("geo")){
@@ -142,9 +137,5 @@ public class OSM {
 			task.execute();
 		}
 	}
-
-
-
-
 
 }

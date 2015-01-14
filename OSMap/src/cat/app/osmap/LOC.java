@@ -1,10 +1,15 @@
 package cat.app.osmap;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.osmdroid.bonuspack.routing.Road;
+import org.osmdroid.bonuspack.routing.RoadNode;
 import org.osmdroid.util.GeoPoint;
 
 import cat.app.maps.MapOptions;
 import cat.app.maps.OSM;
-import cat.app.navi.GeoOptions;
+import cat.app.navi.task.FindMyStepTask;
 
 import android.app.Activity;
 import android.content.Context;
@@ -25,11 +30,16 @@ public class LOC implements LocationListener {
 	private int speed;
 	Activity act;
 	OSM osm;
-	// public static boolean gps_fired = false;
 	public static String countryCode = null;
 	String provider;
+	public boolean onRoad=false;
 	private boolean navigating = false;
-
+	public Road road;
+	public Integer currIndex = -1;
+	//public Integer toCurrentLastTime = 0;
+	public List<RoadNode> passedNodes = new ArrayList<RoadNode>();
+	public List<RoadNode> playedNodes100 = new ArrayList<RoadNode>();
+	public List<RoadNode> playedNodes1000 = new ArrayList<RoadNode>();
 	public void init(Activity act, OSM osm) {
 		this.act = act;
 		this.osm = osm;
@@ -60,27 +70,29 @@ public class LOC implements LocationListener {
 	}
 
 	@Override
-	public void onLocationChanged(Location location) {
-		myPos = location;
+	public void onLocationChanged(Location loc) {
+		myPos = loc;
+		GeoPoint gp = new GeoPoint(loc.getLatitude(),loc.getLongitude());
 		if (LOC.countryCode == null) {
-			osm.startTask("geo", new GeoPoint(location));
+			osm.startTask("geo", gp);
 		}
-		if(navigating )
-			MapOptions.move();
-		speed = (int) (location.getSpeed() * 3.6);
-		GeoPoint gp = new GeoPoint(location.getLatitude(),
-				location.getLongitude());
-		osm.mks.updateMyLocationMarker(gp);
-		Log.i(tag, "speed=" + speed);
+		//speed = (int) (loc.getSpeed() * 3.6);
+		//Log.i(tag, "speed=" + speed);
 	}
 
+	public void uptodate(GeoPoint loc){
+		if(road!=null && this.onRoad){
+			MapOptions.move(loc);
+		}
+		(new FindMyStepTask(osm, loc)).execute();
+		osm.mks.updateMyLocationMarker(loc);
+	}
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
 	}
 
 	@Override
 	public void onProviderEnabled(String provider) {
-
 	}
 
 	@Override
@@ -105,4 +117,5 @@ public class LOC implements LocationListener {
 	public void setSpeed(int speed) {
 		this.speed = speed;
 	}
+
 }

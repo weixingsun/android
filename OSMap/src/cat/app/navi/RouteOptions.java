@@ -6,6 +6,8 @@ import java.util.LinkedHashMap;
 
 import org.osmdroid.util.GeoPoint;
 
+import com.graphhopper.routing.util.EncodingManager;
+
 import android.graphics.Color;
 import android.os.Environment;
 import android.util.Log;
@@ -64,6 +66,7 @@ public class RouteOptions {
 	}
 	public static LinkedHashMap<String, String> MAPQUEST_TRAVEL_MODES = new LinkedHashMap<String,String>();
 	public static LinkedHashMap<String, String> GOOGLE_TRAVEL_MODES = new LinkedHashMap<String,String>();
+	public static LinkedHashMap<String, String> GH_TRAVEL_MODES = new LinkedHashMap<String,String>();
 	static{
 		MAPQUEST_TRAVEL_MODES.put("Fast",  "fastest");
 		MAPQUEST_TRAVEL_MODES.put("Short", "shortest");
@@ -77,6 +80,14 @@ public class RouteOptions {
 		GOOGLE_TRAVEL_MODES.put("Walk",  "walking");
 		GOOGLE_TRAVEL_MODES.put("Bike",  "bicycling");
 		GOOGLE_TRAVEL_MODES.put("Bus",   "transit");
+	}
+
+	static{
+		GH_TRAVEL_MODES.put("Fast",  EncodingManager.CAR+",fastest");
+		GH_TRAVEL_MODES.put("Short", EncodingManager.CAR+",shortest");
+		//GH_TRAVEL_MODES.put("Walk",  EncodingManager.FOOT+",shortest");// not supported yet
+		//GH_TRAVEL_MODES.put("Bike",  EncodingManager.BIKE2+",shortest");// not supported yet
+		//GH_TRAVEL_MODES.put("Bus",   null);				// not supported yet
 	}
 
 	public ArrayList<GeoPoint> list ;

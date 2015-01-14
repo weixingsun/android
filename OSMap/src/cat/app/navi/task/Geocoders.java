@@ -44,7 +44,7 @@ public class Geocoders {
 				return gg.getFromLocationName(name, 3);
 			}
 			case GeoOptions.MAPQUEST: {
-				com.mapquest.android.Geocoder gg = new com.mapquest.android.Geocoder(act); 
+				com.mapquest.android.Geocoder gg = new com.mapquest.android.Geocoder(act);
 				return gg.getFromLocationName(name, 3);
 			}
 			default: 

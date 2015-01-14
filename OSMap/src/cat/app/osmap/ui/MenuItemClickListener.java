@@ -3,6 +3,7 @@ package cat.app.osmap.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import cat.app.audio.MyPlayer;
 import cat.app.maps.MapOptions;
 import cat.app.navi.GeoOptions;
 import cat.app.navi.RouteOptions;
@@ -76,7 +77,6 @@ public class MenuItemClickListener implements OnItemClickListener {
 					RouteOptions.changeRouteProvider(RouteOptions.ROUTERS.get(name));
 					SavedOptions.geocodingProvider = name;
 					SavedOptions.routingProvider = name;
-					//Log.i(TAG, "RouteProvider="+name);
 				}
 				//Log.i(TAG, "MenuClicked="+name);
 			}

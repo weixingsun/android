@@ -15,15 +15,19 @@ import org.osmdroid.bonuspack.utils.PolylineEncoder;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 
+import cat.app.osmap.SavedOptions;
+
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.routing.AlgorithmOptions;
 import com.graphhopper.routing.RoutingAlgorithmFactorySimple;
+import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.util.Instruction;
 import com.graphhopper.util.InstructionList;
 import com.graphhopper.util.PointList;
 
+import android.location.Location;
 import android.util.Log;
 
 /** 
@@ -61,20 +65,31 @@ public class GraphHopperOfflineRoadManager extends RoadManager {
 	public GraphHopperOfflineRoadManager(String path){
 		super();
 		hopper.setCHEnable(true);
+		//hopper.setCHEnable(false);	//cannot load routing file ???
+		//hopper.setCHWeighting("shortest");
 		//hopper.setElevation(true);
-		//hopper.setTraversalMode(traversalMode);
+		//hopper.setTraversalMode(TraversalMode.EDGE_BASED_2DIR);	//no nodes in road.
 		hopper.setEnableInstructions(true);
 		//RoutingAlgorithmFactorySimple factory = new RoutingAlgorithmFactorySimple();
 		//hopper.setAlgorithmFactory(factory.createAlgo(arg0, arg1));
 		hopper.load(path);
 	}
 
-	@Override public Road getRoad(ArrayList<GeoPoint> waypoints) {
-
+	@Override 
+	public Road getRoad(ArrayList<GeoPoint> waypoints) {
 		GeoPoint start = waypoints.get(0);
 		GeoPoint end = waypoints.get(waypoints.size()-1);
 		GHRequest req = new GHRequest(start.getLatitude(),start.getLongitude(),end.getLatitude(),end.getLongitude());
 		req.setAlgorithm(AlgorithmOptions.DIJKSTRA_BI);
+		if(RouteOptions.GH_TRAVEL_MODES.containsKey(SavedOptions.selectedTravelMode)){
+			String value = RouteOptions.GH_TRAVEL_MODES.get(SavedOptions.selectedTravelMode);
+			//car,fastest/foot,shortest/bike,shortest	//Bus not supported yet
+			String vehicle = value.split(",")[0];
+			req.setVehicle(vehicle);
+			String weighting = value.split(",")[1];
+			req.setWeighting(weighting);
+			Log.i(tag, "GH.vehicle="+vehicle+",weighting="+weighting);//only car sipported, 2015-01-12
+		}
 		//req.getHints().put("instructions", "true");
 		GHResponse resp = hopper.route(req);
 		PointList pointList = resp.getPoints();
@@ -93,7 +108,8 @@ public class GraphHopperOfflineRoadManager extends RoadManager {
 				node.mLength = hint.getDistance()/1000;
 				node.mDuration = hint.getTime()/1000;
 				node.mManeuverType = getManeuverCode(hint.getSign());
-				node.mInstructions = hint.getName();
+				String ann = hint.getAnnotation().getImportance()+": "+hint.getAnnotation().getMessage();
+				node.mInstructions = hint.getName()+" , "+ann;
 				road.mNodes.add(node);
 			}
 		Log.d(BonusPackHelper.LOG_TAG, "GraphHopper.getRoad - finished");

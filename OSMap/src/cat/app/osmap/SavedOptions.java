@@ -11,9 +11,11 @@ import cat.app.navi.RouteOptions;
 
 public class SavedOptions {
 	private static final String tag = SavedOptions.class.getSimpleName();
+	public static final int GPS_TOLERANCE = 30;
 	private static String sdcard = Environment.getExternalStorageDirectory().getPath();
 	public static String MAPSFORGE_FILE_PATH = sdcard +"/osmdroid/maps/";	//	/sdcard/osmdroid/maps/nz.map
 	public static String GH_ROUTE_DATA_PATH = sdcard + "/osmdroid/routes/" + "nz/";	//	/sdcard/osmdroid/routes/nz.zip
+	public static String HINT_FILE_PATH = sdcard + "/osmdroid/hints/";	
 	
 	//default=Open Street Map
 	public static String selectedMap = MapOptions.MAP_MAPQUESTOSM;

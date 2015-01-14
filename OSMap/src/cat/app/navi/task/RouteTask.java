@@ -33,33 +33,34 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 
 	private static final String TAG = RouteTask.class.getSimpleName();
 	RoadManager roadManager;
-	OSM map;
+	OSM osm;
 	Road road;
 	RouteOptions ro;
 	public RouteTask(OSM map , RouteOptions ro) {
 		super();
-		this.map = map;
+		this.osm = map;
 		this.ro = ro;
 	}
 
 	@Override
 	protected Polyline doInBackground(GeoPoint... params) {
 		roadManager = Routers.getRoadManager(RouteOptions.getRouteProvider());
+		if(roadManager==null) return null;
 		road = roadManager.getRoad(ro.list);
 		if(road==null || road.mNodes==null) return null;
-		Log.i(TAG, "road="+road.mNodes.size());
-		Polyline pl = RoadManager.buildRoadOverlay(road, map.act);
+		osm.loc.road = road;
+		Polyline pl = RoadManager.buildRoadOverlay(road, osm.act);
 		pl.setWidth(10);
 		pl.setColor(RouteOptions.getColor());
 		return pl;
 	}
 	@Override
     protected void onPostExecute(Polyline pl) {
-		map.mks.removeAllRouteMarkers();
-		map.mks.removePrevPolyline();
+		osm.mks.removeAllRouteMarkers();
+		osm.mks.removePrevPolyline();
 		if(road==null) return;
-		map.mks.addPolyline(pl);
-		map.mks.drawStepsPoint(road);
+		osm.mks.addPolyline(pl);
+		osm.mks.drawStepsPoint(road);
     }
 
 }

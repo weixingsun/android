@@ -16,6 +16,7 @@ import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.tileprovider.util.CloudmadeUtil;
 import org.osmdroid.tileprovider.util.SimpleRegisterReceiver;
+import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
 import cat.app.maps.vendor.OSMMapGoogleRenderer;
@@ -107,6 +108,9 @@ public class MapOptions {
 	public static void move() {
 		osm.move();
 	}
+	public static void move(GeoPoint loc) {
+		osm.move(loc);
+	}
 	public void initTileSources(Activity act){
 		CloudmadeUtil.retrieveCloudmadeKey(act.getApplicationContext());
 		ArrayList<ITileSource> list = TileSourceFactory.getTileSources();
@@ -157,6 +161,7 @@ public class MapOptions {
 		}
 		if (mapFile == null)
 			return null;
+		Log.i(tag, "mapFile="+mapFile);
 		MapsForgeTileProvider mfProvider = new MapsForgeTileProvider(new SimpleRegisterReceiver(act), mapFile);
 		return mfProvider;
 		//GenericMapView genericMap = (GenericMapView) act.findViewById(R.id.osmap);

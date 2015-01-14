@@ -147,5 +147,4 @@ public class Device {
 	          item.put("name", name);
 	          return item;
 	        }
-		
 }

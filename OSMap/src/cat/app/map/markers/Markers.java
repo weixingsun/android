@@ -16,6 +16,8 @@ import org.osmdroid.views.overlay.OverlayItem;
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
+import android.location.Location;
+import android.util.Log;
 
 import cat.app.maps.MapOptions;
 import cat.app.maps.OSM;
@@ -23,6 +25,7 @@ import cat.app.osmap.MyItemizedOverlay;
 import cat.app.osmap.R;
 
 public class Markers {
+	private static final String tag = Markers.class.getSimpleName();
 	static OSM osm;
 	static Markers mks;
 	private Markers(){
@@ -36,6 +39,9 @@ public class Markers {
 	MyItemizedOverlay myLocOverlay;
 	OverlayItem myLocationMarker;
 
+	MyItemizedOverlay testOverlay;
+	Marker testMarker;
+	
 	MyItemizedOverlay routeOverlay;
 	OverlayItem routeMarker;
 	public ArrayList<Marker> routeMarkerList = new ArrayList<Marker>();
@@ -67,7 +73,20 @@ public class Markers {
 		myLocationMarker = new OverlayItem("me", "me", loc);
 		myLocOverlay.addItem(myLocationMarker);
 	}
-	
+	public void initTestMarker(Location loc) {
+		Log.i(tag, "initTestMarker.remove(oldMarker)");
+		osm.mapView.getOverlays().remove(testMarker);
+		Log.i(tag, "initTestMarker.addNewMarker()");
+		testMarker = new Marker(osm.mapView);
+		testMarker.setPosition(new GeoPoint(loc));
+		Drawable img = osm.act.getResources().getDrawable(R.drawable.beetle_64);
+		testMarker.setIcon(img);
+		testMarker.setDraggable(true);
+		testMarker.setOnMarkerDragListener(new OnTestMarkerDragListener(osm));
+		Drawable icon = osm.act.getResources().getDrawable(R.drawable.home_icon);
+		testMarker.setImage(icon);
+		osm.mapView.getOverlays().add(testMarker);
+	}
 	public void initRouteMarker() {
 		Drawable img = osm.act.getResources().getDrawable(R.drawable.marker_blue);
 		int markerWidth = img.getIntrinsicWidth();
