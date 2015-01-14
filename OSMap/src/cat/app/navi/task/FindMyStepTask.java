@@ -73,7 +73,7 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, Float> {
 			for(int i=0;i<osm.loc.road.mNodes.size();i++){
 				RoadNode node = osm.loc.road.mNodes.get(i);
 				if(osm.loc.passedNodes.contains(node)) continue;
-				if(i>0){
+				if(i>0){  //add codes for monitoring two turns very close(<60m), like a roundabout, and some lane changes
 					RoadNode prevNode = osm.loc.road.mNodes.get(i-1);
 					List<GeoPoint> list = new ArrayList<GeoPoint>();
 					list.add(node.mLocation);
