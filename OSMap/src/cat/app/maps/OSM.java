@@ -41,7 +41,6 @@ public class OSM {
 	GenericMapView genericMapView;
 	IMapController mapController;
 	public Markers mks;
-	// Route route;
 	public List<Address> suggestPoints;
 	public MapView mapView;
 	public MapTileProviderBase mapProvider;
@@ -58,7 +57,7 @@ public class OSM {
 		setMap(mtpb);
 		mks=Markers.getInstance(this);
 		mks.initMylocMarker();
-		mks.initRouteMarker();
+		//mks.initRouteMarker();
         loc.init(act,this);
         dv.init(act,this);
 	}
@@ -79,12 +78,12 @@ public class OSM {
 			@Override
 			public boolean longPressHelper(GeoPoint p) {
 				if (loc.myPos == null) return false;
-				OSM.this.startTask("geo", new GeoPoint(p));
+				OSM.this.startTask("geo", new GeoPoint(p),"route");
 				ArrayList<GeoPoint> points = new ArrayList<GeoPoint>();
 				points.add(new GeoPoint(loc.myPos));
 				points.add(p);
 				ro.setWayPoints(points);
-				OSM.this.startTask("route", new GeoPoint(p));
+				OSM.this.startTask("route", new GeoPoint(p),"route");
 				return false;
 			}
 			@Override
@@ -128,9 +127,9 @@ public class OSM {
 			task.execute();
 		}
 	}
-	public void startTask(String type,GeoPoint point){
+	public void startTask(String type,GeoPoint point,String purpose){
 		if(type.equals("geo")){
-			GeocoderTask task = new GeocoderTask(this, point);
+			GeocoderTask task = new GeocoderTask(this, point, purpose);
 			task.execute();
 		}else if(type.equals("route")){
 			RouteTask task = new RouteTask(OSM.this, ro);

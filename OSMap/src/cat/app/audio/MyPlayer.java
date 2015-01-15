@@ -21,7 +21,11 @@ public class MyPlayer {
 	private static final String tag = MyPlayer.class.getSimpleName();
 	private static final String folder = SavedOptions.HINT_FILE_PATH;
 	private static ExoPlayer player;
-	public static void play(Activity act, String filePath) {
+	public static void play(Activity act, int distance,int maneuverType) {
+		String filePath = folder+"dist_"+distance+"_type_"+maneuverType+".mp3";
+		Log.i(tag, filePath);
+		if(distance>1) return;
+		
 		Uri uri = Uri.fromFile(new File(filePath));
 	    FrameworkSampleSource sampleSource = new FrameworkSampleSource(act, uri, null, 1);
 	    // Build the track renderers
@@ -47,18 +51,11 @@ public class MyPlayer {
 			}});
 	}
 	public static void test(Activity act){
-		play(act,folder+"turn-left.mp3");
+		//play(act,folder+"turn-left.mp3");
 	}
-	public static void play(Activity act, RoadNode node, Float dist) {
+	public static void play(Activity act, RoadNode node, int dist) {
 		// "in 400 m" + "turn right"
-		String distance = "";
-		if(dist<1000 && dist>500){
-			distance+="in 1000 m, ";
-		}else if(dist<200 && dist>100){
-			distance+="in 200 m, ";
-		}
-		//play(act,node.mInstructions);  //distance+turn
-		Log.i(tag, "MyPlayer.dist="+dist+"distance="+distance+node.mInstructions);
+		play(act,dist, node.mManeuverType);  //distance+turn
 	}
 	
 }

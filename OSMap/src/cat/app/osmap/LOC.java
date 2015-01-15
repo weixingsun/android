@@ -33,13 +33,11 @@ public class LOC implements LocationListener {
 	public static String countryCode = null;
 	String provider;
 	public boolean onRoad=false;
-	private boolean navigating = false;
+	public boolean navigating = false;
 	public Road road;
 	public Integer currIndex = -1;
 	//public Integer toCurrentLastTime = 0;
 	public List<RoadNode> passedNodes = new ArrayList<RoadNode>();
-	public List<RoadNode> playedNodes100 = new ArrayList<RoadNode>();
-	public List<RoadNode> playedNodes1000 = new ArrayList<RoadNode>();
 	public void init(Activity act, OSM osm) {
 		this.act = act;
 		this.osm = osm;
@@ -48,7 +46,7 @@ public class LOC implements LocationListener {
 			myPos = lm.getLastKnownLocation(provider);
 			startGPSLocation();
 			if(myPos!=null)
-			osm.startTask("geo", new GeoPoint(myPos));
+			osm.startTask("geo", new GeoPoint(myPos),"countryCode");
 		}
 	}
 
@@ -74,7 +72,7 @@ public class LOC implements LocationListener {
 		myPos = loc;
 		GeoPoint gp = new GeoPoint(loc.getLatitude(),loc.getLongitude());
 		if (LOC.countryCode == null) {
-			osm.startTask("geo", gp);
+			osm.startTask("geo", gp,"countryCode");
 		}
 		//speed = (int) (loc.getSpeed() * 3.6);
 		//Log.i(tag, "speed=" + speed);
@@ -116,6 +114,14 @@ public class LOC implements LocationListener {
 
 	public void setSpeed(int speed) {
 		this.speed = speed;
+	}
+
+	public void cleanupRoad() {
+		this.onRoad=false;
+		this.passedNodes.clear();
+		this.currIndex = -1;
+		this.navigating = false;
+		this.road = null;
 	}
 
 }

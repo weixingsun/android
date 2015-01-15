@@ -1,7 +1,9 @@
 package cat.app.map.markers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
@@ -39,12 +41,10 @@ public class Markers {
 	MyItemizedOverlay myLocOverlay;
 	OverlayItem myLocationMarker;
 
-	MyItemizedOverlay testOverlay;
 	Marker testMarker;
-	
-	MyItemizedOverlay routeOverlay;
-	OverlayItem routeMarker;
-	public ArrayList<Marker> routeMarkerList = new ArrayList<Marker>();
+	Marker routeMarker;
+	public List<Marker> waypointsMarkerList = new ArrayList<Marker>();
+	public List<Marker> destinationMarkerList = new ArrayList<Marker>();
 	
 	Polyline routePolyline;
 	
@@ -74,9 +74,7 @@ public class Markers {
 		myLocOverlay.addItem(myLocationMarker);
 	}
 	public void initTestMarker(Location loc) {
-		Log.i(tag, "initTestMarker.remove(oldMarker)");
 		osm.mapView.getOverlays().remove(testMarker);
-		Log.i(tag, "initTestMarker.addNewMarker()");
 		testMarker = new Marker(osm.mapView);
 		testMarker.setPosition(new GeoPoint(loc));
 		Drawable img = osm.act.getResources().getDrawable(R.drawable.beetle_64);
@@ -87,7 +85,7 @@ public class Markers {
 		testMarker.setImage(icon);
 		osm.mapView.getOverlays().add(testMarker);
 	}
-	public void initRouteMarker() {
+	/*public void initRouteMarker() {
 		Drawable img = osm.act.getResources().getDrawable(R.drawable.marker_blue);
 		int markerWidth = img.getIntrinsicWidth();
 		int markerHeight = img.getIntrinsicHeight();
@@ -95,14 +93,26 @@ public class Markers {
 		ResourceProxy resourceProxy = new DefaultResourceProxyImpl(osm.act);
 		routeOverlay = new MyItemizedOverlay(img, resourceProxy);
 		osm.mapView.getOverlays().add(routeOverlay);
-	}
+	}*/
 	public void updateRouteMarker(Address addr) {
 		GeoPoint gp = new GeoPoint(addr.getLatitude(),addr.getLongitude());
-		routeOverlay.removeItem(routeMarker);
 		String detailAddress = addr.getFeatureName()+", "+addr.getThoroughfare();
 		String briefAddress = addr.getLocality()+", "+addr.getCountryName();
-		routeMarker = new OverlayItem(detailAddress, briefAddress, gp);
-		routeOverlay.addItem(routeMarker);
+		osm.mapView.getOverlays().remove(routeMarker);
+		routeMarker = new Marker(osm.mapView);
+		routeMarker.setPosition(gp);
+		routeMarker.setEnabled(true);
+		routeMarker.setTitle(detailAddress);
+		routeMarker.setSnippet(briefAddress);
+		Drawable icon = osm.act.getResources().getDrawable(R.drawable.marker_blue);
+		routeMarker.setIcon(icon);
+		Drawable img = osm.act.getResources().getDrawable(R.drawable.home_icon);
+		routeMarker.setImage(img);
+		//Log.w(tag, "adding routeMarker="+routeMarker);
+		osm.mapView.getOverlays().add(routeMarker);
+
+		osm.move(gp);								//this will cause marker shown in screen ?????????????
+		this.destinationMarkerList.add(routeMarker);  //this will cause marker not shown in screen ?????????????
 	}
 	public void drawStepsPoint(Road road) { // called from tasks
 		for (int i = 0; i < road.mNodes.size(); i++) {
@@ -122,7 +132,7 @@ public class Markers {
 		Drawable icon = osm.act.getResources().getDrawable(resId);
 		nodeMarker.setImage(icon);
 		osm.mapView.getOverlays().add(nodeMarker);
-		routeMarkerList.add(nodeMarker);
+		waypointsMarkerList.add(nodeMarker);
 		/*
 		 * nodeMarker.setOnMarkerClickListener(new OnMarkerClickListener(){
 		 *  public boolean onMarkerClick(Marker arg0, MapView arg1) {
@@ -132,9 +142,12 @@ public class Markers {
 		 */
 	}
 	private void removeAllMarkers() {
-		for (Marker mk : routeMarkerList) {
+		for (Marker mk : waypointsMarkerList) {
 			osm.mapView.getOverlays().remove(mk);
 		}
+		/*for (Marker mk : this.destinationMarkerList.keySet()){
+			osm.mapView.getOverlays().remove(mk);
+		}*/
 	}	
 	public void removeAllRouteMarkers(){
 		removeAllMarkers();

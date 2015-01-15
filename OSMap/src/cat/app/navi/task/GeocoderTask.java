@@ -19,7 +19,7 @@ public class GeocoderTask extends
     private static final String TAG = GeocoderTask.class.getSimpleName();
     Geocoders gc;
     String mode = null;
-    //int type;
+    String purpose;
     OSM osm;
     String searchByPoint = "point";
     GeoPoint position;
@@ -42,7 +42,11 @@ public class GeocoderTask extends
     	//this.type = type;
         this.mode = searchByPoint;
     }
-    @Override  
+    public GeocoderTask(OSM osm, GeoPoint point, String purpose) {
+		this(osm,point);
+		this.purpose=purpose;
+	}
+	@Override  
     public String doInBackground(String... params) {
     	if(mode.equals(searchByName)){
 			list = gc.getFromLocationName(provider,this.address);
@@ -69,7 +73,8 @@ public class GeocoderTask extends
     				LOC.countryCode=foundAddr.getCountryCode();
     			Log.i(TAG, "==================country_code="+LOC.countryCode);
     		}
-    		if(foundAddr != null && LOC.countryCode!=null){
+    		Log.w(TAG, "foundAddr.code="+foundAddr.getCountryCode()+","+this.purpose);
+    		if(foundAddr != null && !this.purpose.equals("countryCode")){
     			foundAddr.setLatitude(position.getLatitude());
     			foundAddr.setLongitude(position.getLongitude());
     			osm.mks.updateRouteMarker(foundAddr);

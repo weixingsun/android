@@ -20,7 +20,7 @@ import android.widget.Toast;
 public class FindMyStepTask extends AsyncTask<GeoPoint, Void, Float> {
 	OSM osm;
 	GeoPoint myGP;
-	//Road road;
+	//boolean onRoad=false;
 	RoadNode node;
 	private Marker marker;
 	private int toCurrent = 0;
@@ -59,18 +59,20 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, Float> {
 		if(index<osm.loc.road.mNodes.size()-1){
 			RoadNode nextNode = osm.loc.road.mNodes.get(osm.loc.currIndex+1);
 			if(this.toCurrent>SavedOptions.GPS_TOLERANCE && this.toPrev>SavedOptions.GPS_TOLERANCE){
-				if(this.toCurrent<200){
-					Log.i(TAG, "in 200 "+nextNode.mInstructions);
-				}else{
-					Log.i(TAG, "out of intersection: in "+nextNode.mLength+" "+nextNode.mInstructions);
-				}
+				if(this.toCurrent>200 && this.toCurrent < 500) return;
+				marker.setTitle("in "+this.toCurrent+" m, "+nextNode.mInstructions);
+				MyPlayer.play(osm.act, nextNode, this.toCurrent);
 			}
 		}
-		//MyPlayer.play(osm.act,this.node,this.toCurrent); //node.mManeuverType + roadName
 	}
 	private void findHintMarkers() {
 		if(marker!=null){
-			for(int i=0;i<osm.loc.road.mNodes.size();i++){
+			findCurrentStep(marker.getPosition());
+		}
+	}
+	private void findCurrentStep(GeoPoint p) {
+		int i=0;
+			for(i=0;i<osm.loc.road.mNodes.size();i++){
 				RoadNode node = osm.loc.road.mNodes.get(i);
 				if(osm.loc.passedNodes.contains(node)) continue;
 				if(i>0){  //add codes for monitoring two turns very close(<60m), like a roundabout, and some lane changes
@@ -78,23 +80,43 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, Float> {
 					List<GeoPoint> list = new ArrayList<GeoPoint>();
 					list.add(node.mLocation);
 					list.add(prevNode.mLocation);
-					if(!isInStep(list, marker.getPosition())){
+					if(!isInStep(list, p)){
+						osm.loc.onRoad=false;
+						Log.i(TAG, "index="+i+" not on the road");
+						if(i==osm.loc.road.mNodes.size()-1){
+							Log.i(TAG, "redraw route...");
+						}
 						continue;
 					}
 				}
-				this.toCurrent = getDistance(marker.getPosition(),node.mLocation);
+				this.toCurrent = getDistance(p, node.mLocation);
 				if(i==0) this.toPrev = 0 ;
-				else this.toPrev = getDistance(marker.getPosition(),osm.loc.road.mNodes.get(i-1).mLocation);
+				else this.toPrev = getDistance(p, osm.loc.road.mNodes.get(i-1).mLocation);
 				Log.i(TAG, "toCurrent="+this.toCurrent+":toPrev="+this.toPrev);
 				if(this.toCurrent<SavedOptions.GPS_TOLERANCE){
 					osm.loc.passedNodes.add(node);
 					this.node=node;
 					osm.loc.currIndex=i;
-					Log.i(TAG, "index="+i);
+					osm.loc.onRoad=true;
+					Log.i(TAG, "on road, "+i+"/"+osm.loc.road.mNodes.size()+",onRoad="+osm.loc.onRoad);
+				}
+				if(i==osm.loc.road.mNodes.size()-1 && this.toCurrent<SavedOptions.GPS_TOLERANCE){
+					Log.i(TAG, "the end of route");
+					cleanupAllonRoad();
+					osm.move();
 				}
 				return;
 			}
-		}
+	}
+	private void cleanupAllonRoad() {
+		osm.mks.removeAllRouteMarkers();
+		osm.mks.removePrevPolyline();
+		osm.loc.cleanupRoad();
+		this.cleanupRoad();
+	}
+	private void cleanupRoad() {
+		toCurrent = 0;
+		toPrev = 0;
 	}
 	@Override
     protected void onPostExecute(Float useless) {
@@ -103,8 +125,8 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, Float> {
 			//Toast.makeText(osm.act, "dist="+dist, Toast.LENGTH_SHORT).show();
 			if(marker!=null){
 				playHintSounds(osm.loc.currIndex);
-				String title = "node "+(osm.loc.currIndex+1)+"/"+osm.loc.road.mNodes.size()+":("+osm.loc.passedNodes.size()+")toCurr="+toCurrent+",toPrev="+this.toPrev;
-				marker.setTitle(title);
+				String snippet = "node "+(osm.loc.currIndex+1)+"/"+osm.loc.road.mNodes.size()+":("+osm.loc.passedNodes.size()+")toCurr="+toCurrent+",toPrev="+this.toPrev;
+				marker.setSnippet(snippet);
 				marker.showInfoWindow();
 			}
 		}
