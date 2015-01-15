@@ -8,6 +8,7 @@ import org.osmdroid.bonuspack.routing.RoadNode;
 import org.osmdroid.util.GeoPoint;
 
 import cat.app.maps.MapOptions;
+import cat.app.maps.MathUtil;
 import cat.app.maps.OSM;
 import cat.app.navi.task.FindMyStepTask;
 
@@ -74,8 +75,14 @@ public class LOC implements LocationListener {
 		if (LOC.countryCode == null) {
 			osm.startTask("geo", gp,"countryCode");
 		}
+		//osm.mks.testMarker.setTitle(title)
+		if(MathUtil.compare(osm.mks.testMarker.getPosition(), gp) ){
+			
+		}
 		//speed = (int) (loc.getSpeed() * 3.6);
 		//Log.i(tag, "speed=" + speed);
+		osm.mks.testMarker.setPosition(gp);
+		(new FindMyStepTask(osm, osm.mks.testMarker.getPosition(),osm.mks.testMarker)).execute();
 	}
 
 	public void uptodate(GeoPoint loc){

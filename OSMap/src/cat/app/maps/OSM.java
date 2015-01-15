@@ -12,6 +12,7 @@ import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MinimapOverlay;
+import org.osmdroid.views.overlay.ScaleBarOverlay;
 
 import android.app.Activity;
 import android.content.Context;
@@ -42,9 +43,10 @@ public class OSM {
 	IMapController mapController;
 	public Markers mks;
 	public List<Address> suggestPoints;
-	public MapView mapView;
+	public MapView map;
 	public MapTileProviderBase mapProvider;
 	public boolean switchTileProvider=false;
+	public ScaleBarOverlay scaleBarOverlay;
 
 	public void init(Activity act) {
 		this.act = act;
@@ -60,20 +62,21 @@ public class OSM {
 		//mks.initRouteMarker();
         loc.init(act,this);
         dv.init(act,this);
+
 	}
 	public void setMap(MapTileProviderBase mtpb) {
 		genericMapView.setTileProvider(mtpb);
-		mapView = genericMapView.getMapView();
-		mapController = mapView.getController();
+		map = genericMapView.getMapView();
+		mapController = map.getController();
 		mapController.setZoom(16);
-		mapView.setBuiltInZoomControls(true);
-		mapView.setMultiTouchControls(true);
-		mapView.setClickable(true);
-		mapView.setLongClickable(true);
+		map.setBuiltInZoomControls(true);
+		map.setMultiTouchControls(true);
+		map.setClickable(true);
+		map.setLongClickable(true);
 		//mapView.setUseDataConnection(false); //disable network
-		mapView.setMinZoomLevel(4);
+		map.setMinZoomLevel(4);
 		//mapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-		mapView.getViewTreeObserver().addOnGlobalLayoutListener(new GlobalLayoutListener(this));
+		map.getViewTreeObserver().addOnGlobalLayoutListener(new GlobalLayoutListener(this));
 		MapEventsReceiver mReceive = new MapEventsReceiver() {
 			@Override
 			public boolean longPressHelper(GeoPoint p) {
@@ -93,10 +96,18 @@ public class OSM {
 			}
 		};
 		MapEventsOverlay OverlayEventos = new MapEventsOverlay(act.getBaseContext(), mReceive);
-		mapView.getOverlays().add(OverlayEventos);
-		mapView.invalidate();
+		map.getOverlays().add(OverlayEventos);
+		map.invalidate();
 	}
 
+	public void initScaleBar(){	//have to invoke after map initialized, call in GlobalLayoutListener
+		map.getOverlays().remove(scaleBarOverlay);
+		scaleBarOverlay = new ScaleBarOverlay(act);
+		scaleBarOverlay.setMaxLength(2);
+		scaleBarOverlay.setScaleBarOffset(map.getWidth()/2 - 100,map.getHeight()-30); //-scaleBarOverlay.screenWidth
+		map.getOverlays().add(scaleBarOverlay);
+		//Log.e(tag, "map.height="+mapView.getHeight());
+	}
 	public void setZoomLevel(int level) {
 		mapController.setZoom(level);
 	}
@@ -105,8 +116,8 @@ public class OSM {
 		move(gp);
 	}
 	public void move(GeoPoint gp) {
-		//mapController.animateTo(gp);
-		mapController.setCenter(gp);
+		mapController.animateTo(gp);
+		//mapController.setCenter(gp);
 		Log.i(tag, "moved to my location: ");
 	}
 	public void move() {
@@ -117,7 +128,7 @@ public class OSM {
 	
 	public void refreshTileSource(String name){
 		MapOptions.switchTileProvider(this,name);
-		mapView.invalidate();
+		map.invalidate();
 		switchTileProvider=true;
 	}
 

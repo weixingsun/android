@@ -23,9 +23,11 @@ public class MyPlayer {
 	private static ExoPlayer player;
 	public static void play(Activity act, int distance,int maneuverType) {
 		String filePath = folder+"dist_"+distance+"_type_"+maneuverType+".mp3";
-		Log.i(tag, filePath);
-		if(distance>1) return;
-		
+		File mp3  = new File(filePath);
+		if(!mp3.exists()) {
+			Log.w(tag, "file="+filePath);
+			return;
+			}
 		Uri uri = Uri.fromFile(new File(filePath));
 	    FrameworkSampleSource sampleSource = new FrameworkSampleSource(act, uri, null, 1);
 	    // Build the track renderers

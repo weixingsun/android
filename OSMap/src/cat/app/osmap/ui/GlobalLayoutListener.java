@@ -1,8 +1,10 @@
 package cat.app.osmap.ui;
 
 import org.osmdroid.views.overlay.MinimapOverlay;
+import org.osmdroid.views.overlay.ScaleBarOverlay;
 
 import cat.app.maps.OSM;
+import android.util.Log;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 
 public class GlobalLayoutListener implements OnGlobalLayoutListener{
@@ -21,6 +23,8 @@ public class GlobalLayoutListener implements OnGlobalLayoutListener{
     		osm.mks.initTestMarker(osm.loc.myPos);
     	}
     	osm.switchTileProvider=false;
+
+		osm.initScaleBar();
     }
 
 }

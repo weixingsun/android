@@ -41,7 +41,7 @@ public class Markers {
 	MyItemizedOverlay myLocOverlay;
 	OverlayItem myLocationMarker;
 
-	Marker testMarker;
+	public Marker testMarker;
 	Marker routeMarker;
 	public List<Marker> waypointsMarkerList = new ArrayList<Marker>();
 	public List<Marker> destinationMarkerList = new ArrayList<Marker>();
@@ -66,7 +66,7 @@ public class Markers {
 		img.setBounds(0, markerHeight, markerWidth, 0);
 		ResourceProxy resourceProxy = new DefaultResourceProxyImpl(osm.act);
 		myLocOverlay = new MyItemizedOverlay(img, resourceProxy);
-		osm.mapView.getOverlays().add(myLocOverlay);
+		osm.map.getOverlays().add(myLocOverlay);
 	}
 	public void updateMyLocationMarker(GeoPoint loc) {
 		myLocOverlay.removeItem(myLocationMarker);
@@ -74,8 +74,8 @@ public class Markers {
 		myLocOverlay.addItem(myLocationMarker);
 	}
 	public void initTestMarker(Location loc) {
-		osm.mapView.getOverlays().remove(testMarker);
-		testMarker = new Marker(osm.mapView);
+		osm.map.getOverlays().remove(testMarker);
+		testMarker = new Marker(osm.map);
 		testMarker.setPosition(new GeoPoint(loc));
 		Drawable img = osm.act.getResources().getDrawable(R.drawable.beetle_64);
 		testMarker.setIcon(img);
@@ -83,7 +83,7 @@ public class Markers {
 		testMarker.setOnMarkerDragListener(new OnTestMarkerDragListener(osm));
 		Drawable icon = osm.act.getResources().getDrawable(R.drawable.home_icon);
 		testMarker.setImage(icon);
-		osm.mapView.getOverlays().add(testMarker);
+		osm.map.getOverlays().add(testMarker);
 	}
 	/*public void initRouteMarker() {
 		Drawable img = osm.act.getResources().getDrawable(R.drawable.marker_blue);
@@ -98,8 +98,8 @@ public class Markers {
 		GeoPoint gp = new GeoPoint(addr.getLatitude(),addr.getLongitude());
 		String detailAddress = addr.getFeatureName()+", "+addr.getThoroughfare();
 		String briefAddress = addr.getLocality()+", "+addr.getCountryName();
-		osm.mapView.getOverlays().remove(routeMarker);
-		routeMarker = new Marker(osm.mapView);
+		osm.map.getOverlays().remove(routeMarker);
+		routeMarker = new Marker(osm.map);
 		routeMarker.setPosition(gp);
 		routeMarker.setEnabled(true);
 		routeMarker.setTitle(detailAddress);
@@ -109,8 +109,7 @@ public class Markers {
 		Drawable img = osm.act.getResources().getDrawable(R.drawable.home_icon);
 		routeMarker.setImage(img);
 		//Log.w(tag, "adding routeMarker="+routeMarker);
-		osm.mapView.getOverlays().add(routeMarker);
-
+		osm.map.getOverlays().add(routeMarker);
 		osm.move(gp);								//this will cause marker shown in screen ?????????????
 		this.destinationMarkerList.add(routeMarker);  //this will cause marker not shown in screen ?????????????
 	}
@@ -121,7 +120,7 @@ public class Markers {
 	}
 	public void addWayPointMarker(Road road,int seq){
 		RoadNode node = road.mNodes.get(seq);
-		Marker nodeMarker = new Marker(osm.mapView);
+		Marker nodeMarker = new Marker(osm.map);
 		nodeMarker.setPosition(node.mLocation);
 		Drawable nodeIcon = osm.act.getResources().getDrawable(R.drawable.red_point_16);
 		nodeMarker.setIcon(nodeIcon);
@@ -131,7 +130,7 @@ public class Markers {
 		int resId = InfoWindow.getIconByManeuver(node.mManeuverType);
 		Drawable icon = osm.act.getResources().getDrawable(resId);
 		nodeMarker.setImage(icon);
-		osm.mapView.getOverlays().add(nodeMarker);
+		osm.map.getOverlays().add(nodeMarker);
 		waypointsMarkerList.add(nodeMarker);
 		/*
 		 * nodeMarker.setOnMarkerClickListener(new OnMarkerClickListener(){
@@ -143,7 +142,7 @@ public class Markers {
 	}
 	private void removeAllMarkers() {
 		for (Marker mk : waypointsMarkerList) {
-			osm.mapView.getOverlays().remove(mk);
+			osm.map.getOverlays().remove(mk);
 		}
 		/*for (Marker mk : this.destinationMarkerList.keySet()){
 			osm.mapView.getOverlays().remove(mk);
@@ -155,13 +154,13 @@ public class Markers {
 	}
 	public void removePrevPolyline(){
 		if (routePolyline != null){
-			osm.mapView.getOverlays().remove(routePolyline);
+			osm.map.getOverlays().remove(routePolyline);
 		}
 	}
 
 	public void addPolyline(Polyline pl) {
-		osm.mapView.getOverlays().add(pl);
-		osm.mapView.invalidate();
+		osm.map.getOverlays().add(pl);
+		osm.map.invalidate();
 		routePolyline = pl;
 	}
 }

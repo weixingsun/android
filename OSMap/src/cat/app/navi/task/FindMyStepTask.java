@@ -59,9 +59,10 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, Float> {
 		if(index<osm.loc.road.mNodes.size()-1){
 			RoadNode nextNode = osm.loc.road.mNodes.get(osm.loc.currIndex+1);
 			if(this.toCurrent>SavedOptions.GPS_TOLERANCE && this.toPrev>SavedOptions.GPS_TOLERANCE){
-				if(this.toCurrent>200 && this.toCurrent < 500) return;
+				//if(this.toCurrent>200 && this.toCurrent < 500) return;
 				marker.setTitle("in "+this.toCurrent+" m, "+nextNode.mInstructions);
-				MyPlayer.play(osm.act, nextNode, this.toCurrent);
+				int modDist = Math.round(this.toCurrent/100)*100;
+				MyPlayer.play(osm.act, nextNode, modDist);
 			}
 		}
 	}

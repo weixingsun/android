@@ -1,4 +1,4 @@
-package cat.app.navi.task;
+package cat.app.maps;
 
 /*
  * Copyright 2013 Google Inc.
@@ -19,6 +19,10 @@ package cat.app.navi.task;
 
 import static java.lang.Math.*;
 
+import org.osmdroid.util.GeoPoint;
+
+import android.util.Log;
+
 /**
  * Utility functions that are used my both PolyUtil and SphericalUtil.
  */
@@ -28,6 +32,7 @@ public class MathUtil {
      * Mean radius as defined by IUGG.
      */
     public static final double EARTH_RADIUS = 6371009;
+	private static final String tag = MathUtil.class.getSimpleName();
 
     /**
      * Restrict x to the range [low, high].
@@ -115,7 +120,14 @@ public class MathUtil {
     
     public static boolean compare(double a, double b){
     	double epsilon = 0.0000000000001;
-	    if(Math.abs(a - b) < epsilon){
+	    if(abs(a - b) < epsilon){
+	    	return true;
+	    }
+	    return false;
+    }
+    public static boolean compare(GeoPoint a, GeoPoint b){
+    	Log.d(tag, "a.lat="+a.getLatitude()+",b.lat="+b.getLatitude());
+    	if(compare(a.getLatitude(),b.getLatitude()) && compare(a.getLongitude(),b.getLongitude())){
 	    	return true;
 	    }
 	    return false;
