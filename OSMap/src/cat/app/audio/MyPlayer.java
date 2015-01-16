@@ -22,7 +22,7 @@ public class MyPlayer {
 	private static final String folder = SavedOptions.HINT_FILE_PATH;
 	private static ExoPlayer player;
 	public static void play(Activity act, int distance,int maneuverType) {
-		String filePath = folder+"dist_"+distance+"_type_"+maneuverType+".mp3";
+		String filePath = folder+"type_"+maneuverType+"_dist_"+distance+".mp3";
 		File mp3  = new File(filePath);
 		if(!mp3.exists()) {
 			Log.w(tag, "file="+filePath);
@@ -61,3 +61,28 @@ public class MyPlayer {
 	}
 	
 }
+/*
+	static {
+		MANEUVERS = new HashMap<String, Integer>();
+		MANEUVERS.put("0", 0); //No instruction
+		MANEUVERS.put("1", 1); //Continue(1)	(dist_0_type_1.mp3)
+		MANEUVERS.put("2", 6); //Slight right
+		MANEUVERS.put("3", 7); //Right			(dist_0_type_7.mp3)
+		MANEUVERS.put("4", 8); //Sharp right
+		MANEUVERS.put("5", 12); //U-turn
+		MANEUVERS.put("6", 5); //Sharp left
+		MANEUVERS.put("7", 4); //Left			(dist_0_type_4.mp3)
+		MANEUVERS.put("8", 3); //Slight left	(dist_0_type_3.mp3)
+		MANEUVERS.put("9", 24); //Arrived (at waypoint)
+		MANEUVERS.put("10", 24); //"Head" => used by OSRM as the start node. Considered here as a "waypoint". 
+		MANEUVERS.put("11-1", 27); //Round-about, 1st exit
+		MANEUVERS.put("11-2", 28); //2nd exit, etc ...
+		MANEUVERS.put("11-3", 29);
+		MANEUVERS.put("11-4", 30);
+		MANEUVERS.put("11-5", 31);
+		MANEUVERS.put("11-6", 32);
+		MANEUVERS.put("11-7", 33);
+		MANEUVERS.put("11-8", 34); //Round-about, 8th exit
+		MANEUVERS.put("15", 24); //Arrived
+	}
+*/

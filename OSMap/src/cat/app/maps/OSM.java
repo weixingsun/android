@@ -1,25 +1,19 @@
 package cat.app.maps;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.mapsforge.GenericMapView;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
-import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
 import org.osmdroid.tileprovider.MapTileProviderBase;
 import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
-import org.osmdroid.views.overlay.MinimapOverlay;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 
 import android.app.Activity;
-import android.content.Context;
 import android.location.Address;
 import android.util.Log;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 
 import cat.app.map.markers.Markers;
 import cat.app.navi.GeoOptions;
@@ -28,7 +22,9 @@ import cat.app.navi.task.GeocoderTask;
 import cat.app.navi.task.RouteTask;
 import cat.app.osmap.Device;
 import cat.app.osmap.LOC;
+import cat.app.osmap.MyMapEventsReceiver;
 import cat.app.osmap.R;
+import cat.app.osmap.RuntimeOptions;
 import cat.app.osmap.ui.GlobalLayoutListener;
 
 public class OSM {
@@ -37,8 +33,9 @@ public class OSM {
 	public Device dv = new Device();
 	public Activity act;
 	MapOptions mo;
-	RouteOptions ro;
+	public RouteOptions ro;
 	GeoOptions go;
+	public RuntimeOptions rto;
 	GenericMapView genericMapView;
 	IMapController mapController;
 	public Markers mks;
@@ -52,6 +49,7 @@ public class OSM {
 		this.act = act;
 		mo = MapOptions.getInstance(this);
 		ro = RouteOptions.getInstance(this);
+		rto = RuntimeOptions.getInstance(act);
 		mo.initTileSources(act);
 		genericMapView = (GenericMapView) act.findViewById(R.id.osmap);
 		MapTileProviderBase mtpb = new MapTileProviderBasic(act.getApplicationContext());
@@ -77,24 +75,7 @@ public class OSM {
 		map.setMinZoomLevel(4);
 		//mapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 		map.getViewTreeObserver().addOnGlobalLayoutListener(new GlobalLayoutListener(this));
-		MapEventsReceiver mReceive = new MapEventsReceiver() {
-			@Override
-			public boolean longPressHelper(GeoPoint p) {
-				if (loc.myPos == null) return false;
-				OSM.this.startTask("geo", new GeoPoint(p),"route");
-				ArrayList<GeoPoint> points = new ArrayList<GeoPoint>();
-				points.add(new GeoPoint(loc.myPos));
-				points.add(p);
-				ro.setWayPoints(points);
-				OSM.this.startTask("route", new GeoPoint(p),"route");
-				return false;
-			}
-			@Override
-			public boolean singleTapConfirmedHelper(GeoPoint arg0) {
-				dv.closeAllList();
-				return false;
-			}
-		};
+		MyMapEventsReceiver mReceive = new MyMapEventsReceiver(this);
 		MapEventsOverlay OverlayEventos = new MapEventsOverlay(act.getBaseContext(), mReceive);
 		map.getOverlays().add(OverlayEventos);
 		map.invalidate();
@@ -104,7 +85,7 @@ public class OSM {
 		map.getOverlays().remove(scaleBarOverlay);
 		scaleBarOverlay = new ScaleBarOverlay(act);
 		scaleBarOverlay.setMaxLength(2);
-		scaleBarOverlay.setScaleBarOffset(map.getWidth()/2 - 100,map.getHeight()-30); //-scaleBarOverlay.screenWidth
+		scaleBarOverlay.setScaleBarOffset(map.getWidth()/2 - 130,map.getHeight()-20);
 		map.getOverlays().add(scaleBarOverlay);
 		//Log.e(tag, "map.height="+mapView.getHeight());
 	}

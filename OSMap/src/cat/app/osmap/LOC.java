@@ -46,7 +46,7 @@ public class LOC implements LocationListener {
 			provider = this.getProvider();
 			myPos = lm.getLastKnownLocation(provider);
 			startGPSLocation();
-			if(myPos!=null)
+			if(myPos!=null && osm.rto.isNetworkAvailable())
 			osm.startTask("geo", new GeoPoint(myPos),"countryCode");
 		}
 	}
@@ -72,12 +72,12 @@ public class LOC implements LocationListener {
 	public void onLocationChanged(Location loc) {
 		myPos = loc;
 		GeoPoint gp = new GeoPoint(loc.getLatitude(),loc.getLongitude());
-		if (LOC.countryCode == null) {
+		if (LOC.countryCode == null && osm.rto.isNetworkAvailable()) {
 			osm.startTask("geo", gp,"countryCode");
 		}
-		//osm.mks.testMarker.setTitle(title)
+		
 		if(MathUtil.compare(osm.mks.testMarker.getPosition(), gp) ){
-			
+			//osm.mks.testMarker.setTitle(title)
 		}
 		//speed = (int) (loc.getSpeed() * 3.6);
 		//Log.i(tag, "speed=" + speed);

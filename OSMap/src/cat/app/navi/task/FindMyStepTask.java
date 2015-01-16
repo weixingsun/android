@@ -1,5 +1,6 @@
 package cat.app.navi.task;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,8 +62,8 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, Float> {
 			if(this.toCurrent>SavedOptions.GPS_TOLERANCE && this.toPrev>SavedOptions.GPS_TOLERANCE){
 				//if(this.toCurrent>200 && this.toCurrent < 500) return;
 				marker.setTitle("in "+this.toCurrent+" m, "+nextNode.mInstructions);
-				int modDist = Math.round(this.toCurrent/100)*100;
-				MyPlayer.play(osm.act, nextNode, modDist);
+				BigDecimal bd = new BigDecimal(this.toCurrent).setScale(-2, BigDecimal.ROUND_HALF_UP);  //Õû°Ù
+				MyPlayer.play(osm.act, nextNode, bd.intValue());
 			}
 		}
 	}
@@ -93,13 +94,13 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, Float> {
 				this.toCurrent = getDistance(p, node.mLocation);
 				if(i==0) this.toPrev = 0 ;
 				else this.toPrev = getDistance(p, osm.loc.road.mNodes.get(i-1).mLocation);
-				Log.i(TAG, "toCurrent="+this.toCurrent+":toPrev="+this.toPrev);
+				//Log.i(TAG, "toCurrent="+this.toCurrent+":toPrev="+this.toPrev);
 				if(this.toCurrent<SavedOptions.GPS_TOLERANCE){
 					osm.loc.passedNodes.add(node);
 					this.node=node;
 					osm.loc.currIndex=i;
 					osm.loc.onRoad=true;
-					Log.i(TAG, "on road, "+i+"/"+osm.loc.road.mNodes.size()+",onRoad="+osm.loc.onRoad);
+					//Log.i(TAG, "on road, "+i+"/"+osm.loc.road.mNodes.size()+",onRoad="+osm.loc.onRoad);
 				}
 				if(i==osm.loc.road.mNodes.size()-1 && this.toCurrent<SavedOptions.GPS_TOLERANCE){
 					Log.i(TAG, "the end of route");

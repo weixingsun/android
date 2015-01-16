@@ -21,10 +21,9 @@ public class GlobalLayoutListener implements OnGlobalLayoutListener{
     		//mini = new MinimapOverlay(osm.act,osm.mapView.getTileRequestCompleteHandler());
     		//osm.mapView.getOverlays().add(mini);
     		osm.mks.initTestMarker(osm.loc.myPos);
+    		osm.initScaleBar();
     	}
     	osm.switchTileProvider=false;
-
-		osm.initScaleBar();
     }
 
 }
