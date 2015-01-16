@@ -13,6 +13,7 @@ import cat.app.maps.APIOptions;
 import cat.app.navi.GeoOptions;
 import cat.app.navi.GraphHopperOfflineRoadManager;
 import cat.app.navi.RouteOptions;
+import cat.app.osmap.RuntimeOptions;
 
 import android.app.Activity;
 import android.location.Address;
@@ -22,13 +23,13 @@ public class Routers {
 	private static final String tag = Routers.class.getSimpleName();
 	String provider;
 	List<Address> list;
-	Activity act;
+	static Activity act;
 	public Routers(Activity act) {
-		this.act = act;
+		Routers.act = act;
 	}
 	public static RoadManager getRoadManager(String provider) {
 		RoadManager roadManager = null;
-		Log.i(tag, "getRoadManager().provider="+provider);
+		//Log.i(tag, "getRoadManager().provider="+provider);
 		try{
 		switch(provider){
 			case RouteOptions.GOOGLE: {
@@ -59,7 +60,6 @@ public class Routers {
 				Log.i(tag, "GRAPHHOPPER Offline route");
 				break;
 			}
-				
 			default: 
 				Log.i(tag, "default router ? "+provider);
 				return null;

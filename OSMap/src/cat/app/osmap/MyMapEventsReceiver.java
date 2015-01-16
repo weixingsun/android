@@ -7,6 +7,7 @@ import org.osmdroid.util.GeoPoint;
 
 import android.widget.Toast;
 import cat.app.maps.OSM;
+import cat.app.navi.GeoOptions;
 
 public class MyMapEventsReceiver implements MapEventsReceiver{
 	OSM osm;
@@ -18,7 +19,7 @@ public class MyMapEventsReceiver implements MapEventsReceiver{
 		if (osm.rto.isNetworkAvailable() ) {	//|| loc.myPos == null
 			osm.startTask("geo", new GeoPoint(p),"route");
 		}else{
-			Toast.makeText(osm.act, "Network Not Available, please try Offline map and routing.", Toast.LENGTH_LONG).show();
+			Toast.makeText(osm.act, GeoOptions.NETWORK_UNAVAILABLE, Toast.LENGTH_LONG).show();
 		}
 		ArrayList<GeoPoint> points = new ArrayList<GeoPoint>();
 		points.add(new GeoPoint(osm.loc.myPos));

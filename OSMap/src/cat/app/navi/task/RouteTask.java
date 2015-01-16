@@ -19,6 +19,7 @@ import cat.app.maps.APIOptions;
 import cat.app.maps.MapOptions;
 import cat.app.maps.OSM;
 import cat.app.navi.RouteOptions;
+import cat.app.osmap.RuntimeOptions;
 
 import android.app.Activity;
 import android.app.IntentService;
@@ -44,6 +45,10 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 
 	@Override
 	protected Polyline doInBackground(GeoPoint... params) {
+		if( !RuntimeOptions.getInstance(osm.act).isNetworkAvailable()
+				&& !RouteOptions.getRouteProvider().equals(RouteOptions.GRAPHHOPPER) ){
+			return null;
+		}
 		roadManager = Routers.getRoadManager(RouteOptions.getRouteProvider());
 		if(roadManager==null) return null;
 		road = roadManager.getRoad(ro.list);

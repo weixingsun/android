@@ -88,14 +88,22 @@ public class Device {
 		inputAddress.addTextChangedListener(new DelayedTextWatcher(2000) {
 			@Override
 			public void afterTextChangedDelayed(Editable s) {
-				osm.startTask("geo",inputAddress.getText().toString());
+				if(RuntimeOptions.getInstance(osm.act).isNetworkAvailable()){
+					osm.startTask("geo",inputAddress.getText().toString());
+				}else{
+					Toast.makeText(osm.act, GeoOptions.NETWORK_UNAVAILABLE, Toast.LENGTH_LONG).show();
+				}
 			}
 		});
 		inputAddress.setOnKeyListener(new OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (keyCode == 66) { // Enter
-					osm.startTask("geo",inputAddress.getText().toString());
+					if(RuntimeOptions.getInstance(osm.act).isNetworkAvailable()){
+						osm.startTask("geo",inputAddress.getText().toString());
+					}else{
+						Toast.makeText(osm.act, GeoOptions.NETWORK_UNAVAILABLE, Toast.LENGTH_LONG).show();
+					}
 					closeKeyBoard();
 				}
 				return false;

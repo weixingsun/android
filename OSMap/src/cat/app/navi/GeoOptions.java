@@ -11,6 +11,7 @@ public class GeoOptions {
 	public static final String GISGRAPHY = "Gisgraphy";	//not used
 	public static final String GRAPHHOPPER = "GraphHopper";
 	
+	public static final String NETWORK_UNAVAILABLE = "Network Not Available, please try Offline map and routing.";
 	private static String geocoder;
 	public static LinkedHashMap<String, String> GEO_CODERS = new LinkedHashMap<String,String>();
 	static{
