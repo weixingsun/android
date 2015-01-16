@@ -2,6 +2,7 @@ package cat.app.navi.task;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 import org.osmdroid.bonuspack.location.GeocoderNominatim;
 import org.osmdroid.util.GeoPoint;
