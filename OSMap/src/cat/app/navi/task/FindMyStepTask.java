@@ -11,7 +11,7 @@ import org.osmdroid.util.GeoPoint;
 
 import cat.app.audio.MyPlayer;
 import cat.app.maps.OSM;
-import cat.app.osmap.SavedOptions;
+import cat.app.osmap.util.SavedOptions;
 
 import android.location.Location;
 import android.os.AsyncTask;

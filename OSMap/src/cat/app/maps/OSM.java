@@ -12,20 +12,22 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.location.Address;
 import android.util.Log;
+import android.widget.Toast;
 
 import cat.app.map.markers.Markers;
-import cat.app.navi.GeoOptions;
-import cat.app.navi.RouteOptions;
 import cat.app.navi.task.GeocoderTask;
 import cat.app.navi.task.RouteTask;
 import cat.app.osmap.Device;
 import cat.app.osmap.LOC;
 import cat.app.osmap.MyMapEventsReceiver;
 import cat.app.osmap.R;
-import cat.app.osmap.RuntimeOptions;
 import cat.app.osmap.ui.GlobalLayoutListener;
+import cat.app.osmap.util.GeoOptions;
+import cat.app.osmap.util.RouteOptions;
+import cat.app.osmap.util.RuntimeOptions;
 
 public class OSM {
 	protected static final String tag = OSM.class.getSimpleName();
@@ -128,5 +130,10 @@ public class OSM {
 			task.execute();
 		}
 	}
-
+	public void startDownloadActivity(){
+		Toast.makeText(act, "You need download offline map.", Toast.LENGTH_SHORT).show();
+		Intent intent = new Intent(act, cat.app.osmap.ui.DownloadManagerDemo.class);
+		//intent.putExtra(EXTRA_MESSAGE, message);
+	    act.startActivity(intent);
+	}
 }

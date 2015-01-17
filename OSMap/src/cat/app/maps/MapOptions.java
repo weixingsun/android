@@ -23,10 +23,12 @@ import cat.app.maps.vendor.OSMMapGoogleRenderer;
 import cat.app.maps.vendor.OSMMapMicrosoftRenderer;
 import cat.app.osmap.LOC;
 import cat.app.osmap.R;
-import cat.app.osmap.SavedOptions;
+import cat.app.osmap.ui.DownloadManagerDemo;
+import cat.app.osmap.util.SavedOptions;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
@@ -43,12 +45,13 @@ public class MapOptions {
 	}
 	private static final String tag = MapOptions.class.getSimpleName();
 
-	static String path = SavedOptions.MAPSFORGE_FILE_PATH;
+	static String path = SavedOptions.sdcard+"/"+SavedOptions.MAPSFORGE_FILE_PATH;
 	
 	public static final String URL_MAPSFORGE_WEB = "http://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/";
 	public static final String URL_MAPSFORGE_FTP = "ftp-stud.hs-esslingen.de";
 	public static final String URL_MAPSFORGE_FTP_FOLDER = "/pub/Mirrors/download.mapsforge.org/maps/";
 	
+	public static final String MAP_OFFLINE = "Offline Map";
 	public static final String MAP_MAPSFORGE = "MapsForge";
 	public static final String MAP_GOOGLE_ROADMAP = "Google Roadmap";
 	public static final String MAP_GOOGLE_SATELLITE = "Google Satellite";
@@ -70,7 +73,7 @@ public class MapOptions {
 		MAP_TILES.put("Open Street Map", MAP_MAPQUESTOSM);
 		MAP_TILES.put("OSM Satellite", MAP_MAPQUEST_AERIAL);
 		MAP_TILES.put("OSM Bus", MAP_PUBLIC_TRANSPORT_OSM);
-		MAP_TILES.put(MAP_MAPSFORGE, MAP_MAPSFORGE);
+		MAP_TILES.put(MAP_OFFLINE, MAP_MAPSFORGE);
 		MAP_TILES.put(MAP_MAPNIK, MAP_MAPNIK);
 		MAP_TILES.put(MAP_GOOGLE_ROADMAP, MAP_GOOGLE_ROADMAP);
 		MAP_TILES.put(MAP_GOOGLE_SATELLITE, MAP_GOOGLE_SATELLITE);
@@ -89,12 +92,11 @@ public class MapOptions {
 	 * Microsoft Maps, Microsoft Earth, Microsoft Hybrid
 	 */
 	public static void switchTileProvider(OSM osm, String name) {
-		//LOC.gps_fired=false;
-		if(name.equals(MapOptions.MAP_MAPSFORGE)){//mapsforge offline data need recreate a mapview
+		if(name.equals(MapOptions.MAP_MAPSFORGE)){	//MapsForge offline data need recreate a mapview
 			osm.mapProvider=MapOptions.getForgeMapTileProvider(osm.act);
 			if(osm.mapProvider==null) {
-				Toast.makeText(osm.act, "You need offline map.", Toast.LENGTH_SHORT).show();
-				return;//no map file.
+				osm.startDownloadActivity();
+				return;//no map file. 
 			}
 		}else{									  //others refresh with tilesource
 			osm.mapProvider=new MapTileProviderBasic(osm.act);
@@ -149,23 +151,24 @@ public class MapOptions {
     NearMap (Australia): PhotoMap, StreetMap, Terrain
 */
 	public static MapTileProviderBase getForgeMapTileProvider(Context act){
-		File folder = new File(path);
-		File[] listOfFiles = folder.listFiles();
-		if (listOfFiles == null)
-			return null;
-		File mapFile = null;
-		for (File file:listOfFiles){
-			if (file.isFile() && file.getName().endsWith(".map")){  //mapsforge format
-				mapFile = file;
-			}
-		}
-		if (mapFile == null)
-			return null;
-		Log.i(tag, "mapFile="+mapFile);
-		MapsForgeTileProvider mfProvider = new MapsForgeTileProvider(new SimpleRegisterReceiver(act), mapFile);
+		String mapFileName = getMapFileName();
+		Log.i(tag, "mapFile="+mapFileName);
+		
+		if(mapFileName==null) return null;
+		MapsForgeTileProvider mfProvider = new MapsForgeTileProvider(new SimpleRegisterReceiver(act), new File(mapFileName));
 		return mfProvider;
 		//GenericMapView genericMap = (GenericMapView) act.findViewById(R.id.osmap);
 		//genericMap.setTileProvider(mfProvider);
 		//return genericMap.getMapView();
+	}
+	public static String getMapFileName(){
+		String mapFileFullName = SavedOptions.sdcard+"/"+SavedOptions.MAPSFORGE_FILE_PATH+SavedOptions.MAPSFORGE_FILE_NAME;
+		//String routeFileFullName =  SavedOptions.sdcard+"/"+SavedOptions.GH_ROUTE_DATA_PATH+SavedOptions.GH_ROUTE_DATA_NAME;
+		File mapFile = new File(mapFileFullName);
+		//File routeFile = new File(routeFileFullName);
+		if(mapFile.exists() ){	//&& routeFile.exists()
+			return mapFileFullName;
+		}
+		return null;
 	}
 }

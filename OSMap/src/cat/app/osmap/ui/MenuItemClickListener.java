@@ -5,10 +5,10 @@ import java.util.List;
 
 import cat.app.audio.MyPlayer;
 import cat.app.maps.MapOptions;
-import cat.app.navi.GeoOptions;
-import cat.app.navi.RouteOptions;
 import cat.app.osmap.R;
-import cat.app.osmap.SavedOptions;
+import cat.app.osmap.util.GeoOptions;
+import cat.app.osmap.util.RouteOptions;
+import cat.app.osmap.util.SavedOptions;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -75,8 +75,10 @@ public class MenuItemClickListener implements OnItemClickListener {
 				}else if(GeoOptions.GEO_CODERS.containsKey(name)){
 					GeoOptions.changeGeocoder(GeoOptions.GEO_CODERS.get(name));
 					RouteOptions.changeRouteProvider(RouteOptions.ROUTERS.get(name));
-					SavedOptions.geocodingProvider = name;
-					SavedOptions.routingProvider = name;
+					String geoProvider = GeoOptions.GEO_CODERS.get(name);
+					String routeProvider = RouteOptions.ROUTERS.get(name);
+					SavedOptions.geocodingProvider = geoProvider;
+					SavedOptions.routingProvider = routeProvider;
 				}
 				//Log.i(TAG, "MenuClicked="+name);
 			}

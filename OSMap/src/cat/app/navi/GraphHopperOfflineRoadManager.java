@@ -15,7 +15,8 @@ import org.osmdroid.bonuspack.utils.PolylineEncoder;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 
-import cat.app.osmap.SavedOptions;
+import cat.app.osmap.util.RouteOptions;
+import cat.app.osmap.util.SavedOptions;
 
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
@@ -72,6 +73,7 @@ public class GraphHopperOfflineRoadManager extends RoadManager {
 		hopper.setEnableInstructions(true);
 		//RoutingAlgorithmFactorySimple factory = new RoutingAlgorithmFactorySimple();
 		//hopper.setAlgorithmFactory(factory.createAlgo(arg0, arg1));
+		//Log.e(tag, "GH.path="+path);
 		hopper.load(path);
 	}
 

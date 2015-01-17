@@ -76,21 +76,15 @@ public class LOC implements LocationListener {
 			osm.startTask("geo", gp,"countryCode");
 		}
 		
-		if(MathUtil.compare(osm.mks.testMarker.getPosition(), gp) ){
+		//if(MathUtil.compare(osm.mks.testMarker.getPosition(), gp) ){
 			//osm.mks.testMarker.setTitle(title)
-		}
+		//}
 		//speed = (int) (loc.getSpeed() * 3.6);
-		//Log.i(tag, "speed=" + speed);
+		Log.i(tag, "point="+gp+",speed=" + speed);
 		osm.mks.testMarker.setPosition(gp);
+		osm.move(gp);
+		osm.mks.updateMyLocationMarker(gp);
 		(new FindMyStepTask(osm, osm.mks.testMarker.getPosition(),osm.mks.testMarker)).execute();
-	}
-
-	public void uptodate(GeoPoint loc){
-		if(road!=null && this.onRoad){
-			MapOptions.move(loc);
-		}
-		(new FindMyStepTask(osm, loc)).execute();
-		osm.mks.updateMyLocationMarker(loc);
 	}
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -111,7 +105,7 @@ public class LOC implements LocationListener {
 		criteria.setAltitudeRequired(false); // no altitude
 		criteria.setBearingRequired(false); //
 		criteria.setCostAllowed(true);
-		criteria.setPowerRequirement(Criteria.POWER_LOW);//
+		criteria.setPowerRequirement(Criteria.POWER_LOW);
 		return lm.getBestProvider(criteria, true);
 	}
 

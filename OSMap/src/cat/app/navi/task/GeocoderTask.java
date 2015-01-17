@@ -8,8 +8,8 @@ import org.osmdroid.bonuspack.location.GeocoderNominatim;
 import org.osmdroid.util.GeoPoint;
 
 import cat.app.maps.OSM;
-import cat.app.navi.GeoOptions;
 import cat.app.osmap.LOC;
+import cat.app.osmap.util.GeoOptions;
 import android.location.Address;
 import android.os.AsyncTask;
 import android.util.Log;

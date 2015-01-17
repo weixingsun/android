@@ -8,7 +8,7 @@ import android.app.Activity;
 import android.net.Uri;
 import android.util.Log;
 
-import cat.app.osmap.SavedOptions;
+import cat.app.osmap.util.SavedOptions;
 
 import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;

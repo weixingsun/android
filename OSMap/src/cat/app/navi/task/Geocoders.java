@@ -7,8 +7,8 @@ import java.util.Locale;
 import org.osmdroid.bonuspack.location.GeocoderNominatim;
 import org.osmdroid.util.GeoPoint;
 
-import cat.app.navi.GeoOptions;
 import cat.app.osmap.LOC;
+import cat.app.osmap.util.GeoOptions;
 
 import com.gisgraphy.gisgraphoid.GisgraphyGeocoder;
 

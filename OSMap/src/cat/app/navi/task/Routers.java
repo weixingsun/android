@@ -10,10 +10,11 @@ import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.util.GeoPoint;
 
 import cat.app.maps.APIOptions;
-import cat.app.navi.GeoOptions;
 import cat.app.navi.GraphHopperOfflineRoadManager;
-import cat.app.navi.RouteOptions;
-import cat.app.osmap.RuntimeOptions;
+import cat.app.osmap.util.GeoOptions;
+import cat.app.osmap.util.RouteOptions;
+import cat.app.osmap.util.RuntimeOptions;
+import cat.app.osmap.util.SavedOptions;
 
 import android.app.Activity;
 import android.location.Address;
@@ -29,7 +30,7 @@ public class Routers {
 	}
 	public static RoadManager getRoadManager(String provider) {
 		RoadManager roadManager = null;
-		//Log.i(tag, "getRoadManager().provider="+provider);
+		Log.i(tag, "getRoadManager().provider="+provider);
 		try{
 		switch(provider){
 			case RouteOptions.GOOGLE: {
@@ -56,7 +57,7 @@ public class Routers {
 				break;
 			}
 			case RouteOptions.GRAPHHOPPER: {
-				roadManager = new GraphHopperOfflineRoadManager(RouteOptions.GH_ROUTE_DATA_PATH);
+				roadManager = new GraphHopperOfflineRoadManager(SavedOptions.sdcard+"/"+RouteOptions.GH_ROUTE_DATA_PATH);
 				Log.i(tag, "GRAPHHOPPER Offline route");
 				break;
 			}
