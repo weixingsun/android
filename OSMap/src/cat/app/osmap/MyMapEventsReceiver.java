@@ -22,7 +22,7 @@ public class MyMapEventsReceiver implements MapEventsReceiver{
 	public boolean longPressHelper(GeoPoint p) {
 		if (osm.rto.isNetworkAvailable() ) {	//|| loc.myPos == null
 			osm.startTask("geo", new GeoPoint(p),"route");
-		}else if(SavedOptions.routingProvider.equals(RouteOptions.GRAPHHOPPER)){
+		}else if(SavedOptions.routingProvider.equals(RouteOptions.OFFLINE)){
 			Address addr = new Address(Locale.getDefault());
 			addr.setLatitude(p.getLatitude());
 			addr.setLongitude(p.getLongitude());

@@ -11,6 +11,7 @@ import org.osmdroid.util.GeoPoint;
 
 import cat.app.maps.APIOptions;
 import cat.app.navi.GraphHopperOfflineRoadManager;
+import cat.app.osmap.LOC;
 import cat.app.osmap.util.GeoOptions;
 import cat.app.osmap.util.RouteOptions;
 import cat.app.osmap.util.RuntimeOptions;
@@ -56,8 +57,8 @@ public class Routers {
 				Log.i(tag, "MAPQUEST route opt="+opt);
 				break;
 			}
-			case RouteOptions.GRAPHHOPPER: {
-				roadManager = new GraphHopperOfflineRoadManager(SavedOptions.sdcard+"/"+RouteOptions.GH_ROUTE_DATA_PATH);
+			case RouteOptions.OFFLINE: {
+				roadManager = new GraphHopperOfflineRoadManager(RouteOptions.getRouteFilePath());
 				Log.i(tag, "GRAPHHOPPER Offline route");
 				break;
 			}

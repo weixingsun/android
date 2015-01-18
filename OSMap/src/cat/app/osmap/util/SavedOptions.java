@@ -17,7 +17,7 @@ public class SavedOptions {
 	public static String GH_ROUTE_DATA_PATH = "osmdroid/routes/" ;	//	/sdcard/osmdroid/routes/nz.zip
 	public static String HINT_FILE_PATH = sdcard + "/osmdroid/hints/";
 	public static String MAPSFORGE_FILE_NAME = "nz.map";
-	public static String GH_ROUTE_DATA_NAME = "nz/edges";  //geometry/locationIndex/names/nodes/properties
+	public static String GH_ROUTE_DATA_NAME = "edges";  //geometry/locationIndex/names/nodes/properties
 	public static String GH_ROUTE_DATA_ZIP_NAME = "nz.zip";
 	//default=Open Street Map
 	public static String selectedMap = MapOptions.MAP_MAPQUESTOSM;
@@ -25,6 +25,7 @@ public class SavedOptions {
 	public static String routingProvider = RouteOptions.OSM;		//navigation
 	public static String geocodingProvider = routingProvider;		//navigation
 	private static String selectedOnRoad = "Police";
+	//public static String countryCode = null;
 	
 	public static int getIndex(String main,String sub){
 		LinkedHashMap<String, String> map=null;

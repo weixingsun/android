@@ -15,13 +15,14 @@ import android.util.Log;
 
 import cat.app.maps.MapOptions;
 import cat.app.maps.OSM;
+import cat.app.osmap.LOC;
 
 
 public class RouteOptions {
 
 	private static final String TAG = RouteOptions.class.getSimpleName();
 	//GraphHopperRouter
-	public static String GH_ROUTE_DATA_PATH = SavedOptions.GH_ROUTE_DATA_PATH;
+	//public static String GH_ROUTE_DATA_PATH = SavedOptions.GH_ROUTE_DATA_PATH;
 
 	public static final String OSM = "OSM";
 	public static final String GOOGLE = "Google";
@@ -36,7 +37,7 @@ public class RouteOptions {
 		ROUTERS.put(OSM, OSM);
 		ROUTERS.put(GOOGLE, GOOGLE);
 		ROUTERS.put(MAPQUEST, MAPQUEST);
-		ROUTERS.put(OFFLINE,GRAPHHOPPER);
+		ROUTERS.put(OFFLINE,OFFLINE);
 		//ROUTERS.put(GISGRAPHY, GISGRAPHY);
 	}
 	public static void changeRouteProvider(String value) {
@@ -44,21 +45,34 @@ public class RouteOptions {
 			SavedOptions.routingProvider=OSM;
 		}else{
 			SavedOptions.routingProvider = value;
-			if(getRouteFileName()==null){
+			if(getRouteFileFullName()==null){
 				osm.startDownloadActivity();
 			}
 		}
-		Log.w(TAG, "name="+value+",FullName="+getRouteFileName());
+		Log.w(TAG, "name="+value+",FullName="+getRouteFileFullName());
 	}
-	public static String getRouteFileName(){
-		String routeFileFullName = SavedOptions.sdcard+"/"+SavedOptions.GH_ROUTE_DATA_PATH+SavedOptions.GH_ROUTE_DATA_NAME;
-		//String routeFileFullName =  SavedOptions.sdcard+"/"+SavedOptions.GH_ROUTE_DATA_PATH+SavedOptions.GH_ROUTE_DATA_NAME;
-		File mapFile = new File(routeFileFullName);
-		//File routeFile = new File(routeFileFullName);
-		if(mapFile.exists() ){	//&& routeFile.exists()
-			return routeFileFullName;
+	public static String getRouteFileFullName(){
+		String routeFileName = null;
+		String routeFilePath = getRouteFilePath();
+		if(getRouteFilePath()!=null){
+			routeFileName = routeFilePath+SavedOptions.GH_ROUTE_DATA_NAME;
+		}
+		File routeFile = new File(routeFileName);
+		if(routeFile.exists() ){	//&& routeFile.exists()
+			return routeFileName;
 		}
 		return null;
+	}
+	public static String getRouteFilePath(){
+		String routeFileFullName = SavedOptions.sdcard+"/"+SavedOptions.GH_ROUTE_DATA_PATH+LOC.countryCode+"/";
+		//String routeFileFullName =  SavedOptions.sdcard+"/"+SavedOptions.GH_ROUTE_DATA_PATH+SavedOptions.GH_ROUTE_DATA_NAME;
+		File routeFilePath = new File(routeFileFullName);
+		//File routeFile = new File(routeFileFullName);
+		routeFilePath.mkdirs();
+		if(routeFilePath.exists())
+			return routeFileFullName;
+		else
+			return null;
 	}
 	/*public static String getRouteProvider() {
 		if(provider==null) provider=RouteOptions.OSM;
@@ -119,7 +133,7 @@ public class RouteOptions {
 	    case GOOGLE:   return GOOGLE_TRAVEL_MODES.get(travelMode);
 	    case MAPQUEST: return MAPQUEST_TRAVEL_MODES.get(travelMode);
 	    //case GISGRAPHY: 
-	    case GRAPHHOPPER:  return null;
+	    case OFFLINE:  return null;
 	    case OSM:   return null;
 	    default:      return "Fast";
 		}

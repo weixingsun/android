@@ -47,7 +47,7 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 	@Override
 	protected Polyline doInBackground(GeoPoint... params) {
 		if( !RuntimeOptions.getInstance(osm.act).isNetworkAvailable()
-				&& !SavedOptions.routingProvider.equals(RouteOptions.GRAPHHOPPER) ){
+				&& !SavedOptions.routingProvider.equals(RouteOptions.OFFLINE) ){
 			Log.w(TAG, "provider="+SavedOptions.routingProvider);
 			return null;
 		}

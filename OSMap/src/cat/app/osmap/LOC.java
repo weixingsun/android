@@ -11,6 +11,7 @@ import cat.app.maps.MapOptions;
 import cat.app.maps.MathUtil;
 import cat.app.maps.OSM;
 import cat.app.navi.task.FindMyStepTask;
+import cat.app.osmap.util.CountryCode;
 
 import android.app.Activity;
 import android.content.Context;
@@ -37,17 +38,24 @@ public class LOC implements LocationListener {
 	public boolean navigating = false;
 	public Road road;
 	public Integer currIndex = -1;
-	//public Integer toCurrentLastTime = 0;
 	public List<RoadNode> passedNodes = new ArrayList<RoadNode>();
 	public void init(Activity act, OSM osm) {
 		this.act = act;
 		this.osm = osm;
 		if (openGPSEnabled()) {
-			provider = this.getProvider();
+			provider = getGoodProvider() ; //LocationManager.GPS_PROVIDER; //this.getProvider();
+			if(provider.equals(LocationManager.NETWORK_PROVIDER)){
+				provider = LocationManager.GPS_PROVIDER;
+			}
+			Log.i(tag, "gps provider="+provider);
 			myPos = lm.getLastKnownLocation(provider);
 			startGPSLocation();
-			if(myPos!=null && osm.rto.isNetworkAvailable())
-			osm.startTask("geo", new GeoPoint(myPos),"countryCode");
+			if(myPos!=null){
+				countryCode = CountryCode.getByLatLng(myPos.getLatitude(), myPos.getLongitude());
+				Log.w(tag, "countryCode="+countryCode);
+				if(countryCode==null && osm.rto.isNetworkAvailable())
+					osm.startTask("geo", new GeoPoint(myPos),"countryCode");
+			}
 		}
 	}
 
@@ -72,8 +80,11 @@ public class LOC implements LocationListener {
 	public void onLocationChanged(Location loc) {
 		myPos = loc;
 		GeoPoint gp = new GeoPoint(loc.getLatitude(),loc.getLongitude());
-		if (LOC.countryCode == null && osm.rto.isNetworkAvailable()) {
-			osm.startTask("geo", gp,"countryCode");
+		if (countryCode == null) {
+			countryCode = CountryCode.getByGeoPoint(gp);
+			Log.w(tag, "countryCode="+countryCode);
+			if(countryCode==null && osm.rto.isNetworkAvailable())
+				osm.startTask("geo", gp,"countryCode");
 		}
 		
 		//if(MathUtil.compare(osm.mks.testMarker.getPosition(), gp) ){
@@ -99,7 +110,7 @@ public class LOC implements LocationListener {
 		Toast.makeText(act, "Location Disabled", Toast.LENGTH_LONG).show();
 	}
 
-	private String getProvider() {
+	private String getNetworkProvider() {
 		Criteria criteria = new Criteria();
 		criteria.setAccuracy(Criteria.ACCURACY_FINE); // good quality
 		criteria.setAltitudeRequired(false); // no altitude
@@ -107,6 +118,24 @@ public class LOC implements LocationListener {
 		criteria.setCostAllowed(true);
 		criteria.setPowerRequirement(Criteria.POWER_LOW);
 		return lm.getBestProvider(criteria, true);
+	}
+	private String getGoodProvider(){
+        //All your normal criteria setup
+        Criteria criteria = new Criteria();
+        //Use FINE or COARSE (or NO_REQUIREMENT) here
+        criteria.setAccuracy(Criteria.ACCURACY_FINE);
+        criteria.setPowerRequirement(Criteria.POWER_LOW);
+        criteria.setAltitudeRequired(true);
+        criteria.setSpeedRequired(true);
+        criteria.setCostAllowed(true);
+        criteria.setBearingRequired(true);
+
+        //API level 9 and up
+        criteria.setHorizontalAccuracy(Criteria.ACCURACY_HIGH);
+        criteria.setVerticalAccuracy(Criteria.ACCURACY_HIGH);
+        criteria.setBearingAccuracy(Criteria.ACCURACY_LOW);
+        criteria.setSpeedAccuracy(Criteria.ACCURACY_HIGH);
+        return lm.getBestProvider(criteria, true);
 	}
 
 	public int getSpeed() {
