@@ -130,10 +130,11 @@ public class OSM {
 			task.execute();
 		}
 	}
-	public void startDownloadActivity(){
-		Toast.makeText(act, "You need download offline map.", Toast.LENGTH_SHORT).show();
+	//type= map/route
+	public void startDownloadActivity(String fileName){
+		Toast.makeText(act, "You need download offline file:"+fileName, Toast.LENGTH_SHORT).show();
 		Intent intent = new Intent(act, cat.app.osmap.ui.DownloadManagerDemo.class);
-		//intent.putExtra(EXTRA_MESSAGE, message);
+		intent.putExtra("file", fileName);
 	    act.startActivity(intent);
 	}
 }

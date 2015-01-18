@@ -46,7 +46,8 @@ public class MapOptions {
 	private static final String tag = MapOptions.class.getSimpleName();
 
 	static String path = SavedOptions.sdcard+"/"+SavedOptions.MAPSFORGE_FILE_PATH;
-	
+
+	public static String MF_ROUTE_URL = "http://servicedata.vhostall.com/map/";	//nz.map
 	public static final String URL_MAPSFORGE_WEB = "http://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/";
 	public static final String URL_MAPSFORGE_FTP = "ftp-stud.hs-esslingen.de";
 	public static final String URL_MAPSFORGE_FTP_FOLDER = "/pub/Mirrors/download.mapsforge.org/maps/";
@@ -95,7 +96,7 @@ public class MapOptions {
 		if(name.equals(MapOptions.MAP_MAPSFORGE)){	//MapsForge offline data need recreate a mapview
 			osm.mapProvider=MapOptions.getForgeMapTileProvider(osm.act);
 			if(osm.mapProvider==null) {
-				osm.startDownloadActivity();
+				osm.startDownloadActivity(getNeededMapFileShortName());
 				return;//no map file. 
 			}
 		}else{									  //others refresh with tilesource
@@ -162,13 +163,17 @@ public class MapOptions {
 		//return genericMap.getMapView();
 	}
 	public static String getMapFileName(){
-		String mapFileFullName = SavedOptions.sdcard+"/"+SavedOptions.MAPSFORGE_FILE_PATH+SavedOptions.MAPSFORGE_FILE_NAME;
-		//String routeFileFullName =  SavedOptions.sdcard+"/"+SavedOptions.GH_ROUTE_DATA_PATH+SavedOptions.GH_ROUTE_DATA_NAME;
+		String mapFileFullName = getNeededMapFileFullName();
 		File mapFile = new File(mapFileFullName);
-		//File routeFile = new File(routeFileFullName);
-		if(mapFile.exists() ){	//&& routeFile.exists()
+		if(mapFile.exists() ){
 			return mapFileFullName;
 		}
 		return null;
+	}
+	public static String getNeededMapFileFullName(){
+		return SavedOptions.sdcard+"/"+SavedOptions.MAPSFORGE_FILE_PATH+getNeededMapFileShortName();
+	}
+	public static String getNeededMapFileShortName(){
+		return LOC.countryCode+SavedOptions.MAPSFORGE_FILE_EXT;
 	}
 }

@@ -23,7 +23,7 @@ public class RouteOptions {
 	private static final String TAG = RouteOptions.class.getSimpleName();
 	//GraphHopperRouter
 	//public static String GH_ROUTE_DATA_PATH = SavedOptions.GH_ROUTE_DATA_PATH;
-
+	public static String GH_ROUTE_URL = "http://servicedata.vhostall.com/route/";	//nz.zip
 	public static final String OSM = "OSM";
 	public static final String GOOGLE = "Google";
 	public static final String MAPQUEST = "MapQuest";
@@ -45,8 +45,8 @@ public class RouteOptions {
 			SavedOptions.routingProvider=OSM;
 		}else{
 			SavedOptions.routingProvider = value;
-			if(getRouteFileFullName()==null){
-				osm.startDownloadActivity();
+			if(getRouteFileFullName()==null){ //
+				osm.startDownloadActivity(getRouteDownloadFileShortName());
 			}
 		}
 		Log.w(TAG, "name="+value+",FullName="+getRouteFileFullName());
@@ -55,7 +55,7 @@ public class RouteOptions {
 		String routeFileName = null;
 		String routeFilePath = getRouteFilePath();
 		if(getRouteFilePath()!=null){
-			routeFileName = routeFilePath+SavedOptions.GH_ROUTE_DATA_NAME;
+			routeFileName = routeFilePath+SavedOptions.GH_ROUTE_DATA_NAME;	//edges
 		}
 		File routeFile = new File(routeFileName);
 		if(routeFile.exists() ){	//&& routeFile.exists()
@@ -74,11 +74,10 @@ public class RouteOptions {
 		else
 			return null;
 	}
-	/*public static String getRouteProvider() {
-		if(provider==null) provider=RouteOptions.OSM;
-		return provider;
+	public static String getRouteDownloadFileShortName() {
+		return LOC.countryCode+SavedOptions.GH_ROUTE_DATA_ZIP_EXT;
 	}
-	public static void setProvider(String router) {
+	/*public static void setProvider(String router) {
 
 		Log.i(TAG, "setProvider="+router);
 		if(!ROUTERS.containsKey(router)) {

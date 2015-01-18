@@ -92,6 +92,9 @@ public class LOC implements LocationListener {
 		//}
 		//speed = (int) (loc.getSpeed() * 3.6);
 		Log.i(tag, "point="+gp+",speed=" + speed);
+		if(osm.mks.testMarker==null){
+			osm.mks.initTestMarker(loc);
+		}
 		osm.mks.testMarker.setPosition(gp);
 		osm.move(gp);
 		osm.mks.updateMyLocationMarker(gp);

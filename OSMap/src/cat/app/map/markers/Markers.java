@@ -74,6 +74,7 @@ public class Markers {
 		myLocOverlay.addItem(myLocationMarker);
 	}
 	public void initTestMarker(Location loc) {
+		if(loc==null) return;
 		osm.map.getOverlays().remove(testMarker);
 		testMarker = new Marker(osm.map);
 		testMarker.setPosition(new GeoPoint(loc));

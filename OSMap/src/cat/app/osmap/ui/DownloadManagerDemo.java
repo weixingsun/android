@@ -22,8 +22,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import cat.app.maps.BaseActivity;
+import cat.app.maps.MapOptions;
 import cat.app.osmap.R;
+import cat.app.osmap.util.RouteOptions;
 import cat.app.osmap.util.SavedOptions;
+import cat.app.osmap.util.ZIP;
 import cn.trinea.android.common.util.DownloadManagerPro;
 import cn.trinea.android.common.util.PreferencesUtils;
 
@@ -34,11 +37,11 @@ import cn.trinea.android.common.util.PreferencesUtils;
  */
 public class DownloadManagerDemo extends BaseActivity {
 
-    public static final String     DOWNLOAD_FOLDER_NAME = SavedOptions.GH_ROUTE_DATA_PATH;
-    public static final String     DOWNLOAD_FILE_NAME   = SavedOptions.GH_ROUTE_DATA_ZIP_NAME;
+    public static String     DOWNLOAD_FOLDER_NAME;
+    public static String     DOWNLOAD_FILE_NAME;
 
     //public static final String   FILE_URL              = "http://servicedata.vhostall.com/route/nz.zip";
-    public static final String     FILE_URL              = "http://servicedata.vhostall.com/route/nz.zip";
+    public static String     FILE_URL;//              = "http://servicedata.vhostall.com/route/nz.zip";
     public static final String     KEY_NAME_DOWNLOAD_ID = "downloadId";
 	protected static final String  tag = DownloadManagerDemo.class.getSimpleName();
 
@@ -62,6 +65,19 @@ public class DownloadManagerDemo extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState, R.layout.download_manager_demo);
 
+        Bundle extras = getIntent().getExtras();
+        String fileName=null;
+        if(extras!=null) {
+        	fileName =extras.getString("file");
+        }
+        DOWNLOAD_FILE_NAME = fileName;
+        if(fileName.endsWith(".zip")){
+        	DOWNLOAD_FOLDER_NAME = SavedOptions.GH_ROUTE_DATA_PATH;
+        	FILE_URL = RouteOptions.GH_ROUTE_URL+fileName;
+        }else if(fileName.endsWith(".map")){
+        	DOWNLOAD_FOLDER_NAME = SavedOptions.MAPSFORGE_FILE_PATH;
+        	FILE_URL = MapOptions.MF_ROUTE_URL+fileName;
+        }
         handler = new MyHandler();
         downloadManager = (DownloadManager)getSystemService(DOWNLOAD_SERVICE);
         downloadManagerPro = new DownloadManagerPro(downloadManager);
@@ -209,7 +225,20 @@ public class DownloadManagerDemo extends BaseActivity {
                     String apkFilePath = new StringBuilder(Environment.getExternalStorageDirectory().getAbsolutePath())
                             .append(File.separator).append(DOWNLOAD_FOLDER_NAME).append(File.separator)
                             .append(DOWNLOAD_FILE_NAME).toString();
-                    install(context, apkFilePath);
+                    //unzip route file, and move the correct path
+                    //install(context, apkFilePath);
+                    if(DOWNLOAD_FILE_NAME.endsWith(".zip")){
+                    	//Log.e(tag, "DOWNLOAD_FILE_NAME="+DOWNLOAD_FILE_NAME);
+                    	//String countryCode = DOWNLOAD_FILE_NAME.split("\\.")[0];
+                    	String folderName = Environment.getExternalStoragePublicDirectory(DOWNLOAD_FOLDER_NAME).getAbsolutePath();
+                    	String zipFile = folderName +"/"+ DOWNLOAD_FILE_NAME;
+                    	String unzipLocation = folderName +"/";
+                    	//Log.e(tag, "unzipping: "+zipFile+", folder="+unzipLocation);
+                    	ZIP d = new ZIP(zipFile, unzipLocation);
+                    	d.unzip();
+                    	File zip = new File(zipFile);
+                    	zip.delete();
+                    }
                 }
             }
         }
