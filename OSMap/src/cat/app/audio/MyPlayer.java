@@ -1,14 +1,12 @@
 package cat.app.audio;
 
-import java.io.File;
-
 import org.osmdroid.bonuspack.routing.RoadNode;
 
 import android.app.Activity;
 import android.net.Uri;
 import android.util.Log;
 
-import cat.app.osmap.util.SavedOptions;
+import cat.app.osmap.R;
 
 import com.google.android.exoplayer.ExoPlaybackException;
 import com.google.android.exoplayer.ExoPlayer;
@@ -19,23 +17,28 @@ import com.google.android.exoplayer.TrackRenderer;
 
 public class MyPlayer {
 	private static final String tag = MyPlayer.class.getSimpleName();
-	private static final String folder = SavedOptions.HINT_FILE_PATH;
+	//private static final String folder = SavedOptions.HINT_FILE_PATH;
 	private static ExoPlayer player;
 	public static void play(Activity act, int distance,int maneuverType) {
-		String filePath = folder+"type_"+maneuverType+"_dist_"+distance+".mp3";
-		File mp3  = new File(filePath);
+		//String fileFullPath = folder+"type_"+maneuverType+"_dist_"+distance+".mp3";
+		String fileName = "type_"+maneuverType+"_dist_"+distance;	//+".mp3"
+		/*File mp3  = new File(filePath);
 		if(!mp3.exists()) {
 			Log.w(tag, "file="+filePath);
 			return;
-			}
-		Uri uri = Uri.fromFile(new File(filePath));
+		}
+		Uri uri = Uri.fromFile(new File(filePath));*/
+		Uri uri = getUriByName("raw/"+fileName);
+		if(!checkRawList(fileName)) {
+			return;
+		}
 	    FrameworkSampleSource sampleSource = new FrameworkSampleSource(act, uri, null, 1);
 	    // Build the track renderers
 	    TrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource, null, true);
 	    //new MediaCodecAudioTrackRenderer(sampleSource, null, true);
 	    //format.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
 	    //A component of name 'OMX.qcom.audio.decoder.aac' already exists, ignoring this one.
-	    Log.w(tag, "init audioRenderer.");
+	    //Log.w(tag, "init audioRenderer.");
 	    player = ExoPlayer.Factory.newInstance(1);
 	    player.prepare(audioRenderer);
 	    player.setPlayWhenReady(true);
@@ -48,7 +51,7 @@ public class MyPlayer {
 			public void onPlayerStateChanged(boolean playWhenReady, int state) {
 				if(state==ExoPlayer.STATE_ENDED){
 					player.release();
-					Log.i(tag, "player released");
+					//Log.i(tag, "player released");
 				}
 			}});
 	}
@@ -59,7 +62,21 @@ public class MyPlayer {
 		// "in 400 m" + "turn right"
 		play(act,dist, node.mManeuverType);  //distance+turn
 	}
-	
+	public static Uri getUriByName(String res){
+		return Uri.parse("android.resource://cat.app.osmap/"+res);  //drawable/icon
+	}
+	public static boolean checkRawList(String fileName){
+		java.lang.reflect.Field[] fields=R.raw.class.getFields();
+	    for(int count=0; count < fields.length; count++){
+	    	String resName = fields[count].getName();
+	    	if(resName.equals(fileName)){
+		        Log.i(tag, "res="+resName+", file="+fileName);
+	    		return true;
+	    	}
+	    }
+	    Log.i("Raw Asset: ", "not in raw list, file="+fileName);
+	    return false;
+	}
 }
 /*
 	static {

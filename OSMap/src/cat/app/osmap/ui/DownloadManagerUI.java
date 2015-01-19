@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.ContentObserver;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -35,22 +36,25 @@ import cn.trinea.android.common.util.PreferencesUtils;
  * 
  * @author <a href="http://sun.vhostall.com/" target="_blank">Sun</a> 2015-1-15
  */
-public class DownloadManagerDemo extends BaseActivity {
+public class DownloadManagerUI extends BaseActivity {
 
     public static String     DOWNLOAD_FOLDER_NAME;
     public static String     DOWNLOAD_FILE_NAME;
+    public static String     DOWNLOAD_FILE_DESC;
+    public static String     COUNTRY_CODE;
 
     //public static final String   FILE_URL              = "http://servicedata.vhostall.com/route/nz.zip";
     public static String     FILE_URL;//              = "http://servicedata.vhostall.com/route/nz.zip";
     public static final String     KEY_NAME_DOWNLOAD_ID = "downloadId";
-	protected static final String  tag = DownloadManagerDemo.class.getSimpleName();
+	protected static final String  tag = DownloadManagerUI.class.getSimpleName();
 
-    private Button                 downloadButton;
+    //private Button                 downloadButton;
     private ProgressBar            downloadProgress;
     private TextView               downloadTip;
     private TextView               downloadSize;
     private TextView               downloadPrecent;
     private Button                 downloadCancel;
+    //private Button				   downloadDone;
 
     private DownloadManager        downloadManager;
     private DownloadManagerPro     downloadManagerPro;
@@ -71,13 +75,16 @@ public class DownloadManagerDemo extends BaseActivity {
         	fileName =extras.getString("file");
         }
         DOWNLOAD_FILE_NAME = fileName;
+        COUNTRY_CODE = DOWNLOAD_FILE_NAME.split("\\.")[0];
         if(fileName.endsWith(".zip")){
-        	DOWNLOAD_FOLDER_NAME = SavedOptions.GH_ROUTE_DATA_PATH;
+        	DOWNLOAD_FOLDER_NAME = SavedOptions.GH_ROUTE_DATA_PATH; 
+        	DOWNLOAD_FILE_DESC = COUNTRY_CODE +" Offline Route";
         	FILE_URL = RouteOptions.GH_ROUTE_URL+fileName;
         }else if(fileName.endsWith(".map")){
         	DOWNLOAD_FOLDER_NAME = SavedOptions.MAPSFORGE_FILE_PATH;
         	FILE_URL = MapOptions.MF_ROUTE_URL+fileName;
-        }
+        	DOWNLOAD_FILE_DESC = COUNTRY_CODE +" Offline Map";
+        } 
         handler = new MyHandler();
         downloadManager = (DownloadManager)getSystemService(DOWNLOAD_SERVICE);
         downloadManagerPro = new DownloadManagerPro(downloadManager);
@@ -125,7 +132,7 @@ public class DownloadManagerDemo extends BaseActivity {
     }
 
     private void initView() {
-        downloadButton = (Button)findViewById(R.id.download_button);
+        //downloadButton = (Button)findViewById(R.id.download_button);
         downloadCancel = (Button)findViewById(R.id.download_cancel);
         downloadProgress = (ProgressBar)findViewById(R.id.download_progress);
         downloadTip = (TextView)findViewById(R.id.download_tip);
@@ -141,37 +148,28 @@ public class DownloadManagerDemo extends BaseActivity {
          */
         downloadId = PreferencesUtils.getLong(context, KEY_NAME_DOWNLOAD_ID);
         updateView();
-        downloadButton.setOnClickListener(new OnClickListener() {
-
+        downloadCancel.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 File folder = Environment.getExternalStoragePublicDirectory(DOWNLOAD_FOLDER_NAME);
                 if (!folder.exists() || !folder.isDirectory()) {
                     folder.mkdirs();
                 }
-                Log.i(tag, "file="+DOWNLOAD_FOLDER_NAME+"/"+DOWNLOAD_FILE_NAME+",url="+FILE_URL);
+                Log.e(tag, "file="+DOWNLOAD_FOLDER_NAME+"/"+DOWNLOAD_FILE_NAME+",url="+FILE_URL);
                 DownloadManager.Request request = new DownloadManager.Request(Uri.parse(FILE_URL));
                 request.setDestinationInExternalPublicDir(DOWNLOAD_FOLDER_NAME, DOWNLOAD_FILE_NAME);
-                request.setTitle(getString(R.string.download_nz));
-                request.setDescription("nz map");
+                request.setTitle(getString(R.string.download_title));
+                request.setDescription(DOWNLOAD_FILE_NAME);
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
                 request.setVisibleInDownloadsUi(false);
                 // request.allowScanningByMediaScanner();
                 // request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI);
                 // request.setShowRunningNotification(false);
                 // request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
-                request.setMimeType("application/cn.trinea.download.file");
+                // request.setMimeType("application/cat.app.download.file");
                 downloadId = downloadManager.enqueue(request);
                 /** save download id to preferences **/
                 PreferencesUtils.putLong(context, KEY_NAME_DOWNLOAD_ID, downloadId);
-                updateView();
-            }
-        });
-        downloadCancel.setOnClickListener(new OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                downloadManager.remove(downloadId);
                 updateView();
             }
         });
@@ -197,16 +195,13 @@ public class DownloadManagerDemo extends BaseActivity {
     }
 
     class DownloadChangeObserver extends ContentObserver {
-
         public DownloadChangeObserver() {
             super(handler);
         }
-
         @Override
         public void onChange(boolean selfChange) {
             updateView();
         }
-
     }
 
     class CompleteReceiver extends BroadcastReceiver {
@@ -220,15 +215,11 @@ public class DownloadManagerDemo extends BaseActivity {
             if (completeDownloadId == downloadId) {
                 initData();
                 updateView();
-                // if download successful, install apk
                 if (downloadManagerPro.getStatusById(downloadId) == DownloadManager.STATUS_SUCCESSFUL) {
-                    String apkFilePath = new StringBuilder(Environment.getExternalStorageDirectory().getAbsolutePath())
-                            .append(File.separator).append(DOWNLOAD_FOLDER_NAME).append(File.separator)
-                            .append(DOWNLOAD_FILE_NAME).toString();
-                    //unzip route file, and move the correct path
-                    //install(context, apkFilePath);
+                	//Log.e(tag, "file="+DOWNLOAD_FILE_NAME);
+                    // if download successful, unzip
                     if(DOWNLOAD_FILE_NAME.endsWith(".zip")){
-                    	//Log.e(tag, "DOWNLOAD_FILE_NAME="+DOWNLOAD_FILE_NAME);
+                    	//Log.e(tag, "zip="+DOWNLOAD_FILE_NAME);
                     	//String countryCode = DOWNLOAD_FILE_NAME.split("\\.")[0];
                     	String folderName = Environment.getExternalStoragePublicDirectory(DOWNLOAD_FOLDER_NAME).getAbsolutePath();
                     	String zipFile = folderName +"/"+ DOWNLOAD_FILE_NAME;
@@ -252,14 +243,13 @@ public class DownloadManagerDemo extends BaseActivity {
     /**
      * MyHandler
      * 
-     * @author Trinea 2012-12-18
+     * @author wsun 2015-1-18
      */
     private class MyHandler extends Handler {
 
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-
             switch (msg.what) {
                 case 0:
                     int status = (Integer)msg.obj;
@@ -267,11 +257,20 @@ public class DownloadManagerDemo extends BaseActivity {
                         downloadProgress.setVisibility(View.VISIBLE);
                         downloadProgress.setMax(0);
                         downloadProgress.setProgress(0);
-                        downloadButton.setVisibility(View.GONE);
+                        //downloadButton.setVisibility(View.GONE);
                         downloadSize.setVisibility(View.VISIBLE);
                         downloadPrecent.setVisibility(View.VISIBLE);
                         downloadCancel.setVisibility(View.VISIBLE);
+                        changeIcon(R.drawable.icon_stop);
 
+                        downloadCancel.setOnClickListener(new OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                downloadManager.remove(downloadId);
+                                updateView();
+                                changeIcon(R.drawable.icon_download);
+                            }
+                        });
                         if (msg.arg2 < 0) {
                             downloadProgress.setIndeterminate(true);
                             downloadPrecent.setText("0%");
@@ -284,20 +283,23 @@ public class DownloadManagerDemo extends BaseActivity {
                             downloadSize.setText(getAppSize(msg.arg1) + "/" + getAppSize(msg.arg2));
                         }
                     } else {
-                        downloadProgress.setVisibility(View.GONE);
+                        downloadProgress.setVisibility(View.VISIBLE);
                         downloadProgress.setMax(0);
                         downloadProgress.setProgress(0);
-                        downloadButton.setVisibility(View.VISIBLE);
-                        downloadSize.setVisibility(View.GONE);
-                        downloadPrecent.setVisibility(View.GONE);
-                        downloadCancel.setVisibility(View.GONE);
+                        //downloadButton.setVisibility(View.VISIBLE);
+                        downloadSize.setVisibility(View.VISIBLE);
+                        downloadPrecent.setVisibility(View.VISIBLE);
+                        downloadCancel.setVisibility(View.VISIBLE);
 
+                        //Log.e(tag, "status="+status+",done="+DownloadManager.STATUS_SUCCESSFUL);
                         if (status == DownloadManager.STATUS_FAILED) {
-                            downloadButton.setText(getString(R.string.app_status_download_fail));
+                            //downloadButton.setText(getString(R.string.app_status_download_fail));
                         } else if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                            downloadButton.setText(getString(R.string.app_status_downloaded));
+                            //downloadButton.setText(getString(R.string.app_status_downloaded));
+                        	changeUIAfterDownload();
                         } else {
-                            downloadButton.setText(getString(R.string.app_status_download));
+                            //downloadButton.setText(getString(R.string.app_status_download));
+                        	downloadSize.setText(DOWNLOAD_FILE_DESC);
                         }
                     }
                     break;
@@ -305,6 +307,19 @@ public class DownloadManagerDemo extends BaseActivity {
         }
     }
 
+    public void changeUIAfterDownload(){
+        downloadPrecent.setText("");
+        downloadSize.setText(DOWNLOAD_FILE_DESC+" Downloaded");
+        changeIcon(R.drawable.icon_correct);
+        downloadCancel.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) { }
+        });
+    }
+    public void changeIcon(int resId){
+        Drawable myIcon = DownloadManagerUI.this.getResources().getDrawable(resId);
+        downloadCancel.setCompoundDrawablesWithIntrinsicBounds(null, null, null, myIcon);
+    }
     static final DecimalFormat DOUBLE_DECIMAL_FORMAT = new DecimalFormat("0.##");
 
     public static final int    MB_2_BYTE             = 1024 * 1024;

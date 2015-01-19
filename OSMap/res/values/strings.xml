@@ -15,8 +15,7 @@
     <string name="password">Password:</string>
     <string name="submit">Submit</string>
     <string name="register">New User Register</string>
-    <string name="download_cn">China</string>
-    <string name="download_nz">New Zealand Offline Map</string>
+    <string name="download_title">Download Map File</string>
     <string name="app_status_download">click to download</string>
     <string name="app_status_downloaded">downloaded</string>
     <string name="app_status_download_fail">download fail, click to download again</string>

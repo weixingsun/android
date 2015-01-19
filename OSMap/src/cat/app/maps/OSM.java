@@ -15,6 +15,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.location.Address;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import cat.app.map.markers.Markers;
@@ -75,7 +76,7 @@ public class OSM {
 		map.setLongClickable(true);
 		//mapView.setUseDataConnection(false); //disable network
 		map.setMinZoomLevel(4);
-		//mapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+		map.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 		map.getViewTreeObserver().addOnGlobalLayoutListener(new GlobalLayoutListener(this));
 		MyMapEventsReceiver mReceive = new MyMapEventsReceiver(this);
 		MapEventsOverlay OverlayEventos = new MapEventsOverlay(act.getBaseContext(), mReceive);
@@ -132,8 +133,8 @@ public class OSM {
 	}
 	//type= map/route
 	public void startDownloadActivity(String fileName){
-		Toast.makeText(act, "You need download offline file:"+fileName, Toast.LENGTH_SHORT).show();
-		Intent intent = new Intent(act, cat.app.osmap.ui.DownloadManagerDemo.class);
+		Toast.makeText(act, "You need download offline files", Toast.LENGTH_SHORT).show();
+		Intent intent = new Intent(act, cat.app.osmap.ui.DownloadManagerUI.class);
 		intent.putExtra("file", fileName);
 	    act.startActivity(intent);
 	}

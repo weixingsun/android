@@ -3,7 +3,6 @@ package cat.app.osmap.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import cat.app.audio.MyPlayer;
 import cat.app.maps.MapOptions;
 import cat.app.osmap.R;
 import cat.app.osmap.util.GeoOptions;
@@ -11,15 +10,11 @@ import cat.app.osmap.util.RouteOptions;
 import cat.app.osmap.util.SavedOptions;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -67,11 +62,12 @@ public class MenuItemClickListener implements OnItemClickListener {
 				if(MapOptions.MAP_TILES.containsKey(name)){
 					MapOptions.changeTileProvider(MapOptions.MAP_TILES.get(name));
 					SavedOptions.selectedMap = name;
-					//Log.i(TAG, "TileProvider="+name);
+					Log.i(TAG, "MapTileProvider="+name);
 				}else if(RouteOptions.MAPQUEST_TRAVEL_MODES.containsKey(name)){
 					RouteOptions.changeTravelMode(name);
 					SavedOptions.selectedTravelMode = name;
-					//Log.i(TAG, "TravelMode="+name);
+					Log.i(TAG, "TravelMode="+name);
+					//////////////////MyPlayer.play(activity, 0, 2);
 				}else if(GeoOptions.GEO_CODERS.containsKey(name)){
 					GeoOptions.changeGeocoder(GeoOptions.GEO_CODERS.get(name));
 					RouteOptions.changeRouteProvider(RouteOptions.ROUTERS.get(name));
@@ -79,6 +75,7 @@ public class MenuItemClickListener implements OnItemClickListener {
 					String routeProvider = RouteOptions.ROUTERS.get(name);
 					SavedOptions.geocodingProvider = geoProvider;
 					SavedOptions.routingProvider = routeProvider;
+					Log.i(TAG, "Route="+name);
 				}
 				//Log.i(TAG, "MenuClicked="+name);
 			}

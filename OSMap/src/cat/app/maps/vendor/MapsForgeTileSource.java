@@ -14,6 +14,8 @@ import org.osmdroid.tileprovider.tilesource.BitmapTileSourceBase;
 import org.mapsforge.map.rendertheme.InternalRenderTheme;
 import org.mapsforge.map.rendertheme.XmlRenderTheme;
 import org.mapsforge.core.model.Tile;
+
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -127,6 +129,7 @@ public class MapsForgeTileSource extends BitmapTileSourceBase {
 		}
 
 		Drawable d = new BitmapDrawable(bitmap);
+		//new BitmapDrawable(Context.getResources(), bitmap);
 		return d;
 	}
 

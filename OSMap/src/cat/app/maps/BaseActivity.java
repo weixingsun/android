@@ -4,7 +4,6 @@ import cat.app.osmap.util.AppUtils;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 
 //import com.google.analytics.tracking.android.EasyTracker;
@@ -12,7 +11,7 @@ import android.view.MenuItem;
 /**
  * BaseActivity
  * 
- * @author <a href="http://www.trinea.cn" target="_blank">Trinea</a> 2013-6-1
+ * @author <a href="http://sun.vhostall.com" target="_blank">Sun</a> 2013-6-1
  */
 public class BaseActivity extends Activity {
 
