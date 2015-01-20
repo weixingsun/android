@@ -55,6 +55,7 @@ public class DownloadManagerUI extends BaseActivity {
     private TextView               downloadPrecent;
     private Button                 downloadCancel;
     //private Button				   downloadDone;
+    private String					phase				= "prepared";
 
     private DownloadManager        downloadManager;
     private DownloadManagerPro     downloadManagerPro;
@@ -78,12 +79,10 @@ public class DownloadManagerUI extends BaseActivity {
         COUNTRY_CODE = DOWNLOAD_FILE_NAME.split("\\.")[0];
         if(fileName.endsWith(".zip")){
         	DOWNLOAD_FOLDER_NAME = SavedOptions.GH_ROUTE_DATA_PATH; 
-        	DOWNLOAD_FILE_DESC = COUNTRY_CODE +" Offline Route";
         	FILE_URL = RouteOptions.GH_ROUTE_URL+fileName;
         }else if(fileName.endsWith(".map")){
         	DOWNLOAD_FOLDER_NAME = SavedOptions.MAPSFORGE_FILE_PATH;
         	FILE_URL = MapOptions.MF_ROUTE_URL+fileName;
-        	DOWNLOAD_FILE_DESC = COUNTRY_CODE +" Offline Map";
         } 
         handler = new MyHandler();
         downloadManager = (DownloadManager)getSystemService(DOWNLOAD_SERVICE);
@@ -171,6 +170,7 @@ public class DownloadManagerUI extends BaseActivity {
                 /** save download id to preferences **/
                 PreferencesUtils.putLong(context, KEY_NAME_DOWNLOAD_ID, downloadId);
                 updateView();
+                DownloadManagerUI.this.phase = "downloading";
             }
         });
     }
@@ -211,6 +211,7 @@ public class DownloadManagerUI extends BaseActivity {
              * get the id of download which have download success, if the id is my id and it's status is successful,
              * then install it
              **/
+        	DownloadManagerUI.this.phase = "downloaded";
             long completeDownloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
             if (completeDownloadId == downloadId) {
                 initData();
@@ -296,17 +297,34 @@ public class DownloadManagerUI extends BaseActivity {
                             //downloadButton.setText(getString(R.string.app_status_download_fail));
                         } else if (status == DownloadManager.STATUS_SUCCESSFUL) {
                             //downloadButton.setText(getString(R.string.app_status_downloaded));
-                        	changeUIAfterDownload();
                         } else {
                             //downloadButton.setText(getString(R.string.app_status_download));
-                        	downloadSize.setText(DOWNLOAD_FILE_DESC);
                         }
+                        if(DownloadManagerUI.this.phase.equals("prepared")){
+                        	changeUIBeforeDownload();
+                        } else if(DownloadManagerUI.this.phase.equals("downloaded") ){
+                    		changeUIAfterDownload();
+                    	}
                     }
                     break;
             }
         }
     }
-
+    public void changeUIBeforeDownload(){
+        downloadPrecent.setText("");
+        String title=null;
+        if(DOWNLOAD_FILE_NAME.endsWith("zip")){
+        	title = "Download Route File: "+COUNTRY_CODE.toUpperCase();
+        }else{
+        	title = "Download Map File: "+COUNTRY_CODE.toUpperCase();
+        }
+        downloadSize.setText(title);
+        //changeIcon(R.drawable.icon_download);
+        //downloadCancel.setOnClickListener(new OnClickListener() {
+        //    @Override
+        //    public void onClick(View v) { }
+        //});
+    }
     public void changeUIAfterDownload(){
         downloadPrecent.setText("");
         downloadSize.setText(DOWNLOAD_FILE_DESC+" Downloaded");
