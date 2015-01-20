@@ -5,6 +5,7 @@ import java.util.List;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.mapsforge.GenericMapView;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
+import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.tileprovider.MapTileProviderBase;
 import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.util.GeoPoint;
@@ -41,6 +42,7 @@ public class OSM {
 	public RuntimeOptions rto;
 	GenericMapView genericMapView;
 	IMapController mapController;
+	public Polyline polyline;
 	public Markers mks;
 	public List<Address> suggestPoints;
 	public MapView map;

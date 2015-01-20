@@ -120,7 +120,7 @@ public class Markers {
 		}
 	}
 	public void addWayPointMarker(Road road,int seq){
-		RoadNode node = road.mNodes.get(seq);
+		RoadNode node = road.mNodes.get(seq); 
 		Marker nodeMarker = new Marker(osm.map);
 		nodeMarker.setPosition(node.mLocation);
 		Drawable nodeIcon = osm.act.getResources().getDrawable(R.drawable.red_point_16);

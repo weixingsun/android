@@ -56,10 +56,11 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 		road = roadManager.getRoad(ro.list);
 		if(road==null || road.mNodes==null) return null;
 		osm.loc.road = road;
-		Polyline pl = RoadManager.buildRoadOverlay(road, osm.act);
-		pl.setWidth(10);
-		pl.setColor(RouteOptions.getColor());
-		return pl;
+		osm.polyline = RoadManager.buildRoadOverlay(road, osm.act);
+		osm.polyline.setWidth(10);
+		osm.polyline.setColor(RouteOptions.getColor());
+		
+		return osm.polyline;
 	}
 	@Override
     protected void onPostExecute(Polyline pl) {
@@ -68,6 +69,7 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 		if(road==null) return;
 		osm.mks.addPolyline(pl);
 		osm.mks.drawStepsPoint(road);
+		osm.loc.passedNodes.clear();
     }
 
 }

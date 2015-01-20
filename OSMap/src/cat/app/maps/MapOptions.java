@@ -109,7 +109,10 @@ public class MapOptions {
 	}
 
 	public static void move() {
-		osm.move();
+		if(osm.loc.myPos==null) return;
+		GeoPoint gp = new GeoPoint(osm.loc.myPos);
+		osm.mks.testMarker.setPosition(gp);
+		move(gp);
 	}
 
 	public static void move(GeoPoint loc) {

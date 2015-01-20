@@ -31,10 +31,7 @@ public class MyMapEventsReceiver implements MapEventsReceiver{
 		}else{
 			Toast.makeText(osm.act, GeoOptions.NETWORK_UNAVAILABLE, Toast.LENGTH_LONG).show();
 		}
-		ArrayList<GeoPoint> points = new ArrayList<GeoPoint>();
-		points.add(new GeoPoint(osm.loc.myPos));
-		points.add(p);
-		osm.ro.setWayPoints(points);
+		osm.ro.setWayPoints(new GeoPoint(osm.loc.myPos),p);
 		osm.startTask("route", new GeoPoint(p),"route");
 		return false;
 	}

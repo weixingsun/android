@@ -21,6 +21,7 @@ import cat.app.osmap.LOC;
 public class RouteOptions {
 
 	private static final String TAG = RouteOptions.class.getSimpleName();
+	GeoPoint dest;
 	//GraphHopperRouter
 	//public static String GH_ROUTE_DATA_PATH = SavedOptions.GH_ROUTE_DATA_PATH;
 	public static String GH_ROUTE_URL = "http://servicedata.vhostall.com/route/";	//nz.zip
@@ -122,7 +123,7 @@ public class RouteOptions {
 		//GH_TRAVEL_MODES.put("Bus",   null);				// not supported yet
 	}
 
-	public ArrayList<GeoPoint> list ;
+	
 	String MAPQUEST_API_KEY = "Fmjtd%7Cluu8296znl%2Crg%3Do5-9w1xdz";
 
 	private static String travelMode;//Fast
@@ -137,8 +138,22 @@ public class RouteOptions {
 	    default:      return "Fast";
 		}
 	}
+	
+	public ArrayList<GeoPoint> list = new ArrayList<GeoPoint>();
 	public void setWayPoints(ArrayList<GeoPoint> points) {
 		this.list=points;
+	}
+	public void setWayPoints(GeoPoint start, GeoPoint end){
+		list.clear();
+		list.add(start);
+		list.add(end);
+		this.dest=end;
+	}
+
+	public void redraw(GeoPoint start){
+		list.clear();
+		list.add(start);
+		list.add(this.dest);
 	}
 	public static void changeTravelMode(String mode) {
 		travelMode=mode;

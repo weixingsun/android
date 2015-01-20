@@ -37,7 +37,7 @@ public class LOC implements LocationListener {
 	public boolean onRoad=false;
 	public boolean navigating = false;
 	public Road road;
-	public Integer currIndex = -1;
+	//public Integer currIndex = -1;
 	public List<RoadNode> passedNodes = new ArrayList<RoadNode>();
 	public void init(Activity act, OSM osm) {
 		this.act = act;
@@ -86,7 +86,6 @@ public class LOC implements LocationListener {
 			if(countryCode==null && osm.rto.isNetworkAvailable())
 				osm.startTask("geo", gp,"countryCode");
 		}
-		
 		//if(MathUtil.compare(osm.mks.testMarker.getPosition(), gp) ){
 			//osm.mks.testMarker.setTitle(title)
 		//}
@@ -152,7 +151,7 @@ public class LOC implements LocationListener {
 	public void cleanupRoad() {
 		this.onRoad=false;
 		this.passedNodes.clear();
-		this.currIndex = -1;
+		//this.currIndex = -1;
 		this.navigating = false;
 		this.road = null;
 	}
