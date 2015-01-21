@@ -20,14 +20,10 @@ public class MyMapEventsReceiver implements MapEventsReceiver{
 	}
 	@Override
 	public boolean longPressHelper(GeoPoint p) {
-		if (osm.rto.isNetworkAvailable() ) {	//|| loc.myPos == null
+		if(SavedOptions.routingProvider.equals(RouteOptions.OFFLINE)){
+			//osm.mks.updateRouteMarker(addr);
+		}else if (osm.rto.isNetworkAvailable() ) {	//|| loc.myPos == null
 			osm.startTask("geo", new GeoPoint(p),"route");
-		}else if(SavedOptions.routingProvider.equals(RouteOptions.OFFLINE)){
-			Address addr = new Address(Locale.getDefault());
-			addr.setLatitude(p.getLatitude());
-			addr.setLongitude(p.getLongitude());
-			addr.setFeatureName("Destination");
-			osm.mks.updateRouteMarker(addr);
 		}else{
 			Toast.makeText(osm.act, GeoOptions.NETWORK_UNAVAILABLE, Toast.LENGTH_LONG).show();
 		}

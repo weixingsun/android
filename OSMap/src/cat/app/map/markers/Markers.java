@@ -107,7 +107,7 @@ public class Markers {
 		routeMarker.setSnippet(briefAddress);
 		Drawable icon = osm.act.getResources().getDrawable(R.drawable.marker_blue);
 		routeMarker.setIcon(icon);
-		Drawable img = osm.act.getResources().getDrawable(R.drawable.home_icon);
+		Drawable img = osm.act.getResources().getDrawable(R.drawable.ic_arrived);
 		routeMarker.setImage(img);
 		//Log.w(tag, "adding routeMarker="+routeMarker);
 		osm.map.getOverlays().add(routeMarker);

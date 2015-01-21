@@ -3,6 +3,7 @@ package cat.app.navi;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,11 +24,15 @@ import com.graphhopper.GHResponse;
 import com.graphhopper.GraphHopper;
 import com.graphhopper.routing.AlgorithmOptions;
 import com.graphhopper.routing.RoutingAlgorithmFactorySimple;
+import com.graphhopper.routing.util.EdgeFilter;
 import com.graphhopper.routing.util.TraversalMode;
+import com.graphhopper.storage.index.QueryResult;
 import com.graphhopper.util.Instruction;
 import com.graphhopper.util.InstructionList;
 import com.graphhopper.util.PointList;
 
+import android.content.Context;
+import android.location.Address;
 import android.location.Location;
 import android.util.Log;
 
@@ -40,8 +45,9 @@ public class GraphHopperOfflineRoadManager extends RoadManager {
 	public static final int STATUS_NO_ROUTE = Road.STATUS_TECHNICAL_ISSUE+1;
 
 	public GraphHopper hopper = new GraphHopper().forMobile();
-	protected String mServiceUrl;
-	
+	//protected String mServiceUrl;
+	GeoPoint start;
+	GeoPoint end;
 	/** mapping from GraphHopper directions to MapQuest maneuver IDs: */
 	static final HashMap<Integer, Integer> MANEUVERS;
 
@@ -79,8 +85,8 @@ public class GraphHopperOfflineRoadManager extends RoadManager {
 
 	@Override 
 	public Road getRoad(ArrayList<GeoPoint> waypoints) {
-		GeoPoint start = waypoints.get(0);
-		GeoPoint end = waypoints.get(waypoints.size()-1);
+		start = waypoints.get(0);
+		end = waypoints.get(waypoints.size()-1);
 		GHRequest req = new GHRequest(start.getLatitude(),start.getLongitude(),end.getLatitude(),end.getLongitude());
 		req.setAlgorithm(AlgorithmOptions.DIJKSTRA_BI);
 		if(RouteOptions.GH_TRAVEL_MODES.containsKey(SavedOptions.selectedTravelMode)){
@@ -103,21 +109,29 @@ public class GraphHopperOfflineRoadManager extends RoadManager {
 			road.mStatus = STATUS_NO_ROUTE;
 			return road;
 		}
-			road.mRouteHigh = this.getHighPoints(pointList);
-			for(Instruction hint:hintList){
-				RoadNode node = new RoadNode();
-				node.mLocation = new GeoPoint(hint.getPoints().getLat(0),hint.getPoints().getLon(0));
-				node.mLength = hint.getDistance()/1000;
-				node.mDuration = hint.getTime()/1000;
-				node.mManeuverType = getManeuverCode(hint.getSign());
-				String ann = hint.getAnnotation().getImportance()+": "+hint.getAnnotation().getMessage();
-				node.mInstructions = hint.getName()+" , "+ann;
-				road.mNodes.add(node);
-			}
+		road.mRouteHigh = this.getHighPoints(pointList);
+		for(Instruction hint:hintList){
+			RoadNode node = new RoadNode();
+			node.mLocation = new GeoPoint(hint.getPoints().getLat(0),hint.getPoints().getLon(0));
+			node.mLength = hint.getDistance()/1000;
+			node.mDuration = hint.getTime()/1000;
+			node.mManeuverType = getManeuverCode(hint.getSign());
+			String ann = hint.getAnnotation().getImportance()+": "+hint.getAnnotation().getMessage();
+			node.mInstructions = hint.getName()+" , "+ann;
+			road.mNodes.add(node);
+		}
 		Log.d(BonusPackHelper.LOG_TAG, "GraphHopper.getRoad - finished");
+		//findAddressNames(waypoints);
 		return road;
 	}
 	
+	public String getAddressName(GeoPoint point){
+		QueryResult rua = hopper.getLocationIndex().findClosest(point.getLatitude(), point.getLongitude(), EdgeFilter.ALL_EDGES);
+		return rua.getClosestEdge().getName();
+	}
+	public double getMaxSpeed(){
+		return hopper.getGraph().getEncodingManager().getEncoder("CAR").getMaxSpeed();
+	}
 	protected int getManeuverCode(int direction){
 		Integer code = MANEUVERS.get(direction);
 		if (code != null)
@@ -133,18 +147,22 @@ public class GraphHopperOfflineRoadManager extends RoadManager {
 		}
 		return list;
 	}
-}
 
-/*
- 	protected String getUrl(ArrayList<GeoPoint> waypoints){
-		StringBuffer urlString = new StringBuffer(mServiceUrl);
-		for (int i=0; i<waypoints.size(); i++){
-			GeoPoint p = waypoints.get(i);
-			urlString.append("&point="+geoPointAsString(p));
-		}
-		//urlString.append("&instructions=true"); already set by default
-		//urlString.append("&elevation="+(mWithElevation?"true":"false"));
-		urlString.append(mOptions);
-		return urlString.toString();
+	@Override
+	public Address getEndAddress() {
+		Address addr = new Address(Locale.getDefault());
+		addr.setLatitude(end.getLatitude());
+		addr.setLongitude(end.getLongitude());
+		addr.setFeatureName(getAddressName(end));
+		return addr;
 	}
-*/
+
+	@Override
+	public Address getStartAddress() {
+		Address addr = new Address(Locale.getDefault());
+		addr.setLatitude(start.getLatitude());
+		addr.setLongitude(start.getLongitude());
+		addr.setFeatureName(getAddressName(start));
+		return addr;
+	}
+}

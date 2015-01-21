@@ -49,6 +49,8 @@ public class OSM {
 	public MapTileProviderBase mapProvider;
 	public boolean switchTileProvider=false;
 	public ScaleBarOverlay scaleBarOverlay;
+	public Address startAddr;
+	public Address endAddr;
 
 	public void init(Activity act) {
 		this.act = act;

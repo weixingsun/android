@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.Polyline;
-import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 import org.osmdroid.bonuspack.routing.MapQuestRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
@@ -18,6 +17,7 @@ import org.osmdroid.views.MapView;
 import cat.app.maps.APIOptions;
 import cat.app.maps.MapOptions;
 import cat.app.maps.OSM;
+import cat.app.navi.GraphHopperOfflineRoadManager;
 import cat.app.osmap.util.RouteOptions;
 import cat.app.osmap.util.RuntimeOptions;
 import cat.app.osmap.util.SavedOptions;
@@ -53,13 +53,17 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 		}
 		roadManager = Routers.getRoadManager(SavedOptions.routingProvider);
 		if(roadManager==null) return null;
+		
 		road = roadManager.getRoad(ro.list);
 		if(road==null || road.mNodes==null) return null;
 		osm.loc.road = road;
 		osm.polyline = RoadManager.buildRoadOverlay(road, osm.act);
 		osm.polyline.setWidth(10);
 		osm.polyline.setColor(RouteOptions.getColor());
-		
+		if(roadManager.getEndAddress()!=null){
+			osm.startAddr=roadManager.getStartAddress();
+			osm.endAddr=roadManager.getEndAddress();
+		}
 		return osm.polyline;
 	}
 	@Override
@@ -70,6 +74,9 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 		osm.mks.addPolyline(pl);
 		osm.mks.drawStepsPoint(road);
 		osm.loc.passedNodes.clear();
+		if(osm.endAddr!=null){
+			osm.mks.updateRouteMarker(osm.endAddr);
+		}
     }
 
 }
