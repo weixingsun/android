@@ -13,7 +13,6 @@ import android.graphics.Color;
 import android.os.Environment;
 import android.util.Log;
 
-import cat.app.maps.MapOptions;
 import cat.app.maps.OSM;
 import cat.app.osmap.LOC;
 
@@ -33,12 +32,13 @@ public class RouteOptions {
 	public static final String GISGRAPHY = "Gisgraphy";		//not used
 	//private static String provider;
 	public static LinkedHashMap<String, String> ROUTERS = new LinkedHashMap<String,String>();
+	
 	static{
 		//provider=OSM;
 		ROUTERS.put(OSM, OSM);
 		ROUTERS.put(GOOGLE, GOOGLE);
 		ROUTERS.put(MAPQUEST, MAPQUEST);
-		ROUTERS.put(OFFLINE,OFFLINE);
+		ROUTERS.put(OFFLINE, OFFLINE);
 		//ROUTERS.put(GISGRAPHY, GISGRAPHY);
 	}
 	public static void changeRouteProvider(String value) {

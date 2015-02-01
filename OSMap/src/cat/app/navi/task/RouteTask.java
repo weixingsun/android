@@ -14,10 +14,10 @@ import org.osmdroid.bonuspack.routing.RoadNode;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
-import cat.app.maps.APIOptions;
-import cat.app.maps.MapOptions;
 import cat.app.maps.OSM;
 import cat.app.navi.GraphHopperOfflineRoadManager;
+import cat.app.osmap.util.APIOptions;
+import cat.app.osmap.util.MapOptions;
 import cat.app.osmap.util.RouteOptions;
 import cat.app.osmap.util.RuntimeOptions;
 import cat.app.osmap.util.SavedOptions;

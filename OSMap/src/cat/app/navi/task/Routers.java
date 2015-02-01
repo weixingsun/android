@@ -9,9 +9,9 @@ import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.util.GeoPoint;
 
-import cat.app.maps.APIOptions;
 import cat.app.navi.GraphHopperOfflineRoadManager;
 import cat.app.osmap.LOC;
+import cat.app.osmap.util.APIOptions;
 import cat.app.osmap.util.GeoOptions;
 import cat.app.osmap.util.RouteOptions;
 import cat.app.osmap.util.RuntimeOptions;

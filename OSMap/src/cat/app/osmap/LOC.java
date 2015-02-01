@@ -7,11 +7,13 @@ import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadNode;
 import org.osmdroid.util.GeoPoint;
 
-import cat.app.maps.MapOptions;
 import cat.app.maps.MathUtil;
 import cat.app.maps.OSM;
 import cat.app.navi.task.FindMyStepTask;
+import cat.app.osmap.ui.Drawer;
 import cat.app.osmap.util.CountryCode;
+import cat.app.osmap.util.DbHelper;
+import cat.app.osmap.util.MapOptions;
 
 import android.app.Activity;
 import android.content.Context;
@@ -27,11 +29,13 @@ import android.widget.Toast;
 
 public class LOC implements LocationListener {
 	private static final String tag = LOC.class.getSimpleName();
+	DbHelper dbHelper;
 	private LocationManager lm;
 	public Location myPos;
 	private int speed;
 	Activity act;
 	OSM osm;
+	public Drawer dr = Drawer.INSTANCE();
 	public static String countryCode = null;
 	String provider;
 	public boolean onRoad=false;
@@ -42,6 +46,7 @@ public class LOC implements LocationListener {
 	public void init(Activity act, OSM osm) {
 		this.act = act;
 		this.osm = osm;
+		this.dbHelper = DbHelper.getInstance(act);
 		if (openGPSEnabled()) {
 			provider = getGoodProvider() ; //LocationManager.GPS_PROVIDER; //this.getProvider();
 			if(provider.equals(LocationManager.NETWORK_PROVIDER)){
@@ -50,11 +55,19 @@ public class LOC implements LocationListener {
 			Log.i(tag, "gps provider="+provider);
 			myPos = lm.getLastKnownLocation(provider);
 			startGPSLocation();
-			if(myPos!=null){
+			if(myPos!=null){ ///////////////////////////////////////////////////////////////////////
 				countryCode = CountryCode.getByLatLng(myPos.getLatitude(), myPos.getLongitude());
 				Log.w(tag, "countryCode="+countryCode);
-				if(countryCode==null && osm.rto.isNetworkAvailable())
+				if(countryCode==null && osm.rto.isNetworkAvailable()){
 					osm.startTask("geo", new GeoPoint(myPos),"countryCode");
+				}
+				dbHelper.updateGPS(0, myPos);
+			}else{
+				countryCode = dbHelper.getCountryCode();
+				if(countryCode==null){
+					//show supported country list in left drawer
+					dr.show("Country");
+				}
 			}
 		}
 	}
@@ -83,8 +96,9 @@ public class LOC implements LocationListener {
 		if (countryCode == null) {
 			countryCode = CountryCode.getByGeoPoint(gp);
 			Log.w(tag, "countryCode="+countryCode);
-			if(countryCode==null && osm.rto.isNetworkAvailable())
-				osm.startTask("geo", gp,"countryCode");
+			//if(countryCode==null && osm.rto.isNetworkAvailable())
+				//osm.startTask("geo", gp,"countryCode");
+			//choose country from list
 		}
 		//if(MathUtil.compare(osm.mks.testMarker.getPosition(), gp) ){
 			//osm.mks.testMarker.setTitle(title)
@@ -98,6 +112,8 @@ public class LOC implements LocationListener {
 		osm.move(gp);
 		osm.mks.updateMyLocationMarker(gp);
 		(new FindMyStepTask(osm, osm.mks.testMarker.getPosition(),osm.mks.testMarker)).execute();
+
+		dbHelper.updateGPS(0, myPos);//
 	}
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {

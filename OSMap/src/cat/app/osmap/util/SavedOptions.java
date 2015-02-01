@@ -2,10 +2,11 @@ package cat.app.osmap.util;
 
 import java.util.LinkedHashMap;
 
+import android.app.Activity;
 import android.os.Environment;
 import android.util.Log;
 
-import cat.app.maps.MapOptions;
+import cat.app.osmap.R;
 
 public class SavedOptions {
 	private static final String tag = SavedOptions.class.getSimpleName();
@@ -22,11 +23,34 @@ public class SavedOptions {
 	//default=Open Street Map
 	public static String selectedMap = MapOptions.MAP_MAPQUESTOSM;
 	public static String selectedTravelMode = "Fast";
+	public static String selectedCountry = "China";
 	public static String routingProvider = RouteOptions.OSM;		//navigation
 	public static String geocodingProvider = routingProvider;		//navigation
 	private static String selectedOnRoad = "Police";
 	//public static String countryCode = null;
-	
+	public static LinkedHashMap<String, String> COUNTRIES = new LinkedHashMap<String,String>();
+
+	static{
+		COUNTRIES.put("China", "cn");
+		COUNTRIES.put("New Zealand", "nz");
+	}
+	public void init(Activity activity){
+		/*String[] countries = activity.getResources().getStringArray(R.array.country_items);
+		String[] codes = activity.getResources().getStringArray(R.array.country_code_items);
+		for(int i=0;i<countries.length;i++){
+			COUNTRIES.put(countries[i], codes[i]);
+		}*/
+		String[] mainMenu = activity.getResources().getStringArray(R.array.menu_items);
+		
+	}
+	public static int getMainMenuIndex(String main,Activity act){
+		String[] mainMenu = act.getResources().getStringArray(R.array.menu_items);
+		LinkedHashMap<String, String> map=new LinkedHashMap<String, String>();
+		for(String s:mainMenu){
+			map.put(s, s);
+		}
+		return getIndexFromLinkedMap(main,map);
+	}
 	public static int getIndex(String main,String sub){
 		LinkedHashMap<String, String> map=null;
 		switch(main){
@@ -36,6 +60,8 @@ public class SavedOptions {
 				break;
 		case "Navigate": map = RouteOptions.ROUTERS;   //GeoOptions.GEO_CODERS;
 				break;
+		case "Country": map = SavedOptions.COUNTRIES;   //GeoOptions.GEO_CODERS;
+			break;
 		}
 		if(map==null) return -1;
 		return getIndexFromLinkedMap(sub,map);
@@ -57,10 +83,12 @@ public class SavedOptions {
 				break;
 		case "Travel": subsettingsSelectedName = SavedOptions.selectedTravelMode;
 				break;
+		case "Country": subsettingsSelectedName = SavedOptions.selectedCountry;
+				break;
 		case "Navigate": subsettingsSelectedName = SavedOptions.routingProvider;
-		break;
+				break;
 		case "On Road": subsettingsSelectedName = SavedOptions.selectedOnRoad ;
-		break;
+				break;
 		}
 		//Log.i(tag, "getSubsettingsSelectedMenuName="+settingsName);
 		return subsettingsSelectedName;

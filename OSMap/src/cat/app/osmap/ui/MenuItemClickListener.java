@@ -3,9 +3,10 @@ package cat.app.osmap.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import cat.app.maps.MapOptions;
 import cat.app.osmap.R;
+import cat.app.osmap.util.DbHelper;
 import cat.app.osmap.util.GeoOptions;
+import cat.app.osmap.util.MapOptions;
 import cat.app.osmap.util.RouteOptions;
 import cat.app.osmap.util.SavedOptions;
 
@@ -24,6 +25,7 @@ public class MenuItemClickListener implements OnItemClickListener {
 			R.array.map_type_items,
 			R.array.nav_type_items,
 			R.array.geocoder_type_items,
+			R.array.country_items,
 			R.array.on_road_items,
 			R.array.whats_hot_items
 			};
@@ -76,6 +78,13 @@ public class MenuItemClickListener implements OnItemClickListener {
 					SavedOptions.geocodingProvider = geoProvider;
 					SavedOptions.routingProvider = routeProvider;
 					Log.i(TAG, "Route="+name);
+				}else if(SavedOptions.COUNTRIES.containsKey(name)){
+					SavedOptions.selectedCountry = name;
+					String countryCode = SavedOptions.COUNTRIES.get(name);
+					Log.i(TAG, "countryCode="+countryCode);
+					
+					DbHelper dbHelper = DbHelper.getInstance();
+					dbHelper.updateCountryCode(countryCode);
 				}
 				//Log.i(TAG, "MenuClicked="+name);
 			}

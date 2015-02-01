@@ -28,6 +28,7 @@ import cat.app.osmap.MyMapEventsReceiver;
 import cat.app.osmap.R;
 import cat.app.osmap.ui.GlobalLayoutListener;
 import cat.app.osmap.util.GeoOptions;
+import cat.app.osmap.util.MapOptions;
 import cat.app.osmap.util.RouteOptions;
 import cat.app.osmap.util.RuntimeOptions;
 

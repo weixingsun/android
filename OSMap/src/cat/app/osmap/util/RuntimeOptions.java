@@ -27,7 +27,9 @@ public class RuntimeOptions {
 	public void init(Activity act){
 		final ConnectivityManager conMgr = (ConnectivityManager) act.getSystemService(Context.CONNECTIVITY_SERVICE);
 		final NetworkInfo activeNetwork = conMgr.getActiveNetworkInfo();
-		if (activeNetwork != null && activeNetwork.isConnected()) {
+		//.getNetworkInfo(ConnectivityManager.TYPE_WIFI); 
+		//.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+		if (activeNetwork != null && activeNetwork.isConnected() && activeNetwork.isAvailable()) {
 			networkAvailable=true;
 		} else {
 			networkAvailable=false;

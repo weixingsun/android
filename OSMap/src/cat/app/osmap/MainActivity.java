@@ -2,9 +2,9 @@ package cat.app.osmap;
 
 import java.util.List;
 
-import cat.app.maps.MapOptions;
 import cat.app.maps.OSM;
 import cat.app.osmap.ui.Drawer;
+import cat.app.osmap.util.MapOptions;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -17,14 +17,14 @@ import android.widget.ListView;
 public class MainActivity extends Activity {
 	private static final String tag = MainActivity.class.getSimpleName();
 	public OSM osm = new OSM();
-	public Drawer dr = new Drawer();
+	public Drawer dr = Drawer.INSTANCE();
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        osm.init(this);
         dr.init(this);
+        osm.init(this);
     }
     @Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {

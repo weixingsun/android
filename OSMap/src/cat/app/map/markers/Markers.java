@@ -21,10 +21,10 @@ import android.location.Address;
 import android.location.Location;
 import android.util.Log;
 
-import cat.app.maps.MapOptions;
 import cat.app.maps.OSM;
 import cat.app.osmap.MyItemizedOverlay;
 import cat.app.osmap.R;
+import cat.app.osmap.util.MapOptions;
 
 public class Markers {
 	private static final String tag = Markers.class.getSimpleName();

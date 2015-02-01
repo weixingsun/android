@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import cat.app.maps.MapOptions;
 import cat.app.maps.OSM;
 import cat.app.osmap.ui.DelayedTextWatcher;
 import cat.app.osmap.ui.SuggestListAdapter;
 import cat.app.osmap.util.GeoOptions;
+import cat.app.osmap.util.MapOptions;
 import cat.app.osmap.util.RuntimeOptions;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
