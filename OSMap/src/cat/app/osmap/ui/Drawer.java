@@ -18,7 +18,7 @@ public class Drawer {
 	private Drawer(){}
 	public static Drawer INSTANCE(){
 		if(drawer==null) {
-			Log.w(tag, "create drawer");
+			//Log.w(tag, "create drawer");
 			drawer=new Drawer();
 		}
 		return drawer;
@@ -30,7 +30,7 @@ public class Drawer {
     
 	public void init(Activity act) {
 		this.act=act;
-		Log.w(tag, "init drawer");
+		//Log.w(tag, "init drawer");
 		mMainSettings = act.getResources().getStringArray(R.array.menu_items);
 		mDrawerListParent = (ListView) act.findViewById(R.id.left_drawer_parent);
 		mDrawerListParent.setAdapter(new ArrayAdapter<String>(act,R.layout.drawer_list_item, mMainSettings));

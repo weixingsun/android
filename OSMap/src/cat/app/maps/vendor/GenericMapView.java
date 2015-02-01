@@ -34,7 +34,7 @@ public class GenericMapView extends FrameLayout {
 			this.removeView(mMapView);
 		}
 		ResourceProxy resourceProxy = new DefaultResourceProxyImpl(this.getContext());
-		int tileSizePixels=aTileProvider.getTileSource().getTileSizePixels();
+		int tileSizePixels=aTileProvider.getTileSource().getTileSizePixels();//////////////////////////////////////////////////////////
 		MapView newMapView = new MapView(this.getContext(), tileSizePixels, resourceProxy, aTileProvider);
 		
 		if (mMapView != null){

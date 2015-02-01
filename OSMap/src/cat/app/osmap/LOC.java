@@ -46,18 +46,18 @@ public class LOC implements LocationListener {
 	public void init(Activity act, OSM osm) {
 		this.act = act;
 		this.osm = osm;
-		this.dbHelper = DbHelper.getInstance(act);
+		this.dbHelper = DbHelper.getInstance();
 		if (openGPSEnabled()) {
 			provider = getGoodProvider() ; //LocationManager.GPS_PROVIDER; //this.getProvider();
 			if(provider.equals(LocationManager.NETWORK_PROVIDER)){
 				provider = LocationManager.GPS_PROVIDER;
 			}
-			Log.i(tag, "gps provider="+provider);
+			//Log.i(tag, "gps provider="+provider);
 			myPos = lm.getLastKnownLocation(provider);
 			startGPSLocation();
 			if(myPos!=null){ ///////////////////////////////////////////////////////////////////////
 				countryCode = CountryCode.getByLatLng(myPos.getLatitude(), myPos.getLongitude());
-				Log.w(tag, "countryCode="+countryCode);
+				//Log.w(tag, "countryCode="+countryCode);
 				if(countryCode==null && osm.rto.isNetworkAvailable()){
 					osm.startTask("geo", new GeoPoint(myPos),"countryCode");
 				}
@@ -95,7 +95,7 @@ public class LOC implements LocationListener {
 		GeoPoint gp = new GeoPoint(loc.getLatitude(),loc.getLongitude());
 		if (countryCode == null) {
 			countryCode = CountryCode.getByGeoPoint(gp);
-			Log.w(tag, "countryCode="+countryCode);
+			//Log.w(tag, "countryCode="+countryCode);
 			//if(countryCode==null && osm.rto.isNetworkAvailable())
 				//osm.startTask("geo", gp,"countryCode");
 			//choose country from list
@@ -104,7 +104,7 @@ public class LOC implements LocationListener {
 			//osm.mks.testMarker.setTitle(title)
 		//}
 		//speed = (int) (loc.getSpeed() * 3.6);
-		Log.i(tag, "point="+gp+",speed=" + speed);
+		//Log.i(tag, "point="+gp+",speed=" + speed);
 		if(osm.mks.testMarker==null){
 			osm.mks.initTestMarker(loc);
 		}

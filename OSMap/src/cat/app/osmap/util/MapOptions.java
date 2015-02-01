@@ -87,18 +87,24 @@ public class MapOptions {
 	 * Maps, Google Maps Satellite, Google Maps Terrain, Yahoo Maps, Yahoo Maps
 	 * Satellite, Microsoft Maps, Microsoft Earth, Microsoft Hybrid
 	 */
-	public static void switchTileProvider(String name) {
-		if (name.equals(MapOptions.MAP_MAPSFORGE)) { 
+	public static MapTileProviderBase getTileProvider(String name){
+		MapTileProviderBase provider = null;
+		if (name.equals(MapOptions.MAP_MAPSFORGE)) {
+			//Log.w(tag, "getTileProvider.name="+name+",activity="+osm.act);
 			// MapsForge offline data need recreate a mapview
-			osm.mapProvider = MapOptions.getForgeMapTileProvider(osm.act);
-			if (osm.mapProvider == null) {
+			provider = MapOptions.getForgeMapTileProvider(osm.act);
+			if (provider == null) {
 				osm.startDownloadActivity(getNeededMapFileShortName());
-				return;// no map file.
+				return null;// no map file.
 			}
 		} else { // others refresh with tilesource
-			osm.mapProvider = new MapTileProviderBasic(osm.act);
-			osm.mapProvider.setTileSource(TileSourceFactory.getTileSource(name));
+			provider = new MapTileProviderBasic(osm.act);
+			provider.setTileSource(TileSourceFactory.getTileSource(name));
 		}
+		return provider;
+	}
+	public static void switchTileProvider(String name) {
+		osm.mapProvider = getTileProvider(name);
 		osm.setMap(osm.mapProvider);
 	}
 
@@ -193,6 +199,7 @@ public class MapOptions {
 
 	public static String getMapFileName() {
 		String mapFileFullName = getNeededMapFileFullName();
+		//Log.w(tag, "mapFileFullName==========="+mapFileFullName);
 		File mapFile = new File(mapFileFullName);
 		if (mapFile.exists()) {
 			return mapFileFullName;

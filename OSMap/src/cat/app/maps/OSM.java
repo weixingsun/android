@@ -27,6 +27,7 @@ import cat.app.osmap.LOC;
 import cat.app.osmap.MyMapEventsReceiver;
 import cat.app.osmap.R;
 import cat.app.osmap.ui.GlobalLayoutListener;
+import cat.app.osmap.util.DbHelper;
 import cat.app.osmap.util.GeoOptions;
 import cat.app.osmap.util.MapOptions;
 import cat.app.osmap.util.RouteOptions;
@@ -34,6 +35,7 @@ import cat.app.osmap.util.RuntimeOptions;
 
 public class OSM {
 	protected static final String tag = OSM.class.getSimpleName();
+	public DbHelper dbHelper;  
 	public LOC loc = new LOC();
 	public Device dv = new Device();
 	public Activity act;
@@ -55,24 +57,29 @@ public class OSM {
 
 	public void init(Activity act) {
 		this.act = act;
+		this.dbHelper = DbHelper.getInstance(act);
+
+        loc.init(act,this);
 		mo = MapOptions.getInstance(this);
 		ro = RouteOptions.getInstance(this);
 		rto = RuntimeOptions.getInstance(act);
 		mo.initTileSources(act);
 		genericMapView = (GenericMapView) act.findViewById(R.id.osmap);
-		MapTileProviderBase mtpb = new MapTileProviderBasic(act.getApplicationContext());
+		String providerMenu = dbHelper.getSettings("Maps");
+		String selectedMap = MapOptions.MAP_TILES.get(providerMenu);
+		MapTileProviderBase mtpb = MapOptions.getTileProvider(selectedMap);//new MapTileProviderBasic(act.getApplicationContext());
 		switchTileProvider=true;
 		setMap(mtpb);
 		mks=Markers.getInstance(this);
 		mks.initMylocMarker();
 		//mks.initRouteMarker();
-        loc.init(act,this);
         dv.init(act,this);
 
 	}
 	public void setMap(MapTileProviderBase mtpb) {
 		genericMapView.setTileProvider(mtpb);
 		map = genericMapView.getMapView();
+		//Log.w(tag, "provider="+mtpb.getTileSource().name());
 		mapController = map.getController();
 		mapController.setZoom(16);
 		map.setBuiltInZoomControls(true);

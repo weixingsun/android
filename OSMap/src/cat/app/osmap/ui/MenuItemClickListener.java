@@ -73,7 +73,13 @@ public class MenuItemClickListener implements OnItemClickListener {
 				if(MapOptions.MAP_TILES.containsKey(name)){
 					MapOptions.changeTileProvider(MapOptions.MAP_TILES.get(name));
 					SavedOptions.selectedMap = name;
-					dbHelper.changeSettings("Maps", name);
+					if(name.equals(MapOptions.MAP_OFFLINE)){
+						if(MapOptions.getMapFileName()!=null){
+							dbHelper.changeSettings("Maps", name);
+						}
+					}else{
+						dbHelper.changeSettings("Maps", name);
+					}
 					//Log.i(TAG, "MapTileProvider="+name);
 				}else if(RouteOptions.MAPQUEST_TRAVEL_MODES.containsKey(name)){
 					RouteOptions.changeTravelMode(name);
