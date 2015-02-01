@@ -3,6 +3,7 @@ package cat.app.osmap.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import cat.app.osmap.LOC;
 import cat.app.osmap.R;
 import cat.app.osmap.util.DbHelper;
 import cat.app.osmap.util.GeoOptions;
@@ -96,7 +97,7 @@ public class MenuItemClickListener implements OnItemClickListener {
 					dbHelper.changeSettings("Country", name);
 					dbHelper.updateCountryCode(countryCode);
 					//judge if the country's map/route file exist?
-					
+					LOC.countryCode = countryCode;
 				}
 				//Log.i(TAG, "MenuClicked="+name);
 			}
