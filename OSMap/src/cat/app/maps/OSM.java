@@ -32,6 +32,7 @@ import cat.app.osmap.util.GeoOptions;
 import cat.app.osmap.util.MapOptions;
 import cat.app.osmap.util.RouteOptions;
 import cat.app.osmap.util.RuntimeOptions;
+import cat.app.osmap.util.SavedOptions;
 
 public class OSM {
 	protected static final String tag = OSM.class.getSimpleName();
@@ -58,6 +59,9 @@ public class OSM {
 	public void init(Activity act) {
 		this.act = act;
 		this.dbHelper = DbHelper.getInstance(act);
+		SavedOptions.routingProvider = dbHelper.getSettings("Navigate");
+		SavedOptions.selectedTravelMode = dbHelper.getSettings("Travel");
+		String providerMenu = dbHelper.getSettings("Maps");
 
         loc.init(act,this);
 		mo = MapOptions.getInstance(this);
@@ -65,7 +69,6 @@ public class OSM {
 		rto = RuntimeOptions.getInstance(act);
 		mo.initTileSources(act);
 		genericMapView = (GenericMapView) act.findViewById(R.id.osmap);
-		String providerMenu = dbHelper.getSettings("Maps");
 		String selectedMap = MapOptions.MAP_TILES.get(providerMenu);
 		MapTileProviderBase mtpb = MapOptions.getTileProvider(selectedMap);//new MapTileProviderBasic(act.getApplicationContext());
 		switchTileProvider=true;

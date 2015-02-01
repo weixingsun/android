@@ -94,7 +94,14 @@ public class MenuItemClickListener implements OnItemClickListener {
 					String routeProvider = RouteOptions.ROUTERS.get(name);
 					SavedOptions.geocodingProvider = geoProvider;
 					SavedOptions.routingProvider = routeProvider;
-					dbHelper.changeSettings("Navigate", name);
+
+					if(name.equals(RouteOptions.OFFLINE)){
+						if(RouteOptions.getRouteFileFullName()!=null){
+							dbHelper.changeSettings("Navigate", name);
+						}
+					}else{
+						dbHelper.changeSettings("Navigate", name);
+					}
 					//Log.i(TAG, "Route="+name);
 				}else if(SavedOptions.COUNTRIES.containsKey(name)){
 					SavedOptions.selectedCountry = name;
