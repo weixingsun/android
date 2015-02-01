@@ -87,10 +87,9 @@ public class MapOptions {
 	 * Maps, Google Maps Satellite, Google Maps Terrain, Yahoo Maps, Yahoo Maps
 	 * Satellite, Microsoft Maps, Microsoft Earth, Microsoft Hybrid
 	 */
-	public static void switchTileProvider(OSM osm, String name) {
-		if (name.equals(MapOptions.MAP_MAPSFORGE)) { // MapsForge offline data
-														// need recreate a
-														// mapview
+	public static void switchTileProvider(String name) {
+		if (name.equals(MapOptions.MAP_MAPSFORGE)) { 
+			// MapsForge offline data need recreate a mapview
 			osm.mapProvider = MapOptions.getForgeMapTileProvider(osm.act);
 			if (osm.mapProvider == null) {
 				osm.startDownloadActivity(getNeededMapFileShortName());
@@ -98,8 +97,7 @@ public class MapOptions {
 			}
 		} else { // others refresh with tilesource
 			osm.mapProvider = new MapTileProviderBasic(osm.act);
-			osm.mapProvider
-					.setTileSource(TileSourceFactory.getTileSource(name));
+			osm.mapProvider.setTileSource(TileSourceFactory.getTileSource(name));
 		}
 		osm.setMap(osm.mapProvider);
 	}

@@ -116,7 +116,7 @@ public class OSM {
 	}
 	
 	public void refreshTileSource(String name){
-		MapOptions.switchTileProvider(this,name);
+		MapOptions.switchTileProvider(name);
 		map.invalidate();
 		switchTileProvider=true;
 	}

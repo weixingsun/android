@@ -20,7 +20,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class MenuItemClickListener implements OnItemClickListener {
-
+	DbHelper dbHelper;
+	String selectedMenu;
 	int[] subMenus = {
 			R.array.map_type_items,
 			R.array.nav_type_items,
@@ -42,7 +43,11 @@ public class MenuItemClickListener implements OnItemClickListener {
 			long id) {
 		TextView tv = (TextView) view;
 		String name = tv.getText().toString();
+
+		dbHelper = DbHelper.getInstance();
+		selectedMenu = dbHelper.getSettings(name);
 		changeSubMenu(subMenus[position],name);
+		//Log.i(TAG, "menu="+name);
 	}
 
 	private void changeSubMenu(int arrayId, String settingsName){  //Maps
@@ -50,9 +55,12 @@ public class MenuItemClickListener implements OnItemClickListener {
 		ArrayAdapter<String> childAdapter = new ArrayAdapter<String>(activity,R.layout.drawer_list_item, subSettingsStr);
 		ListView subSettings = (ListView) activity.findViewById(R.id.left_drawer_child);
 		subSettings.setAdapter(childAdapter);
-		String selectedSubsettingsName = SavedOptions.getSubsettingsSelectedMenuName(settingsName);
-		if(selectedSubsettingsName==null) return;
-		int order = SavedOptions.getIndex(settingsName,selectedSubsettingsName);
+		//String selectedSubsettingsName=null;
+		if(selectedMenu==null){
+			selectedMenu = SavedOptions.getSubsettingsSelectedMenuName(settingsName);
+		}
+		if(selectedMenu==null) return;
+		int order = SavedOptions.getIndex(settingsName,selectedMenu);
 		if(order<0) return;
 		subSettings.setItemChecked(order, true);
 		subSettings.setOnItemClickListener(new OnItemClickListener(){
@@ -64,11 +72,13 @@ public class MenuItemClickListener implements OnItemClickListener {
 				if(MapOptions.MAP_TILES.containsKey(name)){
 					MapOptions.changeTileProvider(MapOptions.MAP_TILES.get(name));
 					SavedOptions.selectedMap = name;
-					Log.i(TAG, "MapTileProvider="+name);
+					dbHelper.changeSettings("Maps", name);
+					//Log.i(TAG, "MapTileProvider="+name);
 				}else if(RouteOptions.MAPQUEST_TRAVEL_MODES.containsKey(name)){
 					RouteOptions.changeTravelMode(name);
 					SavedOptions.selectedTravelMode = name;
-					Log.i(TAG, "TravelMode="+name);
+					dbHelper.changeSettings("Travel", name);
+					//Log.i(TAG, "TravelMode="+name);
 					//////////////////MyPlayer.play(activity, 0, 2);
 				}else if(GeoOptions.GEO_CODERS.containsKey(name)){
 					GeoOptions.changeGeocoder(GeoOptions.GEO_CODERS.get(name));
@@ -77,14 +87,16 @@ public class MenuItemClickListener implements OnItemClickListener {
 					String routeProvider = RouteOptions.ROUTERS.get(name);
 					SavedOptions.geocodingProvider = geoProvider;
 					SavedOptions.routingProvider = routeProvider;
-					Log.i(TAG, "Route="+name);
+					dbHelper.changeSettings("Navigate", name);
+					//Log.i(TAG, "Route="+name);
 				}else if(SavedOptions.COUNTRIES.containsKey(name)){
 					SavedOptions.selectedCountry = name;
 					String countryCode = SavedOptions.COUNTRIES.get(name);
-					Log.i(TAG, "countryCode="+countryCode);
-					
-					DbHelper dbHelper = DbHelper.getInstance();
+					//Log.i(TAG, "countryCode="+countryCode);
+					dbHelper.changeSettings("Country", name);
 					dbHelper.updateCountryCode(countryCode);
+					//judge if the country's map/route file exist?
+					
 				}
 				//Log.i(TAG, "MenuClicked="+name);
 			}

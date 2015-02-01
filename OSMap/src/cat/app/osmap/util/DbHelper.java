@@ -113,23 +113,7 @@ import android.util.Log;
 	        cv.put("country_code", countryCode);
 	        db.update(GPS_TABLE, cv, where, whereValue);
 	    }
-	    public String getSettings(String name) {
-	    	this.db = getReadableDatabase();
-	    	String sql = "SELECT value FROM " +SETTINGS_TABLE+" where name="+name;
-	    	Cursor cursor = db.rawQuery(sql, null);
-	    	if (cursor != null)
-	        	cursor.moveToFirst();
-	    	String value = null;
-	    	try{
-	    		value = cursor.getString(0);
-	    	}catch(Exception e){
-	    		Log.i(TAG, "Error:"+e.getMessage()+",sql="+sql);
-	    	}
-	    	cursor.close();
-	        db.close();
-	        this.db=null;
-	        return value;
-	    }
+	    
 	    //(sensor_type,sensor_metric_seq,sensor_metric_data)
 	    private long insertGPS(int id, double lat,double lng)
 	    {
@@ -180,6 +164,24 @@ import android.util.Log;
 	    		this.updateGPS(id, loc.getLatitude(), loc.getLongitude());
 	    	}
 	    }
+	    public String getSettings(String name) {
+	    	this.db = getReadableDatabase();
+	    	String parsedName = name.replaceAll("\'","\'\'");
+	    	String sql = "SELECT value FROM " +SETTINGS_TABLE+" where name='"+parsedName+"'";
+	    	Cursor cursor = db.rawQuery(sql, null);
+	    	if (cursor != null)
+	        	cursor.moveToFirst();
+	    	String value = null;
+	    	try{
+	    		value = cursor.getString(0);
+	    	}catch(Exception e){
+	    		//Log.i(TAG, "Error:"+e.getMessage()+",sql="+sql);
+	    	}
+	    	cursor.close();
+	        db.close();
+	        this.db=null;
+	        return value;
+	    }
 	    private long insertSettings(String name, String value){
 	    	if(this.db==null)
 	    	this.db = getWritableDatabase();
@@ -187,6 +189,7 @@ import android.util.Log;
 	        cv.put("name", name);
 	        cv.put("value", value);
 	        long row=db.insert(SETTINGS_TABLE, null, cv);
+	        Log.w(TAG, "insertSettings.row="+row);
 	        return row;
 	    }
 	    private void updateSettings(String name, String value) {
@@ -205,4 +208,5 @@ import android.util.Log;
 	    		this.updateSettings(name, value);
 	    	}
 	    }
+	    
 	}
