@@ -63,10 +63,10 @@ public class OSM {
 		SavedOptions.selectedTravelMode = dbHelper.getSettings("Travel");
 		String providerMenu = dbHelper.getSettings("Maps");
 
+		rto = RuntimeOptions.getInstance(act);
         loc.init(act,this);
 		mo = MapOptions.getInstance(this);
 		ro = RouteOptions.getInstance(this);
-		rto = RuntimeOptions.getInstance(act);
 		mo.initTileSources(act);
 		genericMapView = (GenericMapView) act.findViewById(R.id.osmap);
 		String selectedMap = MapOptions.MAP_TILES.get(providerMenu);

@@ -14,6 +14,7 @@ import cat.app.osmap.ui.Drawer;
 import cat.app.osmap.util.CountryCode;
 import cat.app.osmap.util.DbHelper;
 import cat.app.osmap.util.MapOptions;
+import cat.app.wifi.Wifi;
 
 import android.app.Activity;
 import android.content.Context;
@@ -35,6 +36,7 @@ public class LOC implements LocationListener {
 	private int speed;
 	Activity act;
 	OSM osm;
+	Wifi wifi;
 	public Drawer dr = Drawer.INSTANCE();
 	public static String countryCode = null;
 	String provider;
@@ -46,6 +48,7 @@ public class LOC implements LocationListener {
 	public void init(Activity act, OSM osm) {
 		this.act = act;
 		this.osm = osm;
+		wifi = new Wifi();
 		this.dbHelper = DbHelper.getInstance();
 		if (openGPSEnabled()) {
 			provider = getGoodProvider() ; //LocationManager.GPS_PROVIDER; //this.getProvider();
@@ -58,8 +61,10 @@ public class LOC implements LocationListener {
 			if(myPos!=null){ ///////////////////////////////////////////////////////////////////////
 				countryCode = CountryCode.getByLatLng(myPos.getLatitude(), myPos.getLongitude());
 				//Log.w(tag, "countryCode="+countryCode);
-				if(countryCode==null && osm.rto.isNetworkAvailable()){
-					osm.startTask("geo", new GeoPoint(myPos),"countryCode");
+				if(osm.rto.isNetworkAvailable()){
+					if(countryCode==null ){
+						osm.startTask("geo", new GeoPoint(myPos),"countryCode");
+					}
 				}
 				dbHelper.updateGPS(0, myPos);
 			}else{

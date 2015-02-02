@@ -84,17 +84,26 @@
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
 	    android:layout_margin="5dp"
-	    android:orientation="horizontal" >
+	    android:orientation="vertical" >
 
 		<Button
 		    android:id="@+id/register_btn"
 		    android:layout_width="100dp"
 		    android:layout_height="30dp"
 		    android:background="#999999"
-               android:textColor="#000000"
-		    android:layout_centerInParent="true"
+            android:textColor="#000000"
 		    android:gravity="center"
 		    android:text="@string/submit" />
 
+		<TextView
+		    android:id="@+id/wifi_info"
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content" 
+        	android:layout_below="@+id/register_btn"
+			android:text="Wifi"
+			android:textSize="20sp">
+		</TextView>
 	</RelativeLayout>
+
+
 </LinearLayout>
