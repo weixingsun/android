@@ -118,8 +118,8 @@ public class RouteOptions {
 	static{
 		GH_TRAVEL_MODES.put("Fast",  EncodingManager.CAR+",fastest");
 		GH_TRAVEL_MODES.put("Short", EncodingManager.CAR+",shortest");
-		//GH_TRAVEL_MODES.put("Walk",  EncodingManager.FOOT+",shortest");// not supported yet
-		//GH_TRAVEL_MODES.put("Bike",  EncodingManager.BIKE2+",shortest");// not supported yet
+		GH_TRAVEL_MODES.put("Walk",  EncodingManager.FOOT+",shortest");
+		GH_TRAVEL_MODES.put("Bike",  EncodingManager.BIKE+",shortest");// not supported yet
 		//GH_TRAVEL_MODES.put("Bus",   null);				// not supported yet
 	}
 

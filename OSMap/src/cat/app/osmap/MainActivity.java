@@ -27,6 +27,16 @@ public class MainActivity extends Activity {
         osm.init(this);
     }
     @Override
+    protected void onResume() {
+        super.onResume();
+        osm.loc.wifi.register();
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        osm.loc.wifi.unregister();
+    }
+    @Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		switch (requestCode) {

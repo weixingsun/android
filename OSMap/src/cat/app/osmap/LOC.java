@@ -48,7 +48,8 @@ public class LOC implements LocationListener {
 	public void init(Activity act, OSM osm) {
 		this.act = act;
 		this.osm = osm;
-		wifi = new Wifi();
+		wifi = new Wifi(act);
+		wifi.register();
 		this.dbHelper = DbHelper.getInstance();
 		if (openGPSEnabled()) {
 			provider = getGoodProvider() ; //LocationManager.GPS_PROVIDER; //this.getProvider();

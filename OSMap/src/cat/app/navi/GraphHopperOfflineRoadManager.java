@@ -25,6 +25,7 @@ import com.graphhopper.GraphHopper;
 import com.graphhopper.routing.AlgorithmOptions;
 import com.graphhopper.routing.RoutingAlgorithmFactorySimple;
 import com.graphhopper.routing.util.EdgeFilter;
+import com.graphhopper.routing.util.EncodingManager;
 import com.graphhopper.routing.util.TraversalMode;
 import com.graphhopper.storage.index.QueryResult;
 import com.graphhopper.util.Instruction;
@@ -44,7 +45,7 @@ public class GraphHopperOfflineRoadManager extends RoadManager {
 	//protected static final String ROUTE_FILE_PATH = RouteOptions.GH_ROUTE_DATA_PATH;
 	public static final int STATUS_NO_ROUTE = Road.STATUS_TECHNICAL_ISSUE+1;
 
-	public GraphHopper hopper = new GraphHopper().forMobile();
+	public GraphHopper hopper; // = new GraphHopper().forMobile();
 	//protected String mServiceUrl;
 	GeoPoint start;
 	GeoPoint end;
@@ -71,34 +72,47 @@ public class GraphHopperOfflineRoadManager extends RoadManager {
 	 */
 	public GraphHopperOfflineRoadManager(String path){
 		super();
-		hopper.setCHEnable(true);
+		//hopper.setCHEnable(true);
 		//hopper.setCHEnable(false);	//cannot load routing file ???
 		//hopper.setCHWeighting("shortest");
 		//hopper.setElevation(true);
 		//hopper.setTraversalMode(TraversalMode.EDGE_BASED_2DIR);	//no nodes in road.
-		hopper.setEnableInstructions(true);
+		//hopper.setEnableInstructions(true);
 		//RoutingAlgorithmFactorySimple factory = new RoutingAlgorithmFactorySimple();
 		//hopper.setAlgorithmFactory(factory.createAlgo(arg0, arg1));
 		//Log.e(tag, "GH.path="+path);
-		hopper.load(path);
+		//hopper.load(path);
 	}
 
+	public GraphHopper getGraphHopper(String mode){
+		hopper = new GraphHopper().forMobile();
+		hopper.setCHEnable(false);
+		//hopper.setCHWeighting("");
+		hopper.setWayPointMaxDistance(5);
+		hopper.setEnableInstructions(true);
+		//hopper.setEncodingManager(new EncodingManager(mode).);
+		hopper.load(RouteOptions.getRouteFilePath());
+		return hopper;
+	}
 	@Override 
 	public Road getRoad(ArrayList<GeoPoint> waypoints) {
 		start = waypoints.get(0);
 		end = waypoints.get(waypoints.size()-1);
 		GHRequest req = new GHRequest(start.getLatitude(),start.getLongitude(),end.getLatitude(),end.getLongitude());
 		req.setAlgorithm(AlgorithmOptions.DIJKSTRA_BI);
+		String vehicle = null;
+		String weighting = null;
 		if(RouteOptions.GH_TRAVEL_MODES.containsKey(SavedOptions.selectedTravelMode)){
 			String value = RouteOptions.GH_TRAVEL_MODES.get(SavedOptions.selectedTravelMode);
 			//car,fastest/foot,shortest/bike,shortest	//Bus not supported yet
-			String vehicle = value.split(",")[0];
+			vehicle = value.split(",")[0];
 			req.setVehicle(vehicle);
-			String weighting = value.split(",")[1];
+			weighting = value.split(",")[1];
 			req.setWeighting(weighting);
-			Log.i(tag, "GH.vehicle="+vehicle+",weighting="+weighting);//only car sipported, 2015-01-12
+			Log.i(tag, "GH.vehicle="+vehicle+",weighting="+weighting);//only car supported, 2015-01-12
 		}
 		//req.getHints().put("instructions", "true");
+		hopper = getGraphHopper(vehicle);
 		GHResponse resp = hopper.route(req);
 		PointList pointList = resp.getPoints();
 		InstructionList hintList = resp.getInstructions();
