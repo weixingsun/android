@@ -31,7 +31,7 @@ public class Routers {
 	}
 	public static RoadManager getRoadManager(String provider) {
 		RoadManager roadManager = null;
-		Log.i(tag, "getRoadManager().provider="+provider);
+		//Log.i(tag, "getRoadManager().provider="+provider);
 		try{
 		switch(provider){
 			case RouteOptions.GOOGLE: {

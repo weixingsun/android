@@ -102,15 +102,14 @@ public class GraphHopperOfflineRoadManager extends RoadManager {
 		req.setAlgorithm(AlgorithmOptions.DIJKSTRA_BI);
 		String vehicle = null;
 		String weighting = null;
-		if(RouteOptions.GH_TRAVEL_MODES.containsKey(SavedOptions.selectedTravelMode)){
+		if(RouteOptions.GH_TRAVEL_MODES.containsKey(SavedOptions.selectedTravelMode)){ //Bus not supported yet
 			String value = RouteOptions.GH_TRAVEL_MODES.get(SavedOptions.selectedTravelMode);
-			//car,fastest/foot,shortest/bike,shortest	//Bus not supported yet
 			vehicle = value.split(",")[0];
 			req.setVehicle(vehicle);
 			weighting = value.split(",")[1];
 			req.setWeighting(weighting);
-			Log.i(tag, "GH.vehicle="+vehicle+",weighting="+weighting);//only car supported, 2015-01-12
 		}
+		if(vehicle==null) return null;
 		//req.getHints().put("instructions", "true");
 		hopper = getGraphHopper(vehicle);
 		GHResponse resp = hopper.route(req);

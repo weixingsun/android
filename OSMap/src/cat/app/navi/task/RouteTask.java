@@ -53,7 +53,6 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 		}
 		roadManager = Routers.getRoadManager(SavedOptions.routingProvider);
 		if(roadManager==null) return null;
-		
 		road = roadManager.getRoad(ro.list);
 		if(road==null || road.mNodes==null) return null;
 		osm.loc.road = road;
