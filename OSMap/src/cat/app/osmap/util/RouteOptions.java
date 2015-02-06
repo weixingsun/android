@@ -164,8 +164,8 @@ public class RouteOptions {
 	    case "Fast":
 	    case "Short": return Color.BLUE;
 	    case "Bike":
-	    case "Walk":  return Color.YELLOW;
-	    case "Bus":   return Color.RED;
+	    case "Walk":  return Color.RED;
+	    case "Bus":   return Color.GREEN;
 	    default:      return -1;
 	    }
 	}

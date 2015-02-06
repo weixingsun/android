@@ -18,7 +18,11 @@ public class MainActivity extends Activity {
 	private static final String tag = MainActivity.class.getSimpleName();
 	public OSM osm = new OSM();
 	public Drawer dr = Drawer.INSTANCE();
-	
+	/*
+		onCreate - onDestroy
+		onResume - onPause
+		onStart  - onStop
+	 * */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,12 +33,18 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        osm.loc.wifi.register();
+        //osm.loc.wifi.register();
     }
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
+       // osm.loc.wifi.unregister();
+    }
+
+    @Override
+    protected void onDestroy() {
         osm.loc.wifi.unregister();
+        super.onDestroy();
     }
     @Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {

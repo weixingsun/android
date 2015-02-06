@@ -49,7 +49,6 @@ public class LOC implements LocationListener {
 		this.act = act;
 		this.osm = osm;
 		wifi = new Wifi(act);
-		wifi.register();
 		this.dbHelper = DbHelper.getInstance();
 		if (openGPSEnabled()) {
 			provider = getGoodProvider() ; //LocationManager.GPS_PROVIDER; //this.getProvider();

@@ -1,5 +1,6 @@
 package cat.app.wifi;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -13,65 +14,57 @@ import android.content.IntentFilter;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class Wifi {
 	private static final String tag = Wifi.class.getSimpleName();
-	private static final long SCAN_DELAY = 2000;
-	private Activity act;
-	private IntentFilter i = new IntentFilter();
+	private static final long SCAN_DELAY = 1000;
 	private String scanResult; 
-	private Timer timer;
 	private TextView wifiText;
 	private WifiManager wm;
-	private BroadcastReceiver receiver = new BroadcastReceiver(){
-		 public void onReceive(Context c, Intent i){
-				Log.i(tag, "wifi receiver triggerred");
-		  List<ScanResult> l = wm.getScanResults();
-		  StringBuilder sb = new StringBuilder("Scan Results:\n");
-		  sb.append("-----------------------\n");
-		  for (ScanResult r : l) {
-		   sb.append(r.SSID + " " + r.level + " dBM\n");
-		  }
-		  scanResult = sb.toString();
-		  wifiText.setText(scanResult);
-		 }
-	};
+	private boolean running = false;	//to avoid start two threads
+	private Handler handler = new Handler();
+	
 	public Wifi(Activity act) {
-		this.act = act;
 		this.wifiText = (TextView) act.findViewById(R.id.wifi_info);
 		this.wm = (WifiManager) act.getSystemService(Context.WIFI_SERVICE);
+		this.register();
 	}
 	
 	public void register(){
-		timer = new Timer(true);
-		timer.scheduleAtFixedRate(new TimerTask(){
-			 @Override
-			 public void run() {
-			  WifiManager wm = (WifiManager) act.getSystemService(Context.WIFI_SERVICE);
-			  if (wm.isWifiEnabled()) {
-			   WifiInfo info = wm.getConnectionInfo();
-			   if (info != null) {
-			    //txtAssoc.setText("Associated with " + info.getSSID() +"\nat " + info.getLinkSpeed() + WifiInfo.LINK_SPEED_UNITS + " (" + info.getRssi() + " dBM)");
-			   } else {
-			    //txtAssoc.setText("Not currently associated.");
-			   }
-			   wm.startScan();
-			  } else {
-			   Toast.makeText(act, "WIFI is disabled.", Toast.LENGTH_LONG).show();
-			  }
-			 }
-			}, 0, SCAN_DELAY);
-			act.registerReceiver(receiver, i );
-			Log.i(tag, "wifi receiver registerred");
+		Log.w(tag, "Wifi.register()");
+		if(!running)
+			handler.postDelayed(runnable, SCAN_DELAY);
+		running = true;
 	}
 	
 	public void unregister(){
-		timer.cancel();
-		act.unregisterReceiver(receiver);
+		Log.w(tag, "Wifi.unregister()");
+		handler.removeCallbacks(runnable);
+		running = false;
 	}
+    private Runnable runnable = new Runnable() {
+    	   @Override
+    	   public void run() {
+    		   Log.i(tag, "wifi scanning signal");
+    	  		  List<ScanResult> l = wm.getScanResults();
+    	  		  Calendar c = Calendar.getInstance();
+    	  		  StringBuilder sb = new StringBuilder("Scan Results:\n"+c.getTime());
+    	  		  sb.append("-----------------------\n");
+    	  		  for (ScanResult r : l) {
+    	  		   sb.append(r.SSID + " " + r.level + " dBM\n");
+    	  		  }
+    	  		  scanResult = sb.toString();
+    		   wifiText.setText(scanResult);
+    	      /* and here comes the "trick" */
+    	      handler.postDelayed(this, SCAN_DELAY);
+    	   }
+    	};
+
 	/*public void onReceive(Context context, Intent intent) {
 		this.mContext = context;
 		i.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
