@@ -50,8 +50,10 @@ public class GeocoderTask extends
 	@Override  
     public String doInBackground(String... params) {
     	if(mode.equals(searchByName)){
-			list = gc.getFromLocationName(provider,this.address);
-			//Log.i(TAG, provider+",found_list.size="+list.size());
+			//list = gc.getFromLocationName(provider,this.address);
+    		list = gc.getFromLocationNameGoogle(this.address);
+    		//GoogleSearchByAddressNameTask task = new GoogleSearchByAddressNameTask(osm,this.address);
+			//task.execute();
 		}else if (mode.equals(searchByPoint)){
 			foundAddr = gc.getFromLocation(provider,position);
 			//Log.i(TAG, provider+",foundAddr="+foundAddr);
@@ -63,11 +65,13 @@ public class GeocoderTask extends
     protected void onPostExecute(String ret) {
         super.onPostExecute(ret);
         if(mode.equals(searchByName)){
+        	if(list!=null && list.size()>0){
         		osm.dv.fillList(list);
         		osm.suggestPoints = list;
-        		//activity.map.updateMarker(marker,foundPoint);
-        		//activity.map.activity.openPopup(marker,type);
-        		//activity.map.addRouteMarker(foundPoint);
+        	}
+    		//activity.map.updateMarker(marker,foundPoint);
+    		//activity.map.activity.openPopup(marker,type);
+    		//activity.map.addRouteMarker(foundPoint);
         }else if(mode.equals(searchByPoint)){
     		if(LOC.countryCode == null){
     			if(foundAddr!=null)

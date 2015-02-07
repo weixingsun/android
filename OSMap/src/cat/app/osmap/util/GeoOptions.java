@@ -29,7 +29,7 @@ public class GeoOptions {
 		setGeocoder(geo);
 	}
 	public static String getGeocoder() {
-		if(geocoder==null) geocoder=GeoOptions.OSM;
+		if(geocoder==null) geocoder=GeoOptions.GOOGLE;
 		return geocoder;
 	}
 	public static void setGeocoder(String geocoder) {

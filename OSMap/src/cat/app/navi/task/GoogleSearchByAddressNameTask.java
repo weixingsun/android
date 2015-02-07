@@ -6,7 +6,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -24,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.util.GeoPoint;
 
+import cat.app.maps.OSM;
 import cat.app.osmap.LOC;
 
 import android.app.Activity;
@@ -43,11 +46,14 @@ import android.widget.Toast;
 public class GoogleSearchByAddressNameTask extends
         AsyncTask<String, Void, List<Address>> {
     private static final String TAG = GoogleSearchByAddressNameTask.class.getSimpleName();
+    OSM osm;
 	HttpClient client;
     String url;
     String address;
     List<Address> list = new ArrayList<Address>();
-    public GoogleSearchByAddressNameTask(String address) {
+    private Collection<AddressComponent> address_components = new ArrayList<AddressComponent>();
+    public GoogleSearchByAddressNameTask(OSM osm,String address) {
+    	this.osm = osm;
     	this.address=address;
         this.url = getLocationURL(address);
     }
@@ -72,10 +78,32 @@ public class GoogleSearchByAddressNameTask extends
 	            	JSONObject addressFull = posArray.getJSONObject(i);
 	            	JSONObject location = addressFull.getJSONObject("geometry").getJSONObject("location");
 	            	String formatted_address = addressFull.getString("formatted_address");
-	            	//Log.i(TAG,"formatted_address:" + formatted_address);
 	    			GeoPoint ll = new GeoPoint(location.getDouble("lat"), location.getDouble("lng"));
 	    			Address addr = new Address(Locale.getDefault());
-	    			//addr.setCountryCode(countryCode);
+	    			JSONArray address_components = addressFull.getJSONArray("address_components");
+	    			//ArrayList<HashMap<String, Object>> tblPoints=new ArrayList<HashMap<String,Object>>();
+	    			for(int j=0;j<address_components.length();j++){
+	                    JSONObject jsonTblPoint=address_components.getJSONObject(j);
+	                    HashMap<String, Object> tblPoint=new HashMap<String, Object>();
+	                    Iterator<String> keys=jsonTblPoint.keys();
+	                    while(keys.hasNext())
+	                    {
+	                        String key=(String) keys.next();
+	                        if(tblPoint.get(key) instanceof JSONArray)
+	                        {
+	                            tblPoint.put(key, jsonTblPoint.getJSONArray(key));
+	                        }
+	                        tblPoint.put(key, jsonTblPoint.getString(key));
+	                    }
+
+		    			addr.setFeatureName(tblPoint.get("premise").toString());
+		    			addr.setThoroughfare(tblPoint.get("establishment").toString());
+		    			//addr.setLocality(tblPoint.get(key));
+		    			//addr.setCountryName(countryName)
+	                    //tblPoints.add(tblPoint);
+	                }
+	    			addr.setLatitude(ll.getLatitude());
+	    			addr.setLongitude(ll.getLongitude());
 	    			list.add(addr);
             	}
     			return list;
@@ -98,19 +126,19 @@ public class GoogleSearchByAddressNameTask extends
     @Override  
     protected void onPreExecute() {
         client = new DefaultHttpClient();  
-        client.getParams().setParameter(  
-                CoreConnectionPNames.CONNECTION_TIMEOUT, 15000);  
+        client.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 15000);  
         client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT,15000);  
         super.onPreExecute();
     }  
   
     @Override  
-    protected void onPostExecute(List<Address> points) {
-        super.onPostExecute(points);  
-        if (points == null) {
+    protected void onPostExecute(List<Address> list) {
+        super.onPostExecute(list);  
+        if (list == null) {
             //Toast.makeText(gmap.activity, "No route found.", Toast.LENGTH_LONG).show();
         }else{
-    		//fillList();
+    		osm.dv.fillList(list);
+    		osm.suggestPoints = list;
         }
     }
     
@@ -138,3 +166,25 @@ public class GoogleSearchByAddressNameTask extends
         return url;
     }
 }
+
+/*
+ * 
+ @Service
+public class RestService {
+    private static final String URL = "http://maps.googleapis.com/maps/api/geocode/json?address={address}&sensor=false";
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    public GeocodeResponse getMap(String address) {
+        Map<String, String> vars = new HashMap<String, String>();
+        vars.put("address", address);
+
+        String json = restTemplate.getForObject(URL,String.class, vars);
+
+        return new Gson().fromJson(json, GeocodeResponse.class);
+    }
+
+}
+ * 
+ * */

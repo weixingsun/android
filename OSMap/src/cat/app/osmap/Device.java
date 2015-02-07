@@ -49,6 +49,7 @@ public class Device {
 		setImage();
 		setList();
 	}
+	
 	private void setList() {
 		listVoice.setOnItemClickListener(new OnItemClickListener() {
 			@Override

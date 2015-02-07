@@ -26,26 +26,36 @@ public class Geocoders {
 	public Geocoders(Activity act) {
 		this.act = act;
 	}
+	public List<Address> getFromLocationNameGoogle(String name){
+		List<Address> list = null;
+		try {
+			list = (new android.location.Geocoder(act)).getFromLocationName(name, 3);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
 	public List<Address> getFromLocationName(String provider, String name){
 		this.provider = provider;
+		List<Address> list = null;
 		try{
 		switch(provider){
 			case GeoOptions.GOOGLE: {
 				android.location.Geocoder gc = new android.location.Geocoder(act);
-				return gc.getFromLocationName(name, 3);
+				list = gc.getFromLocationName(name, 3);
 			}
 			case GeoOptions.OFFLINE:	//use OSM temporary
 			case GeoOptions.OSM: {
 				org.osmdroid.bonuspack.location.GeocoderNominatim gn = new org.osmdroid.bonuspack.location.GeocoderNominatim(act);  //nominatim.openstreetmap.org/
-				return gn.getFromLocationName(name, 3);
+				list = gn.getFromLocationName(name, 3);
 			}
 			case GeoOptions.GISGRAPHY: {
 				com.gisgraphy.gisgraphoid.GisgraphyGeocoder gg = new com.gisgraphy.gisgraphoid.GisgraphyGeocoder(act); 
-				return gg.getFromLocationName(name, 3);
+				list = gg.getFromLocationName(name, 3);
 			}
 			case GeoOptions.MAPQUEST: {
 				com.mapquest.android.Geocoder gg = new com.mapquest.android.Geocoder(act);
-				return gg.getFromLocationName(name, 3);
+				list = gg.getFromLocationName(name, 3);
 			}
 			default: 
 				Log.i(tag, "default geocoder ?");
@@ -53,7 +63,7 @@ public class Geocoders {
 		}catch(IOException e){
 			Log.i(tag, "IOException"+e.getMessage());
 		}
-		return null;
+		return list;
 	}
 	public Address getFromLocation(String provider,GeoPoint position) {
 		this.provider = provider;

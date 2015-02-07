@@ -100,7 +100,7 @@
 		    android:layout_width="match_parent"
 		    android:layout_height="wrap_content" 
         	android:layout_below="@+id/register_btn"
-			android:text="Wifi"
+			android:text=""
 			android:textSize="20sp">
 		</TextView>
 	</RelativeLayout>
