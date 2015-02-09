@@ -7,6 +7,10 @@ import org.osmdroid.tileprovider.IRegisterReceiver;
 import org.osmdroid.tileprovider.MapTileProviderArray;
 import org.osmdroid.tileprovider.modules.MapTileModuleProviderBase;
 
+import cat.app.maps.OSM;
+
+import android.app.Activity;
+
 /**
  * http://www.salidasoftware.com/how-to-render-mapsforge-tiles-in-osmdroid/
  * @author Salida Software
@@ -14,9 +18,9 @@ import org.osmdroid.tileprovider.modules.MapTileModuleProviderBase;
  */
 public class MapsForgeTileProvider extends MapTileProviderArray {
 
-    public MapsForgeTileProvider(IRegisterReceiver receiverRegistrar, File file) {
+    public MapsForgeTileProvider(OSM osm, IRegisterReceiver receiverRegistrar, File file) {
 
-        super(MapsForgeTileSourceOld.createFromFile(file), receiverRegistrar);
+        super(MapsForgeTileSourceOld.createFromFile(osm,file), receiverRegistrar);
 
         // Create the module provider; this class provides a TileLoader that
         // actually loads the tile from the map file.

@@ -2,6 +2,7 @@ package cat.app.maps.vendor;
 
 import java.io.File;
 import org.mapsforge.map.reader.MapDatabase;
+import org.mapsforge.map.reader.MapReadResult;
 import org.mapsforge.android.maps.DebugSettings;
 import org.mapsforge.android.maps.mapgenerator.JobParameters;
 import org.mapsforge.android.maps.mapgenerator.MapGeneratorJob;
@@ -11,10 +12,15 @@ import org.osmdroid.ResourceProxy;
 import org.osmdroid.ResourceProxy.string;
 import org.osmdroid.tileprovider.MapTile;
 import org.osmdroid.tileprovider.tilesource.BitmapTileSourceBase;
+import org.mapsforge.map.rendertheme.ExternalRenderTheme;
 import org.mapsforge.map.rendertheme.InternalRenderTheme;
 import org.mapsforge.map.rendertheme.XmlRenderTheme;
 import org.mapsforge.core.model.Tile;
 
+import cat.app.map.poi.MapsForgePOI;
+import cat.app.maps.OSM;
+
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -29,18 +35,21 @@ import android.util.Log;
  */
 public class MapsForgeTileSourceOld extends BitmapTileSourceBase {
 
+	private static final String tag = MapsForgeTileSourceOld.class.getSimpleName();
 	protected File mapFile;
-
+	static Activity act;
+	private static OSM osm;
 	// Reasonable defaults ..
-	public static final int MIN_ZOOM = 8;
+	public static final int MIN_ZOOM = 5;
 	public static final int MAX_ZOOM = 20;
 	public static final int TILE_SIZE_PIXELS = 256;
 
 	private DatabaseRenderer renderer;
-	private MapDatabase mapDatabase;
+	public MapDatabase mapDatabase = new MapDatabase();
 	private XmlRenderTheme jobTheme;
 	private JobParameters jobParameters;
 	private DebugSettings debugSettings;
+	public MapsForgePOI poi;
 
 	// Required for the superclass
 	public static final string resourceId = ResourceProxy.string.offline_mode;
@@ -57,9 +66,6 @@ public class MapsForgeTileSourceOld extends BitmapTileSourceBase {
 	 */
 	protected MapsForgeTileSourceOld(int minZoom, int maxZoom, int tileSizePixels, File file) {
 		super("MapsForgeTiles", resourceId, minZoom, maxZoom, tileSizePixels, ".png");
-
-		mapDatabase = new MapDatabase();
-
 		//Make sure the database can open the file
 		FileOpenResult fileOpenResult = this.mapDatabase.openFile(file);
 		if (fileOpenResult.isSuccess()) {
@@ -68,7 +74,9 @@ public class MapsForgeTileSourceOld extends BitmapTileSourceBase {
 		else{
 			mapFile = null;
 		}
-
+		poi = new MapsForgePOI(this.mapDatabase);
+		//osm.pois.add(poi);
+		//osm.removePOIs();
 		renderer = new DatabaseRenderer(mapDatabase);
 		minZoom = renderer.getStartZoomLevel();
 		maxZoom = renderer.getZoomLevelMax();
@@ -80,7 +88,6 @@ public class MapsForgeTileSourceOld extends BitmapTileSourceBase {
 		jobTheme = InternalRenderTheme.OSMARENDER;    		
 		jobParameters = new JobParameters(jobTheme, 1);
 		debugSettings = new DebugSettings(false, false, false);
-
 	}
 
 	/**
@@ -93,12 +100,13 @@ public class MapsForgeTileSourceOld extends BitmapTileSourceBase {
 	 * @param file
 	 * @return the tile source
 	 */
-	public static MapsForgeTileSourceOld createFromFile(File file) {
+	public static MapsForgeTileSourceOld createFromFile(OSM osm,File file) {
 		//TODO - set these based on .map file info
 		int minZoomLevel = MIN_ZOOM;
 		int maxZoomLevel = MAX_ZOOM;
 		int tileSizePixels = TILE_SIZE_PIXELS;
-
+		MapsForgeTileSourceOld.osm = osm;
+		MapsForgeTileSourceOld.act = osm.act;
 		return new MapsForgeTileSourceOld(minZoomLevel, maxZoomLevel, tileSizePixels, file);
 	}
 
@@ -107,29 +115,22 @@ public class MapsForgeTileSourceOld extends BitmapTileSourceBase {
 
 		Tile tile = new Tile((long)pTile.getX(), (long)pTile.getY(), (byte)pTile.getZoomLevel());
 
+		osm.mks.pois.addAll(poi.getPOI(pTile));
+		//MapReadResult result = mapDatabase.readMapData(tile);
+		//int POIsize = result.pointOfInterests.size();
+		//Log.w(tag,"X="+pTile.getX()+",Y="+pTile.getY()+",POIsize="+POIsize);
 		//Create a bitmap to draw on
 		Bitmap bitmap = Bitmap.createBitmap(TILE_SIZE_PIXELS, TILE_SIZE_PIXELS, Bitmap.Config.RGB_565);
-
-		//You could try something like this to load a custom theme
-		//try{
-		//	jobTheme = new ExternalRenderTheme(themeFile);
-		//}
-		//catch(Exception e){
-		//	jobTheme = InternalRenderTheme.OSMARENDER;
-		//}
-
 		try{
 			//Draw the tile
 			MapGeneratorJob mapGeneratorJob = new MapGeneratorJob(tile, mapFile, jobParameters, debugSettings);
 			renderer.executeJob(mapGeneratorJob, bitmap);
-		}
-		catch(Exception ex){
+		}catch(Exception ex){
 			//Make the bad tile easy to spot
 			bitmap.eraseColor(Color.YELLOW);
 		}
 
-		Drawable d = new BitmapDrawable(bitmap);
-		//new BitmapDrawable(Context.getResources(), bitmap);
+		Drawable d = new BitmapDrawable(act.getResources(),bitmap);
 		return d;
 	}
 

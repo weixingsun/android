@@ -6,6 +6,8 @@ import org.osmdroid.tileprovider.MapTileRequestState;
 import org.osmdroid.tileprovider.modules.MapTileFileStorageProviderBase;
 import org.osmdroid.tileprovider.modules.MapTileModuleProviderBase;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
+
+import cat.app.map.poi.MapsForgePOI;
 import android.graphics.drawable.Drawable;
 
 /**
@@ -16,7 +18,7 @@ import android.graphics.drawable.Drawable;
 public class MapsForgeTileModuleProvider extends MapTileFileStorageProviderBase {
 
 	protected MapsForgeTileSourceOld tileSource;
-
+	//MapsForgePOI poi;
 	/**
 	 * Constructor
 	 * 
@@ -67,6 +69,7 @@ public class MapsForgeTileModuleProvider extends MapTileFileStorageProviderBase 
 		//prevent re-assignment of tile source
 		if (tileSource instanceof MapsForgeTileSourceOld) {
 			this.tileSource = (MapsForgeTileSourceOld) tileSource;
+			//this.poi = new MapsForgePOI(this.tileSource.mapDatabase);
 		}
 	}
 
@@ -74,6 +77,7 @@ public class MapsForgeTileModuleProvider extends MapTileFileStorageProviderBase 
 
 		@Override
 		public Drawable loadTile(final MapTileRequestState pState) {
+			//poi.getPOIsize(pState.getMapTile());
 			return tileSource.renderTile(pState.getMapTile());
 		}
 	}

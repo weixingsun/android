@@ -91,7 +91,7 @@ public class MapOptions {
 		if (name.equals(MapOptions.MAP_MAPSFORGE)) {
 			//Log.w(tag, "getTileProvider.name="+name+",activity="+osm.act);
 			// MapsForge offline data need recreate a mapview
-			provider = MapOptions.getForgeMapTileProvider(osm.act);
+			provider = MapOptions.getForgeMapTileProvider(osm);
 			if (provider == null) {
 				osm.startDownloadActivity(getNeededMapFileShortName());
 				return null;// no map file.
@@ -181,14 +181,14 @@ public class MapOptions {
 	 * (Norway): Topo, Raster Maps+ (Switzerland): Topography, Terrain NearMap
 	 * (Australia): PhotoMap, StreetMap, Terrain
 	 */
-	public static MapTileProviderBase getForgeMapTileProvider(Activity act) {
+	public static MapTileProviderBase getForgeMapTileProvider(OSM osm) {
 		String mapFileName = getMapFileName();
 		Log.i(tag, "mapFile=" + mapFileName);
 
 		if (mapFileName == null)
 			return null;
 		cat.app.maps.vendor.MapsForgeTileProvider mfProvider = new cat.app.maps.vendor.MapsForgeTileProvider(
-				new SimpleRegisterReceiver(act), new File(mapFileName));
+				osm,new SimpleRegisterReceiver(osm.act), new File(mapFileName));
 		return mfProvider;
 		// GenericMapView genericMap = (GenericMapView)
 		// act.findViewById(R.id.osmap);

@@ -1,12 +1,16 @@
 package cat.app.maps;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.mapsforge.map.reader.PointOfInterest;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.tileprovider.MapTileProviderBase;
 import org.osmdroid.tileprovider.MapTileProviderBasic;
+import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
@@ -19,6 +23,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import cat.app.map.markers.Markers;
+import cat.app.map.poi.POI;
 import cat.app.maps.vendor.GenericMapView;
 import cat.app.navi.task.GeocoderTask;
 import cat.app.navi.task.RouteTask;
@@ -153,4 +158,20 @@ public class OSM {
 		intent.putExtra("file", fileName);
 	    act.startActivity(intent);
 	}
+	public BoundingBoxE6 getBoundary(){
+		 return map.getBoundingBox();
+	}
+
+	public boolean InBoundary(GeoPoint pos,BoundingBoxE6 box) {
+		int minLat = Math.min(box.getLatNorthE6(), box.getLatSouthE6());
+		int maxLat = Math.max(box.getLatNorthE6(), box.getLatSouthE6());
+		int minLng = Math.min(box.getLonEastE6(), box.getLonWestE6());
+		int maxLng = Math.max(box.getLonEastE6(), box.getLonWestE6());
+		if(pos.getLatitudeE6()>minLat && pos.getLatitudeE6()<maxLat 
+				&& pos.getLongitudeE6()>minLng && pos.getLongitudeE6()<maxLng ){
+			return true;
+		}
+		return false;
+	}
+	
 }

@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.mapsforge.map.reader.PointOfInterest;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadNode;
+import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.OverlayItem;
@@ -45,6 +48,8 @@ public class Markers {
 	Marker routeMarker;
 	public List<Marker> waypointsMarkerList = new ArrayList<Marker>();
 	public List<Marker> destinationMarkerList = new ArrayList<Marker>();
+	public List<Marker> poiMarkerList = new CopyOnWriteArrayList<Marker>();
+	public CopyOnWriteArrayList<PointOfInterest> pois = new CopyOnWriteArrayList<PointOfInterest>();
 	
 	Polyline routePolyline;
 	
@@ -67,6 +72,37 @@ public class Markers {
 		ResourceProxy resourceProxy = new DefaultResourceProxyImpl(osm.act);
 		myLocOverlay = new MyItemizedOverlay(img, resourceProxy);
 		osm.map.getOverlays().add(myLocOverlay);
+	}
+	/////////////////////////////////////////////////////
+	public int cleanPOIs(){
+		int i = 0;
+		BoundingBoxE6 box = osm.getBoundary();
+		for(PointOfInterest poi:this.pois){
+			if(!osm.InBoundary(new GeoPoint(poi.position.latitude,poi.position.longitude),box)){
+				this.pois.remove(poi);
+				i++;
+			}
+		}
+		return i;
+	}
+	public void addPOIMarker(int resId,PointOfInterest poi) {
+		Marker newMarker = new Marker(osm.map);
+		newMarker.setPosition(new GeoPoint(poi.position.latitude,poi.position.longitude));
+		//poi.layer
+		newMarker.setTitle(poi.toString());
+		//newMarker.setSnippet(poi.tags)
+		//newMarker.setSubDescription(poi.tags)
+		Drawable img = osm.act.getResources().getDrawable(resId);
+		newMarker.setIcon(img);
+		//Drawable icon = osm.act.getResources().getDrawable(resId);
+		newMarker.setImage(img);
+		osm.map.getOverlays().add(newMarker);
+		poiMarkerList.add(newMarker);
+	}
+	public void addPOIMarkers() {
+		for(PointOfInterest poi:this.pois){
+			addPOIMarker(R.drawable.red_point,poi);
+		}
 	}
 	public void updateMyLocationMarker(GeoPoint loc) {
 		myLocOverlay.removeItem(myLocationMarker);
@@ -164,4 +200,5 @@ public class Markers {
 		osm.map.invalidate();
 		routePolyline = pl;
 	}
+	
 }
