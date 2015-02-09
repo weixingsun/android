@@ -24,7 +24,7 @@ public class GenericMapView extends FrameLayout {
 
 	protected MapView mMapView;
 
-	public GenericMapView(Context context, AttributeSet attrs) 
+	public GenericMapView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
 	}

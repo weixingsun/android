@@ -3,7 +3,6 @@ package cat.app.maps;
 import java.util.List;
 
 import org.osmdroid.api.IMapController;
-import org.osmdroid.bonuspack.mapsforge.GenericMapView;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.tileprovider.MapTileProviderBase;
@@ -20,6 +19,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import cat.app.map.markers.Markers;
+import cat.app.maps.vendor.GenericMapView;
 import cat.app.navi.task.GeocoderTask;
 import cat.app.navi.task.RouteTask;
 import cat.app.osmap.Device;
@@ -44,7 +44,7 @@ public class OSM {
 	public RouteOptions ro;
 	GeoOptions go;
 	public RuntimeOptions rto;
-	GenericMapView genericMapView;
+	GenericMapView genericMapView; 
 	IMapController mapController;
 	public Polyline polyline;
 	public Markers mks;

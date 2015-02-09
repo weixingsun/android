@@ -15,7 +15,7 @@ import android.graphics.drawable.Drawable;
  */
 public class MapsForgeTileModuleProvider extends MapTileFileStorageProviderBase {
 
-	protected MapsForgeTileSource tileSource;
+	protected MapsForgeTileSourceOld tileSource;
 
 	/**
 	 * Constructor
@@ -24,7 +24,7 @@ public class MapsForgeTileModuleProvider extends MapTileFileStorageProviderBase 
 	 * @param file
 	 * @param tileSource
 	 */
-	public MapsForgeTileModuleProvider(IRegisterReceiver receiverRegistrar, File file, MapsForgeTileSource tileSource) {
+	public MapsForgeTileModuleProvider(IRegisterReceiver receiverRegistrar, File file, MapsForgeTileSourceOld tileSource) {
 
 		super(receiverRegistrar, NUMBER_OF_TILE_FILESYSTEM_THREADS, TILE_FILESYSTEM_MAXIMUM_QUEUE_SIZE);
 
@@ -65,8 +65,8 @@ public class MapsForgeTileModuleProvider extends MapTileFileStorageProviderBase 
 	@Override
 	public void setTileSource(ITileSource tileSource) {
 		//prevent re-assignment of tile source
-		if (tileSource instanceof MapsForgeTileSource) {
-			this.tileSource = (MapsForgeTileSource) tileSource;
+		if (tileSource instanceof MapsForgeTileSourceOld) {
+			this.tileSource = (MapsForgeTileSourceOld) tileSource;
 		}
 	}
 

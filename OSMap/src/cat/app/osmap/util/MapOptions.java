@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import org.osmdroid.ResourceProxy;
-import org.osmdroid.bonuspack.mapsforge.MapsForgeTileProvider;
 import org.osmdroid.tileprovider.MapTileProviderBase;
 import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
@@ -182,7 +181,7 @@ public class MapOptions {
 	 * (Norway): Topo, Raster Maps+ (Switzerland): Topography, Terrain NearMap
 	 * (Australia): PhotoMap, StreetMap, Terrain
 	 */
-	public static MapTileProviderBase getForgeMapTileProvider(Context act) {
+	public static MapTileProviderBase getForgeMapTileProvider(Activity act) {
 		String mapFileName = getMapFileName();
 		Log.i(tag, "mapFile=" + mapFileName);
 

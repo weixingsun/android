@@ -16,12 +16,12 @@ public class MapsForgeTileProvider extends MapTileProviderArray {
 
     public MapsForgeTileProvider(IRegisterReceiver receiverRegistrar, File file) {
 
-        super(MapsForgeTileSource.createFromFile(file), receiverRegistrar);
+        super(MapsForgeTileSourceOld.createFromFile(file), receiverRegistrar);
 
         // Create the module provider; this class provides a TileLoader that
         // actually loads the tile from the map file.
         MapsForgeTileModuleProvider moduleProvider;
-        moduleProvider = new MapsForgeTileModuleProvider(receiverRegistrar, file, (MapsForgeTileSource) getTileSource());
+        moduleProvider = new MapsForgeTileModuleProvider(receiverRegistrar, file, (MapsForgeTileSourceOld) getTileSource());
 
         MapTileModuleProviderBase[] pTileProviderArray;
         pTileProviderArray = new MapTileModuleProviderBase[] { moduleProvider };

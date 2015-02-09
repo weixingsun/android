@@ -10,11 +10,17 @@
         android:layout_height="match_parent"
         tools:context="${relativePackage}.${activityClass}" >
 
-        <org.osmdroid.bonuspack.mapsforge.GenericMapView
+        <cat.app.maps.vendor.GenericMapView
             android:id="@+id/osmap"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="true" />
+        <!-- 
+        <org.mapsforge.map.android.view.MapView
+	        android:id="@+id/mfmap"
+	        android:layout_width="fill_parent"
+	        android:layout_height="fill_parent" /> 
+        -->
 
         <LinearLayout
             android:layout_width="match_parent"
