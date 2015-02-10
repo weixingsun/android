@@ -89,7 +89,7 @@ public class Markers {
 		Marker newMarker = new Marker(osm.map);
 		newMarker.setPosition(new GeoPoint(poi.position.latitude,poi.position.longitude));
 		//poi.layer
-		newMarker.setTitle(poi.toString());
+		newMarker.setTitle(poi.tags.toString());
 		//newMarker.setSnippet(poi.tags)
 		//newMarker.setSubDescription(poi.tags)
 		Drawable img = osm.act.getResources().getDrawable(resId);
@@ -101,7 +101,7 @@ public class Markers {
 	}
 	public void addPOIMarkers() {
 		for(PointOfInterest poi:this.pois){
-			addPOIMarker(R.drawable.red_point,poi);
+			addPOIMarker(R.drawable.star_gray_26,poi);
 		}
 	}
 	public void updateMyLocationMarker(GeoPoint loc) {
