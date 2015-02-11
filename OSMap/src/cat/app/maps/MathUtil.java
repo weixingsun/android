@@ -132,4 +132,12 @@ public class MathUtil {
 	    }
 	    return false;
     }
+
+	public static boolean compare(org.mapsforge.core.model.GeoPoint a,
+			org.mapsforge.core.model.GeoPoint b) {
+    	if(compare(a.latitude,b.latitude) && compare(a.longitude,b.longitude)){
+	    	return true;
+	    }
+		return false;
+	}
 }

@@ -1,9 +1,13 @@
 package cat.app.map.poi;
 
 import org.mapsforge.map.reader.PointOfInterest;
+import org.osmdroid.bonuspack.overlays.Marker;
 
 public class POI {
-
-	PointOfInterest poiInfo;
-	PointOfInterest poiImg;
+	public POI(PointOfInterest poiInfo, Marker poiMarker){
+		this.poiInfo = poiInfo;
+		this.poiMarker = poiMarker;
+	}
+	public PointOfInterest poiInfo;
+	public Marker poiMarker;
 }

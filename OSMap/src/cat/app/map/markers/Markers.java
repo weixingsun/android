@@ -23,7 +23,11 @@ import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Location;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
 
+import cat.app.map.poi.POI;
 import cat.app.maps.OSM;
 import cat.app.osmap.MyItemizedOverlay;
 import cat.app.osmap.R;
@@ -48,10 +52,11 @@ public class Markers {
 	Marker routeMarker;
 	public List<Marker> waypointsMarkerList = new ArrayList<Marker>();
 	public List<Marker> destinationMarkerList = new ArrayList<Marker>();
-	public List<Marker> poiMarkerList = new CopyOnWriteArrayList<Marker>();
-	public CopyOnWriteArrayList<PointOfInterest> pois = new CopyOnWriteArrayList<PointOfInterest>();
+	//public List<Marker> poiMarkerList = new CopyOnWriteArrayList<Marker>();
+	public CopyOnWriteArrayList<POI> pois = new CopyOnWriteArrayList<POI>();
 	
 	Polyline routePolyline;
+	public Marker selectedMarker;
 	
 	//List<Marker> markers= new ArrayList<Marker>();
 /*	public void addMarker(GeoPoint p){
@@ -73,24 +78,30 @@ public class Markers {
 		myLocOverlay = new MyItemizedOverlay(img, resourceProxy);
 		osm.map.getOverlays().add(myLocOverlay);
 	}
-	/////////////////////////////////////////////////////
-	public int cleanPOIs(){
-		int i = 0;
-		BoundingBoxE6 box = osm.getBoundary();
-		for(PointOfInterest poi:this.pois){
-			if(!osm.InBoundary(new GeoPoint(poi.position.latitude,poi.position.longitude),box)){
-				this.pois.remove(poi);
-				i++;
+	/*
+	public int cleanPOIs(boolean all){
+		if(all){
+			this.pois.clear();
+			return 0;
+		}else{
+			int i = 0;
+			BoundingBoxE6 box = osm.getBoundary();
+			for(POI poi:this.pois){
+				if(!osm.InBoundary(new GeoPoint(poi.poiInfo.position.latitude,poi.poiInfo.position.longitude),box)){
+					this.pois.remove(poi);
+					osm.map.getOverlays().remove(poi.poiMarker);
+					i++;
+				}
 			}
+			return i;
 		}
-		return i;
 	}
 	public void addPOIMarker(int resId,PointOfInterest poi) {
 		Marker newMarker = new Marker(osm.map);
 		newMarker.setPosition(new GeoPoint(poi.position.latitude,poi.position.longitude));
-		//poi.layer
+		
 		String name = poi.tags.size()>1?poi.tags.get(1).value:poi.tags.get(0).value;
-		newMarker.setTitle(name);
+		newMarker.setTitle(name+":"+poi.layer);
 		//newMarker.setSnippet(poi.tags)
 		//newMarker.setSubDescription(poi.tags)
 		Drawable img = osm.act.getResources().getDrawable(resId);
@@ -98,12 +109,18 @@ public class Markers {
 		//Drawable icon = osm.act.getResources().getDrawable(resId);
 		newMarker.setImage(img);
 		osm.map.getOverlays().add(newMarker);
-		poiMarkerList.add(newMarker);
+		//poiMarkerList.add(newMarker);
 	}
 	public void addPOIMarkers() {
-		for(PointOfInterest poi:this.pois){
-			addPOIMarker(R.drawable.ic_empty,poi);
+		for(POI poi:this.pois){
+			addPOIMarker(R.drawable.square_outter_blue,poi.poiInfo);
 		}
+	}*/
+	public void removePOIMarkers(){
+		for(POI p:osm.mks.pois){
+			osm.map.getOverlays().remove(p.poiMarker);
+		}
+		osm.mks.pois.clear();
 	}
 	public void updateMyLocationMarker(GeoPoint loc) {
 		myLocOverlay.removeItem(myLocationMarker);
@@ -201,5 +218,15 @@ public class Markers {
 		osm.map.invalidate();
 		routePolyline = pl;
 	}
-	
+	public void setNaviImage(){
+		ImageView navi = (ImageView) osm.act.findViewById(R.id.navi);
+		navi.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				if(selectedMarker!=null){
+					osm.ro.setWayPoints(new GeoPoint(osm.loc.myPos),selectedMarker.getPosition());
+					osm.startTask("route", selectedMarker.getPosition(),"route");
+				}
+			}});
+	}
 }

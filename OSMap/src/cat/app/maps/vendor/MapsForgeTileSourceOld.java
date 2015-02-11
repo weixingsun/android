@@ -17,6 +17,7 @@ import org.mapsforge.map.rendertheme.InternalRenderTheme;
 import org.mapsforge.map.rendertheme.XmlRenderTheme;
 import org.mapsforge.core.model.Tile;
 
+import cat.app.map.poi.LoadPOITask;
 import cat.app.map.poi.MapsForgePOI;
 import cat.app.maps.OSM;
 
@@ -36,8 +37,9 @@ import android.util.Log;
 public class MapsForgeTileSourceOld extends BitmapTileSourceBase {
 
 	private static final String tag = MapsForgeTileSourceOld.class.getSimpleName();
+	private Bitmap bitmapOrigin = Bitmap.createBitmap(TILE_SIZE_PIXELS, TILE_SIZE_PIXELS, Bitmap.Config.RGB_565);
 	protected File mapFile;
-	static Activity act;
+	//static Activity act;
 	private static OSM osm;
 	// Reasonable defaults ..
 	public static final int MIN_ZOOM = 5;
@@ -74,9 +76,8 @@ public class MapsForgeTileSourceOld extends BitmapTileSourceBase {
 		else{
 			mapFile = null;
 		}
+		osm.offlineMapFile = mapFile;
 		poi = new MapsForgePOI(this.mapDatabase);
-		//osm.pois.add(poi);
-		//osm.removePOIs();
 		renderer = new DatabaseRenderer(mapDatabase);
 		minZoom = renderer.getStartZoomLevel();
 		maxZoom = renderer.getZoomLevelMax();
@@ -106,7 +107,6 @@ public class MapsForgeTileSourceOld extends BitmapTileSourceBase {
 		int maxZoomLevel = MAX_ZOOM;
 		int tileSizePixels = TILE_SIZE_PIXELS;
 		MapsForgeTileSourceOld.osm = osm;
-		MapsForgeTileSourceOld.act = osm.act;
 		return new MapsForgeTileSourceOld(minZoomLevel, maxZoomLevel, tileSizePixels, file);
 	}
 
@@ -115,22 +115,20 @@ public class MapsForgeTileSourceOld extends BitmapTileSourceBase {
 
 		Tile tile = new Tile((long)pTile.getX(), (long)pTile.getY(), (byte)pTile.getZoomLevel());
 
-		osm.mks.pois.addAll(poi.getPOI(pTile));
-		//MapReadResult result = mapDatabase.readMapData(tile);
-		//int POIsize = result.pointOfInterests.size();
-		//Log.w(tag,"X="+pTile.getX()+",Y="+pTile.getY()+",POIsize="+POIsize);
+		//osm.mks.pois.addAll(poi.getPOI(pTile));
+		//LoadPOITask task = new LoadPOITask(osm, poi, pTile);
+		//task.execute();
+		///////////////////////////////////////////////////////////////////////////
 		//Create a bitmap to draw on
-		Bitmap bitmap = Bitmap.createBitmap(TILE_SIZE_PIXELS, TILE_SIZE_PIXELS, Bitmap.Config.RGB_565);
+		Bitmap bitmap = this.bitmapOrigin.copy(Bitmap.Config.RGB_565, true);
 		try{
-			//Draw the tile
 			MapGeneratorJob mapGeneratorJob = new MapGeneratorJob(tile, mapFile, jobParameters, debugSettings);
 			renderer.executeJob(mapGeneratorJob, bitmap);
 		}catch(Exception ex){
 			//Make the bad tile easy to spot
 			bitmap.eraseColor(Color.YELLOW);
 		}
-
-		Drawable d = new BitmapDrawable(act.getResources(),bitmap);
+		Drawable d = new BitmapDrawable(osm.act.getResources(),bitmap);
 		return d;
 	}
 

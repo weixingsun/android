@@ -1,5 +1,6 @@
 package cat.app.maps;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -60,7 +61,8 @@ public class OSM {
 	public ScaleBarOverlay scaleBarOverlay;
 	public Address startAddr;
 	public Address endAddr;
-
+	public File offlineMapFile;
+	
 	public void init(Activity act) {
 		this.act = act;
 		this.dbHelper = DbHelper.getInstance(act);
@@ -80,6 +82,7 @@ public class OSM {
 		setMap(mtpb);
 		mks=Markers.getInstance(this);
 		mks.initMylocMarker();
+		mks.setNaviImage();
 		//mks.initRouteMarker();
         dv.init(act,this);
 
