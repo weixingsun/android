@@ -2,6 +2,7 @@ package cat.app.osmap.ui;
 
 import cat.app.map.poi.LoadPOITask;
 import cat.app.maps.OSM;
+import android.util.Log;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 
 public class GlobalLayoutListener implements OnGlobalLayoutListener{
@@ -13,6 +14,7 @@ public class GlobalLayoutListener implements OnGlobalLayoutListener{
 	}
 	@Override
     public void onGlobalLayout() {
+		Log.i(tag, "onGlobalLayout");
     	if(osm.switchTileProvider){
     		osm.move();//make sure setCenter() is called after mapview is loaded.
     		//osm.mapView.getOverlays().remove(mini);

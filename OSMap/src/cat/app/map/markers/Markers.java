@@ -167,6 +167,7 @@ public class Markers {
 		osm.map.getOverlays().add(routeMarker);
 		osm.move(gp);								//this will cause marker shown in screen ?????????????
 		this.destinationMarkerList.add(routeMarker);  //this will cause marker not shown in screen ?????????????
+		this.selectedMarker = routeMarker;
 	}
 	public void drawStepsPoint(Road road) { // called from tasks
 		for (int i = 0; i < road.mNodes.size(); i++) {

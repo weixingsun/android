@@ -36,4 +36,5 @@ public class MyMapEventsReceiver implements MapEventsReceiver{
 		osm.dv.closeAllList();
 		return false;
 	}
+	
 }

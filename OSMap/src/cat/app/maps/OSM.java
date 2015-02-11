@@ -9,6 +9,10 @@ import org.mapsforge.map.reader.PointOfInterest;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.Polyline;
+import org.osmdroid.events.DelayedMapListener;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.MapTileProviderBase;
 import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.util.BoundingBoxE6;
@@ -20,7 +24,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.location.Address;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.View;
+import android.view.View.OnDragListener;
 import android.widget.Toast;
 
 import cat.app.map.markers.Markers;
@@ -105,6 +111,17 @@ public class OSM {
 		MapEventsOverlay OverlayEventos = new MapEventsOverlay(act.getBaseContext(), mReceive);
 		map.getOverlays().add(OverlayEventos);
 		map.invalidate();
+		map.setMapListener(new DelayedMapListener(new MapListener(){
+			@Override
+			public boolean onScroll(ScrollEvent arg0) {
+				BoundingBoxE6 box = arg0.getSource().getBoundingBox();
+				Log.i(tag, "onScroll="+box);
+				return false;
+			}
+			@Override
+			public boolean onZoom(ZoomEvent arg0) {
+				return false;
+			}}, 300));
 	}
 
 	public void initScaleBar(){	//have to invoke after map initialized, call in GlobalLayoutListener
