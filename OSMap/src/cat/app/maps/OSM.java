@@ -116,6 +116,7 @@ public class OSM {
 			public boolean onScroll(ScrollEvent arg0) {
 				BoundingBoxE6 box = arg0.getSource().getBoundingBox();
 				Log.i(tag, "onScroll="+box);
+				mks.showHidePOIs();
 				return false;
 			}
 			@Override

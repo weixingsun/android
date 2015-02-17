@@ -230,4 +230,8 @@ public class Markers {
 				}
 			}});
 	}
+	public void showHidePOIs() {
+		
+		
+	}
 }
