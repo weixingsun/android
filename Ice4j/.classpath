@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="libs/EventBus-2.4.0.jar"/>
 	<classpathentry kind="lib" path="libs/ice4j.jar"/>
 	<classpathentry kind="lib" path="libs/jain-sdp.jar"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

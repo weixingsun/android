@@ -1,5 +1,6 @@
 package cat.app.net.p2p.core;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -30,6 +31,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 
+import android.provider.MediaStore.Video;
 import android.provider.Settings.Secure;
 
 
@@ -43,7 +45,7 @@ public class Peer {
 	public String remoteHostname = "SUN-DELL";
 	String deviceName;
     private Peer(){
-        client = new IceClient(8888, "text");
+        client = new IceClient(8888, "data");  //video/audio/data/text
         try {
 			client.init();
 	        //client.exchangeSdpWithPeer();
@@ -61,6 +63,12 @@ public class Peer {
     	SenderTask task = new SenderTask(client, msg);
 		task.execute();
     }
+
+    public void send(File file){
+    	SenderTask task = new SenderTask(client, file.toString());
+		task.execute();
+    }
+    
     /*public void startRecieverService(Activity act){
         //bind service  
         Intent intent = new Intent(act, ListenerIntentService.class);  

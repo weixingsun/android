@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 import cat.app.net.p2p.Ear;
+import cat.app.net.p2p.db.DbHelper;
 import cat.app.net.p2p.eb.ReceiveDataEvent;
 import cat.app.net.p2p.eb.RemoteSdpEvent;
 import cat.app.net.p2p.eb.SdpEvent;
@@ -24,6 +25,7 @@ public class ListenerIntentService extends IntentService {
 
 	public ListenerIntentService() {
 		super("");
+		DbHelper.getInstance().createTables();
 	}
 	private void init() {
 		if (peer == null) {
@@ -72,6 +74,7 @@ public class ListenerIntentService extends IntentService {
 	}
 	private void receiveMsg(String host, String msg) {
 		EventBus.getDefault().post(new ReceiveDataEvent(host, msg));
+		DbHelper.getInstance().insertMsg(host, msg);
 	}
 /*	private void sendRemoteMsg(String host, String sdp) {
 		EventBus.getDefault().post(new RemoteSdpEvent(host, sdp));

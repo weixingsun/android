@@ -9,6 +9,11 @@ import java.net.InetAddress;
 import java.net.SocketAddress;
 import java.util.List;
 
+import net.majorkernelpanic.streaming.Session;
+import net.majorkernelpanic.streaming.SessionBuilder;
+import net.majorkernelpanic.streaming.audio.AudioQuality;
+import net.majorkernelpanic.streaming.video.VideoQuality;
+
 import org.ice4j.Transport;
 import org.ice4j.TransportAddress;
 import org.ice4j.ice.Agent;
@@ -61,6 +66,17 @@ public class IceClient {
 		//Log.i(tag,"=================== feed the following to the remote agent ===================");
 		//Log.i(tag,localSdp);
 		//Log.i(tag,"=========================================================================\n");
+		/*Session b = SessionBuilder.getInstance()
+        //.setCallback(this)
+        //.setSurfaceView(mSurfaceView)
+        .setPreviewOrientation(90)
+        //.setContext(getApplicationContext())
+        .setAudioEncoder(SessionBuilder.AUDIO_NONE)
+        .setAudioQuality(new AudioQuality(16000, 32000))
+        .setVideoEncoder(SessionBuilder.VIDEO_H264)
+        .setVideoQuality(new VideoQuality(320,240,20,500000))
+        .build();
+		b.getAudioTrack();*/
 	}
 	
 	/**
@@ -77,7 +93,6 @@ public class IceClient {
 	        remoteAddress = getRemotePeerSocketAddress();
 
 		} catch (Throwable e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
