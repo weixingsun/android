@@ -9,6 +9,7 @@ import cat.app.net.p2p.db.DbHelper;
 import cat.app.net.p2p.eb.ReceiveDataEvent;
 import cat.app.net.p2p.eb.RemoteSdpEvent;
 import cat.app.net.p2p.eb.SdpEvent;
+import cat.app.net.p2p.eb.StatusEvent;
 
 import de.greenrobot.event.EventBus;
 import android.app.IntentService;
@@ -43,8 +44,11 @@ public class ListenerIntentService extends IntentService {
 		init();
 		sendLocalMsg(peer.hostname, peer.client.localSdp);
 		loopForRemoteSdp(peer.remoteHostname);
-		peer.client.initConnection(Ear.remoteSdp);
-		loopForNextMessage();
+		boolean flag = peer.client.initConnection(Ear.remoteSdp);
+		if(flag){
+			EventBus.getDefault().post(new StatusEvent("connected"));
+			loopForNextMessage();
+		}
 	}
 	public void loopForRemoteSdp(String host){
 		Log.i(tag, "waiting for sdp from host="+host);

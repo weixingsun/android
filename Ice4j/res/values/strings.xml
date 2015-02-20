@@ -3,5 +3,6 @@
 
     <string name="app_name">Ice4j</string>
     <string name="send">Send</string>
-
+	<string name="action_status">Status</string>
+	<string name="action_search">Search</string>
 </resources>

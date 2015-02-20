@@ -45,7 +45,9 @@ public class IceClient {
 	public DatagramSocket socket = null;
 	public SocketAddress remoteAddress;
 	private String[] turnServers = new String[] { "stun.jitsi.net:3478" };
+    //private String[] stunServers = new String[] { "stun.jitsi.net:3478" };
 	private String[] stunServers = new String[] { "stun.stunprotocol.org:3478" };
+    //private String[] stunServers = new String[]{"stun.jitsi.org:3478","stun6.jitsi.net:3478"};
 	private String username = "guest";
 	private String password = "anonymouspower!!";
 	private IceProcessingListener listener;
@@ -84,16 +86,17 @@ public class IceClient {
 	 * environment that we can exchange SDP with peer through signaling
 	 * server(SIP server)
 	 */
-	public void initConnection(String remoteSdp) {
+	public boolean initConnection(String remoteSdp) {
 		try {
 			this.remoteSdp = remoteSdp;
 			SdpUtils.parseSDP(agent, remoteSdp);
 	        startConnect();
 	        socket = getDatagramSocket();
 	        remoteAddress = getRemotePeerSocketAddress();
-
+	        return true;
 		} catch (Throwable e) {
 			e.printStackTrace();
+			return false;
 		}
 	}
 	public DatagramSocket getDatagramSocket() throws Throwable {

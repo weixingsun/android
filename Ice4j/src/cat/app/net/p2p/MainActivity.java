@@ -19,16 +19,24 @@ import cat.app.net.p2p.core.ListenerIntentService;
 import cat.app.net.p2p.core.Peer;
 import cat.app.net.p2p.db.DbHelper;
 import cat.app.net.p2p.eb.ReceiveDataEvent;
+import cat.app.net.p2p.eb.StatusEvent;
 import cat.app.net.p2p.ui.ListItem;
 import de.greenrobot.event.EventBus;
+import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnFocusChangeListener;
@@ -38,7 +46,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,6 +61,8 @@ public class MainActivity extends Activity {
 	EditText msgBox;
 	ListView records;
 	private Button add;  
+	ImageView statusLight;
+	EditText search;
 	public MyAdapter adapter;
 	Ear ear;
 	
@@ -58,14 +70,29 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		setupActionBar();
 		setupInput();
-		setupRecord();
+		setupHistoryListView();
 		setupEar();
 		startRecieverService();
 		EventBus.getDefault().register(this);
 		DbHelper.getInstance(this);
 	}
-
+	@SuppressLint("NewApi")
+	private void setupActionBar() {
+		ActionBar actionBar = getActionBar();
+		actionBar.setCustomView(R.layout.actionview);
+		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME| ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_SHOW_CUSTOM);
+		search = (EditText) actionBar.getCustomView().findViewById(R.id.action_search);
+		statusLight = (ImageView)actionBar.getCustomView().findViewById(R.id.status_light);
+	}
+	/*@Override
+	  public boolean onCreateOptionsMenu(Menu menu) {
+	    getMenuInflater().inflate(R.layout.actionmenu, menu); 
+	    MenuItem searchItem = menu.findItem(R.id.action_search);
+	    SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+	    return true;
+	  }*/
 	/*private void setupNet() {
 		mQueue = Volley.newRequestQueue(this);
 	}*/
@@ -76,9 +103,14 @@ public class MainActivity extends Activity {
 	public void onEventMainThread(ReceiveDataEvent event) {
 		Log.i(tag, "EventBus received ReceiveData event:" + event.getMessage());
         adapter.items.add(new ListItem(event.getHost(),event.getMessage()));
-        adapter.notifyDataSetChanged();  
+        adapter.notifyDataSetChanged();
+        scrollMyListViewToBottom();
 	}
-	private void setupRecord() {
+	public void onEventMainThread(StatusEvent event) {
+		//Log.i(tag, "EventBus received StatusEvent:" + event.getStatus());
+        statusLight.setImageResource(R.drawable.light_green_16);
+	}
+	private void setupHistoryListView() {
 		records = (ListView) findViewById(R.id.listView1);
 		adapter = new MyAdapter(this);
 		records.setAdapter(adapter);
@@ -101,7 +133,7 @@ public class MainActivity extends Activity {
 		add = (Button)  this.findViewById(R.id.send);
 		add.setOnClickListener(new OnClickListener() {
             @Override  
-            public void onClick(View arg0) {  
+            public void onClick(View arg0) {
             	String msg = msgBox.getText().toString();
             	if(msg.length()>0){
 					Peer.getInstance().send(msg);
@@ -130,8 +162,15 @@ public class MainActivity extends Activity {
 		InputMethodManager imm = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(msgBox.getWindowToken(), 0);
 	}
-	
-	
+
+	private void scrollMyListViewToBottom() {
+		records.post(new Runnable() {
+	        @Override
+	        public void run() {
+	        	records.setSelection(adapter.getCount() - 1);
+	        }
+	    });
+	}
     private class MyAdapter extends BaseAdapter {
 
     	private Context context;
@@ -165,26 +204,14 @@ public class MainActivity extends Activity {
     		String msg = items.get(position).text;
     		final TextView edit = (TextView) view.findViewById(R.id.edit);
     		edit.setText(msg);
-    		Log.d(tag, "position="+position+",sender="+items.get(position).text); 
-    		if(items.get(position).sender.equals(Peer.getInstance().hostname))
-    		edit.setGravity(Gravity.RIGHT);
-    		/*edit.setOnFocusChangeListener(new OnFocusChangeListener() {
-				@Override
-				public void onFocusChange(View v, boolean hasFocus) {
-					if(arr.size()>0){
-						arr.set(position, edit.getText().toString());
-					}
-				}
-			});
-    		  Button del = (Button) view.findViewById(R.id.del);
-    		  del.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View arg0) {
-					//从集合中删除所删除项的EditText的内容
-					arr.remove(position);
-					adapter.notifyDataSetChanged();
-				}
-			});*/
+    		String sender = items.get(position).sender;
+    		String hostname = Peer.getInstance().hostname;
+    		//Log.d(tag, "position="+position+",sender="+sender+",hostname="+hostname);
+    		if(sender.equals(hostname)){
+    			edit.setGravity(Gravity.RIGHT);
+    		}else{
+    			edit.setGravity(Gravity.LEFT);
+    		}
     		return view;
     	}
     }
