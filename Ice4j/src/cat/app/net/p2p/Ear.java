@@ -2,13 +2,16 @@ package cat.app.net.p2p;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import cat.app.net.p2p.core.Peer;
 import cat.app.net.p2p.eb.MessageEvent;
 import cat.app.net.p2p.eb.RemoteSdpEvent;
 import cat.app.net.p2p.eb.SdpEvent;
@@ -32,7 +35,7 @@ public class Ear {
 	private static RequestQueue rQueue;
 	
 	public static boolean hearRemoteSdp = false;
-	public static String remoteSdp;
+	public static Map<String,String> remoteHosts = new HashMap<String,String>();
 	public Ear(Activity act) {
 		rQueue = Volley.newRequestQueue(act);
 		EventBus.getDefault().register(this);
@@ -40,23 +43,15 @@ public class Ear {
 
 	public void onEvent(SdpEvent event) {
 		Log.i(tag, "EventBus received SDP event:" + event.getHost());
-		sendLocalSdp(event.getHost(), event.getSdp());
-	}
-	public void onEvent(RemoteSdpEvent event) {
-		//Log.i(tag, "EventBus received RemoteSDP event:" + event.getHost());
-		if(event.getSdp() !=null && event.getSdp().length()>10) {
-			Ear.hearRemoteSdp = true;
-			//Log.e(tag, "sdp="+event.getSdp());
-			remoteSdp = event.getSdp();
-		}
+		sendLocalSdp(event.getHost(), event.getSdp(), event.getGroup());
 	}
 
-	public void sendLocalSdp(final String hostname, final String localSdp) {
+	public void sendLocalSdp(final String hostname, final String localSdp, final String group) {
 		String baseurl = "http://www.servicedata.vhostall.com/p2p/insert_p2p.php";
 		Response.Listener<String> listener = new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
-				Log.d("TAG", response.toString());
+				//Log.d("TAG", response.toString());
 			}
 		};
 		Response.ErrorListener errorListener = new Response.ErrorListener() {
@@ -72,37 +67,29 @@ public class Ear {
 				Map<String, String> map = new HashMap<String, String>();
 				map.put("host", hostname);
 				map.put("sdp", localSdp);
-				map.put("group", "1");
+				map.put("group", group);
 				return map;
 			}
 		};
 		rQueue.add(request);
 		//Log.w(tag, "hostname="+hostname);
 	}
-
+	
 	public static void cleanupLocalSdp() {
-		//String baseurl = "http://www.servicedata.vhostall.com/p2p/delete_p2p.php?host="+localHostname;
-		
-	}
-	public static void triggerHearRemoteSdp(final String hostname) {
-		String baseurl = "http://www.servicedata.vhostall.com/p2p/select_p2p_json.php";
-		String params = "?host=";
-		String encodedHostname = "";
+		final Peer p = Peer.getInstance();
+		String encodedHostname="";
 		try {
-			encodedHostname = URLEncoder.encode(hostname, "utf-8");
+			encodedHostname = URLEncoder.encode(p.hostname, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
-		String url = baseurl + params +encodedHostname; 
-		//Log.i(tag, "url="+url);
-		//JsonObjectRequest
+		String url = "http://www.servicedata.vhostall.com/p2p/delete_p2p.php?group="+p.group+"&host="+encodedHostname;
+		Log.i(tag, "clean_url="+url);
 		StringRequest request = new StringRequest(url,
 				new Response.Listener<String>() {
 					@Override
 					public void onResponse(String response) {
-						//Log.w(tag, response.toString());
-						String sdp = getSdpFromJSON(response);
-						EventBus.getDefault().post(new RemoteSdpEvent(hostname,sdp));
+						Log.i(tag, "host "+p.hostname+":"+response);
 					}
 				}, new Response.ErrorListener() {
 					@Override
@@ -111,28 +98,46 @@ public class Ear {
 					}
 				});
 		rQueue.add(request);
+		//Log.i(tag, "deleting host "+p.hostname);
 	}
-
-	private static String getSdpFromJSON(String response) {
-		String sdp = "";
+	public static void triggerHearRemoteSdp(String group) {
+		String baseurl = "http://www.servicedata.vhostall.com/p2p/select_p2p_json.php?group=";
+		String url = baseurl +group;
+		StringRequest request = new StringRequest(url,
+				new Response.Listener<String>() {
+					@Override
+					public void onResponse(String response) {
+						Log.i(tag,"response executed");
+						extractHostSdpFromJSON(response);
+						EventBus.getDefault().post(new RemoteSdpEvent(remoteHosts));
+					}
+				}, new Response.ErrorListener() {
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						Log.e(tag, error.getMessage(), error);
+					}
+				});
+		//Log.i(tag, "url="+url);
+		rQueue.add(request);
+	}
+	
+	private static void extractHostSdpFromJSON(String response){
+		remoteHosts.clear();
 		try {
 			JSONArray posArray = new JSONObject(response).getJSONArray("result");
 	    	//Log.i(tag,"Array.length():" + posArray.length());  // last comma contains an array slot
 	    	for(int i=0;i<posArray.length()-1;i++){
+
+				//Log.i(tag, "posArray="+posArray.length());
 	        	JSONObject row = posArray.getJSONObject(i);
-	        	//String hostname = row.getString("hostname");
-	        	sdp = row.getString("sdp");
+	    		String host = row.getString("hostname");
+	        	String sdp = row.getString("sdp");
+	        	//Log.w(sdp, "host="+host+ ",sdp="+sdp);
+	        	if(!Peer.getInstance().hostname.equals(host))
+	        	remoteHosts.put(host, sdp);
 	    	}
 		} catch (JSONException e) {
 			//e.printStackTrace();
 		}
-		return sdp;
 	}
-
-
-	/*
-	 * public void onEvent(MessageEvent event) { 
-	 * Log.i(tag,"EventBus received event:" + event.getMessage()); 
-	 * }
-	 */
 }

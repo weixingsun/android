@@ -2,25 +2,37 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    >
+    android:orientation="horizontal" >
 
-<EditText
-    android:id="@+id/action_search"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_alignParentLeft="true"
-    android:inputType="textFilter" />
+    <TextView
+        android:id="@+id/group_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerInParent="true" />
 
-<ImageView
-    android:id="@+id/status_light"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_alignParentRight="true"
-    android:layout_centerInParent="true"
-    android:layout_centerVertical="false"
-    android:layout_toRightOf="@drawable/ic_action_search"
-    android:contentDescription="@string/action_status"
-    android:src="@drawable/light_red_16" />
+    <EditText
+        android:id="@+id/action_search"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+    	android:maxLength="@integer/max_length"
+        android:inputType="number" >
+
+        <requestFocus />
+    </EditText>
+	<Spinner
+            android:id="@+id/hosts"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content" />
+    <ImageView
+        android:id="@+id/status_light"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:contentDescription="@string/action_status"
+        android:src="@drawable/light_red_16" />
 
 </RelativeLayout>

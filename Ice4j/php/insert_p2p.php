@@ -14,11 +14,11 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$sql = "SELECT hostname FROM tbl_p2p where hostname = '" . $host . "'";
+$sql = "SELECT hostname FROM tbl_p2p where group_id = " . $group . " and hostname = '" . $host . "'";
 $result = $conn->query($sql);
 if ($result->num_rows > 0) {
 	//echo "got " . $result->num_rows . "rows: " . $sql ;
-	$sql = "UPDATE tbl_p2p set sdp = '" . $sdp . "', last_update_time=now(),create_time=now() where hostname = '" . $host . "'";
+	$sql = "UPDATE tbl_p2p set sdp = '" . $sdp . "', last_update_time=now(),create_time=now() where group_id = " . $group . " and hostname = '" . $host . "'";
 	if ($conn->query($sql) === TRUE) {
 		echo "\n" . $host . " updated\n";
 	} else {

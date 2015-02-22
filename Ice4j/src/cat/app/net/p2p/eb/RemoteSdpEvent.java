@@ -1,20 +1,24 @@
 package cat.app.net.p2p.eb;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 public class RemoteSdpEvent {
 
-	public RemoteSdpEvent(String host,String sdp) {
-		this.host = host;
-		this.sdp = sdp;
+	public RemoteSdpEvent(List<String> hosts,List<String> sdps) {
 	}
-
-	String host;
-	String sdp;
-
-	public String getSdp() {
-		return sdp;
+	public RemoteSdpEvent(Map<String,String> hosts) {
+		this.remoteHosts = hosts;
 	}
-	public String getHost() {
-		return host;
+	public Map<String,String> remoteHosts;
+
+	public Collection<String> getSdps() {
+		return remoteHosts.values();
+	}
+	public Set<String> getHosts() {
+		return remoteHosts.keySet();
 	}
 	
 }

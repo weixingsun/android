@@ -42,8 +42,10 @@ public class Peer {
 	}
     public IceClient client;
 	public String hostname;
-	public String remoteHostname = "SUN-DELL";
 	String deviceName;
+	public String group;
+	public String remoteHostname;
+	public String remoteSdp;
     private Peer(){
         client = new IceClient(8888, "data");  //video/audio/data/text
         try {

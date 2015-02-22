@@ -1,0 +1,418 @@
+run:
+二月 22, 2015 10:38:44 上午 org.ice4j.ice.Agent gatherCandidates
+INFO: Gather candidates for component audio.RTP
+二月 22, 2015 10:38:45 上午 org.ice4j.ice.harvest.UPNPHarvester$UPNPThread run
+INFO: Failed to harvest UPnP: java.lang.NoClassDefFoundError: org/bitlet/weupnp/GatewayDiscover
+二月 22, 2015 10:38:45 上午 org.ice4j.ice.harvest.UPNPHarvester$UPNPThread run
+INFO: Failed to harvest UPnP: java.lang.NoClassDefFoundError: org/bitlet/weupnp/GatewayDiscover
+二月 22, 2015 10:38:45 上午 org.ice4j.ice.harvest.CandidateHarvesterSetElement setEnabled
+INFO: Disabling: UPNPHarvester
+二月 22, 2015 10:38:46 上午 org.ice4j.ice.harvest.CandidateHarvesterSetElement setEnabled
+INFO: Disabling: TURN harvester(srvr: 91.121.47.14:3478/udp)
+二月 22, 2015 10:38:46 上午 org.ice4j.ice.Agent createComponent
+INFO: 	192.168.1.78:9090/udp (host)
+二月 22, 2015 10:38:46 上午 org.ice4j.ice.Agent createComponent
+INFO: 	[fe80:0:0:0:443b:9499:91d2:c53f]:9090/udp (host)
+二月 22, 2015 10:38:46 上午 org.ice4j.ice.Agent createComponent
+INFO: 	125.239.119.110:58646/udp (srflx)
+IceTest:RTP Component created in 2515 ms
+二月 22, 2015 10:38:46 上午 org.ice4j.ice.Agent gatherCandidates
+INFO: Gather candidates for component audio.RTCP
+二月 22, 2015 10:38:47 上午 org.ice4j.ice.Agent createComponent
+INFO: 	192.168.1.78:9091/udp (host)
+二月 22, 2015 10:38:47 上午 org.ice4j.ice.Agent createComponent
+INFO: 	[fe80:0:0:0:443b:9499:91d2:c53f]:9091/udp (host)
+二月 22, 2015 10:38:47 上午 org.ice4j.ice.Agent createComponent
+INFO: 	125.239.119.110:58880/udp (srflx)
+二月 22, 2015 10:38:47 上午 org.ice4j.ice.Agent gatherCandidates
+IceTest:RTCP Component created in 1263 ms
+INFO: Gather candidates for component video.RTP
+二月 22, 2015 10:38:49 上午 org.ice4j.ice.Agent createComponent
+INFO: 	192.168.1.78:9092/udp (host)
+二月 22, 2015 10:38:49 上午 org.ice4j.ice.Agent createComponent
+INFO: 	[fe80:0:0:0:443b:9499:91d2:c53f]:9092/udp (host)
+二月 22, 2015 10:38:49 上午 org.ice4j.ice.Agent createComponent
+INFO: 	125.239.119.110:60850/udp (srflx)
+IceTest:RTP Component created in 1463 ms
+二月 22, 2015 10:38:49 上午 org.ice4j.ice.Agent gatherCandidates
+INFO: Gather candidates for component video.RTCP
+二月 22, 2015 10:38:50 上午 org.ice4j.ice.Agent createComponent
+INFO: 	192.168.1.78:9093/udp (host)
+二月 22, 2015 10:38:50 上午 org.ice4j.ice.Agent createComponent
+INFO: 	[fe80:0:0:0:443b:9499:91d2:c53f]:9093/udp (host)
+二月 22, 2015 10:38:50 上午 org.ice4j.ice.Agent createComponent
+INFO: 	125.239.119.110:51088/udp (srflx)
+IceTest:RTCP Component created in 1420 ms
+IceTest:Total harvesting time: 7487ms.
+二月 22, 2015 10:38:50 上午 org.ice4j.ice.Agent gatherCandidates
+INFO: Gather candidates for component audio.RTP
+二月 22, 2015 10:38:51 上午 org.ice4j.ice.harvest.UPNPHarvester$UPNPThread run
+INFO: Failed to harvest UPnP: java.lang.NoClassDefFoundError: org/bitlet/weupnp/GatewayDiscover
+二月 22, 2015 10:38:51 上午 org.ice4j.ice.harvest.UPNPHarvester$UPNPThread run
+INFO: Failed to harvest UPnP: java.lang.NoClassDefFoundError: org/bitlet/weupnp/GatewayDiscover
+二月 22, 2015 10:38:51 上午 org.ice4j.ice.harvest.CandidateHarvesterSetElement setEnabled
+INFO: Disabling: UPNPHarvester
+二月 22, 2015 10:38:52 上午 org.ice4j.ice.harvest.CandidateHarvesterSetElement setEnabled
+INFO: Disabling: TURN harvester(srvr: 91.121.47.14:3478/udp)
+二月 22, 2015 10:38:52 上午 org.ice4j.ice.Agent createComponent
+INFO: 	192.168.1.78:6060/udp (host)
+二月 22, 2015 10:38:52 上午 org.ice4j.ice.Agent createComponent
+IceTest:RTP Component created in 2143 ms
+INFO: 	[fe80:0:0:0:443b:9499:91d2:c53f]:6060/udp (host)
+二月 22, 2015 10:38:52 上午 org.ice4j.ice.Agent createComponent
+INFO: 	125.239.119.110:64325/udp (srflx)
+二月 22, 2015 10:38:52 上午 org.ice4j.ice.Agent gatherCandidates
+INFO: Gather candidates for component audio.RTCP
+二月 22, 2015 10:38:54 上午 org.ice4j.ice.Agent createComponent
+INFO: 	192.168.1.78:6061/udp (host)
+二月 22, 2015 10:38:54 上午 org.ice4j.ice.Agent createComponent
+INFO: 	[fe80:0:0:0:443b:9499:91d2:c53f]:6061/udp (host)
+二月 22, 2015 10:38:54 上午 org.ice4j.ice.Agent createComponent
+INFO: 	125.239.119.110:62922/udp (srflx)
+IceTest:RTCP Component created in 1469 ms
+二月 22, 2015 10:38:54 上午 org.ice4j.ice.Agent gatherCandidates
+INFO: Gather candidates for component video.RTP
+二月 22, 2015 10:38:55 上午 org.ice4j.ice.Agent createComponent
+INFO: 	192.168.1.78:6062/udp (host)
+二月 22, 2015 10:38:55 上午 org.ice4j.ice.Agent createComponent
+INFO: 	[fe80:0:0:0:443b:9499:91d2:c53f]:6062/udp (host)
+二月 22, 2015 10:38:55 上午 org.ice4j.ice.Agent createComponent
+INFO: 	125.239.119.110:52860/udp (srflx)
+IceTest:RTP Component created in 1473 ms
+二月 22, 2015 10:38:55 上午 org.ice4j.ice.Agent gatherCandidates
+INFO: Gather candidates for component video.RTCP
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.Agent createComponent
+INFO: 	192.168.1.78:6063/udp (host)
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.Agent createComponent
+INFO: 	[fe80:0:0:0:443b:9499:91d2:c53f]:6063/udp (host)
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.Agent createComponent
+INFO: 	125.239.119.110:49818/udp (srflx)
+IceTest:RTCP Component created in 1604 ms
+IceTest:Total harvesting time: 6693ms.
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.Component addRemoteCandidate
+INFO: Add remote candidate for audio.RTP: 192.168.1.78:6060/udp/host
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.Component addRemoteCandidate
+INFO: Add remote candidate for audio.RTP: [fe80:0:0:0:443b:9499:91d2:c53f]:6060/udp/host
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.Component addRemoteCandidate
+INFO: Add remote candidate for audio.RTP: 125.239.119.110:64325/udp/srflx
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.Component addRemoteCandidate
+INFO: Add remote candidate for audio.RTCP: 192.168.1.78:6061/udp/host
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.Component addRemoteCandidate
+INFO: Add remote candidate for audio.RTCP: [fe80:0:0:0:443b:9499:91d2:c53f]:6061/udp/host
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.Component addRemoteCandidate
+INFO: Add remote candidate for audio.RTCP: 125.239.119.110:62922/udp/srflx
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.Component addRemoteCandidate
+INFO: Add remote candidate for video.RTP: 192.168.1.78:6062/udp/host
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.Component addRemoteCandidate
+INFO: Add remote candidate for video.RTP: [fe80:0:0:0:443b:9499:91d2:c53f]:6062/udp/host
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.Component addRemoteCandidate
+INFO: Add remote candidate for video.RTP: 125.239.119.110:52860/udp/srflx
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.Component addRemoteCandidate
+INFO: Add remote candidate for video.RTCP: 192.168.1.78:6063/udp/host
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.Component addRemoteCandidate
+INFO: Add remote candidate for video.RTCP: [fe80:0:0:0:443b:9499:91d2:c53f]:6063/udp/host
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.Component addRemoteCandidate
+INFO: Add remote candidate for video.RTCP: 125.239.119.110:49818/udp/srflx
+IceTest:Total candidate gathering time: 14183ms
+IceTest:LocalAgent:
+ICE Agent (stream-count=2 ice-pwd:nc2q0b31t745ajnhd5ihpkmrt ice-ufrag:1fek519en182l6 tie-breaker:3717268349614910577):
+media stream:audio (component count=2)
+Component id=1 parent stream=audio
+3 Local candidates:
+default candidate: candidate:1 1 udp 2130706431 192.168.1.78 9090 typ host
+candidate:1 1 udp 2130706431 192.168.1.78 9090 typ host
+candidate:2 1 udp 2130706431 fe80:0:0:0:443b:9499:91d2:c53f 9090 typ host
+candidate:3 1 udp 1677724415 125.239.119.110 58646 typ srflx raddr 192.168.1.78 rport 9090
+3 Remote candidates:
+default remote candidate: candidate:1 1 udp 2130706431 192.168.1.78 6060 typ host
+candidate:1 1 udp 2130706431 192.168.1.78 6060 typ host
+candidate:2 1 udp 2130706431 fe80:0:0:0:443b:9499:91d2:c53f 6060 typ host
+candidate:3 1 udp 1677724415 125.239.119.110 64325 typ srflx
+Component id=2 parent stream=audio
+3 Local candidates:
+default candidate: candidate:1 2 udp 2130706430 192.168.1.78 9091 typ host
+candidate:1 2 udp 2130706430 192.168.1.78 9091 typ host
+candidate:2 2 udp 2130706430 fe80:0:0:0:443b:9499:91d2:c53f 9091 typ host
+candidate:3 2 udp 1677724414 125.239.119.110 58880 typ srflx raddr 192.168.1.78 rport 9091
+3 Remote candidates:
+default remote candidate: candidate:1 2 udp 2130706430 192.168.1.78 6061 typ host
+candidate:1 2 udp 2130706430 192.168.1.78 6061 typ host
+candidate:2 2 udp 2130706430 fe80:0:0:0:443b:9499:91d2:c53f 6061 typ host
+candidate:3 2 udp 1677724414 125.239.119.110 62922 typ srflx
+media stream:video (component count=2)
+Component id=1 parent stream=video
+3 Local candidates:
+default candidate: candidate:1 1 udp 2130706431 192.168.1.78 9092 typ host
+candidate:1 1 udp 2130706431 192.168.1.78 9092 typ host
+candidate:2 1 udp 2130706431 fe80:0:0:0:443b:9499:91d2:c53f 9092 typ host
+candidate:3 1 udp 1677724415 125.239.119.110 60850 typ srflx raddr 192.168.1.78 rport 9092
+3 Remote candidates:
+default remote candidate: candidate:1 1 udp 2130706431 192.168.1.78 6062 typ host
+candidate:1 1 udp 2130706431 192.168.1.78 6062 typ host
+candidate:2 1 udp 2130706431 fe80:0:0:0:443b:9499:91d2:c53f 6062 typ host
+candidate:3 1 udp 1677724415 125.239.119.110 52860 typ srflx
+Component id=2 parent stream=video
+3 Local candidates:
+default candidate: candidate:1 2 udp 2130706430 192.168.1.78 9093 typ host
+candidate:1 2 udp 2130706430 192.168.1.78 9093 typ host
+candidate:2 2 udp 2130706430 fe80:0:0:0:443b:9499:91d2:c53f 9093 typ host
+candidate:3 2 udp 1677724414 125.239.119.110 51088 typ srflx raddr 192.168.1.78 rport 9093
+3 Remote candidates:
+default remote candidate: candidate:1 2 udp 2130706430 192.168.1.78 6063 typ host
+candidate:1 2 udp 2130706430 192.168.1.78 6063 typ host
+candidate:2 2 udp 2130706430 fe80:0:0:0:443b:9499:91d2:c53f 6063 typ host
+candidate:3 2 udp 1677724414 125.239.119.110 49818 typ srflx
+
+IceProcessingListener:Agent entered the Running state.
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.Agent startConnectivityEstablishment
+INFO: Start ICE connectivity establishment
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.Agent initCheckLists
+INFO: Init checklist for stream audio
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.Agent initCheckLists
+INFO: Init checklist for stream video
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient startChecks
+IceTest:Local audio clist:
+CheckList. (num pairs=6)
+CandidatePair (State=Waiting Priority=9151314442783293438):
+	LocalCandidate=candidate:1 1 udp 2130706431 192.168.1.78 9090 typ host
+	RemoteCandidate=candidate:1 1 udp 2130706431 192.168.1.78 6060 typ host
+CandidatePair (State=Waiting Priority=9151314442783293438):
+	LocalCandidate=candidate:2 1 udp 2130706431 fe80:0:0:0:443b:9499:91d2:c53f 9090 typ host
+	RemoteCandidate=candidate:2 1 udp 2130706431 fe80:0:0:0:443b:9499:91d2:c53f 6060 typ host
+CandidatePair (State=Frozen Priority=9151314438488326140):
+	LocalCandidate=candidate:1 2 udp 2130706430 192.168.1.78 9091 typ host
+	RemoteCandidate=candidate:1 2 udp 2130706430 192.168.1.78 6061 typ host
+CandidatePair (State=Frozen Priority=9151314438488326140):
+	LocalCandidate=candidate:2 2 udp 2130706430 fe80:0:0:0:443b:9499:91d2:c53f 9091 typ host
+	RemoteCandidate=candidate:2 2 udp 2130706430 fe80:0:0:0:443b:9499:91d2:c53f 6061 typ host
+CandidatePair (State=Waiting Priority=7205771498387144703):
+	LocalCandidate=candidate:1 1 udp 2130706431 192.168.1.78 9090 typ host
+	RemoteCandidate=candidate:3 1 udp 1677724415 125.239.119.110 64325 typ srflx
+CandidatePair (State=Frozen Priority=7205771494092177405):
+	LocalCandidate=candidate:1 2 udp 2130706430 192.168.1.78 9091 typ host
+	RemoteCandidate=candidate:3 2 udp 1677724414 125.239.119.110 62922 typ srflx
+
+IceTest:Local video clist:
+CheckList. (num pairs=6)
+CandidatePair (State=Frozen Priority=9151314442783293438):
+	LocalCandidate=candidate:1 1 udp 2130706431 192.168.1.78 9092 typ host
+	RemoteCandidate=candidate:1 1 udp 2130706431 192.168.1.78 6062 typ host
+CandidatePair (State=Frozen Priority=9151314442783293438):
+	LocalCandidate=candidate:2 1 udp 2130706431 fe80:0:0:0:443b:9499:91d2:c53f 9092 typ host
+	RemoteCandidate=candidate:2 1 udp 2130706431 fe80:0:0:0:443b:9499:91d2:c53f 6062 typ host
+CandidatePair (State=Frozen Priority=9151314438488326140):
+	LocalCandidate=candidate:1 2 udp 2130706430 192.168.1.78 9093 typ host
+	RemoteCandidate=candidate:1 2 udp 2130706430 192.168.1.78 6063 typ host
+CandidatePair (State=Frozen Priority=9151314438488326140):
+	LocalCandidate=candidate:2 2 udp 2130706430 fe80:0:0:0:443b:9499:91d2:c53f 9093 typ host
+	RemoteCandidate=candidate:2 2 udp 2130706430 fe80:0:0:0:443b:9499:91d2:c53f 6063 typ host
+CandidatePair (State=Frozen Priority=7205771498387144703):
+	LocalCandidate=candidate:1 1 udp 2130706431 192.168.1.78 9092 typ host
+	RemoteCandidate=candidate:3 1 udp 1677724415 125.239.119.110 52860 typ srflx
+CandidatePair (State=Frozen Priority=7205771494092177405):
+	LocalCandidate=candidate:1 2 udp 2130706430 192.168.1.78 9093 typ host
+	RemoteCandidate=candidate:3 2 udp 1677724414 125.239.119.110 49818 typ srflx
+
+IceTest:The End
+INFO: Start connectivity checks!
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair succeeded: 192.168.1.78:9090/udp/host -> 192.168.1.78:6060/udp/host (audio.RTP)
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair validated: 192.168.1.78:9090/udp/host -> 192.168.1.78:6060/udp/host (audio.RTP)
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Start checks for checkList of stream video that was frozen
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: IsControlling: true USE-CANDIDATE:false
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair succeeded: [fe80:0:0:0:443b:9499:91d2:c53f]:9090/udp/host -> [fe80:0:0:0:443b:9499:91d2:c53f]:6060/udp/host (audio.RTP)
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair validated: [fe80:0:0:0:443b:9499:91d2:c53f]:9090/udp/host -> [fe80:0:0:0:443b:9499:91d2:c53f]:6060/udp/host (audio.RTP)
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: IsControlling: true USE-CANDIDATE:false
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair succeeded: 192.168.1.78:9092/udp/host -> 192.168.1.78:6062/udp/host (video.RTP)
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair validated: 192.168.1.78:9092/udp/host -> 192.168.1.78:6062/udp/host (video.RTP)
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: IsControlling: true USE-CANDIDATE:false
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair succeeded: 192.168.1.78:9091/udp/host -> 192.168.1.78:6061/udp/host (audio.RTCP)
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair validated: 192.168.1.78:9091/udp/host -> 192.168.1.78:6061/udp/host (audio.RTCP)
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: IsControlling: true USE-CANDIDATE:false
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair succeeded: 192.168.1.78:9093/udp/host -> 192.168.1.78:6063/udp/host (video.RTCP)
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair validated: 192.168.1.78:9093/udp/host -> 192.168.1.78:6063/udp/host (video.RTCP)
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: IsControlling: true USE-CANDIDATE:false
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair succeeded: [fe80:0:0:0:443b:9499:91d2:c53f]:9091/udp/host -> [fe80:0:0:0:443b:9499:91d2:c53f]:6061/udp/host (audio.RTCP)
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair validated: [fe80:0:0:0:443b:9499:91d2:c53f]:9091/udp/host -> [fe80:0:0:0:443b:9499:91d2:c53f]:6061/udp/host (audio.RTCP)
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: IsControlling: true USE-CANDIDATE:false
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair succeeded: [fe80:0:0:0:443b:9499:91d2:c53f]:9092/udp/host -> [fe80:0:0:0:443b:9499:91d2:c53f]:6062/udp/host (video.RTP)
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair validated: [fe80:0:0:0:443b:9499:91d2:c53f]:9092/udp/host -> [fe80:0:0:0:443b:9499:91d2:c53f]:6062/udp/host (video.RTP)
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: IsControlling: true USE-CANDIDATE:false
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair succeeded: [fe80:0:0:0:443b:9499:91d2:c53f]:9093/udp/host -> [fe80:0:0:0:443b:9499:91d2:c53f]:6063/udp/host (video.RTCP)
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair validated: [fe80:0:0:0:443b:9499:91d2:c53f]:9093/udp/host -> [fe80:0:0:0:443b:9499:91d2:c53f]:6063/udp/host (video.RTCP)
+二月 22, 2015 10:38:57 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: IsControlling: true USE-CANDIDATE:false
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.ConnectivityCheckClient processTimeout
+INFO: timeout for pair: 192.168.1.78:9090/udp/host -> 125.239.119.110:64325/udp/srflx (audio.RTP), failing.
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.ConnectivityCheckClient processTimeout
+INFO: timeout for pair: 192.168.1.78:9091/udp/host -> 125.239.119.110:62922/udp/srflx (audio.RTCP), failing.
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.DefaultNominator strategyNominateHighestPrio
+INFO: Nominate (highest priority): 192.168.1.78:9091/udp/host -> 125.239.119.110:62922/udp/srflx (audio.RTCP)
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.Agent nominate
+INFO: verify if nominated pair answer again
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.ConnectivityCheckClient processTimeout
+INFO: timeout for pair: 192.168.1.78:9092/udp/host -> 125.239.119.110:52860/udp/srflx (video.RTP), failing.
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.DefaultNominator strategyNominateHighestPrio
+INFO: Nominate (highest priority): 192.168.1.78:9091/udp/host -> 125.239.119.110:62922/udp/srflx (audio.RTCP)
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.Agent nominate
+INFO: verify if nominated pair answer again
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.ConnectivityCheckClient processTimeout
+INFO: timeout for pair: 192.168.1.78:9093/udp/host -> 125.239.119.110:49818/udp/srflx (video.RTCP), failing.
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.DefaultNominator strategyNominateHighestPrio
+INFO: Nominate (highest priority): 192.168.1.78:9093/udp/host -> 125.239.119.110:49818/udp/srflx (video.RTCP)
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair succeeded: 192.168.1.78:9090/udp/host -> 192.168.1.78:6060/udp/host (audio.RTP)
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: IsControlling: true USE-CANDIDATE:true
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Nomination confirmed for pair: 192.168.1.78:9090/udp/host -> 192.168.1.78:6060/udp/host (audio.RTP)
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.CheckList handleNominationConfirmed
+INFO: Selected pair for stream audio.RTP: 192.168.1.78:9090/udp/host -> 192.168.1.78:6060/udp/host (audio.RTP)
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.Agent nominate
+INFO: verify if nominated pair answer again
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.DefaultNominator strategyNominateHighestPrio
+INFO: Nominate (highest priority): 192.168.1.78:9093/udp/host -> 125.239.119.110:49818/udp/srflx (video.RTCP)
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.Agent nominate
+INFO: verify if nominated pair answer again
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair succeeded: 192.168.1.78:9091/udp/host -> 192.168.1.78:6061/udp/host (audio.RTCP)
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: IsControlling: true USE-CANDIDATE:true
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Nomination confirmed for pair: 192.168.1.78:9091/udp/host -> 192.168.1.78:6061/udp/host (audio.RTCP)
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.CheckList handleNominationConfirmed
+INFO: Selected pair for stream audio.RTCP: 192.168.1.78:9091/udp/host -> 192.168.1.78:6061/udp/host (audio.RTCP)
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.Agent checkListStatesUpdated
+INFO: CheckList of stream audio is COMPLETED
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair succeeded: 192.168.1.78:9092/udp/host -> 192.168.1.78:6062/udp/host (video.RTP)
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Pair succeeded: 192.168.1.78:9093/udp/host -> 192.168.1.78:6063/udp/host (video.RTCP)
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: IsControlling: true USE-CANDIDATE:true
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Nomination confirmed for pair: 192.168.1.78:9093/udp/host -> 192.168.1.78:6063/udp/host (video.RTCP)
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.CheckList handleNominationConfirmed
+INFO: Selected pair for stream video.RTCP: 192.168.1.78:9093/udp/host -> 192.168.1.78:6063/udp/host (video.RTCP)
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.Agent checkListStatesUpdated
+INFO: CheckList of stream audio is COMPLETED
+IceProcessingListener:Agent entered the Completed state.
+IceProcessingListener:Total ICE processing time: 15739ms
+IceProcessingListener:Pairs selected for stream: audio
+IceProcessingListener:RTP: CandidatePair (State=Succeeded Priority=9151314442783293438):
+	LocalCandidate=candidate:1 1 udp 2130706431 192.168.1.78 9090 typ host
+	RemoteCandidate=candidate:1 1 udp 2130706431 192.168.1.78 6060 typ host
+IceProcessingListener:RTCP: CandidatePair (State=Succeeded Priority=9151314438488326140):
+	LocalCandidate=candidate:1 2 udp 2130706430 192.168.1.78 9091 typ host
+	RemoteCandidate=candidate:1 2 udp 2130706430 192.168.1.78 6061 typ host
+IceProcessingListener:Pairs selected for stream: video
+IceProcessingListener:RTP: CandidatePair (State=Succeeded Priority=9151314442783293438):
+	LocalCandidate=candidate:1 1 udp 2130706431 192.168.1.78 9092 typ host
+	RemoteCandidate=candidate:1 1 udp 2130706431 192.168.1.78 6062 typ host
+IceProcessingListener:RTCP: CandidatePair (State=Succeeded Priority=9151314438488326140):
+	LocalCandidate=candidate:1 2 udp 2130706430 192.168.1.78 9093 typ host
+	RemoteCandidate=candidate:1 2 udp 2130706430 192.168.1.78 6063 typ host
+IceProcessingListener:Printing the completed check lists:
+IceProcessingListener:Check list for  stream: audio
+IceProcessingListener:CheckList. (num pairs=6)
+CandidatePair (State=Succeeded Priority=9151314442783293438):
+	LocalCandidate=candidate:1 1 udp 2130706431 192.168.1.78 9090 typ host
+	RemoteCandidate=candidate:1 1 udp 2130706431 192.168.1.78 6060 typ host
+CandidatePair (State=Succeeded Priority=9151314442783293438):
+	LocalCandidate=candidate:2 1 udp 2130706431 fe80:0:0:0:443b:9499:91d2:c53f 9090 typ host
+	RemoteCandidate=candidate:2 1 udp 2130706431 fe80:0:0:0:443b:9499:91d2:c53f 6060 typ host
+CandidatePair (State=Succeeded Priority=9151314438488326140):
+	LocalCandidate=candidate:1 2 udp 2130706430 192.168.1.78 9091 typ host
+	RemoteCandidate=candidate:1 2 udp 2130706430 192.168.1.78 6061 typ host
+CandidatePair (State=Succeeded Priority=9151314438488326140):
+	LocalCandidate=candidate:2 2 udp 2130706430 fe80:0:0:0:443b:9499:91d2:c53f 9091 typ host
+	RemoteCandidate=candidate:2 2 udp 2130706430 fe80:0:0:0:443b:9499:91d2:c53f 6061 typ host
+CandidatePair (State=Failed Priority=7205771498387144703):
+	LocalCandidate=candidate:1 1 udp 2130706431 192.168.1.78 9090 typ host
+	RemoteCandidate=candidate:3 1 udp 1677724415 125.239.119.110 64325 typ srflx
+CandidatePair (State=Failed Priority=7205771494092177405):
+	LocalCandidate=candidate:1 2 udp 2130706430 192.168.1.78 9091 typ host
+	RemoteCandidate=candidate:3 2 udp 1677724414 125.239.119.110 62922 typ srflx
+
+IceProcessingListener:Check list for  stream: video
+IceProcessingListener:CheckList. (num pairs=6)
+CandidatePair (State=Succeeded Priority=9151314442783293438):
+	LocalCandidate=candidate:1 1 udp 2130706431 192.168.1.78 9092 typ host
+	RemoteCandidate=candidate:1 1 udp 2130706431 192.168.1.78 6062 typ host
+CandidatePair (State=Succeeded Priority=9151314442783293438):
+	LocalCandidate=candidate:2 1 udp 2130706431 fe80:0:0:0:443b:9499:91d2:c53f 9092 typ host
+	RemoteCandidate=candidate:2 1 udp 2130706431 fe80:0:0:0:443b:9499:91d2:c53f 6062 typ host
+CandidatePair (State=Succeeded Priority=9151314438488326140):
+	LocalCandidate=candidate:1 2 udp 2130706430 192.168.1.78 9093 typ host
+	RemoteCandidate=candidate:1 2 udp 2130706430 192.168.1.78 6063 typ host
+CandidatePair (State=Succeeded Priority=9151314438488326140):
+	LocalCandidate=candidate:2 2 udp 2130706430 fe80:0:0:0:443b:9499:91d2:c53f 9093 typ host
+	RemoteCandidate=candidate:2 2 udp 2130706430 fe80:0:0:0:443b:9499:91d2:c53f 6063 typ host
+CandidatePair (State=Failed Priority=7205771498387144703):
+	LocalCandidate=candidate:1 1 udp 2130706431 192.168.1.78 9092 typ host
+	RemoteCandidate=candidate:3 1 udp 1677724415 125.239.119.110 52860 typ srflx
+CandidatePair (State=Failed Priority=7205771494092177405):
+	LocalCandidate=candidate:1 2 udp 2130706430 192.168.1.78 9093 typ host
+	RemoteCandidate=candidate:3 2 udp 1677724414 125.239.119.110 49818 typ srflx
+
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: IsControlling: true USE-CANDIDATE:true
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.ConnectivityCheckClient processSuccessResponse
+INFO: Nomination confirmed for pair: 192.168.1.78:9092/udp/host -> 192.168.1.78:6062/udp/host (video.RTP)
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.CheckList handleNominationConfirmed
+INFO: Selected pair for stream video.RTP: 192.168.1.78:9092/udp/host -> 192.168.1.78:6062/udp/host (video.RTP)
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.Agent checkListStatesUpdated
+INFO: CheckList of stream audio is COMPLETED
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.Agent checkListStatesUpdated
+INFO: CheckList of stream video is COMPLETED
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.Agent checkListStatesUpdated
+INFO: ICE state is COMPLETED
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.Agent logCandTypes
+INFO: Harvester used for selected pair for audio.RTP: host
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.Agent logCandTypes
+INFO: Harvester used for selected pair for audio.RTCP: host
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.Agent logCandTypes
+INFO: Harvester used for selected pair for video.RTP: host
+二月 22, 2015 10:38:58 上午 org.ice4j.ice.Agent logCandTypes
+INFO: Harvester used for selected pair for video.RTCP: host
+IceProcessingListener:Total ICE processing time to completion: 15742
+二月 22, 2015 10:39:01 上午 org.ice4j.ice.Agent$TerminationThread run
+INFO: ICE state is TERMINATED
+二月 22, 2015 10:39:01 上午 org.ice4j.ice.Agent free
+IceProcessingListener:Agent entered the Terminated state.
+INFO: Free ICE agent
+二月 22, 2015 10:39:01 上午 org.ice4j.ice.Agent free
+INFO: remove streams
+二月 22, 2015 10:39:01 上午 org.ice4j.ice.Agent runInStunKeepAliveThread
+INFO: StunKeepAliveThread ends.
+二月 22, 2015 10:39:01 上午 org.ice4j.ice.Agent free
+INFO: remove stream audio
+二月 22, 2015 10:39:01 上午 org.ice4j.ice.Agent free
+INFO: remove stream video
+二月 22, 2015 10:39:01 上午 org.ice4j.ice.Agent free
+INFO: ICE agent freed
+IceProcessingListener:Total ICE processing time: 18787
+BUILD SUCCESSFUL (total time: 1 minute 15 seconds)

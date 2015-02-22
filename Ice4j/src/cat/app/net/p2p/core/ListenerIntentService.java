@@ -3,6 +3,8 @@ package cat.app.net.p2p.core;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import cat.app.net.p2p.Ear;
 import cat.app.net.p2p.db.DbHelper;
@@ -28,10 +30,11 @@ public class ListenerIntentService extends IntentService {
 		super("");
 		DbHelper.getInstance().createTables();
 	}
-	private void init() {
+	private void init(String group) {
 		if (peer == null) {
 			try {
 				peer = Peer.getInstance();
+				peer.group = group;
 				// this.socket = peer.client.getDatagramSocket();
 				// Log.i(tag,">>>>>>>>>>>>>>>>>>>>>>>>>SOCKET:"+socket.toString());
 			} catch (Throwable e) {
@@ -41,23 +44,28 @@ public class ListenerIntentService extends IntentService {
 	}
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		init();
-		sendLocalMsg(peer.hostname, peer.client.localSdp);
-		loopForRemoteSdp(peer.remoteHostname);
-		boolean flag = peer.client.initConnection(Ear.remoteSdp);
+		String group = intent.getStringExtra("group");
+		init(group);
+		//Log.i(tag, "sendLocalSdp()");
+		sendLocalSdp(peer.hostname, peer.client.localSdp,peer.group);
+		//Log.i(tag, "loopForRemoteSdp()");
+		loopForRemoteSdp(peer.group);
+		Log.i(tag, "initConnection():sdp="+peer.remoteSdp); 
+		boolean flag = peer.client.initConnection(peer.remoteSdp);
 		if(flag){
 			EventBus.getDefault().post(new StatusEvent("connected"));
+			Ear.cleanupLocalSdp();
 			loopForNextMessage();
 		}
 	}
-	public void loopForRemoteSdp(String host){
-		Log.i(tag, "waiting for sdp from host="+host);
-		while (!Ear.hearRemoteSdp) {
+	public void loopForRemoteSdp(String group){
+		while (!Ear.hearRemoteSdp || peer.remoteSdp==null){
+			Log.i(tag, "waiting for sdp from group="+group);
 			try {
 				Thread.sleep(5000);
-				Ear.triggerHearRemoteSdp(host);
+				Ear.triggerHearRemoteSdp(group);
 			} catch (Exception e) {
-				e.printStackTrace();
+				//e.printStackTrace();
 			}
 		}
 	}
@@ -66,18 +74,18 @@ public class ListenerIntentService extends IntentService {
 			try {
 				this.content = receive();
 				Thread.sleep(5000);	// TimeUnit.MILLISECONDS.sleep(2000);
-				//Log.i(tag, "received message:"+this.content);
+				Log.i(tag, "received message from host:"+peer.remoteHostname+","+this.content);
 				receiveMsg(peer.remoteHostname,this.content);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	private void sendLocalMsg(String host, String sdp) {
-		EventBus.getDefault().post(new SdpEvent(host, sdp));
+	private void sendLocalSdp(String host, String sdp, String group) {
+		EventBus.getDefault().post(new SdpEvent(host, sdp, group));
 	}
 	private void receiveMsg(String host, String msg) {
-		EventBus.getDefault().post(new ReceiveDataEvent(host, msg));
+		EventBus.getDefault().post(new ReceiveDataEvent(host, msg +",received at:"+ formatTime()));
 		DbHelper.getInstance().insertMsg(host, msg);
 	}
 /*	private void sendRemoteMsg(String host, String sdp) {
@@ -93,7 +101,11 @@ public class ListenerIntentService extends IntentService {
 		}
 		return new String(packet.getData(), 0, packet.getLength());
 	}
-
+    private String formatTime(){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Calendar c = Calendar.getInstance();
+        return sdf.format(c.getTime());
+    }
 }
 /*
  * Messenger messenger = (Messenger) bundle.get("messenger"); Message msg =

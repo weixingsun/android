@@ -61,7 +61,8 @@ import android.util.Log;
 		    		+"value varchar(20) NOT NULL"
 		    		+");";
 	    	this.db.execSQL(STR_CREATE);
-	    	 
+	    	//STR_CREATE = "insert into "+SETTINGS_TABLE+ " (name,value) values ( 'group','1')";
+	    	//this.db.execSQL(STR_CREATE);
 	    	/*STR_CREATE = "CREATE TABLE IF NOT EXISTS "
 	    			+MSG_TABLE+ " ("
 	    			+"recv_time timestamp not null DEFAULT CURRENT_TIMESTAMP primary key, "
@@ -76,7 +77,7 @@ import android.util.Log;
 		    		+"gravity_Y int, "	//NOT NULL
 		    		+"gravity_Z int, "	//NOT NULL
 		    		+"value varchar(200) NOT NULL"
-		    		+");";*/
+		    		+");";*/ 
 	    	STR_CREATE = "CREATE TABLE IF NOT EXISTS " + MSG_TABLE+ " ("
 	    			+"recv_time timestamp not null DEFAULT CURRENT_TIMESTAMP primary key, "
 		    		+"sender varchar(50) NOT NULL,"
@@ -225,7 +226,7 @@ import android.util.Log;
 	        this.db=null;
 	        return value;
 	    }
-	    private long insertSettings(String name, String value){
+	    public long insertSettings(String name, String value){
 	    	if(this.db==null)
 	    	this.db = getWritableDatabase();
 	        ContentValues cv=new ContentValues();

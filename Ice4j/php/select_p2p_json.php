@@ -20,6 +20,7 @@ $username = "u928696073_gmap";
 $password = "ws206771";
 $dbname = "u928696073_gmap";
 $host = $_GET['host'];
+$group = $_GET['group'];
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
@@ -27,7 +28,7 @@ if ($conn->connect_error) {
 } 
 //$sql = "SELECT floor((UNIX_TIMESTAMP(now())-UNIX_TIMESTAMP(report_time))/60) as report_time, FROM reminder ";
 //tbl_p2p(hostname,sdp,create_time,last_update_time,group_id)
-$sql = "SELECT hostname,sdp FROM tbl_p2p where last_update_time=create_time and hostname = '" . $host . "'";
+$sql = "SELECT hostname,sdp FROM tbl_p2p where last_update_time=create_time and group_id = " . $group ; // . " and hostname = '" . $host . "'";
 $result = $conn->query($sql);
 //$db_arr = $conn->fetch_assoc($result);
 //echo ( json_encode($db_arr));
