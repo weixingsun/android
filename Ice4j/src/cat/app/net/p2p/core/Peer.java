@@ -25,6 +25,7 @@ import com.android.volley.toolbox.Volley;
 
 import de.greenrobot.event.EventBus;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -54,7 +55,7 @@ public class Peer {
 	        //client.startConnect();
 	        //socket = client.getDatagramSocket();
 	        //remoteAddress = client.getRemotePeerSocketAddress();
-			deviceName = getDeviceName();
+			deviceName = getDeviceName();		//Asus Nexus 7059b4562
 			hostname =deviceName;
 			
 		} catch (Throwable e) {
@@ -80,9 +81,11 @@ public class Peer {
 	public void startSenderTask(){
     	
     }*/
+    @SuppressLint("NewApi") 
     public String getDeviceName() {
         String manufacturer = Build.MANUFACTURER;
-        String model = Build.MODEL;
+        String model = Build.MODEL+Build.SERIAL;
+        
         if (model.startsWith(manufacturer)) {
             return capitalize(model);
         } else {

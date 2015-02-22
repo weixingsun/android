@@ -45,10 +45,10 @@ if ($result->num_rows > 0) {
 } else {
     echo "no results:" . $sql;
 }
-$sql = "UPDATE tbl_p2p set sdp = '" . $sdp . "', last_update_time=now() where hostname = '" . $host . "'";
-if ($conn->query($sql) === TRUE) {
+//$sql = "UPDATE tbl_p2p set sdp = '" . $sdp . "', last_update_time=now() where hostname = '" . $host . "'";
+//if ($conn->query($sql) === TRUE) {
 	//echo "]\r\n}";
-}
+//}
 
 $conn->close();
 ?>

@@ -21,7 +21,7 @@ import android.util.Log;
 public class ListenerIntentService extends IntentService {
 
 	private static final String tag = ListenerIntentService.class.getSimpleName();
-	byte[] buf = new byte[1024];
+	byte[] buf = new byte[256];
 	// IceClient client=null;
 	Peer peer;
 	String content;
@@ -60,7 +60,7 @@ public class ListenerIntentService extends IntentService {
 	}
 	public void loopForRemoteSdp(String group){
 		while (!Ear.hearRemoteSdp || peer.remoteSdp==null){
-			Log.i(tag, "waiting for sdp from group="+group);
+			Log.i(tag, "waiting for sdp from group="+group+",sdp="+peer.remoteSdp);
 			try {
 				Thread.sleep(5000);
 				Ear.triggerHearRemoteSdp(group);
@@ -73,19 +73,19 @@ public class ListenerIntentService extends IntentService {
 		while (true) {
 			try {
 				this.content = receive();
-				Thread.sleep(5000);	// TimeUnit.MILLISECONDS.sleep(2000);
+				//Thread.sleep(5000);	// TimeUnit.MILLISECONDS.sleep(2000);
 				Log.i(tag, "received message from host:"+peer.remoteHostname+","+this.content);
 				receiveMsg(peer.remoteHostname,this.content);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
+		} 
 	}
 	private void sendLocalSdp(String host, String sdp, String group) {
 		EventBus.getDefault().post(new SdpEvent(host, sdp, group));
 	}
 	private void receiveMsg(String host, String msg) {
-		EventBus.getDefault().post(new ReceiveDataEvent(host, msg +",received at:"+ formatTime()));
+		EventBus.getDefault().post(new ReceiveDataEvent(host, msg +",["+ formatTime()+"]"));
 		DbHelper.getInstance().insertMsg(host, msg);
 	}
 /*	private void sendRemoteMsg(String host, String sdp) {

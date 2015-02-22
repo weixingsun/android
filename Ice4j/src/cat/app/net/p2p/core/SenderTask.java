@@ -11,6 +11,8 @@ import java.util.concurrent.TimeUnit;
 import org.ice4j.pseudotcp.PseudoTcpSocket;
 import org.ice4j.pseudotcp.PseudoTcpSocketFactory;
 
+import cat.app.net.p2p.util.DateUtils;
+
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -56,7 +58,7 @@ public class SenderTask extends AsyncTask<String, Void, String> {
 	}
 	public void sendUDPMsg(String msg) {
              try {
-                 byte[] buf = (msg).getBytes();
+                 byte[] buf = (msg+"["+DateUtils.formatTime()+"]").getBytes();
                  DatagramPacket packet = new DatagramPacket(buf,buf.length);
                  packet.setSocketAddress(remoteAddress);
                  socket.send(packet);

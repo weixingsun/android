@@ -107,7 +107,7 @@ public class Ear {
 				new Response.Listener<String>() {
 					@Override
 					public void onResponse(String response) {
-						Log.i(tag,"response executed");
+						//Log.i(tag,"response="+response);
 						extractHostSdpFromJSON(response);
 						EventBus.getDefault().post(new RemoteSdpEvent(remoteHosts));
 					}
@@ -123,19 +123,21 @@ public class Ear {
 	
 	private static void extractHostSdpFromJSON(String response){
 		remoteHosts.clear();
+		Peer p = Peer.getInstance();
 		try {
 			JSONArray posArray = new JSONObject(response).getJSONArray("result");
 	    	//Log.i(tag,"Array.length():" + posArray.length());  // last comma contains an array slot
 	    	for(int i=0;i<posArray.length()-1;i++){
-
 				//Log.i(tag, "posArray="+posArray.length());
 	        	JSONObject row = posArray.getJSONObject(i);
 	    		String host = row.getString("hostname");
 	        	String sdp = row.getString("sdp");
-	        	//Log.w(sdp, "host="+host+ ",sdp="+sdp);
-	        	if(!Peer.getInstance().hostname.equals(host))
-	        	remoteHosts.put(host, sdp);
+	        	if(!p.hostname.equals(host)){
+	        		remoteHosts.put(host, sdp);
+	        	}
 	    	}
+	    	//Object myKey = remoteHosts.keySet().toArray()[0];
+        	//Log.w(tag, "extractHostSdpFromJSON():host="+myKey+ ",sdp="+remoteHosts.get(myKey));
 		} catch (JSONException e) {
 			//e.printStackTrace();
 		}
