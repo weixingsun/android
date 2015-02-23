@@ -8,6 +8,7 @@ import java.util.Calendar;
 
 import cat.app.net.p2p.Ear;
 import cat.app.net.p2p.db.DbHelper;
+import cat.app.net.p2p.db.DbTask;
 import cat.app.net.p2p.eb.ReceiveDataEvent;
 import cat.app.net.p2p.eb.RemoteSdpEvent;
 import cat.app.net.p2p.eb.SdpEvent;
@@ -21,7 +22,7 @@ import android.util.Log;
 public class ListenerIntentService extends IntentService {
 
 	private static final String tag = ListenerIntentService.class.getSimpleName();
-	byte[] buf = new byte[256];
+	byte[] buf = new byte[1024];
 	// IceClient client=null;
 	Peer peer;
 	String content;
@@ -86,7 +87,8 @@ public class ListenerIntentService extends IntentService {
 	}
 	private void receiveMsg(String host, String msg) {
 		EventBus.getDefault().post(new ReceiveDataEvent(host, msg +",["+ formatTime()+"]"));
-		DbHelper.getInstance().insertMsg(host, msg);
+		DbTask task = new DbTask(host, msg);
+		task.execute();
 	}
 /*	private void sendRemoteMsg(String host, String sdp) {
 		EventBus.getDefault().post(new RemoteSdpEvent(host, sdp));

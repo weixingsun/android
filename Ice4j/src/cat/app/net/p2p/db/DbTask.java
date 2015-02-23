@@ -1,5 +1,18 @@
 package cat.app.net.p2p.db;
 
-public class DbTask {
+import android.os.AsyncTask;
+
+public class DbTask extends AsyncTask<String, Void, String>{
+	private static final String tag = DbTask.class.getSimpleName();
+	String host;
+	String msg;
+	public DbTask(String host, String msg) {
+		
+	}
+	@Override
+	protected String doInBackground(String... params) {
+		DbHelper.getInstance().insertMsg(host, msg);
+		return null;
+	}
 
 }

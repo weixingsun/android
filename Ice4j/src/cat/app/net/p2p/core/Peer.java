@@ -84,12 +84,12 @@ public class Peer {
     @SuppressLint("NewApi") 
     public String getDeviceName() {
         String manufacturer = Build.MANUFACTURER;
-        String model = Build.MODEL+Build.SERIAL;
+        String model = (Build.MODEL+"_"+Build.SERIAL).replaceAll(" ", "");
         
         if (model.startsWith(manufacturer)) {
             return capitalize(model);
         } else {
-            return capitalize(manufacturer) + " " + model;
+            return capitalize(manufacturer) + "_" + model;
         }
     }
 
