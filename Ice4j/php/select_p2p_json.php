@@ -19,13 +19,29 @@ $servername = "mysql.vhostfull.com";
 $username = "u928696073_gmap";
 $password = "ws206771";
 $dbname = "u928696073_gmap";
-$host = $_GET['host'];
-$group = $_GET['group'];
+$host = $_POST['host'];
+$group = $_POST['group'];
+$sdp = $_POST['sdp'];
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 } 
+
+//TODO make sure contains self sdp record
+$sql = "SELECT hostname FROM tbl_p2p where group_id = " . $group . " and hostname = '" . $host . "'";
+$result = $conn->query($sql);
+if ($result->num_rows > 0) {
+	//
+} else {
+    $sql = "INSERT INTO tbl_p2p ( hostname,sdp,create_time,last_update_time,group_id ) values ('" 
+		. $host . "','" . $sdp . "', now(), now()," . $group . ")";
+	if ($conn->query($sql) === TRUE) {
+		//echo "\n" . $host . " created\n";
+	} else {
+		echo "error: " . $sql . "<br>" . $conn->error;
+	}
+}
 //$sql = "SELECT floor((UNIX_TIMESTAMP(now())-UNIX_TIMESTAMP(report_time))/60) as report_time, FROM reminder ";
 //tbl_p2p(hostname,sdp,create_time,last_update_time,group_id)
 $sql = "SELECT hostname,sdp FROM tbl_p2p where last_update_time=create_time and group_id = " . $group ; // . " and hostname = '" . $host . "'";
@@ -45,10 +61,6 @@ if ($result->num_rows > 0) {
 } else {
     echo "no results:" . $sql;
 }
-//$sql = "UPDATE tbl_p2p set sdp = '" . $sdp . "', last_update_time=now() where hostname = '" . $host . "'";
-//if ($conn->query($sql) === TRUE) {
-	//echo "]\r\n}";
-//}
 
 $conn->close();
 ?>

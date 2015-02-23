@@ -21,6 +21,7 @@ import com.android.volley.toolbox.Volley;
 import cat.app.net.p2p.core.ListenerIntentService;
 import cat.app.net.p2p.core.Peer;
 import cat.app.net.p2p.db.DbHelper;
+import cat.app.net.p2p.db.DbTask;
 import cat.app.net.p2p.eb.DatabaseEvent;
 import cat.app.net.p2p.eb.ReceiveDataEvent;
 import cat.app.net.p2p.eb.RemoteSdpEvent;
@@ -147,6 +148,8 @@ public class MainActivity extends Activity implements OnItemSelectedListener {
         adapter.items.add(new ListItem(event.getHost(),event.getMessage()));
         adapter.notifyDataSetChanged();
         scrollMyListViewToBottom();
+		DbTask task = new DbTask(event.getHost(),event.getMessage());
+		task.execute();
 	}
 	public void onEventMainThread(StatusEvent event) {
 		//Log.i(tag, "EventBus received StatusEvent:" + event.getStatus());

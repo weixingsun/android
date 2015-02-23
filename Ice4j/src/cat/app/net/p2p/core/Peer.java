@@ -43,7 +43,8 @@ public class Peer {
 	}
     public IceClient client;
 	public String hostname;
-	String deviceName;
+	public String sdp;
+	//String deviceName;
 	public String group;
 	public String remoteHostname;
 	public String remoteSdp;
@@ -55,8 +56,7 @@ public class Peer {
 	        //client.startConnect();
 	        //socket = client.getDatagramSocket();
 	        //remoteAddress = client.getRemotePeerSocketAddress();
-			deviceName = getDeviceName();		//Asus Nexus 7059b4562
-			hostname =deviceName;
+			hostname = getDeviceName();		//Asus_Nexus7_059b4562
 			
 		} catch (Throwable e) {
 			e.printStackTrace();

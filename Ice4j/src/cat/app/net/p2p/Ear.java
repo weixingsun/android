@@ -47,6 +47,7 @@ public class Ear {
 	}
 
 	public void sendLocalSdp(final String hostname, final String localSdp, final String group) {
+		//TODO truncate table tbl_p2p
 		String baseurl = "http://www.servicedata.vhostall.com/p2p/insert_p2p.php";
 		Response.Listener<String> listener = new Response.Listener<String>() {
 			@Override
@@ -100,10 +101,11 @@ public class Ear {
 		rQueue.add(request);
 		//Log.i(tag, "deleting host "+p.hostname);
 	}
-	public static void triggerHearRemoteSdp(String group) {
-		String baseurl = "http://www.servicedata.vhostall.com/p2p/select_p2p_json.php?group=";
-		String url = baseurl +group;
-		StringRequest request = new StringRequest(url,
+	public static void downloadRemoteSdp(final String group,final String localhost,final String localSdp) {
+		String baseurl = "http://www.servicedata.vhostall.com/p2p/select_p2p_json.php";
+		String url = baseurl;
+		//Log.i(tag,"url="+url);
+		StringRequest request = new StringRequest(Method.POST, url,
 				new Response.Listener<String>() {
 					@Override
 					public void onResponse(String response) {
@@ -116,7 +118,18 @@ public class Ear {
 					public void onErrorResponse(VolleyError error) {
 						Log.e(tag, error.getMessage(), error);
 					}
-				});
+				})
+		{
+
+			@Override
+			protected Map<String, String> getParams() throws AuthFailureError {
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("host", localhost);
+				map.put("sdp", localSdp);
+				map.put("group", group);
+				return map;
+			}
+		};
 		//Log.i(tag, "url="+url);
 		rQueue.add(request);
 	}

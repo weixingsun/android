@@ -13,7 +13,11 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
+//TODO remove all records before adding self sdp
+$sql = "truncate table tbl_p2p" ;
+if ($result->num_rows > 0) {
+}
+/*
 $sql = "SELECT hostname FROM tbl_p2p where group_id = " . $group . " and hostname = '" . $host . "'";
 $result = $conn->query($sql);
 if ($result->num_rows > 0) {
@@ -34,5 +38,6 @@ if ($result->num_rows > 0) {
 		echo "error: " . $sql . "<br>" . $conn->error;
 	}
 }
+*/
 $conn->close();
 ?>

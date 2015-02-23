@@ -36,6 +36,7 @@ public class ListenerIntentService extends IntentService {
 			try {
 				peer = Peer.getInstance();
 				peer.group = group;
+				peer.sdp = peer.client.localSdp;
 				// this.socket = peer.client.getDatagramSocket();
 				// Log.i(tag,">>>>>>>>>>>>>>>>>>>>>>>>>SOCKET:"+socket.toString());
 			} catch (Throwable e) {
@@ -49,6 +50,7 @@ public class ListenerIntentService extends IntentService {
 		init(group);
 		//Log.i(tag, "sendLocalSdp()");
 		sendLocalSdp(peer.hostname, peer.client.localSdp,peer.group);
+		
 		//Log.i(tag, "loopForRemoteSdp()");
 		loopForRemoteSdp(peer.group);
 		Log.i(tag, "initConnection():sdp="+peer.remoteSdp); 
@@ -64,7 +66,7 @@ public class ListenerIntentService extends IntentService {
 			Log.i(tag, "waiting for sdp from group="+group+",sdp="+peer.remoteSdp);
 			try {
 				Thread.sleep(5000);
-				Ear.triggerHearRemoteSdp(group);
+				Ear.downloadRemoteSdp(peer.group,peer.hostname,peer.sdp);
 			} catch (Exception e) {
 				//e.printStackTrace();
 			}
@@ -87,8 +89,6 @@ public class ListenerIntentService extends IntentService {
 	}
 	private void receiveMsg(String host, String msg) {
 		EventBus.getDefault().post(new ReceiveDataEvent(host, msg +",["+ formatTime()+"]"));
-		DbTask task = new DbTask(host, msg);
-		task.execute();
 	}
 /*	private void sendRemoteMsg(String host, String sdp) {
 		EventBus.getDefault().post(new RemoteSdpEvent(host, sdp));
