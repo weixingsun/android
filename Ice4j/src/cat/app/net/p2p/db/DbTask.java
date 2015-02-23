@@ -7,7 +7,8 @@ public class DbTask extends AsyncTask<String, Void, String>{
 	String host;
 	String msg;
 	public DbTask(String host, String msg) {
-		
+		this.host = host;
+		this.msg = msg;
 	}
 	@Override
 	protected String doInBackground(String... params) {

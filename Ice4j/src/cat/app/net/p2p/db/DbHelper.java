@@ -79,7 +79,7 @@ import android.util.Log;
 		    		+"value varchar(200) NOT NULL"
 		    		+");";*/ 
 	    	STR_CREATE = "CREATE TABLE IF NOT EXISTS " + MSG_TABLE+ " ("
-	    			+"recv_time timestamp not null DEFAULT CURRENT_TIMESTAMP primary key, "
+	    			+"recv_time TIMESTAMP DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW')) primary key, "  // for milliseconds(was DEFAULT CURRENT_TIMESTAMP)
 		    		+"sender varchar(50) NOT NULL,"
 		    		+"msg varchar(200) NOT NULL" 
 		    		+");";
