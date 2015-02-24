@@ -1,10 +1,19 @@
 package cat.app.net.p2p.core;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import cat.app.net.p2p.Ear;
 import cat.app.net.p2p.db.DbHelper;
@@ -13,6 +22,7 @@ import cat.app.net.p2p.eb.ReceiveDataEvent;
 import cat.app.net.p2p.eb.RemoteSdpEvent;
 import cat.app.net.p2p.eb.SdpEvent;
 import cat.app.net.p2p.eb.StatusEvent;
+import cat.app.net.p2p.util.DateUtils;
 
 import de.greenrobot.event.EventBus;
 import android.app.IntentService;
@@ -90,6 +100,30 @@ public class ListenerIntentService extends IntentService {
 	private void receiveMsg(String host, String msg) {
 		EventBus.getDefault().post(new ReceiveDataEvent(host, msg +",["+ formatTime()+"]"));
 	}
+    private JSONObject createMsgJSONObject(Peer peer, String type, String msg) throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("sender", peer.hostname);
+        //jsonObject.put("to", peer.remoteHostname);
+        jsonObject.put("send_time", DateUtils.formatTime());
+        jsonObject.put("msg_type", type);	//control:1 , msg:2
+        jsonObject.put("msg_content", msg);
+        return jsonObject;
+    }
+    public void testStream() throws IOException, ClassNotFoundException{
+        // Sender
+        List list = new ArrayList();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ObjectOutputStream outputStream = new ObjectOutputStream(out);
+        outputStream.writeObject(list);
+        outputStream.close();
+
+        byte[] listData = out.toByteArray();
+
+
+        // Reciever
+        ObjectInputStream inputStream = new ObjectInputStream(new ByteArrayInputStream(listData));
+        list = (List) inputStream.readObject();
+    }
 /*	private void sendRemoteMsg(String host, String sdp) {
 		EventBus.getDefault().post(new RemoteSdpEvent(host, sdp));
 	}*/

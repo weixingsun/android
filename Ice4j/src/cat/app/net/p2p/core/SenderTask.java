@@ -10,6 +10,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.ice4j.pseudotcp.PseudoTcpSocket;
 import org.ice4j.pseudotcp.PseudoTcpSocketFactory;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import cat.app.net.p2p.util.DateUtils;
 
@@ -23,12 +25,14 @@ public class SenderTask extends AsyncTask<String, Void, String> {
 
     private static final String tag = SenderTask.class.getSimpleName();
 	byte[] buf = new byte[1024];
+	//IceClient client;
     DatagramSocket socket;
     SocketAddress remoteAddress;
 	private String msg;
 	private File file;
 	public SenderTask(IceClient client, String msg) {
 		try {
+			//this.client = client;
 			this.msg = msg;
 			this.socket = client.socket;
 			this.remoteAddress = client.remoteAddress;
@@ -84,4 +88,13 @@ public class SenderTask extends AsyncTask<String, Void, String> {
 		}
 	}
 
+    private JSONObject createMsgJSONObject(Peer peer, String type, String msg) throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("sender", peer.hostname);
+        //jsonObject.put("to", peer.remoteHostname);
+        jsonObject.put("send_time", DateUtils.formatTime());
+        jsonObject.put("msg_type", type);	//control:1 , msg:2
+        jsonObject.put("msg_content", msg);
+        return jsonObject;
+    }
 }

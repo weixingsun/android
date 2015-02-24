@@ -44,15 +44,16 @@ public class IceClient {
 
 	public DatagramSocket socket = null;
 	public SocketAddress remoteAddress;
-	private String[] turnServers = new String[] { "stun.jitsi.net:3478" };
+	//private String[] turnServers = new String[] { "stun.jitsi.net:3478"};
     //private String[] stunServers = new String[] { "stun.jitsi.net:3478" };
-	private String[] stunServers = new String[] { "stun.stunprotocol.org:3478" };
+	//private String[] stunServers = new String[] { "stun.stunprotocol.org:3478" };
     //private String[] stunServers = new String[]{"stun.jitsi.org:3478","stun6.jitsi.net:3478"};
-	private String username = "guest";
-	private String password = "anonymouspower!!";
-
-    //private String username = "weixingsun";
-    //private String password = "ws206771";
+	//private String username = "guest";
+	//private String password = "anonymouspower!!";
+	private String[] turnServers = new String[] { "numb.viagenie.ca:3478"};
+	private String[] stunServers = new String[] { "numb.viagenie.ca:3478"};
+    private String username = "weixingsun";
+    private String password = "ws206771";
 	private IceProcessingListener listener;
 	public IceClient(int port, String streamName) {
 		this.port = port;
