@@ -14,6 +14,7 @@ import net.majorkernelpanic.streaming.SessionBuilder;
 import net.majorkernelpanic.streaming.audio.AudioQuality;
 import net.majorkernelpanic.streaming.video.VideoQuality;
 
+import org.ice4j.StackProperties;
 import org.ice4j.Transport;
 import org.ice4j.TransportAddress;
 import org.ice4j.ice.Agent;
@@ -50,11 +51,14 @@ public class IceClient {
     //private String[] stunServers = new String[]{"stun.jitsi.org:3478","stun6.jitsi.net:3478"};
 	//private String username = "guest";
 	//private String password = "anonymouspower!!";
-	private String[] turnServers = new String[] { "numb.viagenie.ca:3478"};
+	private String[] turnServers = new String[] { "numb.viagenie.ca:3478"}; //,"stun.jitsi.net:3478","180.160.188.246:3478"};
 	private String[] stunServers = new String[] { "numb.viagenie.ca:3478"};
-    private String username = "weixingsun";
-    private String password = "ws206771";
-	private IceProcessingListener listener;
+    private String[] usernames = new String[] { "weixingsun"}; //,"guest","u1"};
+    private String[] passwords = new String[] {  "ws206771"}; //,"anonymouspower!!","p1" };
+    private String[] serverConfig1 = new String[] {"numb.viagenie.ca:3478","weixingsun","ws206771"};//tested with turn
+    private String[] serverConfig2 = new String[] {"180.160.188.246:3478","u1","p1"};
+    private String[] serverConfig3 = new String[] {"stun.jitsi.net:3478","guest","anonymouspower!!"};
+    private IceProcessingListener listener;
 	public IceClient(int port, String streamName) {
 		this.port = port;
 		this.streamName = streamName;
@@ -62,11 +66,13 @@ public class IceClient {
 	}
 
 	public void init() throws Throwable {
+		System.setProperty(StackProperties.FIRST_CTRAN_RETRANS_AFTER,"300");//default timeout
 		agent = createAgent(port, streamName);
 		agent.setNominationStrategy(NominationStrategy.NOMINATE_HIGHEST_PRIO);
 		agent.addStateChangeListener(listener);
 		agent.setControlling(false);
 		agent.setTa(10000);
+		
 		localSdp = SdpUtils.createSDPDescription(agent);
 		//uploadLocalSdpMySQL();
 		//Log.i(tag,"=================== feed the following to the remote agent ===================");
@@ -157,10 +163,10 @@ public class IceClient {
 							Transport.UDP)));
 		}
 
-		// TURN
-		LongTermCredential longTermCredential = new LongTermCredential(username, password);
+		
 
-		for (String server : turnServers) {
+		for (String server : turnServers) {// TURN
+			LongTermCredential longTermCredential = new LongTermCredential(usernames[0], passwords[0]);
 			String[] pair = server.split(":");
 			agent.addCandidateHarvester(new TurnCandidateHarvester(
 					new TransportAddress(pair[0], Integer.parseInt(pair[1]),

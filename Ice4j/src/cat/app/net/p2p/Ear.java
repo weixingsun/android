@@ -43,12 +43,12 @@ public class Ear {
 
 	public void onEvent(SdpEvent event) {
 		Log.i(tag, "EventBus received SDP event:" + event.getHost());
-		sendLocalSdp(event.getHost(), event.getSdp(), event.getGroup());
+		removeAllSdps();//event.getHost(), event.getSdp(), event.getGroup()
 	}
 
-	public void sendLocalSdp(final String hostname, final String localSdp, final String group) {
-		//TODO truncate table tbl_p2p
-		String baseurl = "http://www.servicedata.vhostall.com/p2p/insert_p2p.php";
+	public void removeAllSdps() {//final String hostname, final String localSdp, final String group
+		//String baseurl = "http://www.servicedata.vhostall.com/p2p/insert_p2p.php";
+		String baseurl = "http://www.servicedata.vhostall.com/p2p/delete_p2p.php";
 		Response.Listener<String> listener = new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
@@ -63,14 +63,14 @@ public class Ear {
 		};
 		StringRequest request = new StringRequest(Method.POST, baseurl,
 				listener, errorListener) {
-			@Override
+			/*@Override
 			protected Map<String, String> getParams() throws AuthFailureError {
 				Map<String, String> map = new HashMap<String, String>();
 				map.put("host", hostname);
 				map.put("sdp", localSdp);
 				map.put("group", group);
 				return map;
-			}
+			}*/
 		};
 		rQueue.add(request);
 		//Log.w(tag, "hostname="+hostname);

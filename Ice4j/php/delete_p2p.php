@@ -13,10 +13,10 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$sql = "delete FROM tbl_p2p where group_id = " . $group . " and hostname = '" . $host . "'";
+$sql = "truncate table tbl_p2p " ;
 $result = $conn->query($sql);
 if ( $result === TRUE ) {
-	echo "\n" . $host . " deleted\n";
+	echo "\n truncated\n";
 } else {
 	echo "error: " . $sql . "<br>" . $conn->error;
 }
