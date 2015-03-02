@@ -12,10 +12,16 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import net.majorkernelpanic.streaming.Session;
+import net.majorkernelpanic.streaming.SessionBuilder;
+import net.majorkernelpanic.streaming.audio.AudioQuality;
+import net.majorkernelpanic.streaming.video.VideoQuality;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import cat.app.net.p2p.Ear;
+import cat.app.net.p2p.R;
 import cat.app.net.p2p.db.DbHelper;
 import cat.app.net.p2p.db.DbTask;
 import cat.app.net.p2p.eb.ReceiveDataEvent;
@@ -25,58 +31,49 @@ import cat.app.net.p2p.eb.StatusEvent;
 import cat.app.net.p2p.util.DateUtils;
 
 import de.greenrobot.event.EventBus;
+import android.app.Activity;
 import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
+import net.majorkernelpanic.streaming.gl.SurfaceView;
 
-public class ListenerIntentService extends IntentService {
+public class VideoIntentService extends IntentService implements Session.Callback{
 
-	private static final String tag = ListenerIntentService.class.getSimpleName();
+	private static final String tag = VideoIntentService.class.getSimpleName();
 	byte[] buf = new byte[1024];
 	// IceClient client=null;
 	Peer peer;
-	String content;
-
-	public ListenerIntentService() {
+	String content; 
+	DatagramSocket socket;
+	private SurfaceView mSurfaceView;
+	
+	public VideoIntentService(IceClient client,Activity act) {
 		super("");
+		this.socket = client.socket;
+		this.mSurfaceView = (SurfaceView) act.findViewById(R.id.surface);
 		DbHelper.getInstance().createTables();
-	}
-	private void init(String group) {
-		if (peer == null) {
-			try {
-				peer = Peer.getInstance();
-				peer.group = group;
-				peer.sdp = peer.client.localSdp;
-				// this.socket = peer.client.getDatagramSocket();
-				// Log.i(tag,">>>>>>>>>>>>>>>>>>>>>>>>>SOCKET:"+socket.toString());
-			} catch (Throwable e) {
-				e.printStackTrace();
-			}
-		}
 	}
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		String group = intent.getStringExtra("group");
-		init(group);
-		//Log.i(tag, "sendLocalSdp()");
-		sendLocalSdp(peer.hostname, peer.client.localSdp,peer.group);
-		
-		//Log.i(tag, "loopForRemoteSdp()");
-		loopForRemoteSdp(peer.group);
-		Log.i(tag, "initConnection():sdp="+peer.remoteSdp); 
-		boolean flag = peer.client.initConnection(peer.remoteSdp);
-		if(flag){
-			//EventBus.getDefault().post(new StatusEvent("connected"));
-			Ear.cleanupLocalSdp();
-			loopForNextMessage();
-		}
+		//this.startService(new Intent(this,RtspServer.class));
+		Session mSession = SessionBuilder.getInstance()
+		        .setCallback(this)
+		        .setSurfaceView(mSurfaceView)
+		        .setPreviewOrientation(90)
+		        .setContext(getApplicationContext())
+		        .setAudioEncoder(SessionBuilder.AUDIO_NONE)
+		        .setAudioQuality(new AudioQuality(16000, 32000))
+		        .setVideoEncoder(SessionBuilder.VIDEO_H264)
+		        .setVideoQuality(new VideoQuality(320,240,20,500000))
+		        .build(this.socket);
+		mSession.start();
 	}
 	public void loopForRemoteSdp(String group){
 		while (!Ear.hearRemoteSdp || peer.remoteSdp==null){
 			Log.i(tag, "waiting for sdp from group="+group+",sdp="+peer.remoteSdp);
 			try {
 				Thread.sleep(5000);
-				Ear.downloadRemoteSdp(peer.group,peer.hostname,peer.sdp); 
+				Ear.downloadRemoteSdp(peer.group,peer.hostname,peer.sdp);
 			} catch (Exception e) {
 				//e.printStackTrace();
 			}
@@ -93,9 +90,6 @@ public class ListenerIntentService extends IntentService {
 				e.printStackTrace();
 			}
 		} 
-	}
-	private void sendLocalSdp(String host, String sdp, String group) {
-		EventBus.getDefault().post(new SdpEvent(host, sdp, group));
 	}
 	private void receiveMsg(String host, String msg) {
 		EventBus.getDefault().post(new ReceiveDataEvent(host, msg +",["+ formatTime()+"]"));
@@ -118,16 +112,10 @@ public class ListenerIntentService extends IntentService {
         outputStream.close();
 
         byte[] listData = out.toByteArray();
-
-
         // Reciever
         ObjectInputStream inputStream = new ObjectInputStream(new ByteArrayInputStream(listData));
         list = (List) inputStream.readObject();
     }
-/*	private void sendRemoteMsg(String host, String sdp) {
-		EventBus.getDefault().post(new RemoteSdpEvent(host, sdp));
-	}*/
-
 	private String receive() {
 		DatagramPacket packet = new DatagramPacket(buf, buf.length);
 		try {
@@ -142,9 +130,34 @@ public class ListenerIntentService extends IntentService {
         Calendar c = Calendar.getInstance();
         return sdf.format(c.getTime());
     }
+	@Override
+	public void onBitrateUpdate(long bitrate) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onSessionError(int reason, int streamType, Exception e) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onPreviewStarted() {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onSessionConfigured() {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onSessionStarted() {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onSessionStopped() {
+		// TODO Auto-generated method stub
+		
+	}
 }
-/*
- * Messenger messenger = (Messenger) bundle.get("messenger"); Message msg =
- * Message.obtain(); //Bundle bundle = new Bundle(); bundle.putString("text",
- * this.content); msg.setData(bundle); //put the data here messenger.send(msg);
- */

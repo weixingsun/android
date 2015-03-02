@@ -16,8 +16,6 @@ import org.ice4j.ice.*;
 import org.ice4j.ice.harvest.*;
 import org.ice4j.security.*;
 
-import android.util.Log;
-
 /**
  * Simple ice4j testing scenario. The sample application would create and start
  * both agents and make one of them run checks against the other.
@@ -25,9 +23,14 @@ import android.util.Log;
  * @author Emil Ivov
  * @author Lyubomir Marinov
  */
-public class IceTest
+public class Ice
 {
-	private static final String tag = IceTest.class.getSimpleName();
+    /**
+     * The <tt>Logger</tt> used by the <tt>Ice</tt>
+     * class and its instances for logging output.
+     */
+    private static final Logger logger
+        = Logger.getLogger(Ice.class.getName());
 
     /**
      * The indicator which determines whether the <tt>Ice</tt> application (i.e.
@@ -35,7 +38,8 @@ public class IceTest
      * remote peer (in addition to the connectivity establishment of the local
      * agent which is always started, of course).
      */
-    private static final boolean START_CONNECTIVITY_ESTABLISHMENT_OF_REMOTE_PEER= false;
+    private static final boolean START_CONNECTIVITY_ESTABLISHMENT_OF_REMOTE_PEER
+        = false;
 
     /**
      * Start time for debugging purposes.
@@ -53,47 +57,51 @@ public class IceTest
         startTime = System.currentTimeMillis();
 
         Agent localAgent = createAgent(9090, false);
-        localAgent.setNominationStrategy(NominationStrategy.NOMINATE_HIGHEST_PRIO);
-        Agent remoteAgent = createAgent(6060, false);
+        localAgent.setNominationStrategy(
+                        NominationStrategy.NOMINATE_HIGHEST_PRIO);
+        Agent remotePeer = createAgent(6060, false);
 
         localAgent.addStateChangeListener(new IceProcessingListener());
 
         //let them fight ... fights forge character.
         localAgent.setControlling(true);
-        remoteAgent.setControlling(false);
+        remotePeer.setControlling(false);
 
         long endTime = System.currentTimeMillis();
 
-        transferRemoteCandidates(localAgent, remoteAgent);
+        transferRemoteCandidates(localAgent, remotePeer);
         for(IceMediaStream stream : localAgent.getStreams())
         {
-            stream.setRemoteUfrag(remoteAgent.getLocalUfrag());
-            stream.setRemotePassword(remoteAgent.getLocalPassword());
+            stream.setRemoteUfrag(remotePeer.getLocalUfrag());
+            stream.setRemotePassword(remotePeer.getLocalPassword());
         }
 
         if (START_CONNECTIVITY_ESTABLISHMENT_OF_REMOTE_PEER)
-            transferRemoteCandidates(remoteAgent, localAgent);
+            transferRemoteCandidates(remotePeer, localAgent);
 
-        for(IceMediaStream stream : remoteAgent.getStreams())
+        for(IceMediaStream stream : remotePeer.getStreams())
         {
             stream.setRemoteUfrag(localAgent.getLocalUfrag());
             stream.setRemotePassword(localAgent.getLocalPassword());
         }
 
-        Log.i(tag,"Total candidate gathering time: " + (endTime - startTime) + "ms");
-        Log.i(tag,"LocalAgent:\n" + localAgent);
+        logger.info("Total candidate gathering time: "
+                        + (endTime - startTime) + "ms");
+        logger.info("LocalAgent:\n" + localAgent);
 
         localAgent.startConnectivityEstablishment();
 
         if (START_CONNECTIVITY_ESTABLISHMENT_OF_REMOTE_PEER)
-        	remoteAgent.startConnectivityEstablishment();
+            remotePeer.startConnectivityEstablishment();
 
-        Log.i(tag,"Local audio clist:\n" + localAgent.getStream("audio").getCheckList());
+        logger.info("Local audio clist:\n"
+                        + localAgent.getStream("audio").getCheckList());
 
         IceMediaStream videoStream = localAgent.getStream("video");
 
         if(videoStream != null)
-        	Log.i(tag,"Local video clist:\n" + videoStream.getCheckList());
+            logger.info("Local video clist:\n"
+                            + videoStream.getCheckList());
 
         //Give processing enough time to finish. We'll System.exit() anyway
         //as soon as localAgent enters a final state.
@@ -104,7 +112,9 @@ public class IceTest
      * The listener that would end example execution once we enter the
      * completed state.
      */
-    public static final class IceProcessingListener implements PropertyChangeListener {
+    public static final class IceProcessingListener
+        implements PropertyChangeListener
+    {
         /**
          * System.exit()s as soon as ICE processing enters a final state.
          *
@@ -117,36 +127,42 @@ public class IceTest
 
             Object iceProcessingState = evt.getNewValue();
 
-            Log.i(tag,"Agent entered the " + iceProcessingState + " state.");
+            logger.info(
+                    "Agent entered the " + iceProcessingState + " state.");
             if(iceProcessingState == IceProcessingState.COMPLETED)
             {
-            	Log.i(tag,"Total ICE processing time: "+ (processingEndTime - startTime) + "ms");
+                logger.info(
+                        "Total ICE processing time: "
+                            + (processingEndTime - startTime) + "ms");
                 Agent agent = (Agent)evt.getSource();
                 List<IceMediaStream> streams = agent.getStreams();
 
                 for(IceMediaStream stream : streams)
                 {
                     String streamName = stream.getName();
-                    Log.i(tag,"Pairs selected for stream: " + streamName);
+                    logger.info(
+                            "Pairs selected for stream: " + streamName);
                     List<Component> components = stream.getComponents();
 
                     for(Component cmp : components)
                     {
                         String cmpName = cmp.getName();
-                        Log.i(tag,cmpName + ": " + cmp.getSelectedPair());
+                        logger.info(cmpName + ": "
+                                        + cmp.getSelectedPair());
                     }
                 }
 
-                Log.i(tag,"Printing the completed check lists:");
+                logger.info("Printing the completed check lists:");
                 for(IceMediaStream stream : streams)
                 {
                     String streamName = stream.getName();
-                    Log.i(tag,"Check list for  stream: " + streamName);
+                    logger.info("Check list for  stream: " + streamName);
                     //uncomment for a more verbose output
-                    Log.i(tag,stream.getCheckList().toString());
+                    logger.info(stream.getCheckList().toString());
                 }
 
-                Log.i(tag,"Total ICE processing time to completion: "+ (System.currentTimeMillis() - startTime));
+                logger.info("Total ICE processing time to completion: "
+                    + (System.currentTimeMillis() - startTime));
             }
             else if(iceProcessingState == IceProcessingState.TERMINATED
                     || iceProcessingState == IceProcessingState.FAILED)
@@ -157,8 +173,10 @@ public class IceTest
                  * garbage collection.
                  */
                 ((Agent) evt.getSource()).free();
-                Log.i(tag,"Total ICE processing time: "+ (System.currentTimeMillis() - startTime));
-                //System.exit(0);
+
+                logger.info("Total ICE processing time: "
+                    + (System.currentTimeMillis() - startTime));
+                System.exit(0);
             }
         }
     }
@@ -224,9 +242,10 @@ public class IceTest
      * @param remoteComponent the source of remote candidates.
      */
     private static void transferRemoteCandidates(Component localComponent,
-                                                 Component remoteComponent
-    ) {
-        List<LocalCandidate> remoteCandidates = remoteComponent.getLocalCandidates();
+                                                 Component remoteComponent)
+    {
+        List<LocalCandidate> remoteCandidates
+            = remoteComponent.getLocalCandidates();
 
         localComponent.setDefaultRemoteCandidate(
                 remoteComponent.getDefaultCandidate());
@@ -276,7 +295,8 @@ public class IceTest
      * @throws Throwable if anything goes wrong.
      */
     protected static Agent createAgent(int rtpPort, boolean isTrickling)
-        throws Throwable {
+        throws Throwable
+    {
         return createAgent(rtpPort, isTrickling, null);
     }
 
@@ -299,7 +319,8 @@ public class IceTest
     protected static Agent createAgent(int      rtpPort,
                                        boolean  isTrickling,
                                        List<CandidateHarvester>  harvesters)
-        throws Throwable {
+        throws Throwable
+    {
         long startTime = System.currentTimeMillis();
         Agent agent = new Agent();
         agent.setTrickling(isTrickling);
@@ -322,29 +343,38 @@ public class IceTest
                                     "stun6.jitsi.net"
                                  };
             int port = 3478;
-            LongTermCredential longTermCredential = new LongTermCredential("guest", "anonymouspower!!"); //weixingsun/ws206771
+            LongTermCredential longTermCredential
+                = new LongTermCredential("guest", "anonymouspower!!");
 
             for (String hostname : hostnames)
-                agent.addCandidateHarvester( new TurnCandidateHarvester(
-                                new TransportAddress(hostname, port, Transport.UDP),
+                agent.addCandidateHarvester(
+                        new TurnCandidateHarvester(
+                                new TransportAddress(
+                                    hostname, port, Transport.UDP),
                                 longTermCredential));
 
             //UPnP: adding an UPnP harvester because they are generally slow
             //which makes it more convenient to test things like trickle.
             agent.addCandidateHarvester( new UPNPHarvester() );
-        } else {
-            for(CandidateHarvester harvester: harvesters) {
+        }
+        else
+        {
+            for(CandidateHarvester harvester: harvesters)
+            {
                 agent.addCandidateHarvester(harvester);
-                
             }
         }
 
         //STREAMS
         createStream(rtpPort, "audio", agent);
         createStream(rtpPort + 2, "video", agent);
+
+
         long endTime = System.currentTimeMillis();
         long total = endTime - startTime;
-        Log.i(tag,"Total harvesting time: " + total + "ms.");
+
+        logger.info("Total harvesting time: " + total + "ms.");
+
         return agent;
     }
 
@@ -362,9 +392,11 @@ public class IceTest
      */
     private static IceMediaStream createStream(int    rtpPort,
                                                String streamName,
-                                               Agent  agent
-        ) throws Throwable {
+                                               Agent  agent)
+        throws Throwable
+    {
         IceMediaStream stream = agent.createMediaStream(streamName);
+
         long startTime = System.currentTimeMillis();
 
         //TODO: component creation should probably be part of the library. it
@@ -373,16 +405,21 @@ public class IceTest
         //simultaneously with the others.
 
         //rtp
-        agent.createComponent(stream, Transport.UDP, rtpPort, rtpPort, rtpPort + 100);
+        agent.createComponent(
+                stream, Transport.UDP, rtpPort, rtpPort, rtpPort + 100);
 
         long endTime = System.currentTimeMillis();
-        Log.i(tag,"RTP Component created in " + (endTime - startTime) + " ms");
+        logger.info("RTP Component created in "
+            + (endTime - startTime) + " ms");
         startTime = endTime;
         //rtcpComp
-        agent.createComponent(stream, Transport.UDP, rtpPort + 1, rtpPort + 1, rtpPort + 101);
+        agent.createComponent(
+                stream, Transport.UDP, rtpPort + 1, rtpPort + 1, rtpPort + 101);
+
         endTime = System.currentTimeMillis();
-        Log.i(tag,"RTCP Component created in " + (endTime - startTime) + " ms");
+        logger.info("RTCP Component created in "
+            + (endTime - startTime) + " ms");
+
         return stream;
     }
-    
 }

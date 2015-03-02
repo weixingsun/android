@@ -18,6 +18,7 @@ import org.ice4j.StackProperties;
 import org.ice4j.Transport;
 import org.ice4j.TransportAddress;
 import org.ice4j.ice.Agent;
+import org.ice4j.ice.CandidatePair;
 import org.ice4j.ice.Component;
 import org.ice4j.ice.IceMediaStream;
 import org.ice4j.ice.IceProcessingState;
@@ -45,19 +46,6 @@ public class IceClient {
 
 	public DatagramSocket socket = null;
 	public SocketAddress remoteAddress;
-	//private String[] turnServers = new String[] { "stun.jitsi.net:3478"};
-    //private String[] stunServers = new String[] { "stun.jitsi.net:3478" };
-	//private String[] stunServers = new String[] { "stun.stunprotocol.org:3478" };
-    //private String[] stunServers = new String[]{"stun.jitsi.org:3478","stun6.jitsi.net:3478"};
-	//private String username = "guest";
-	//private String password = "anonymouspower!!";
-	private String[] turnServers = new String[] { "numb.viagenie.ca:3478"}; //,"stun.jitsi.net:3478","180.160.188.246:3478"};
-	private String[] stunServers = new String[] { "numb.viagenie.ca:3478"};
-    private String[] usernames = new String[] { "weixingsun"}; //,"guest","u1"};
-    private String[] passwords = new String[] {  "ws206771"}; //,"anonymouspower!!","p1" };
-    private String[] serverConfig1 = new String[] {"numb.viagenie.ca:3478","weixingsun","ws206771"};//tested with turn
-    private String[] serverConfig2 = new String[] {"180.160.188.246:3478","u1","p1"};
-    private String[] serverConfig3 = new String[] {"stun.jitsi.net:3478","guest","anonymouspower!!"};
     private IceProcessingListener listener;
 	public IceClient(int port, String streamName) {
 		this.port = port;
@@ -66,7 +54,7 @@ public class IceClient {
 	}
 
 	public void init() throws Throwable {
-		System.setProperty(StackProperties.FIRST_CTRAN_RETRANS_AFTER,"300");//default timeout
+		System.setProperty(StackProperties.FIRST_CTRAN_RETRANS_AFTER,"5000");//default timeout
 		agent = createAgent(port, streamName);
 		agent.setNominationStrategy(NominationStrategy.NOMINATE_HIGHEST_PRIO);
 		agent.addStateChangeListener(listener);
@@ -109,18 +97,31 @@ public class IceClient {
 			return false;
 		}
 	}
-	public DatagramSocket getDatagramSocket() throws Throwable {
-		LocalCandidate localCandidate = agent.getSelectedLocalCandidate(streamName);
+/*	public DatagramSocket getDatagramSocket() throws Throwable {
 		IceMediaStream stream = agent.getStream(streamName);
-		List<Component> components = stream.getComponents();
-		for (Component c : components) {
-			Log.i(tag, c.toString());
-		}
-		Log.i(tag, localCandidate.toString());
-		LocalCandidate candidate = (LocalCandidate) localCandidate;
-		return candidate.getDatagramSocket();
-	}
 
+		//LocalCandidate candidate = agent.getSelectedLocalCandidate(streamName);
+		//List<Component> components = stream.getComponents();
+		//for (Component c : components) { Log.i(tag, c.toString()); }
+		//Log.i(tag, localCandidate.toString());
+		//LocalCandidate candidate = (LocalCandidate) localCandidate;
+		//return candidate.getDatagramSocket();
+		Component udpComponent = stream.getComponents().get(0);
+		CandidatePair selectedPair = udpComponent.getSelectedPair();
+		return selectedPair.getDatagramSocket();
+	}*/
+    public DatagramSocket getDatagramSocket() throws Throwable {
+        LocalCandidate localCandidate = agent.getSelectedLocalCandidate(streamName);
+        IceMediaStream stream = agent.getStream(streamName);
+        List<Component> components = stream.getComponents();
+        for (Component c : components) {
+            Log.i(tag, "Component<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"+c.toString());
+        }
+        //Log.i(tag, localCandidate.toString());
+        LocalCandidate candidate = (LocalCandidate) localCandidate;
+        return candidate.getDatagramSocket();
+
+    }
 	public SocketAddress getRemotePeerSocketAddress() {
 		RemoteCandidate remoteCandidate = agent.getSelectedRemoteCandidate(streamName);
 		Log.i(tag,"Remote candinate transport address:" + remoteCandidate.getTransportAddress());
@@ -156,21 +157,15 @@ public class IceClient {
 		Agent agent = new Agent();
 		agent.setTrickling(isTrickling);
 		// STUN
-		for (String server : stunServers) {
-			String[] pair = server.split(":");
+		for (P2PServerInfo server : P2PServerUtil.servers) {
 			agent.addCandidateHarvester(new StunCandidateHarvester(
-					new TransportAddress(pair[0], Integer.parseInt(pair[1]),
-							Transport.UDP)));
+					new TransportAddress(server.getStunServerIP(), server.getStunServerPort(),Transport.UDP)));
 		}
-
-		
-
-		for (String server : turnServers) {// TURN
-			LongTermCredential longTermCredential = new LongTermCredential(usernames[0], passwords[0]);
-			String[] pair = server.split(":");
+		// TURN
+		for (P2PServerInfo server : P2PServerUtil.servers) {
+			LongTermCredential longTermCredential = new LongTermCredential(server.getTurnServerUsername(),server.getTurnServerPassword());
 			agent.addCandidateHarvester(new TurnCandidateHarvester(
-					new TransportAddress(pair[0], Integer.parseInt(pair[1]),
-							Transport.UDP), longTermCredential));
+					new TransportAddress(server.getTurnServerIP(), server.getTurnServerPort(),Transport.UDP), longTermCredential));
 		}
 		// STREAMS
 		createStream(rtpPort, streamName, agent);
@@ -193,48 +188,5 @@ public class IceClient {
 		return stream;
 	}
 
-	/**
-	 * Receive notify event when ice processing state has changed.
-	 */
-	public static final class IceProcessingListener implements
-			PropertyChangeListener {
-		private long startTime = System.currentTimeMillis();
-		public void propertyChange(PropertyChangeEvent event) {
-			Object state = event.getNewValue();
-			Log.i(tag, "Agent entered the " + state + " state.");
-			if (state == IceProcessingState.COMPLETED) {
-				long processingEndTime = System.currentTimeMillis();
-				Log.i(tag, "Total ICE processing time: "
-						+ (processingEndTime - startTime) + "ms");
-				Agent agent = (Agent) event.getSource();
-				List<IceMediaStream> streams = agent.getStreams();
-
-				for (IceMediaStream stream : streams) {
-					Log.i(tag, "Stream name: " + stream.getName());
-					List<Component> components = stream.getComponents();
-					for (Component c : components) {
-						Log.i(tag, "------------------------------------------");
-						Log.i(tag, "Component of stream:" + c.getName()
-								+ ",selected of pair:" + c.getSelectedPair());
-						Log.i(tag, "------------------------------------------");
-					}
-				}
-
-				Log.i(tag, "Printing the completed check lists:");
-				for (IceMediaStream stream : streams) {
-					Log.i(tag, "Check list for  stream: " + stream.getName());
-					Log.i(tag, "nominated check list:" + stream.getCheckList());
-				}
-				synchronized (this) {
-					this.notifyAll();
-				}
-			} else if (state == IceProcessingState.TERMINATED) {
-				Log.i(tag, "ice processing TERMINATED");
-			} else if (state == IceProcessingState.FAILED) {
-				Log.i(tag, "ice processing FAILED");
-				((Agent) event.getSource()).free();
-			}
-		}
-	}
 
 }

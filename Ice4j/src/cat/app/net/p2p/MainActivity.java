@@ -153,7 +153,13 @@ public class MainActivity extends Activity implements OnItemSelectedListener {
 	}
 	public void onEventMainThread(StatusEvent event) {
 		//Log.i(tag, "EventBus received StatusEvent:" + event.getStatus());
-        statusLight.setImageResource(R.drawable.light_green_16); 
+		if(event.getStatus().equals(StatusEvent.TERMINATED)){
+			statusLight.setImageResource(R.drawable.light_green_16);
+		}else if(event.getStatus().equals(StatusEvent.FAILED)){
+			statusLight.setImageResource(R.drawable.light_red_16);
+		}else if(event.getStatus().equals(StatusEvent.FAILED)){
+			
+		}
 	}
 	public void onEventMainThread(DatabaseEvent event) {
 		this.search.setText(event.getSettingsValue());
