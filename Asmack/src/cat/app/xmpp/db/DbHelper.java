@@ -1,8 +1,9 @@
-package cat.app.net.p2p.db;
+package cat.app.xmpp.db;
 
 import java.util.List;
 
-import cat.app.net.p2p.util.CountryCode;
+import cat.app.xmpp.acct.Account;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -16,15 +17,15 @@ import android.util.Log;
 		static DbHelper dbHelper;
 		private SQLiteDatabase db = null;
 	    private final static int DATABASE_VERSION=1;
-		private final static String DATABASE_NAME="p2p.db";
-	    private final static String GPS_TABLE="gps_data";
+		private final static String DATABASE_NAME="xmpp.db";
+	    private final static String ACCOUNT_TABLE="acct_data";
 	    private final static String MSG_TABLE="msg_data";
 	    private final static String SETTINGS_TABLE="settings";
 	    private static String STR_CREATE;
-	    //gps_data(lat,lng,country_code)	//id=0, lastknownlocation
+	    //gps_data(lat,lng,country_code)
+	    //acct_data(host,name,pswd)
 	    private DbHelper(Context context){
 	    	super(context, DATABASE_NAME,null, DATABASE_VERSION);
-	    	this.createTables();
 	    }
 	    public static DbHelper getInstance(Context context){
 	    	if(dbHelper==null){
@@ -49,55 +50,53 @@ import android.util.Log;
 	    public void onCreate(SQLiteDatabase db) {
 	    	//recreateTables(db);
 	    }
-	    public void createTables() {
+	    private void dropTables(SQLiteDatabase db) {
+	    	dropTable(SETTINGS_TABLE,db);
+	    	dropTable(ACCOUNT_TABLE,db);
+		}
+	    public void createTables(SQLiteDatabase db) {
 	    	this.db = getWritableDatabase();
-	    	Log.i(TAG,"recreate table:"+GPS_TABLE);
+	    	//Log.i(TAG,"recreate table:"+GPS_TABLE);
 	    	//dropTable(GPS_TABLE,db);
 	    	//settings(name,)  //name=map_vendor,travel_mode,route,geocode
-	    	STR_CREATE = "CREATE TABLE IF NOT EXISTS "    //+DATABASE_NAME+"."
+	    	STR_CREATE = "CREATE TABLE IF NOT EXISTS "
 		    		+SETTINGS_TABLE+ " ("
 		    		+"name varchar(10) not null primary key, "
 		    		+"value varchar(20) NOT NULL"
 		    		+");";
 	    	this.db.execSQL(STR_CREATE);
-	    	//STR_CREATE = "insert into "+SETTINGS_TABLE+ " (name,value) values ( 'group','1')";
-	    	//this.db.execSQL(STR_CREATE);
-	    	/*STR_CREATE = "CREATE TABLE IF NOT EXISTS "
-	    			+MSG_TABLE+ " ("
-	    			+"recv_time timestamp not null DEFAULT CURRENT_TIMESTAMP primary key, "
-		    		+"sender varchar(50) NOT NULL"
-		    		+"lat double , "	//NOT NULL
-		    		+"lng double , "	//NOT NULL
-		    		+"alt double , "	//NOT NULL
-		    		+"direction int, "	//NOT NULL
-		    		+"speed int , "		//NOT NULL
-		    		+"acceleration int,"	//NOT NULL
-		    		+"gravity_X int, "	//NOT NULL
-		    		+"gravity_Y int, "	//NOT NULL
-		    		+"gravity_Z int, "	//NOT NULL
-		    		+"value varchar(200) NOT NULL"
-		    		+");";*/ 
-	    	STR_CREATE = "CREATE TABLE IF NOT EXISTS " + MSG_TABLE+ " ("
+	    	STR_CREATE =  "CREATE TABLE IF NOT EXISTS " + ACCOUNT_TABLE
+	    			+"(host varchar(50) NOT NULL,"
+	    			+"name varchar(50) NOT NULL,"
+	    			+"pswd varchar(50) NOT NULL);";
+	    	this.db.execSQL(STR_CREATE);
+	    	STR_CREATE = "CREATE TABLE IF NOT EXISTS " + MSG_TABLE
+	    			+" ("
 	    			+"recv_time TIMESTAMP DATETIME DEFAULT(STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW')) primary key, "  // for milliseconds(was DEFAULT CURRENT_TIMESTAMP)
 		    		+"sender varchar(50) NOT NULL,"
 		    		+"msg varchar(200) NOT NULL" 
 		    		+");";
 	    	this.db.execSQL(STR_CREATE);
-	    	//this.db.close();
 		}
+	    public void init(){
+	    	this.db = getWritableDatabase();
+	    	//dropTables(db);
+	    	createTables(db);
+	    	this.db.close();
+	    	this.db = null;
+	    }
 		@Override
 	    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 	    	this.db = db;
-	    	dropTable(GPS_TABLE,db);
-	        onCreate(db);
+	    	//this.db.close();
 	    }
-	    public void dropTable(String tableName,SQLiteDatabase db){
+		public void dropTable(String tableName,SQLiteDatabase db){
 	        String sql=" DROP TABLE IF EXISTS "+tableName+";VACUUM;";
 	        db.execSQL(sql);
 	    }
 	    public String getCountryCode() {
 	    	this.db = getReadableDatabase();
-	    	String sql = "SELECT country_code FROM " +GPS_TABLE+" where data_id=0";
+	    	String sql = "SELECT country_code FROM " +ACCOUNT_TABLE+" where data_id=0";
 	    	Cursor cursor = db.rawQuery(sql, null);
 	    	if (cursor != null)
 	        	cursor.moveToFirst();
@@ -115,28 +114,12 @@ import android.util.Log;
 	    public void addCountryCode(String countryCode) {
 	    	insertGPS(0, -1,-1,countryCode);
 	    }
-	    public void updateCountryCode(String countryCode) {
-	    	if(getCountryCode()!=null){
-	    		updateOnlyCountryCode(countryCode);
-	    	}else{
-	    		addCountryCode(countryCode);
-	    	}
-	    }
-	    public void updateOnlyCountryCode(String countryCode) {
-	    	if(this.db==null)
-	    		this.db = this.getWritableDatabase();
-	        String where="data_id=?";
-	        String[] whereValue={Integer.toString(0)};
-	        ContentValues cv=new ContentValues();
-	        cv.put("country_code", countryCode);
-	        db.update(GPS_TABLE, cv, where, whereValue);
-	    }
 	    
 	    //(sensor_type,sensor_metric_seq,sensor_metric_data)
 	    private long insertGPS(int id, double lat,double lng)
 	    {
-	        String countryCode = CountryCode.getByLatLng(lat, lng);
-	        return insertGPS(id, lat,lng,countryCode);
+	        //String countryCode = CountryCode.getByLatLng(lat, lng);
+	        return insertGPS(id, lat,lng,"");
 	    }
 	    private long insertGPS(int id, double lat,double lng,String countryCode) {
 	    	if(this.db==null)
@@ -146,12 +129,12 @@ import android.util.Log;
 	        cv.put("lat", lat);
 	        cv.put("lng", lng);
 	        cv.put("country_code", countryCode);
-	        long row=db.insert(GPS_TABLE, null, cv);
+	        long row=db.insert(ACCOUNT_TABLE, null, cv);
 	        return row;
 	    }
 	    public long insertMsg(String sender, String msg) {
-	    	if(this.db==null)
-	    	this.db = getWritableDatabase();
+	    	if(this.db==null || !this.db.isOpen())
+	    		this.db = getWritableDatabase();
 	        ContentValues cv=new ContentValues();
 	        cv.put("sender", sender);
 	        cv.put("msg", msg);
@@ -176,15 +159,6 @@ import android.util.Log;
 	        this.db=null;
 	        return null;
 	    }
-	    public int deleteOldData(SQLiteDatabase db,int id) {
-	    	if(this.db==null)
-	    		this.db = this.getWritableDatabase();
-	        String where="data_id="+id;
-	        int a = db.delete(GPS_TABLE, where,null);
-	        //db.close();
-	        return a;
-	    }
-	    
 	    private void updateGPS(int id,double lat,double lng, String countryCode) {
 	    	if(this.db==null)
 	    		this.db = this.getWritableDatabase();
@@ -194,11 +168,11 @@ import android.util.Log;
 	        cv.put("lat", lat);
 	        cv.put("lng", lng);
 	        cv.put("country_code", countryCode);
-	        db.update(GPS_TABLE, cv, where, whereValue);
+	        db.update(ACCOUNT_TABLE, cv, where, whereValue);
 	    }
 	    private void updateGPS(int id,double lat,double lng) {
-	        String countryCode = CountryCode.getByLatLng(lat, lng);
-	        this.updateGPS(id, lat, lng, countryCode);
+	        //String countryCode = CountryCode.getByLatLng(lat, lng);
+	        this.updateGPS(id, lat, lng, "");
 	    }
 	    public void updateGPS(int id,Location loc){
 	    	if(getCountryCode()==null){
@@ -251,5 +225,48 @@ import android.util.Log;
 	    		this.updateSettings(name, value);
 	    	}
 	    }
+		public void changeAccount(Account account) {
+	    	if(getAccount(account.getUsername())==null){
+	    		this.insertAccount(account);
+	    	}else{
+	    		this.updateAccount(account);
+	    	}
+		}
+		private void updateAccount(Account account) {
+	    	if(this.db==null)
+	    		this.db = this.getWritableDatabase();
+	        String where="name=?";
+	        String[] whereValue={account.getUsername()};
+	        ContentValues cv=new ContentValues();
+	        cv.put("pswd", account.getPassword());
+	        db.update(ACCOUNT_TABLE, cv, where, whereValue);
+		}
+		private long insertAccount(Account account) {
+	    	if(this.db==null)
+	    	this.db = getWritableDatabase();
+	        ContentValues cv=new ContentValues();
+	        cv.put("host", account.getHostname());
+	        cv.put("name", account.getUsername());
+	        cv.put("pswd", account.getPassword());
+	        long row=db.insert(ACCOUNT_TABLE, null, cv);
+	        Log.w(TAG, "insertAccount.row="+row);
+	        return row;
+		}
+		private Account getAccount(String username) {
+	    	this.db = getReadableDatabase();
+	    	//String parsedName = username.replaceAll("\'","\'\'");
+	    	String sql = "SELECT host,name,pswd FROM " +ACCOUNT_TABLE+" where name='"+username+"'";
+	    	Cursor cursor = db.rawQuery(sql, null);
+	    	if (cursor != null)
+	        	cursor.moveToFirst();
+	    	Account account = null;
+	    	try{
+	    		String host = cursor.getString(0);
+	    		String name = cursor.getString(1);
+	    		String pswd = cursor.getString(2);
+	    		account = new Account(host,name,pswd);
+	    	}catch(Exception e){}
+			return account;
+		}
 	    
 	}
