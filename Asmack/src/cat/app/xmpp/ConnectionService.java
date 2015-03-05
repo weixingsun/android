@@ -1,6 +1,8 @@
 package cat.app.xmpp;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.Roster;
@@ -18,9 +20,11 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.util.StringUtils;
 
 import cat.app.xmpp.acct.Account;
+import cat.app.xmpp.acct.Contact;
 import cat.app.xmpp.db.DbTask;
 import cat.app.xmpp.evt.LoginEvent;
 import cat.app.xmpp.evt.MessageReceiveEvent;
+import cat.app.xmpp.evt.PopulateContactsEvent;
 import cat.app.xmpp.evt.PopulateSettingsEvent;
 import de.greenrobot.event.EventBus;
 
@@ -52,7 +56,7 @@ public class ConnectionService extends IntentService  {
 		try {
 			connection.connect();
 			connection.login(user, pswd);
-			Log.i("XMPPChatDemoActivity","Logged in to "+connection.getHost()+" as " + connection.getUser());
+			Log.i(tag,"Logged in to "+connection.getHost()+" as " + connection.getUser());
 			client.setConnection(connection);
 			// Set the status to available
 			Presence presence = new Presence(Presence.Type.available);
@@ -62,15 +66,15 @@ public class ConnectionService extends IntentService  {
 			printContacts(connection.getRoster());
 			
 			Account account = new Account(host,user,pswd);
-			DbTask task = new DbTask("settings", PopulateSettingsEvent.LAST_LOGIN, account.getUsername()+"@"+account.getHostname());
+			DbTask task = new DbTask(DbTask.SETTINGS, PopulateSettingsEvent.LAST_LOGIN, account.getUsername()+"@"+account.getHostname());
 			task.execute();
-			task = new DbTask("settings", PopulateSettingsEvent.LAST_PASSWORD, account.getPassword());
+			task = new DbTask(DbTask.SETTINGS, PopulateSettingsEvent.LAST_PASSWORD, account.getPassword());
 			task.execute();
-			task = new DbTask("account",account);
+			task = new DbTask(DbTask.ACCOUNT,account);
 			task.execute();
 		} catch (Exception e) {
-			Log.e("XMPPChatDemoActivity", "Failed to log in as "+ user);
-			Log.e("XMPPChatDemoActivity", e.toString());
+			Log.e(tag, "Failed to log in as "+ user);
+			Log.e(tag, e.toString());
 			e.printStackTrace();
 			EventBus.getDefault().post(new LoginEvent(LoginEvent.FAIL));
 		}
@@ -111,23 +115,23 @@ public class ConnectionService extends IntentService  {
 	}
  
 	private void printContacts(Roster roster) {
-		Log.i(tag, "print contacts:"+roster.getEntries().size());
+		//Log.i(tag, "print contacts:"+roster.getEntries().size());
+		ArrayList<Contact> cts = new ArrayList<Contact>();
 		for (RosterEntry entry : roster.getEntries()) {
-			Log.d("XMPPChatDemoActivity","--------------------------------------");
-			Log.d("XMPPChatDemoActivity", "RosterEntry " + entry);
-			Log.d("XMPPChatDemoActivity","User: " + entry.getUser());
-			Log.d("XMPPChatDemoActivity","Name: " + entry.getName());
-			Log.d("XMPPChatDemoActivity","Status: " + entry.getStatus());
-			Log.d("XMPPChatDemoActivity","Type: " + entry.getType());
+			String user = entry.getUser();
+			String name = entry.getName();
+			//String status = entry.getStatus().toString();
+			//Log.d(tag,"Type: " + entry.getType());
 			Presence entryPresence = roster.getPresence(entry.getUser());
-			Log.d("XMPPChatDemoActivity", "Presence Status: "+ entryPresence.getStatus());
-			Log.d("XMPPChatDemoActivity", "Presence Type: "+ entryPresence.getType());
+			//Log.d(tag, "Presence Status: "+ entryPresence.getStatus());
 			Presence.Type type = entryPresence.getType();
-			if (type == Presence.Type.available)
-				Log.d("XMPPChatDemoActivity", "Presence AVIALABLE");
-			Log.d("XMPPChatDemoActivity", "Presence : "+ entryPresence);
+			//if (type == Presence.Type.available)
+			//Log.d(tag, user + " : "+type.name());
+			//Log.d(tag, "Presence : "+ entryPresence);
+			Contact c = new Contact(user, name, type.name());
+			cts.add(c);
 		}
-		
+		EventBus.getDefault().post(new PopulateContactsEvent(cts));
 	}
 
 	/**
@@ -145,13 +149,12 @@ public class ConnectionService extends IntentService  {
 				public void processPacket(Packet packet) {
 					Message message = (Message) packet;
 					if (message.getBody() != null) {
+						String body = message.getBody().trim();
 						String fromName = StringUtils.parseBareAddress(message.getFrom());
-						Log.i(tag, "Text Recieved " + message.getBody() + " from " + fromName );
-						//messages.add(fromName + ":");
-						//messages.add(message.getBody());
-						// Add the incoming message to the list view
-						//setListAdapter();
-						EventBus.getDefault().post(new MessageReceiveEvent(fromName,message.getBody()));
+						Log.i(tag, "Text Recieved " + body + " from " + fromName );
+						DbTask task = new DbTask(DbTask.MSG, fromName, body);
+						task.execute();
+						EventBus.getDefault().post(new MessageReceiveEvent(fromName,body));
 					}
 				}
 			}, filter);

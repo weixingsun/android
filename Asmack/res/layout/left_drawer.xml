@@ -6,7 +6,7 @@
     
 	<LinearLayout
            android:layout_width="0dp"
-           android:layout_weight=".4"
+           android:layout_weight=".6"
            android:layout_height="match_parent"
            android:background="#0000FF"
            android:orientation="vertical">
@@ -14,7 +14,7 @@
                android:id="@+id/tvsettings"
                android:layout_width="match_parent"
                android:layout_height="30dp"
-               android:background="#000000"
+               android:background="#333333"
                android:gravity="center"
                android:text="@string/settings"
                android:textSize="20sp" />
@@ -23,12 +23,12 @@
                android:id="@+id/left_drawer_parent"
                android:layout_width="match_parent"
                android:layout_height="match_parent"
-               android:background="#000000"
+               android:background="#333333"
                android:choiceMode="singleChoice"/>
 	</LinearLayout>
 	<LinearLayout
            android:layout_width="0dp"
-           android:layout_weight=".6"
+           android:layout_weight=".4"
            android:layout_height="match_parent"
            android:background="#0000FF"
            android:orientation="vertical">
@@ -36,7 +36,7 @@
                android:id="@+id/tvsubsettings"
                android:layout_width="match_parent"
                android:layout_height="30dp"
-               android:background="#888888"
+               android:background="#666666"
                android:gravity="center"
                android:text="@null"
                android:textSize="20sp" />
@@ -45,7 +45,7 @@
                android:id="@+id/left_drawer_child"
                android:layout_width="match_parent"
                android:layout_height="match_parent"
-               android:background="#888888"
+               android:background="#666666"
                android:choiceMode="singleChoice" >
            </ListView>
        </LinearLayout>

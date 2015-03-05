@@ -2,33 +2,36 @@ package cat.app.xmpp.acct;
 
 public class Contact {
 
-	private String hostname;
-	private String username;
+	public static String AVAILABLE = "available";
+	public static String ONLINE = "online";
+	public static String OFFLINE = "offline";
+	private String name;
+	private String user;
 	private String status;
 
-	public Contact(String host, String username, String status) {
-		this.setHostname(host);
-		this.setUsername(username);
+	public Contact(String user, String name, String status) {
+		this.setName(name);
+		this.setUser(user);
 		this.setStatus(status);
 	}
 
-	public String getHostname() {
-		return hostname;
+	public String getName() {
+		return name;
 	}
 
 
-	public void setHostname(String hostname) {
-		this.hostname = hostname;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 
-	public String getUsername() {
-		return username;
+	public String getUser() {
+		return user;
 	}
 
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setUser(String user) {
+		this.user = user;
 	}
 
 	public String getStatus() {

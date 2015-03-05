@@ -1,5 +1,9 @@
-package cat.app.xmpp;
+package cat.app.xmpp.ui;
 
+import cat.app.xmpp.ConnectionService;
+import cat.app.xmpp.R;
+import cat.app.xmpp.R.id;
+import cat.app.xmpp.R.layout;
 import cat.app.xmpp.db.DbTask;
 import cat.app.xmpp.evt.LoginEvent;
 import cat.app.xmpp.evt.PopulateSettingsEvent;

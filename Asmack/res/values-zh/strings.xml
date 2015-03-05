@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Connect</string>
+    <string name="app_name">联系</string>
+    <string name="send">发送</string>
+	<string name="action_status">状态</string>
+	<string name="action_search">搜索</string>
+
     <string name="username">Username</string>
 	<string name="login">Login</string>
 	<string name="password">Password</string>
 	<string name="roster">Roster</string>
-	<string name="send">Send</string>
 	<string name="chat">Chat</string>
-	
-	<string name="action_status">Status</string>
-	<string name="action_search">Search</string>
 	<string name="all_contacts">All Contacts</string>
 	<string name="online_contacts">Online Contacts</string>
 	<string name="conferences">Conferences</string>
@@ -62,9 +62,4 @@
 	<string name="contactpicture_desc">The User\'s contact picture</string>
 	<string name="chat_offline">$(name) is offline. Messages will be delivered when $(name) returns.</string>
 
-    <string-array name="action_type_items">
-       <item >Chat</item>
-       <item >Control</item>
-       <item >Group</item>
-   </string-array>
 </resources>
