@@ -64,7 +64,7 @@ public class MessageAdapter extends BaseAdapter {
         holder.title.setText((String)mData.get(position).get("title"));  
         holder.info.setText((String)mData.get(position).get("info"));  
         String from = (String)mData.get(position).get("from");
-		if(!Client.SELF.equals(from)){
+		if(Client.SELF.equals(from)){
 			//RelativeLayout contentLO = (RelativeLayout) convertView.findViewById(R.id.content_layout);
 			//contentLO.setGravity(Gravity.RIGHT);
 			 RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
