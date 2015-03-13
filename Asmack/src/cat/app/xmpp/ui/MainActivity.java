@@ -112,6 +112,7 @@ public class MainActivity extends Activity {
 		Message msg = new Message(event.getFrom(),event.getBody());
     	messages.add(msg);
 		setMessageListAdapter();
+    	//messagelistview.getAdapter().registerDataSetObserver(observer);
 	}
 	private void setContactListAdapter() {
 		ContactAdapter adapter = new ContactAdapter(this, contacts);

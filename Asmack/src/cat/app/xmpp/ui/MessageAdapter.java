@@ -9,6 +9,8 @@ import cat.app.xmpp.R;
 import cat.app.xmpp.acct.*;
 
 import android.app.Activity;
+import android.database.DataSetObservable;
+import android.database.DataSetObserver;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -24,6 +26,7 @@ import android.widget.TextView;
 
 public class MessageAdapter extends BaseAdapter {
     private static final String tag = MessageAdapter.class.getSimpleName();
+    private final DataSetObservable mDataSetObservable = new DataSetObservable();  
 	//private List<Contact> list;
     //private Activity activity;
     private LayoutInflater inflater;
@@ -45,6 +48,13 @@ public class MessageAdapter extends BaseAdapter {
 			map.put("info", m.getSendTime());
 			mData.add(map);
 		}
+		/*DataSetObserver mDataSetObserver = new DataSetObserver(){
+			@Override  
+			public void onChanged() {
+				
+			}
+		};  
+		this.registerDataSetObserver(mDataSetObserver);*/
     }
     @Override  
     public View getView(int position, View convertView, ViewGroup parent){
@@ -61,9 +71,12 @@ public class MessageAdapter extends BaseAdapter {
             holder = (MessageViewHolder)convertView.getTag();
         }  
         //holder.img.setBackgroundResource((Integer)mData.get(position).get("img"));
-        holder.title.setText((String)mData.get(position).get("title"));  
-        holder.info.setText((String)mData.get(position).get("info"));  
+         
+        holder.info.setText((String)mData.get(position).get("info"));
         String from = (String)mData.get(position).get("from");
+        String body = (String)mData.get(position).get("title");
+        holder.title.setText(body); 
+		Log.w(tag, "self="+Client.SELF+":"+position+",from="+from+",body="+body);
 		if(Client.SELF.equals(from)){
 			//RelativeLayout contentLO = (RelativeLayout) convertView.findViewById(R.id.content_layout);
 			//contentLO.setGravity(Gravity.RIGHT);
@@ -74,7 +87,6 @@ public class MessageAdapter extends BaseAdapter {
 					 //lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);//与父容器的上侧对齐
 			holder.title.setLayoutParams(lp);
 			holder.info.setLayoutParams(lp);
-			Log.i(tag, "self="+Client.SELF+",from="+from);
 		}
         return convertView;
     }
@@ -87,7 +99,7 @@ public class MessageAdapter extends BaseAdapter {
 	@Override
 	public Object getItem(int position) {
 		// TODO Auto-generated method stub
-		return position;
+		return mData.get(position);
 	}
 
 	@Override
@@ -102,4 +114,20 @@ public class MessageAdapter extends BaseAdapter {
         public TextView title;
         public TextView info;
     }  
+    /*@Override
+    public void registerDataSetObserver(DataSetObserver observer) {  
+    	mDataSetObservable.registerObserver(observer);  
+    	}  
+    @Override
+    	public void unregisterDataSetObserver(DataSetObserver observer) {  
+    	mDataSetObservable.unregisterObserver(observer);  
+    	}
+    @Override
+    	public void notifyDataSetChanged() {  
+    	mDataSetObservable.notifyChanged();  
+    	}
+    @Override
+    	public void notifyDataSetInvalidated() {  
+    	mDataSetObservable.notifyInvalidated();  
+    	}  */
 }  
