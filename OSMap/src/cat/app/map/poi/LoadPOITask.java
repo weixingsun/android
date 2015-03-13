@@ -34,6 +34,7 @@ public LoadPOITask(OSM osm) {
 }
 @Override
 protected String doInBackground(String... params) {
+	if(osm.offlineMapFile==null) return null;
 	mfpoi = new MapsForgePOI(osm.offlineMapFile);
 	zoom = osm.map.getZoomLevel();
 	bbE6Visible = osm.getBoundary();
