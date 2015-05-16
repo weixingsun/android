@@ -26,7 +26,7 @@
         <item >Travel</item>
         <item >Navigate</item>
         <item >Country</item>
-        <item >On Road</item>
+        <item >Parking</item>
         <item >What\'s Hot</item>
     </string-array>
     <string-array name="geocoder_type_items">
@@ -48,8 +48,7 @@
         <item >Open Street Map</item>
         <item >OSM Satellite</item>
         <item >OSM Bus</item>
-        <item >Offline Map</item>
-        <!-- <item >MapsForge</item>-->
+        <item >Offline Map</item> <!-- <item >MapsForge</item>-->
         <item >Mapnik</item>
         <item >Google Roadmap</item>
         <item >Google Satellite</item>
@@ -69,10 +68,11 @@
         <item >cn</item>
         <item >nz</item>
     </string-array>
-    <string-array name="on_road_items">
-        <item >Police</item>
-        <item >Medical</item>
-        <item >Help</item>
+    <string-array name="parking_items">
+        <item >1KM</item>
+        <item >2KM</item>
+        <item >5KM</item>
+        <item >My Car</item>
     </string-array>
     
     <string-array name="whats_hot_items">

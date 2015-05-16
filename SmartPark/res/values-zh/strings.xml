@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">智能停车</string>
+    <string name="speech_prompt">请说出地名&#8230;</string>
+    <string name="speech_not_supported">对不起，您的设备不支持语音输入</string>
+    <string name="navigate">导航</string>
+    <string name="settings">设置</string>
+    <string name="subsettings">子设备</string>
+    <string name="action_settings">动作设置</string>
+    <string name="delete">删除</string>
+    <string name="police">警车</string>
+    <string name="cctv">CCTV</string>
+    <string name="email">邮箱:</string>
+    <string name="password">密码:</string>
+    <string name="submit">提交</string>
+    <string name="register">新用户注册</string>
+    <string name="download_title">下载地图</string>
+    <string name="app_status_download">点击下载</string>
+    <string name="app_status_downloaded">已下载</string>
+    <string name="app_status_download_fail">下载失败, 点击重试</string>
+     
+    <!-- Main Nav Drawer Menu Items -->
+    <string-array name="menu_items">
+        <item >Maps</item>
+        <item >Travel</item>
+        <item >Navigate</item>
+        <item >Country</item>
+        <item >Parking</item>
+        <item >What\'s Hot</item>
+    </string-array>
+    <string-array name="geocoder_type_items">
+        <item >OSM</item>
+        <item >Google</item>
+        <item >MapQuest</item>
+        <item >Offline Route</item>
+        <!--<item >GraphHopper</item>-->
+    </string-array>
+    <string-array name="nav_type_items">
+        <item >最快</item>
+        <item >最短</item>
+        <item >步行</item>
+        <item >骑车</item>
+        <item >公交</item>
+    </string-array>
+    
+    <string-array name="map_type_items">
+        <item >Open Street Map</item>
+        <!-- <item >OSM Satellite</item>
+        <item >OSM Bus</item>-->
+        <item >Offline Map</item> <!-- <item >MapsForge</item>-->
+        <item >Mapnik</item>
+        <item >Google Roadmap</item>
+        <item >Google Satellite</item>
+        <item >Google Terrain</item>
+        <item >Microsoft Maps</item>
+        <item >Microsoft Earth</item>
+        <item >Microsoft Hybrid</item>
+        <!-- <item >Yahoo Roadmap</item> -->
+        <!-- <item >Yahoo Satellite</item> -->
+    </string-array>
+    
+    <string-array name="country_items">
+        <item >China</item>
+        <item >New Zealand</item>
+    </string-array>
+    <string-array name="country_code_items">
+        <item >cn</item>
+        <item >nz</item>
+    </string-array>
+    <string-array name="parking_items">
+        <item >1KM</item>
+        <item >2KM</item>
+        <item >5KM</item>
+        <item >My Car</item>
+    </string-array>
+    
+    <string-array name="whats_hot_items">
+        <item >Activity</item>
+        <item >Sale</item>
+    </string-array>
+    <!-- Nav Drawer List Item Icons -->
+    <!-- Keep them in order as the titles are in -->
+    <array name="nav_drawer_icons">
+        <item>@drawable/ic_empty</item>
+        <!-- <item>@drawable/ic_people</item>
+        <item>@drawable/ic_photos</item>
+        <item>@drawable/ic_communities</item>
+        <item>@drawable/ic_pages</item>
+        <item>@drawable/ic_whats_hot</item> -->
+    </array>
+     
+    <!-- Content Description -->
+    <string name="desc_list_item_icon">Item Icon</string>
+</resources>

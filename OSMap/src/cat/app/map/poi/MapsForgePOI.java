@@ -18,7 +18,8 @@ import android.util.Log;
 public class MapsForgePOI {
 	private static final String TAG = MapsForgePOI.class.getSimpleName();
 	MapDatabase mapDatabase;
-	List<String> tags = new ArrayList<String>();
+	List<String> tags = new ArrayList<String>();//amenity=parking
+	
 	List<String> highwayTags = new ArrayList<String>();
 	//amenity, building, highway(bus_stop,speed_camera),junction(roundabout), historic,leisure,shop,sport,tourism
 	
@@ -33,16 +34,16 @@ public class MapsForgePOI {
 	}
 	public void initTags(){
 		if(tags.size()==0){
-			tags.add("amenity");
-			tags.add("building");
+			//tags.add("amenity");  //amenity=parking
+			//tags.add("building");
 			//tags.add("highway");
-			tags.add("junction");
-			tags.add("historic");
-			tags.add("leisure");
-			tags.add("shop");
-			tags.add("sport");
-			tags.add("tourism");
-			highwayTags.add("bus_stop");
+			//tags.add("junction"); //junction=roundabout
+			//tags.add("historic");
+			//tags.add("leisure");
+			//tags.add("shop");
+			//tags.add("sport");
+			//tags.add("tourism");
+			//highwayTags.add("bus_stop");
 			highwayTags.add("speed_camera");
 		}
 	}
@@ -59,10 +60,11 @@ public class MapsForgePOI {
 	public List<PointOfInterest> filterPOI(List<PointOfInterest> POI){
 		List<PointOfInterest> l = new ArrayList<PointOfInterest>();
 		for(PointOfInterest p:POI){
-			if(tags.contains(p.tags.get(0).key)){
+			//if(tags.contains(p.tags.get(0).key)){
 				//if(!checkDuplicate(p,l))
-					l.add(p);
-			}else if(p.tags.get(0).key.equals("highway") && highwayTags.contains(p.tags.get(0).value)){
+				//	l.add(p);
+			//}else 
+				if(p.tags.get(0).key.equals("highway") && highwayTags.contains(p.tags.get(0).value)){
 				//if(!checkDuplicate(p,l))
 					l.add(p);
 			}

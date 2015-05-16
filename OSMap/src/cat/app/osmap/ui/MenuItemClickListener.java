@@ -28,7 +28,7 @@ public class MenuItemClickListener implements OnItemClickListener {
 			R.array.nav_type_items,
 			R.array.geocoder_type_items,
 			R.array.country_items,
-			R.array.on_road_items,
+			R.array.parking_items,
 			R.array.whats_hot_items
 			};
 	private static final String TAG = MenuItemClickListener.class.getSimpleName();

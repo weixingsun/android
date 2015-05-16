@@ -51,7 +51,7 @@ public class MapsForgeTileSourceOld extends BitmapTileSourceBase {
 	private XmlRenderTheme jobTheme;
 	private JobParameters jobParameters;
 	private DebugSettings debugSettings;
-	public MapsForgePOI poi;
+	//public MapsForgePOI poi;
 
 	// Required for the superclass
 	public static final string resourceId = ResourceProxy.string.offline_mode;
@@ -77,7 +77,7 @@ public class MapsForgeTileSourceOld extends BitmapTileSourceBase {
 			mapFile = null;
 		}
 		osm.offlineMapFile = mapFile;
-		poi = new MapsForgePOI(this.mapDatabase);
+		//poi = new MapsForgePOI(this.mapDatabase);
 		renderer = new DatabaseRenderer(mapDatabase);
 		minZoom = renderer.getStartZoomLevel();
 		maxZoom = renderer.getZoomLevelMax();
