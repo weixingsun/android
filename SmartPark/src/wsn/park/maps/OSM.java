@@ -48,7 +48,7 @@ import wsn.park.util.SavedOptions;
 
 public class OSM {
 	protected static final String tag = OSM.class.getSimpleName();
-	public DbHelper dbHelper;  
+	public DbHelper dbHelper;
 	public LOC loc = new LOC();
 	public Device dv = new Device();
 	public Activity act;
@@ -74,7 +74,7 @@ public class OSM {
 		this.dbHelper = DbHelper.getInstance(act);
 		SavedOptions.routingProvider = dbHelper.getSettings("Navigate");
 		SavedOptions.selectedTravelMode = dbHelper.getSettings("Travel");
-		String providerMenu = dbHelper.getSettings("Maps");
+		SavedOptions.selectedMap = dbHelper.getSettings("Maps");
 
 		rto = RuntimeOptions.getInstance(act);
         loc.init(act,this);
@@ -82,8 +82,12 @@ public class OSM {
 		ro = RouteOptions.getInstance(this);
 		mo.initTileSources(act);
 		genericMapView = (GenericMapView) act.findViewById(R.id.osmap);
-		String selectedMap = MapOptions.MAP_TILES.get(providerMenu);
+		String selectedMap = MapOptions.MAP_TILES.get(SavedOptions.selectedMap);
 		MapTileProviderBase mtpb = MapOptions.getTileProvider(selectedMap);//new MapTileProviderBasic(act.getApplicationContext());
+		if(mtpb==null){
+			mtpb = MapOptions.getTileProvider(MapOptions.MAP_MAPQUESTOSM);
+			SavedOptions.selectedMap = MapOptions.MAP_MAPQUESTOSM;
+		}
 		switchTileProvider=true;
 		setMap(mtpb);
 		mks=Markers.getInstance(this);
@@ -94,6 +98,7 @@ public class OSM {
 
 	}
 	public void setMap(MapTileProviderBase mtpb) {
+		if(mtpb==null) return;
 		genericMapView.setTileProvider(mtpb);
 		map = genericMapView.getMapView();
 		//Log.w(tag, "provider="+mtpb.getTileSource().name());
@@ -176,6 +181,7 @@ public class OSM {
 	public void startDownloadActivity(String fileName){
 		Toast.makeText(act, "You need download offline files", Toast.LENGTH_SHORT).show();
 		Intent intent = new Intent(act, wsn.park.ui.DownloadManagerUI.class);
+		Log.e(tag,"fileName="+fileName);
 		intent.putExtra("file", fileName);
 	    act.startActivity(intent);
 	}

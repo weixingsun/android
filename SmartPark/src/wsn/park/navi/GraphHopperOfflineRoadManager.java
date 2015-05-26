@@ -42,7 +42,7 @@ import android.util.Log;
 	offline routing class
  */
 public class GraphHopperOfflineRoadManager extends RoadManager {
-
+	
 	//protected static final String ROUTE_FILE_PATH = RouteOptions.GH_ROUTE_DATA_PATH;
 	public static final int STATUS_NO_ROUTE = Road.STATUS_TECHNICAL_ISSUE+1;
 
@@ -85,7 +85,7 @@ public class GraphHopperOfflineRoadManager extends RoadManager {
 		//hopper.load(path);
 	}
 
-	public GraphHopper getGraphHopper(String mode){
+	public GraphHopper getGraphHopper(String mode) throws IllegalStateException{
 		hopper = new GraphHopper().forMobile();
 		hopper.setCHEnable(false);
 		//hopper.setCHWeighting("");
@@ -96,7 +96,7 @@ public class GraphHopperOfflineRoadManager extends RoadManager {
 		return hopper;
 	}
 	@Override 
-	public Road getRoad(ArrayList<GeoPoint> waypoints) {
+	public Road getRoad(ArrayList<GeoPoint> waypoints) throws IllegalStateException{
 		start = waypoints.get(0);
 		end = waypoints.get(waypoints.size()-1);
 		GHRequest req = new GHRequest(start.getLatitude(),start.getLongitude(),end.getLatitude(),end.getLongitude());

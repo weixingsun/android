@@ -54,7 +54,12 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 		}
 		roadManager = Routers.getRoadManager(SavedOptions.routingProvider);
 		if(roadManager==null) return null;
-		road = roadManager.getRoad(ro.list);
+		
+		try{
+			road = roadManager.getRoad(ro.list);
+		}catch(IllegalStateException e){
+			return null;
+		}
 		if(road==null || road.mNodes==null) return null;
 		osm.loc.road = road;
 		osm.polyline = RoadManager.buildRoadOverlay(road, osm.act);
@@ -68,6 +73,11 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 	}
 	@Override
     protected void onPostExecute(Polyline pl) {
+		if(pl == null){
+			//Toast.makeText(osm.act, "Please download new version routes files ", Toast.LENGTH_LONG).show();
+			osm.startDownloadActivity(RouteOptions.getRouteDownloadFileShortName());
+			return;
+		}
 		osm.mks.removeAllRouteMarkers();
 		osm.mks.removePrevPolyline();
 		if(road==null) return;

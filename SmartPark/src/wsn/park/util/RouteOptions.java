@@ -24,6 +24,7 @@ public class RouteOptions {
 	GeoPoint dest;
 	//GraphHopperRouter
 	//public static String GH_ROUTE_DATA_PATH = SavedOptions.GH_ROUTE_DATA_PATH;
+	//http://www.androidmaps.co.uk/maps/australia-oceania/new-zealand.zip
 	public static String GH_ROUTE_URL = "http://servicedata.vhostall.com/route/";	//nz.zip
 	public static final String OSM = "OSM";
 	public static final String GOOGLE = "Google";
@@ -47,11 +48,11 @@ public class RouteOptions {
 			SavedOptions.routingProvider=OSM;
 		}else{
 			SavedOptions.routingProvider = value;
-			if(getRouteFileFullName()==null){ //
+			if(getRouteFileFullName()==null){
 				osm.startDownloadActivity(getRouteDownloadFileShortName());
 			}
 		}
-		Log.w(TAG, "name="+value+",FullName="+getRouteFileFullName());
+		//Log.w(TAG, "name="+value+",FullName="+getRouteFileFullName());
 	}
 	public static String getRouteFileFullName(){
 		String routeFileName = null;

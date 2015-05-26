@@ -220,11 +220,12 @@ public class DownloadManagerUI extends BaseActivity {
                 	//Log.e(tag, "file="+DOWNLOAD_FILE_NAME);
                     // if download successful, unzip
                     if(DOWNLOAD_FILE_NAME.endsWith(".zip")){
-                    	//Log.e(tag, "zip="+DOWNLOAD_FILE_NAME);
+                    	Log.e(tag, "DOWNLOAD_FILE_NAME="+DOWNLOAD_FILE_NAME);
                     	//String countryCode = DOWNLOAD_FILE_NAME.split("\\.")[0];
                     	String folderName = Environment.getExternalStoragePublicDirectory(DOWNLOAD_FOLDER_NAME).getAbsolutePath();
                     	String zipFile = folderName +"/"+ DOWNLOAD_FILE_NAME;
-                    	String unzipLocation = folderName +"/";
+                    	Log.e(tag, "zipFile="+zipFile);
+                    	String unzipLocation = folderName +"/"+COUNTRY_CODE;
                     	//Log.e(tag, "unzipping: "+zipFile+", folder="+unzipLocation);
                     	ZIP d = new ZIP(zipFile, unzipLocation);
                     	d.unzip();

@@ -41,7 +41,7 @@ public class MapOptions {
 
 	static String path = SavedOptions.sdcard + "/"
 			+ SavedOptions.MAPSFORGE_FILE_PATH;
-
+	//public static String MF_ROUTE_URL = "http://www.androidmaps.co.uk/maps/australia-oceania/new-zealand.zip";
 	public static String MF_ROUTE_URL = "http://servicedata.vhostall.com/map/"; // nz.map
 	public static final String URL_MAPSFORGE_WEB = "http://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/";
 	public static final String URL_MAPSFORGE_FTP = "ftp-stud.hs-esslingen.de";
@@ -118,14 +118,15 @@ public class MapOptions {
 	}
 
 	public static void move() {
-		if(osm.loc.myPos==null) return;
+		if(osm.loc.myPos==null || osm.mks.myLocMarker ==null) return;
 		GeoPoint gp = new GeoPoint(osm.loc.myPos);
 		osm.mks.myLocMarker.setPosition(gp);
 		move(gp);
 	}
 
 	public static void move(GeoPoint loc) {
-		osm.move(loc);
+		if(loc!=null)
+			osm.move(loc);
 	}
 
 	public void initTileSources(Activity act) {
