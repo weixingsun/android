@@ -34,6 +34,15 @@ public class Geocoders {
 		}
 		return list;
 	}
+	public List<Address> getFromLocationNameGoogleAPI(String name){
+		List<Address> list = null;
+		try {
+			list = GoogleAPISearchByAddress.search(name);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
 	public List<Address> getFromLocationName(String provider, String name){
 		this.provider = provider;
 		List<Address> list = null;
@@ -84,7 +93,7 @@ public class Geocoders {
 				return gg.getFromLocation(lat, lng, 1).get(0);
 			}*/
 			case GeoOptions.MAPQUEST: {
-				com.mapquest.android.Geocoder gc = new com.mapquest.android.Geocoder(act); 
+				com.mapquest.android.Geocoder gc = new com.mapquest.android.Geocoder(act);
 				return gc.getFromLocation(lat, lng, 1).get(0);
 			}
 			default: 

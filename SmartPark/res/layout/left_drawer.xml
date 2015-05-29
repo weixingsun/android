@@ -5,8 +5,7 @@
     android:baselineAligned="false">
     
 	<LinearLayout
-           android:layout_width="0dp"
-           android:layout_weight=".4"
+           android:layout_width="match_parent"
            android:layout_height="match_parent"
            android:background="#0000FF"
            android:orientation="vertical">
@@ -16,7 +15,7 @@
                android:layout_height="30dp"
                android:background="#000000"
                android:gravity="center"
-               android:text="@string/settings"
+               android:text="@string/user_register_login"
                android:textSize="20sp" />
 
            <ListView
@@ -26,7 +25,7 @@
                android:background="#000000"
                android:choiceMode="singleChoice"/>
 	</LinearLayout>
-	<LinearLayout
+	<!-- <LinearLayout
            android:layout_width="0dp"
            android:layout_weight=".6"
            android:layout_height="match_parent"
@@ -48,5 +47,5 @@
                android:background="#888888"
                android:choiceMode="singleChoice" >
            </ListView>
-       </LinearLayout>
+       </LinearLayout> -->
 </LinearLayout>

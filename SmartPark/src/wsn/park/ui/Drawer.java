@@ -1,5 +1,6 @@
 package wsn.park.ui;
 
+import wsn.park.MainActivity;
 import wsn.park.R;
 import wsn.park.util.SavedOptions;
 import android.app.Activity;
@@ -28,7 +29,7 @@ public class Drawer {
     private DrawerLayout mDrawerLayout;
     private Activity act;
     
-	public void init(Activity act) {
+	public void init(MainActivity act) {
 		this.act=act;
 		//Log.w(tag, "init drawer");
 		mMainSettings = act.getResources().getStringArray(R.array.menu_items);

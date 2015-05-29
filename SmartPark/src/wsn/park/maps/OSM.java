@@ -72,9 +72,10 @@ public class OSM {
 	public void init(Activity act) {
 		this.act = act;
 		this.dbHelper = DbHelper.getInstance(act);
-		SavedOptions.routingProvider = dbHelper.getSettings("Navigate");
-		SavedOptions.selectedTravelMode = dbHelper.getSettings("Travel");
-		SavedOptions.selectedMap = dbHelper.getSettings("Maps");
+		SavedOptions.selectedBy = dbHelper.getSettings(SavedOptions.BY);
+		SavedOptions.selectedMap = dbHelper.getSettings(SavedOptions.MAP);
+		SavedOptions.selectedGeo = dbHelper.getSettings(SavedOptions.GEO);
+		SavedOptions.selectedNavi = dbHelper.getSettings(SavedOptions.NAVI);
 
 		rto = RuntimeOptions.getInstance(act);
         loc.init(act,this);
@@ -86,6 +87,7 @@ public class OSM {
 		MapTileProviderBase mtpb = MapOptions.getTileProvider(selectedMap);//new MapTileProviderBasic(act.getApplicationContext());
 		if(mtpb==null){
 			mtpb = MapOptions.getTileProvider(MapOptions.MAP_MAPQUESTOSM);
+			Log.e(tag, "no map found "+SavedOptions.selectedMap+", use OSM");
 			SavedOptions.selectedMap = MapOptions.MAP_MAPQUESTOSM;
 		}
 		switchTileProvider=true;
@@ -120,7 +122,7 @@ public class OSM {
 			@Override
 			public boolean onScroll(ScrollEvent arg0) {
 				BoundingBoxE6 box = arg0.getSource().getBoundingBox();
-				Log.i(tag, "onScroll="+box);
+				//Log.i(tag, "onScroll="+box);
 				mks.showHidePOIs();
 				return false;
 			}
@@ -148,7 +150,7 @@ public class OSM {
 	public void move(GeoPoint gp) {
 		mapController.animateTo(gp);
 		//mapController.setCenter(gp);
-		Log.i(tag, "moved to my location: ");
+		//Log.i(tag, "moved to my location: ");
 	}
 	public void move() {
 		if(loc.myPos==null) return;
@@ -184,6 +186,17 @@ public class OSM {
 		Log.e(tag,"fileName="+fileName);
 		intent.putExtra("file", fileName);
 	    act.startActivity(intent);
+	}
+	public void startSettingsActivity(){
+		//Toast.makeText(act, "starting settings", Toast.LENGTH_SHORT).show();
+		Intent intent = new Intent(act, wsn.park.ui.SettingsActivity.class);
+		//Log.e(tag,"fileName="+fileName);
+		//intent.putExtra("file", fileName);
+	    act.startActivity(intent);
+	}
+	public void startMyPlacesActivity() {
+		Intent intent = new Intent(act, wsn.park.ui.MyPlacesActivity.class);
+		act.startActivity(intent);
 	}
 	public BoundingBoxE6 getBoundary(){
 		 return map.getBoundingBox();

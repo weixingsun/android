@@ -21,12 +21,24 @@ public class SavedOptions {
 	public static String GH_ROUTE_DATA_NAME = "edges";  //geometry/locationIndex/names/nodes/properties
 	public static String GH_ROUTE_DATA_ZIP_EXT = ".zip";
 	//default=Open Street Map
-	public static String selectedMap = MapOptions.MAP_MAPQUESTOSM;
-	public static String selectedTravelMode = "Fast";
+	public static String selectedBy;
+	public static String selectedMap;
+	public static String selectedGeo;
+	public static String selectedNavi;
 	public static String selectedCountry = "China";
-	public static String routingProvider = RouteOptions.OSM;		//navigation
-	public static String geocodingProvider = routingProvider;		//navigation
+	public static String geocodingProvider = selectedNavi;		//navigation
 	private static String selectedOnRoad = "Police";
+
+	public static final String BY   = "Maps";
+	public static final String MAP  = "Travel";
+	public static final String GEO  = "Geocoder";
+	public static final String NAVI = "Navigate";
+	
+	public static final String MYPLACES = "My Places";
+	public static final String HISTORY = "History";
+	public static final String PARKING = "Parking";
+	public static final String SETTINGS = "Settings";
+	
 	//public static String countryCode = null;
 	public static LinkedHashMap<String, String> COUNTRIES = new LinkedHashMap<String,String>();
 
@@ -81,11 +93,11 @@ public class SavedOptions {
 		switch(settingsName){
 		case "Maps": subsettingsSelectedName = SavedOptions.selectedMap;
 				break;
-		case "Travel": subsettingsSelectedName = SavedOptions.selectedTravelMode;
+		case "Travel": subsettingsSelectedName = SavedOptions.selectedBy;
 				break;
 		case "Country": subsettingsSelectedName = SavedOptions.selectedCountry;
 				break;
-		case "Navigate": subsettingsSelectedName = SavedOptions.routingProvider;
+		case "Navigate": subsettingsSelectedName = SavedOptions.selectedNavi;
 				break;
 		case "On Road": subsettingsSelectedName = SavedOptions.selectedOnRoad ;
 				break;

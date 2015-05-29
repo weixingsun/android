@@ -127,7 +127,7 @@ public class GoogleSearchByAddressNameTask extends
     @Override  
     protected void onPreExecute() {
         client = new DefaultHttpClient();  
-        client.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 15000);  
+        client.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 15000);
         client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT,15000);  
         super.onPreExecute();
     }  

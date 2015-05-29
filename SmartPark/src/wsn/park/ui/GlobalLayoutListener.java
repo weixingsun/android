@@ -14,7 +14,7 @@ public class GlobalLayoutListener implements OnGlobalLayoutListener{
 	}
 	@Override
     public void onGlobalLayout() {
-		Log.i(tag, "onGlobalLayout");
+		//Log.i(tag, "onGlobalLayout");
     	if(osm.switchTileProvider){
     		osm.move();//make sure setCenter() is called after mapview is loaded.
     		//osm.mapView.getOverlays().remove(mini);

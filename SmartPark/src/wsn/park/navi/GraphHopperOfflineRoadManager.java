@@ -119,8 +119,8 @@ public class GraphHopperOfflineRoadManager extends RoadManager {
 		req.setAlgorithm(AlgorithmOptions.DIJKSTRA_BI);
 		String vehicle = null;
 		String weighting = null;
-		if(RouteOptions.GH_TRAVEL_MODES.containsKey(SavedOptions.selectedTravelMode)){ //Bus not supported yet
-			String value = RouteOptions.GH_TRAVEL_MODES.get(SavedOptions.selectedTravelMode);
+		if(RouteOptions.GH_TRAVEL_MODES.containsKey(SavedOptions.selectedBy)){ //Bus not supported yet
+			String value = RouteOptions.GH_TRAVEL_MODES.get(SavedOptions.selectedBy);
 			vehicle = value.split(",")[0];
 			req.setVehicle(vehicle);
 			weighting = value.split(",")[1];
@@ -147,7 +147,7 @@ public class GraphHopperOfflineRoadManager extends RoadManager {
 			node.mLength = hint.getDistance()/1000;
 			node.mDuration = hint.getTime()/1000;
 			node.mManeuverType = getManeuverCode(hint.getSign());
-			Log.e(tag, "Instruction.sign="+hint.getSign());
+			//Log.e(tag, "Instruction.sign="+hint.getSign());
 			String ann = hint.getAnnotation().getImportance()+": "+hint.getAnnotation().getMessage();
 			node.mInstructions = hint.getName()+" , "+ann;
 			road.mNodes.add(node);

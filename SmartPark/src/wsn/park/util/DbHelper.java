@@ -1,10 +1,16 @@
 package wsn.park.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import wsn.park.map.markers.SavedPlace;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.location.Address;
 import android.location.Location;
 import android.util.Log;
 
@@ -208,5 +214,19 @@ import android.util.Log;
 	    		this.updateSettings(name, value);
 	    	}
 	    }
-	    
+	    //id, name, admin, lat,lng, machine_code, user_name
+		public List<SavedPlace> getSavedPlaces() {
+			List<SavedPlace> list = new ArrayList<SavedPlace>();
+			//
+			return list;
+		}
+		public String[] getSavedPlaceNames() {
+			List<String> list_name = new ArrayList<String>();
+			for(SavedPlace addr : getSavedPlaces()){
+				list_name.add(addr.getName()); //feature_name
+				//addr.getAdmin();
+			}
+			String[] stringArray = list_name.toArray(new String[list_name.size()]);
+			return stringArray;
+		}
 	}

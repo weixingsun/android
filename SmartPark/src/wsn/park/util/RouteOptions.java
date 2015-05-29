@@ -45,9 +45,9 @@ public class RouteOptions {
 	}
 	public static void changeRouteProvider(String value) {
 		if(!ROUTERS.containsValue(value)) {
-			SavedOptions.routingProvider=OSM;
+			SavedOptions.selectedNavi=OSM;
 		}else{
-			SavedOptions.routingProvider = value;
+			SavedOptions.selectedNavi = value;
 			if(getRouteFileFullName()==null){
 				osm.startDownloadActivity(getRouteDownloadFileShortName());
 			}
