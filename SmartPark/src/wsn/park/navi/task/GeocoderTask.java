@@ -10,6 +10,7 @@ import org.osmdroid.util.GeoPoint;
 import wsn.park.LOC;
 import wsn.park.maps.OSM;
 import wsn.park.util.GeoOptions;
+import wsn.park.util.SavedOptions;
 
 import android.location.Address;
 import android.os.AsyncTask;
@@ -20,29 +21,29 @@ public class GeocoderTask extends
         AsyncTask<String, Void, String> {
     private static final String TAG = GeocoderTask.class.getSimpleName();
     Geocoders gc;
-    String mode = null;
     String purpose;
     OSM osm;
-    String searchByPoint = "point";
+    String searchBy ;
     GeoPoint position;
     Address foundAddr;
-    String searchByName = "name";
+    String ByPoint = "point";
+    String ByName = "name";
     String address;
     List<Address> list;
-    String provider = GeoOptions.getGeocoder();
+    String provider = SavedOptions.selectedGeo;
     
     public GeocoderTask(OSM osm,String address) {
     	this.address=address;
     	this.osm = osm;
     	gc = new Geocoders(osm.act);
-        this.mode = searchByName;
+        this.searchBy = ByName;
     }
     public GeocoderTask(OSM osm,GeoPoint position) {
     	this.position=position;
     	this.osm = osm;
     	gc = new Geocoders(osm.act);
     	//this.type = type;
-        this.mode = searchByPoint;
+        this.searchBy = ByPoint;
     }
     public GeocoderTask(OSM osm, GeoPoint point, String purpose) {
 		this(osm,point);
@@ -50,12 +51,12 @@ public class GeocoderTask extends
 	}
 	@Override  
     public String doInBackground(String... params) {
-    	if(mode.equals(searchByName)){
+    	if(searchBy.equals(ByName)){
 			//list = gc.getFromLocationName(provider,this.address);
-    		list = gc.getFromLocationNameGoogle(this.address);
+    		list = gc.getFromLocationName(provider,this.address);
     		//GoogleSearchByAddressNameTask task = new GoogleSearchByAddressNameTask(osm,this.address);
 			//task.execute();
-		}else if (mode.equals(searchByPoint)){
+		}else if (searchBy.equals(ByPoint)){
 			foundAddr = gc.getFromLocation(provider,position);
 			//Log.i(TAG, provider+",foundAddr="+foundAddr);
 		}
@@ -65,7 +66,7 @@ public class GeocoderTask extends
     @Override  
     protected void onPostExecute(String ret) {
         super.onPostExecute(ret);
-        if(mode.equals(searchByName)){
+        if(searchBy.equals(ByName)){
         	if(list!=null && list.size()>0){
         		osm.dv.fillList(list);
         		osm.suggestPoints = list;
@@ -73,7 +74,7 @@ public class GeocoderTask extends
     		//activity.map.updateMarker(marker,foundPoint);
     		//activity.map.activity.openPopup(marker,type);
     		//activity.map.addRouteMarker(foundPoint);
-        }else if(mode.equals(searchByPoint)){
+        }else if(searchBy.equals(ByPoint)){
     		if(LOC.countryCode == null){
     			if(foundAddr!=null)
     				LOC.countryCode=foundAddr.getCountryCode();

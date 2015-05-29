@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.location.Address;
 import android.speech.RecognizerIntent;
 import android.text.Editable;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnKeyListener;
@@ -40,6 +41,7 @@ public class Device {
 	EditText inputAddress;
 	ListView listVoice;
 	ListView listSuggest;
+	private String tag=Device.class.getSimpleName();
 	public void init(Activity act, OSM osm){
 		this.act=act;
 		this.osm=osm;
@@ -150,7 +152,23 @@ public class Device {
 	    private ArrayList<Map<String, String>> buildData(List<Address> addrs) {
 	        ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
 	        for(Address a:addrs){
-	        	list.add(putData(a.getFeatureName()+", "+a.getThoroughfare()+", "+a.getLocality()+", "+a.getCountryName()));
+	        	String display = "";
+	        	if(a.getExtras() != null){//Nominatim
+	        		String display1=a.getExtras().get("display_name").toString();
+	        		if(display1!=null ) display = display1;
+	        	}else{
+	        		/*if(a.getFeatureName() != null){//Google
+			        	String feature = a.getFeatureName();
+			        	String admin = a.getSubAdminArea()==null?a.getAdminArea():a.getSubAdminArea();
+			        	String road = a.getThoroughfare()==null?a.getAddressLine(1):a.getThoroughfare();
+			        	
+	        		}*/
+	        		display=a.getAddressLine(0)+", "+a.getAddressLine(1)+", "+a.getAddressLine(2)+", "+a.getCountryName();
+        			
+	        	}
+	        	Log.w(tag, a.toString());
+	        	list.add(putData(display));
+	        	
 	        }
 	        return list;
 	      }

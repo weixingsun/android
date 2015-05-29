@@ -120,13 +120,17 @@ public class SettingsActivity extends BaseActivity {
 		String text_geo = sp_geo.getSelectedItem().toString();
 		String text_map = sp_map.getSelectedItem().toString();
 		String text_navi = sp_navi.getSelectedItem().toString();
-		//String prev_map = dbHelper.getSettings(SavedOptions.MAP);
+		String prev_map = SavedOptions.selectedMap; //dbHelper.getSettings(SavedOptions.MAP);
 		dbHelper.changeSettings(SavedOptions.MAP, text_map);
 		dbHelper.changeSettings(SavedOptions.BY, text_by);
 		dbHelper.changeSettings(SavedOptions.NAVI, text_navi);
 		dbHelper.changeSettings(SavedOptions.GEO, text_geo);
-		//if(!prev_map.equals(text_map))
+		if(!prev_map.equals(text_map))
 		MapOptions.changeTileProvider(MapOptions.MAP_TILES.get(text_map));
+		SavedOptions.selectedMap = text_map;
+		SavedOptions.selectedGeo = text_geo;
+		SavedOptions.selectedBy = text_by;
+		SavedOptions.selectedNavi = text_navi;
 		finish();
 	}
 	private void exit(){

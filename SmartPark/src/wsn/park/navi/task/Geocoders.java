@@ -25,7 +25,7 @@ public class Geocoders {
 	public Geocoders(Activity act) {
 		this.act = act;
 	}
-	public List<Address> getFromLocationNameGoogle(String name){
+	/*public List<Address> getFromLocationNameGoogle(String name){
 		List<Address> list = null;
 		try {
 			list = (new android.location.Geocoder(act)).getFromLocationName(name, 3);
@@ -33,7 +33,7 @@ public class Geocoders {
 			e.printStackTrace();
 		}
 		return list;
-	}
+	}*/
 	public List<Address> getFromLocationNameGoogleAPI(String name){
 		List<Address> list = null;
 		try {
@@ -46,16 +46,19 @@ public class Geocoders {
 	public List<Address> getFromLocationName(String provider, String name){
 		this.provider = provider;
 		List<Address> list = null;
+		Log.i(tag, "GeoFromName."+provider);
 		try{
 		switch(provider){
 			case GeoOptions.GOOGLE: {
 				android.location.Geocoder gc = new android.location.Geocoder(act);
 				list = gc.getFromLocationName(name, 3);
+				break;
 			}
-			case GeoOptions.OFFLINE:	//use OSM temporary
+			//case GeoOptions.OFFLINE:	//not available
 			case GeoOptions.OSM: {
 				org.osmdroid.bonuspack.location.GeocoderNominatim gn = new org.osmdroid.bonuspack.location.GeocoderNominatim(act);  //nominatim.openstreetmap.org/
 				list = gn.getFromLocationName(name, 3);
+				break;
 			}
 			/*case GeoOptions.GISGRAPHY: {
 				com.gisgraphy.gisgraphoid.GisgraphyGeocoder gg = new com.gisgraphy.gisgraphoid.GisgraphyGeocoder(act); 
@@ -64,9 +67,10 @@ public class Geocoders {
 			case GeoOptions.MAPQUEST: {
 				com.mapquest.android.Geocoder gg = new com.mapquest.android.Geocoder(act);
 				list = gg.getFromLocationName(name, 3);
+				break;
 			}
 			default: 
-				Log.i(tag, "default geocoder ?");
+				Log.i(tag, "default geocoder ?"+provider);
 		}
 		}catch(IOException e){
 			Log.i(tag, "IOException"+e.getMessage());
@@ -77,13 +81,14 @@ public class Geocoders {
 		this.provider = provider;
 		double lat = position.getLatitude();
 		double lng = position.getLongitude();
+		Log.i(tag, "GeoFromLocation."+provider);
 		try{
 		switch(provider){
 			case GeoOptions.GOOGLE: {
 				android.location.Geocoder gc = new android.location.Geocoder(act); 
 				return gc.getFromLocation(lat,lng, 1).get(0);
 			}
-			case GeoOptions.OFFLINE:	//use OSM temporary
+			case GeoOptions.OFFLINE:	//not available
 			case GeoOptions.OSM: {
 				org.osmdroid.bonuspack.location.GeocoderNominatim gn = new org.osmdroid.bonuspack.location.GeocoderNominatim(act); 
 				return gn.getFromLocation(lat,lng, 1).get(0);

@@ -195,7 +195,7 @@ import android.util.Log;
 	        cv.put("name", name);
 	        cv.put("value", value);
 	        long row=db.insert(SETTINGS_TABLE, null, cv);
-	        Log.w(TAG, "insertSettings.row="+row);
+	        Log.w(TAG, "insertSettings:"+name+"="+value);
 	        return row;
 	    }
 	    private void updateSettings(String name, String value) {
@@ -206,6 +206,7 @@ import android.util.Log;
 	        ContentValues cv=new ContentValues();
 	        cv.put("value", value);
 	        db.update(SETTINGS_TABLE, cv, where, whereValue);
+	        Log.w(TAG, "updateSettings:"+name+"="+value);
 	    }
 	    public void changeSettings(String name, String value){
 	    	if(getSettings(name)==null){

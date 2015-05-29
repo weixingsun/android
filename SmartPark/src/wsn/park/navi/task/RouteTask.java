@@ -73,7 +73,7 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 	}
 	@Override
     protected void onPostExecute(Polyline pl) {
-		if(pl == null){
+		if(pl == null && SavedOptions.selectedNavi.equals(RouteOptions.OFFLINE)){
 			//Toast.makeText(osm.act, "Please download new version routes files ", Toast.LENGTH_LONG).show();
 			osm.startDownloadActivity(RouteOptions.getRouteDownloadFileShortName());
 			return;

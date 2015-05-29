@@ -25,9 +25,9 @@ public class SavedOptions {
 	public static String selectedMap;
 	public static String selectedGeo;
 	public static String selectedNavi;
-	public static String selectedCountry = "China";
-	public static String geocodingProvider = selectedNavi;		//navigation
-	private static String selectedOnRoad = "Police";
+	//public static String selectedCountry = "China";
+	//public static String geocodingProvider = selectedNavi;		//navigation
+	//private static String selectedOnRoad = "Police";
 
 	public static final String BY   = "Maps";
 	public static final String MAP  = "Travel";
@@ -40,18 +40,18 @@ public class SavedOptions {
 	public static final String SETTINGS = "Settings";
 	
 	//public static String countryCode = null;
-	public static LinkedHashMap<String, String> COUNTRIES = new LinkedHashMap<String,String>();
+	/*public static LinkedHashMap<String, String> COUNTRIES = new LinkedHashMap<String,String>();
 
 	static{
 		COUNTRIES.put("China", "cn");
 		COUNTRIES.put("New Zealand", "nz");
 	}
 	public void init(Activity activity){
-		/*String[] countries = activity.getResources().getStringArray(R.array.country_items);
+		String[] countries = activity.getResources().getStringArray(R.array.country_items);
 		String[] codes = activity.getResources().getStringArray(R.array.country_code_items);
 		for(int i=0;i<countries.length;i++){
 			COUNTRIES.put(countries[i], codes[i]);
-		}*/
+		}
 		String[] mainMenu = activity.getResources().getStringArray(R.array.menu_items);
 		
 	}
@@ -95,8 +95,6 @@ public class SavedOptions {
 				break;
 		case "Travel": subsettingsSelectedName = SavedOptions.selectedBy;
 				break;
-		case "Country": subsettingsSelectedName = SavedOptions.selectedCountry;
-				break;
 		case "Navigate": subsettingsSelectedName = SavedOptions.selectedNavi;
 				break;
 		case "On Road": subsettingsSelectedName = SavedOptions.selectedOnRoad ;
@@ -104,5 +102,5 @@ public class SavedOptions {
 		}
 		//Log.i(tag, "getSubsettingsSelectedMenuName="+settingsName);
 		return subsettingsSelectedName;
-	}
+	}*/
 }

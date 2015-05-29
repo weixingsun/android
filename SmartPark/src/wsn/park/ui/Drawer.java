@@ -49,7 +49,7 @@ public class Drawer {
 		mDrawerLayout.openDrawer(Gravity.LEFT);	//Gravity.TOP / Gravity.BOTTOM
 	}
 
-	public void show(String name){
+	/*public void show(String name){
 		mDrawerLayout.openDrawer(Gravity.LEFT);	//Gravity.TOP / Gravity.BOTTOM
 		ListView settings = (ListView) this.act.findViewById(R.id.left_drawer_parent);
 		int order = SavedOptions.getMainMenuIndex(name, act);
@@ -57,5 +57,5 @@ public class Drawer {
 		//settings.setItemChecked(order, true);
 		//settings.getAdapter().getView(order, null, null).performClick();
 		settings.performItemClick(settings.getAdapter().getView(order, null, null), order, settings.getAdapter().getItemId(order));
-	}
+	}*/
 }

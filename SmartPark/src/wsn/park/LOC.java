@@ -72,7 +72,7 @@ public class LOC implements LocationListener {
 				countryCode = dbHelper.getCountryCode();
 				if(countryCode==null){
 					//show supported country list in left drawer
-					dr.show("Country");
+					//dr.show("Country");
 				}
 			}
 		}

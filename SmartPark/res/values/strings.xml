@@ -42,10 +42,10 @@
         <item >Help</item>
     </string-array>
     <string-array name="geo_items">
-        <!--<item >OSM</item>-->
         <item >Google</item>
-        <!--<item >MapQuest</item>
-        <item >Offline Route</item>
+        <item >Nominatim</item>
+        <item >MapQuest</item>
+        <!--<item >Offline Route</item>
         <item >GraphHopper</item>-->
     </string-array>
         <string-array name="navi_items">
