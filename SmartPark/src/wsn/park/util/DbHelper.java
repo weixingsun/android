@@ -206,7 +206,7 @@ import android.util.Log;
 	        ContentValues cv=new ContentValues();
 	        cv.put("value", value);
 	        db.update(SETTINGS_TABLE, cv, where, whereValue);
-	        Log.w(TAG, "updateSettings:"+name+"="+value);
+	        //Log.w(TAG, "updateSettings:"+name+"="+value);
 	    }
 	    public void changeSettings(String name, String value){
 	    	if(getSettings(name)==null){

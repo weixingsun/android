@@ -65,10 +65,10 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 		osm.polyline = RoadManager.buildRoadOverlay(road, osm.act);
 		osm.polyline.setWidth(10);
 		osm.polyline.setColor(RouteOptions.getColor());
-		if(roadManager.getEndAddress()!=null){
+		/*if(roadManager.getEndAddress()!=null){
 			osm.startAddr=roadManager.getStartAddress();
 			osm.endAddr=roadManager.getEndAddress();
-		}
+		}*/
 		return osm.polyline;
 	}
 	@Override

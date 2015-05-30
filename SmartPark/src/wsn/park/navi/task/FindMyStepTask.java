@@ -98,7 +98,8 @@ protected Float doInBackground(GeoPoint... params) {
 private void playHintSounds(int index) {
 	if(index<osm.loc.road.mNodes.size()-1){
 		//RoadNode nextNode = osm.loc.road.mNodes.get(osm.loc.currIndex+1);
-		if(this.toCurrent>SavedOptions.GPS_TOLERANCE && this.toPrev>SavedOptions.GPS_TOLERANCE){
+		//if(this.toCurrent>SavedOptions.GPS_TOLERANCE && this.toPrev>SavedOptions.GPS_TOLERANCE){
+		if(this.toCurrent<SavedOptions.VOICE_DISTANCE){
 			//if(this.toCurrent>200 && this.toCurrent < 500) return;
 			marker.setTitle("in "+this.toCurrent+" m, "+this.currNode.mInstructions);
 			BigDecimal bd = new BigDecimal(this.toCurrent).setScale(-2, BigDecimal.ROUND_HALF_UP);  //Õû°Ù

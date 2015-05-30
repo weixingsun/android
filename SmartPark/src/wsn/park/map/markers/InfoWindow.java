@@ -7,18 +7,19 @@ public class InfoWindow {
 	private static final String tag = InfoWindow.class.getSimpleName();
 
 	public static int getIconByManeuver(int mId){
+		String turn = null;
 		switch(mId){
 		case Maneuver.EXIT_LEFT:
-		case Maneuver.LEFT:			return R.drawable.ic_turn_left;
+		case Maneuver.LEFT:			turn="left";return R.drawable.ic_turn_left;
 		case Maneuver.SLIGHT_LEFT:	return R.drawable.ic_slight_left;
 		case Maneuver.SHARP_LEFT:   return R.drawable.ic_sharp_left;
 		case Maneuver.EXIT_RIGHT:
-		case Maneuver.RIGHT:    return R.drawable.ic_turn_right;
+		case Maneuver.RIGHT:    	turn="right";return R.drawable.ic_turn_right;
 		case Maneuver.SLIGHT_RIGHT:   return R.drawable.ic_slight_right;
 		case Maneuver.SHARP_RIGHT:    return R.drawable.ic_sharp_right;
 		
 		case Maneuver.STRAIGHT:		return R.drawable.ic_continue;
-		case Maneuver.DESTINATION:	return R.drawable.ic_empty;
+		case Maneuver.DESTINATION:	return R.drawable.ic_arrived;
 		case Maneuver.ROUNDABOUT1:  return R.drawable.ic_roundabout_1;
 		case Maneuver.ROUNDABOUT2:  return R.drawable.ic_roundabout_2;
 		case Maneuver.ROUNDABOUT3:  

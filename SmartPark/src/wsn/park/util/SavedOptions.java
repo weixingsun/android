@@ -11,6 +11,7 @@ import wsn.park.R;
 public class SavedOptions {
 	private static final String tag = SavedOptions.class.getSimpleName();
 	public static final int GPS_TOLERANCE = 30;
+	public static final int VOICE_DISTANCE = 100;
 	public static String sdcard = Environment.getExternalStorageDirectory().getPath();
 	public static String MAPSFORGE_FILE_URL = "http://servicedata.vhostall.com/map/"; // + nz.map
 	public static String GH_ROUTE_DATA_URL = "http://servicedata.vhostall.com/route/"; // + nz.zip
@@ -25,9 +26,12 @@ public class SavedOptions {
 	public static String selectedMap;
 	public static String selectedGeo;
 	public static String selectedNavi;
-	//public static String selectedCountry = "China";
-	//public static String geocodingProvider = selectedNavi;		//navigation
-	//private static String selectedOnRoad = "Police";
+
+	//Navi option
+	public static final String OSM = "OSM";
+	public static final String Google = "Google";
+	public static final String MapQuest = "MapQuest";
+	public static final String Graphopper = "Offline Route";
 
 	public static final String BY   = "Maps";
 	public static final String MAP  = "Travel";

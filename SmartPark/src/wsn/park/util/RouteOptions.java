@@ -15,6 +15,7 @@ import com.graphhopper.routing.util.EncodingManager;
 import android.graphics.Color;
 import android.os.Environment;
 import android.util.Log;
+import android.util.SparseArray;
 
 
 
@@ -171,6 +172,87 @@ public class RouteOptions {
 	    default:      return -1;
 	    }
 	}
+	/** mapping from GraphHopper directions to MapQuest maneuver IDs: */
+	//static final HashMap<Integer, Integer> GH_MANEUVERS;
+	static final SparseArray<Integer> GH_MANEUVERS = new SparseArray<Integer>();
+	//convert Graphhopper maneuver to MapQuest
+	static {
+		GH_MANEUVERS.put(-3, 5); //Sharp_Left(-3) = Sharp_Left(5)
+		GH_MANEUVERS.put(-2, 4); //Left(-2) = Left(4)
+		GH_MANEUVERS.put(-1, 3); //Slight_Left(-1) = Slight_Left(3)
+		GH_MANEUVERS.put(0, 1);  //Continue(0) = Straight(1)
+		GH_MANEUVERS.put(1, 6);  //Slight_Right(1) = Slight_Right(6)
+		GH_MANEUVERS.put(2, 7);  //Right(2) = Right(7)
+		GH_MANEUVERS.put(3, 8);  //Sharp_Right(3) = Sharp_Right(8)
+		GH_MANEUVERS.put(4, 24); //Arrived(4) = DESTINATION(24)
+		//MANEUVERS.put(4, 25); //Arrived(4) = DESTINATION_LEFT(25)
+		//MANEUVERS.put(4, 26); //Arrived(4) = DESTINATION_LEFT(26)
+		GH_MANEUVERS.put(6, 27); //UseRoundabout(6) = ROUNDABOUT1(27)
+		//MANEUVERS.put(6, 28); //UseRoundabout(6) = ROUNDABOUT2(28)
+	}
+	/*
+	// graphhopper maneuver
+	public static final int LEAVE_ROUNDABOUT = -6; // for future use
+	public static final int TURN_SHARP_LEFT = -3;
+	public static final int TURN_LEFT = -2;
+	public static final int TURN_SLIGHT_LEFT = -1;
+	public static final int CONTINUE_ON_STREET = 0;
+	public static final int TURN_SLIGHT_RIGHT = 1;
+	public static final int TURN_RIGHT = 2;
+	public static final int TURN_SHARP_RIGHT = 3;
+	public static final int FINISH = 4;				//
+	public static final int REACHED_VIA = 5; 		//?
+	public static final int USE_ROUNDABOUT = 6;		//
+	* */
+	public static int getManeuverCodeByGH(int ghCode){
+		Integer code = GH_MANEUVERS.get(ghCode);
+		if (code != null)
+			return code;
+		else 
+			return 0;
+	}
+	public static int getManeuverCode(int origCode) {
+		int code = origCode;
+		switch(SavedOptions.selectedNavi){
+		case SavedOptions.OSM: code=origCode;break;
+		case SavedOptions.Google: code=origCode;break;
+		case SavedOptions.Graphopper: code=getManeuverCodeByGH(origCode);break;
+			default: code=origCode;
+		}
+		return code;
+	}
+	//according to mapquest API
+	public static String getTurnString(int turn){
+		String str=null;
+		switch(turn){
+		case 1:
+		case 2: str="Continue";break;
+		case 3: str="Slight Left";break;
+		case 4: str="Turn Left";break;
+		case 5: str="Sharp Left";break;
+		case 6: str="Slight Right";break;
+		case 7: str="Turn Right";break;
+		case 8: str="Sharp Right";break;
+		case 9: str="Stay Left";break;
+		case 10: str="Stay Right";break;
+		case 11: str="Stay Straight";break;
+		case 12: str="Make a U-turn";break;
+		case 15: str="Exit Left";break;
+		case 16: str="Exit Right";break;
+		case 20: str="Merge Left";break;
+		case 21: str="Merge Right";break;
+		case 22: str="Merge";break;
+		case 23: str="Enter";break;
+		case 24: str="Arrive at your Destination";break;
+		case 25: str="Destination is on the Left";break;
+		case 26: str="Destination is on the Right";break;
+		case 27: str="Enter the roundabout and take the 1st exit";break;
+		case 28: str="Enter the roundabout and take the 2st exit";break;
+		case 29: str="Enter the roundabout and take the 3st exit";break;
+		default: str= "";
+		}
+		return str;
+	}
 }
 /*
 Guidance Route Data										Narrative
@@ -182,6 +264,8 @@ ManeuverType: RIGHT			Link: PA-72 N				Turn right on PA-72 N
 ManeuverType: LEFT			Link: PA-443				Turn left on PA-443/Moonshine Rd
 ManeuverType: DESTINATION	Link: PA-443				Arrive at GREEN POINT, PA
 */
+
+
 
 /*
 Limited Access - Highways

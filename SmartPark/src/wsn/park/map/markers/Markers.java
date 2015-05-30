@@ -32,6 +32,7 @@ import wsn.park.R;
 import wsn.park.map.poi.POI;
 import wsn.park.maps.OSM;
 import wsn.park.util.MapOptions;
+import wsn.park.util.RouteOptions;
 
 public class Markers {
 	private static final String tag = Markers.class.getSimpleName();
@@ -172,6 +173,7 @@ public class Markers {
 	public void drawStepsPoint(Road road) { // called from tasks
 		for (int i = 0; i < road.mNodes.size(); i++) {
 			addWayPointMarker(road,i);
+			//
 		}
 	}
 	public void addWayPointMarker(Road road,int seq){
@@ -180,9 +182,12 @@ public class Markers {
 		nodeMarker.setPosition(node.mLocation);
 		Drawable nodeIcon = osm.act.getResources().getDrawable(R.drawable.red_point_16);
 		nodeMarker.setIcon(nodeIcon);
-		nodeMarker.setTitle("Step " + seq);
+		nodeMarker.setTitle(RouteOptions.getTurnString(node.mManeuverType));
 		nodeMarker.setSnippet(node.mInstructions);
+		//Log.i(tag, "hint=("+node.mInstructions+")");
 		nodeMarker.setSubDescription(Road.getLengthDurationText(node.mLength, node.mDuration));
+		//int code = RouteOptions.getManeuverCode(node.mManeuverType);
+		//Log.i(tag, "old_code=("+node.mManeuverType+")new_code=("+code+")");
 		int resId = InfoWindow.getIconByManeuver(node.mManeuverType);
 		Drawable icon = osm.act.getResources().getDrawable(resId);
 		nodeMarker.setImage(icon);

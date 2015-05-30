@@ -46,11 +46,11 @@ public class Routers {
 				roadManager =new OSRMRoadManager();
 				return roadManager;
 			}
-			case RouteOptions.GISGRAPHY: {
+			/*case RouteOptions.GISGRAPHY: {
 				//com.gisgraphy.gisgraphoid
 				Log.i(tag, "GISGRAPHY route");
 				return null;
-			}
+			}*/
 			case RouteOptions.MAPQUEST: {
 				roadManager = new MapQuestRoadManager(APIOptions.MAPQUEST_API_KEY);
 				String opt = "routeType="+RouteOptions.getTravelMode(provider);
