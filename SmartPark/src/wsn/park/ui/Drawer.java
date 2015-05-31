@@ -15,7 +15,7 @@ import android.widget.ListView;
 public class Drawer {
 
 	private static final String tag = Drawer.class.getSimpleName();
-	static Drawer drawer;
+	private static Drawer drawer;
 	private Drawer(){}
 	public static Drawer INSTANCE(){
 		if(drawer==null) {
@@ -48,7 +48,9 @@ public class Drawer {
 	public void show(){
 		mDrawerLayout.openDrawer(Gravity.LEFT);	//Gravity.TOP / Gravity.BOTTOM
 	}
-
+	public void close(){
+		mDrawerLayout.closeDrawers();
+	}
 	/*public void show(String name){
 		mDrawerLayout.openDrawer(Gravity.LEFT);	//Gravity.TOP / Gravity.BOTTOM
 		ListView settings = (ListView) this.act.findViewById(R.id.left_drawer_parent);

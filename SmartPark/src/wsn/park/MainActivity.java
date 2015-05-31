@@ -18,7 +18,7 @@ import android.widget.ListView;
 
 public class MainActivity extends Activity {
 	private static final String tag = MainActivity.class.getSimpleName();
-	public OSM osm = new OSM();
+	public OSM osm = OSM.getInstance();
 	public Drawer dr = Drawer.INSTANCE();
 	/*
 		onCreate - onDestroy

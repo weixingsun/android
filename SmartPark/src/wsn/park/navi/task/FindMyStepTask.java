@@ -11,8 +11,8 @@ import org.osmdroid.bonuspack.routing.RoadNode;
 import org.osmdroid.util.GeoPoint;
 
 import wsn.park.audio.MyPlayer;
-import wsn.park.map.markers.InfoWindow;
 import wsn.park.maps.OSM;
+import wsn.park.ui.marker.InfoWindow;
 import wsn.park.util.SavedOptions;
 
 

@@ -3,7 +3,7 @@ package wsn.park.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import wsn.park.map.markers.SavedPlace;
+import wsn.park.model.SavedPlace;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -15,7 +15,7 @@ import android.location.Location;
 import android.util.Log;
 
 	public class DbHelper extends SQLiteOpenHelper {
-		private static final String TAG = DbHelper.class.getSimpleName();
+		private static final String tag = DbHelper.class.getSimpleName();
 		static DbHelper dbHelper;
 		private SQLiteDatabase db = null;
 		//private int maxHistoryPlaceID;
@@ -57,7 +57,7 @@ import android.util.Log;
 	    
 	    private void createTables() {
 	    	this.db = getWritableDatabase();
-	    	Log.i(TAG,"recreate table:"+GPS_TABLE);
+	    	Log.i(tag,"recreate table:"+GPS_TABLE);
 	    	//dropTable(GPS_TABLE,db);
 	    	STR_CREATE = "CREATE TABLE IF NOT EXISTS "    //+DATABASE_NAME+"."
 		    		+GPS_TABLE+ " ("
@@ -80,7 +80,7 @@ import android.util.Log;
 		    		+HISTORY_TABLE+ " ("
 				    +"id integer not null primary key AUTOINCREMENT, "
 		    		+"name varchar(100) not null, "
-		    		+"admin varchar(50) not null, "
+		    		+"admin varchar(50), "
 		    		+"country_code varchar(5) not null, "
 		    		+"lat double NOT NULL, lng double NOT NULL"
 		    		+");";
@@ -90,7 +90,7 @@ import android.util.Log;
 		    		+MY_PLACE_TABLE+ " ("
 				    +"create_time DATETIME not null, "
 		    		+"name varchar(80) not null, "
-		    		+"admin varchar(50) not null, "
+		    		+"admin varchar(50), "
 		    		+"country_code varchar(5) not null, " 
 		    		+"lat double NOT NULL, lng double NOT NULL, "
 		    		+"machine_code varchar(50) NOT NULL,"
@@ -110,12 +110,32 @@ import android.util.Log;
 	    	try{
 	    	  id = cursor.getInt(0);
 	    	}catch(Exception e){
-	    		Log.i(TAG, "Error:"+e.getMessage()+",sql="+sql);
+	    		Log.i(tag, "Error:"+e.getMessage()+",sql="+sql);
 	    	}
 	    	cursor.close();
 	        //db.close();
 	        //this.db=null;
 	        return id;
+	    }
+	    public List<SavedPlace> getHistoryPlaces() {
+			List<SavedPlace> list = new ArrayList<SavedPlace>();
+	    	this.db = getReadableDatabase();
+	    	String sql = "SELECT name,admin,lat,lng FROM " +HISTORY_TABLE;
+	    	Cursor cursor = db.rawQuery(sql, null);
+	    	if (cursor.moveToFirst()){
+	    		do{
+	    			String name= cursor.getString(0);
+	    			String admin= cursor.getString(1);
+	    			double lat= cursor.getDouble(2);
+	    			double lng= cursor.getDouble(3);
+	    			SavedPlace sp = new SavedPlace(name,admin,lat,lng);
+	    			Log.i(tag, "name="+name+",admin="+admin+",lat="+lat+",lng="+lng);
+	    			list.add(sp);
+	    		}while(cursor.moveToNext());
+	    	}
+	    	cursor.close();
+	        //db.close();
+	        return list;
 	    }
 		@Override
 	    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -137,7 +157,7 @@ import android.util.Log;
 	    	try{
 	    	  name = cursor.getString(0);
 	    	}catch(Exception e){
-	    		Log.i(TAG, "Error:"+e.getMessage()+",sql="+sql);
+	    		Log.i(tag, "Error:"+e.getMessage()+",sql="+sql);
 	    	}
 	    	cursor.close();
 	        db.close();
@@ -239,7 +259,7 @@ import android.util.Log;
 	        cv.put("name", name);
 	        cv.put("value", value);
 	        long row=db.insert(SETTINGS_TABLE, null, cv);
-	        Log.w(TAG, "insertSettings:"+name+"="+value);
+	        Log.w(tag, "insertSettings:"+name+"="+value);
 	        return row;
 	    }
 	    private void updateSettings(String name, String value) {
@@ -265,23 +285,20 @@ import android.util.Log;
 			//
 			return list;
 		}
+		
 		public String[] getSavedPlaceNames() {
 			List<String> list_name = new ArrayList<String>();
 			for(SavedPlace addr : getSavedPlaces()){
-				list_name.add(addr.getName()); //feature_name
-				//addr.getAdmin();
+				list_name.add(addr.getName());
 			}
 			String[] stringArray = list_name.toArray(new String[list_name.size()]);
 			return stringArray;
 		}
-		public String[] getHistoryPlaceNames() {
-			List<String> list_name = new ArrayList<String>();
-			for(SavedPlace addr : getSavedPlaces()){
-				list_name.add(addr.getName()); //feature_name
-				//addr.getAdmin();
-			}
-			String[] stringArray = list_name.toArray(new String[list_name.size()]);
-			return stringArray;
+		public SavedPlace[] getHistoryPlaceNames() {
+			List<SavedPlace> list =getHistoryPlaces();
+			SavedPlace[] array = list.toArray(new SavedPlace[list.size()]);
+			Log.w(tag, "array="+array[0].getName()+", "+array[1].getName());
+			return array;
 		}
 		//id, address_name, admin, country_code, lat,lng
 		public void addHistoryPlace(Address addr) {
@@ -296,7 +313,7 @@ import android.util.Log;
 	        cv.put("lat", addr.getLatitude());
 	        cv.put("lng", addr.getLongitude());
 	        long row=db.insert(HISTORY_TABLE, null, cv);
-	        Log.w(TAG, "insertHistory:"+name);
+	        Log.w(tag, "insertHistory:"+name);
 			
 		}
 	}

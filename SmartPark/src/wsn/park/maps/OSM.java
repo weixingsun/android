@@ -35,12 +35,12 @@ import wsn.park.Device;
 import wsn.park.LOC;
 import wsn.park.MyMapEventsReceiver;
 import wsn.park.R;
-import wsn.park.map.markers.Markers;
 import wsn.park.map.poi.POI;
 import wsn.park.maps.vendor.GenericMapView;
 import wsn.park.navi.task.GeocoderTask;
 import wsn.park.navi.task.RouteTask;
 import wsn.park.ui.GlobalLayoutListener;
+import wsn.park.ui.marker.Markers;
 import wsn.park.util.DbHelper;
 import wsn.park.util.GeoOptions;
 import wsn.park.util.MapOptions;
@@ -49,6 +49,15 @@ import wsn.park.util.RuntimeOptions;
 import wsn.park.util.SavedOptions;
 
 public class OSM {
+	   private static OSM singleton;
+
+	   private OSM(){ }
+
+	   public static synchronized OSM getInstance( ) {
+	      if (singleton == null)
+	          singleton=new OSM();
+	      return singleton;
+	   }
 	protected static final String tag = OSM.class.getSimpleName();
 	public DbHelper dbHelper;
 	public LOC loc = new LOC();
