@@ -6,7 +6,6 @@ import wsn.park.maps.OSM;
 import wsn.park.ui.Drawer;
 import wsn.park.util.MapOptions;
 
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;

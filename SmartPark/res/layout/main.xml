@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
@@ -15,7 +16,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="true" />
-        <!-- 
+        <!--<fragment
+			android:id="@+id/gmap"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:visibility="gone"
+			class="com.google.android.gms.maps.MapFragment" />
+         
         <org.mapsforge.map.android.view.MapView
 	        android:id="@+id/mfmap"
 	        android:layout_width="fill_parent"

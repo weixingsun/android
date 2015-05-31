@@ -133,42 +133,18 @@ public class MapOptions {
 		CloudmadeUtil.retrieveCloudmadeKey(act.getApplicationContext());
 		ArrayList<ITileSource> list = TileSourceFactory.getTileSources();
 		final int size = list.size();
-		TileSourceFactory.addTileSource(new OSMMapGoogleRenderer(
-				MapOptions.MAP_GOOGLE_ROADMAP, ResourceProxy.string.unknown, 0,
-				20, 256, ".png", size, "http://mt0.google.com/vt/lyrs=m@127&"));
-		TileSourceFactory.addTileSource(new OSMMapGoogleRenderer(
-				MapOptions.MAP_GOOGLE_SATELLITE, ResourceProxy.string.unknown,
-				0, 20, 256, ".png", size + 1,
-				"http://mt0.google.com/vt/lyrs=s@127,h@127&"));
-		TileSourceFactory.addTileSource(new OSMMapGoogleRenderer(
-				MapOptions.MAP_GOOGLE_TERRAIN, ResourceProxy.string.unknown, 0,
-				20, 256, ".jpg", size + 2,
-				"http://mt0.google.com/vt/lyrs=t@127,r@127&"));
+		TileSourceFactory.addTileSource(new OSMMapGoogleRenderer(MapOptions.MAP_GOOGLE_ROADMAP, ResourceProxy.string.unknown, 0,20,256,".png",size,"http://mt0.google.com/vt/lyrs=m@127&"));
+		//TileSourceFactory.addTileSource(new OSMMapGoogleRenderer(MapOptions.MAP_GOOGLE_SATELLITE,ResourceProxy.string.unknown,0,20,256,".png",size+1,"http://mt0.google.com/vt/lyrs=s@127,h@127&"));
+		TileSourceFactory.addTileSource(new OSMMapGoogleRenderer(MapOptions.MAP_GOOGLE_SATELLITE,ResourceProxy.string.unknown,0,20,256,".jpg",size+1,  "http://mt0.google.com/vt/lyrs=s@127,h@127&"));
+		TileSourceFactory.addTileSource(new OSMMapGoogleRenderer(MapOptions.MAP_GOOGLE_TERRAIN, ResourceProxy.string.unknown, 0,20,256,".jpg",size+2,  "http://mt0.google.com/vt/lyrs=t@127,r@127&"));
+		// TileSourceFactory.addTileSource(new OSMMapYahooRenderer(MapOptions.MAP_YAHOO_ROADMAP,  ResourceProxy.string.unknown,0,17,256,".jpg",size+3,"http://maps.yimg.com/hw/tile?"));
+		// TileSourceFactory.addTileSource(new OSMMapYahooRenderer(MapOptions.MAP_YAHOO_SATELLITE,ResourceProxy.string.unknown,0,17,256,".jpg",size+4,"http://maps.yimg.com/ae/ximg?"));
+ 
+		TileSourceFactory.addTileSource(new OSMMapMicrosoftRenderer(MapOptions.MAP_MS_ROADMAP, ResourceProxy.string.unknown,0,19,256,".png", size + 5,"http://r0.ortho.tiles.virtualearth.net/tiles/r"));
+		TileSourceFactory.addTileSource(new OSMMapMicrosoftRenderer(MapOptions.MAP_MS_EARTH,  ResourceProxy.string.unknown, 0,19,256,".jpg", size + 6,"http://a0.ortho.tiles.virtualearth.net/tiles/a"));
+		TileSourceFactory.addTileSource(new OSMMapMicrosoftRenderer(MapOptions.MAP_MS_HYBRID, ResourceProxy.string.unknown, 0,19,256,".jpg", size + 7,"http://h0.ortho.tiles.virtualearth.net/tiles/h"));
 
-		// TileSourceFactory.addTileSource(new
-		// OSMMapYahooRenderer(MapOptions.MAP_YAHOO_ROADMAP,ResourceProxy.string.unknown,0,17,256,".jpg",size
-		// + 3,"http://maps.yimg.com/hw/tile?"));
-		// TileSourceFactory.addTileSource(new
-		// OSMMapYahooRenderer(MapOptions.MAP_YAHOO_SATELLITE,ResourceProxy.string.unknown,0,17,256,".jpg",size
-		// + 4,"http://maps.yimg.com/ae/ximg?"));
-
-		TileSourceFactory.addTileSource(new OSMMapMicrosoftRenderer(
-				MapOptions.MAP_MS_ROADMAP, ResourceProxy.string.unknown, 0, 19,
-				256, ".png", size + 5,
-				"http://r0.ortho.tiles.virtualearth.net/tiles/r"));
-		TileSourceFactory.addTileSource(new OSMMapMicrosoftRenderer(
-				MapOptions.MAP_MS_EARTH, ResourceProxy.string.unknown, 0, 19,
-				256, ".jpg", size + 6,
-				"http://a0.ortho.tiles.virtualearth.net/tiles/a"));
-		TileSourceFactory.addTileSource(new OSMMapMicrosoftRenderer(
-				MapOptions.MAP_MS_HYBRID, ResourceProxy.string.unknown, 0, 19,
-				256, ".jpg", size + 7,
-				"http://h0.ortho.tiles.virtualearth.net/tiles/h"));
-
-		// TileSourceFactory.addTileSource(new
-		// OSMMapGoogleRenderer("Google Maps Hybrid",
-		// ResourceProxy.string.unknown, 0, 19, 256, ".jpg", size+8,
-		// "http://mt0.google.com/vt/lyrs=m@127,s@127,h@127,r@127&"));
+		// TileSourceFactory.addTileSource(new OSMMapGoogleRenderer("Google Maps Hybrid", ResourceProxy.string.unknown, 0, 19, 256, ".jpg", size+8,"http://mt0.google.com/vt/lyrs=m@127,s@127,h@127,r@127&"));
 		// //mt0.google.com/vt/lyrs=h@159000000&hl=ru
 		// TileSourceFactory.addTileSource(getTileSource("MapquestOSM"));
 		// AssetsTileProvider atp = new AssetsTileProvider();

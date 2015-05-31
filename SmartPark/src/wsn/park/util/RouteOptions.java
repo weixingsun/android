@@ -225,8 +225,8 @@ public class RouteOptions {
 	public static String getTurnString(int turn){
 		String str=null;
 		switch(turn){
-		case 1:
-		case 2: str="Continue";break;
+		case 1: str="Continue";break;
+		case 2: str="Change Road Name";break;
 		case 3: str="Slight Left";break;
 		case 4: str="Turn Left";break;
 		case 5: str="Sharp Left";break;

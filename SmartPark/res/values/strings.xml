@@ -32,6 +32,9 @@
     <string name="home">Home</string>
     <string name="work">Work</string>
     <string name="star">Saved Places</string>
+    
+    
+    <string name="history">History</string>
      
     <!-- Main Nav Drawer Menu Items -->
     <string-array name="menu_items">
@@ -70,7 +73,7 @@
         <item >Offline Map</item> <!-- <item >MapsForge</item>-->
         <item >Mapnik</item>
         <item >Google Roadmap</item>
-        <item >Google Satellite</item>
+        <!--<item >Google Satellite</item>-->
         <item >Google Terrain</item>
         <item >Microsoft Maps</item>
         <item >Microsoft Earth</item>

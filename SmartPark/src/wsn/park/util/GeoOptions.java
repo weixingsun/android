@@ -3,6 +3,8 @@ package wsn.park.util;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import android.location.Address;
+
 public class GeoOptions {
 
 	public static final String OSM = "Nominatim";
@@ -25,10 +27,23 @@ public class GeoOptions {
 		//GEO_CODERS.put(GRAPHHOPPER, GRAPHHOPPER);
 		
 	}
-	/*public static void changeGeocoder(String geo) {
-		setGeocoder(geo);
+	public static String getAddressName(Address a) {
+		String display = null;
+    	if(a.getExtras() != null){//Nominatim
+    		String display1=a.getExtras().get("display_name").toString();
+    		if(display1!=null ) display = display1;
+    	}else{
+    		/*if(a.getFeatureName() != null){//Google
+	        	String feature = a.getFeatureName();
+	        	String admin = a.getSubAdminArea()==null?a.getAdminArea():a.getSubAdminArea();
+	        	String road = a.getThoroughfare()==null?a.getAddressLine(1):a.getThoroughfare();
+	        	
+    		}*/
+    		display=a.getAddressLine(0)+", "+a.getAddressLine(1)+", "+a.getAddressLine(2)+", "+a.getCountryName();
+    	}
+    	return display;
 	}
-	public static String getGeocoder() {
+	/*public static String getGeocoder() {
 		if(geocoder==null) geocoder=GeoOptions.GOOGLE;
 		return geocoder;
 	}

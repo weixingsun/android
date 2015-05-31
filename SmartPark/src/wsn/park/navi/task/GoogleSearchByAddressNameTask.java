@@ -130,7 +130,7 @@ public class GoogleSearchByAddressNameTask extends
         client.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, 15000);
         client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT,15000);  
         super.onPreExecute();
-    }  
+    }
   
     @Override  
     protected void onPostExecute(List<Address> list) {

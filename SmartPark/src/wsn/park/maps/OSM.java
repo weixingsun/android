@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+//import com.google.android.gms.maps.*;
+//import com.google.android.gms.maps.model.*;
 import org.mapsforge.map.reader.PointOfInterest;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
@@ -188,11 +190,14 @@ public class OSM {
 	    act.startActivity(intent);
 	}
 	public void startSettingsActivity(){
-		//Toast.makeText(act, "starting settings", Toast.LENGTH_SHORT).show();
 		Intent intent = new Intent(act, wsn.park.ui.SettingsActivity.class);
-		//Log.e(tag,"fileName="+fileName);
-		//intent.putExtra("file", fileName);
 	    act.startActivity(intent);
+	}
+	public void startHistoryActivity() {
+
+		Intent intent = new Intent(act, wsn.park.ui.HistoryActivity.class);
+	    act.startActivity(intent);
+		
 	}
 	public void startMyPlacesActivity() {
 		Intent intent = new Intent(act, wsn.park.ui.MyPlacesActivity.class);

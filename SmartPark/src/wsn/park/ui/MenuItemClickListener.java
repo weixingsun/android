@@ -56,7 +56,8 @@ public class MenuItemClickListener implements OnItemClickListener {
 		case SavedOptions.MYPLACES: 
 			activity.osm.startMyPlacesActivity(); 
 			break;
-		case SavedOptions.HISTORY: //activity.osm.startSettingsActivity(); 
+		case SavedOptions.HISTORY: 
+			activity.osm.startHistoryActivity(); 
 			break;
 		case SavedOptions.PARKING: //activity.osm.startSettingsActivity(); 
 			break;

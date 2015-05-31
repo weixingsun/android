@@ -10,6 +10,7 @@ import wsn.park.R;
 import wsn.park.maps.OSM;
 import wsn.park.ui.DelayedTextWatcher;
 import wsn.park.ui.SuggestListAdapter;
+import wsn.park.util.DbHelper;
 import wsn.park.util.GeoOptions;
 import wsn.park.util.MapOptions;
 import wsn.park.util.RuntimeOptions;
@@ -41,6 +42,7 @@ public class Device {
 	EditText inputAddress;
 	ListView listVoice;
 	ListView listSuggest;
+	DbHelper dbHelper;
 	private String tag=Device.class.getSimpleName();
 	public void init(Activity act, OSM osm){
 		this.act=act;
@@ -52,6 +54,7 @@ public class Device {
 		closeKeyBoard();
 		setImage();
 		setList();
+		dbHelper = DbHelper.getInstance();
 	}
 	
 	private void setList() {
@@ -67,9 +70,10 @@ public class Device {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Address addr = osm.suggestPoints.get(position);
-				osm.mks.updateRouteMarker(addr);
+				osm.mks.updateRouteMarker(addr);////////////////////offline navi no marker??????
 				listSuggest.setVisibility(View.INVISIBLE);
 				osm.move(addr.getLatitude(),addr.getLongitude());
+				dbHelper.addHistoryPlace(addr);
 			}
 		});
 	}
@@ -152,20 +156,7 @@ public class Device {
 	    private ArrayList<Map<String, String>> buildData(List<Address> addrs) {
 	        ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
 	        for(Address a:addrs){
-	        	String display = "";
-	        	if(a.getExtras() != null){//Nominatim
-	        		String display1=a.getExtras().get("display_name").toString();
-	        		if(display1!=null ) display = display1;
-	        	}else{
-	        		/*if(a.getFeatureName() != null){//Google
-			        	String feature = a.getFeatureName();
-			        	String admin = a.getSubAdminArea()==null?a.getAdminArea():a.getSubAdminArea();
-			        	String road = a.getThoroughfare()==null?a.getAddressLine(1):a.getThoroughfare();
-			        	
-	        		}*/
-	        		display=a.getAddressLine(0)+", "+a.getAddressLine(1)+", "+a.getAddressLine(2)+", "+a.getCountryName();
-        			
-	        	}
+	        	String display = GeoOptions.getAddressName(a);
 	        	Log.w(tag, a.toString());
 	        	list.add(putData(display));
 	        	

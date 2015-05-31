@@ -17,10 +17,13 @@ import android.util.Log;
 	public class DbHelper extends SQLiteOpenHelper {
 		private static final String TAG = DbHelper.class.getSimpleName();
 		static DbHelper dbHelper;
-		private SQLiteDatabase db = null; 
+		private SQLiteDatabase db = null;
+		//private int maxHistoryPlaceID;
 		private final static String DATABASE_NAME="osmap.db";
 	    private final static int DATABASE_VERSION=1;
 	    private final static String GPS_TABLE="gps_data";
+	    private final static String HISTORY_TABLE="history_place"; //just local history
+	    private final static String MY_PLACE_TABLE="my_place"; // upload to cloud
 	    private final static String SETTINGS_TABLE="settings";
 	    private static String STR_CREATE;
 	    //gps_data(data_id,lat,lng,country_code)	//id=0, lastknownlocation,
@@ -71,8 +74,49 @@ import android.util.Log;
 		    		+"value varchar(20) NOT NULL"
 		    		+");";
 	    	this.db.execSQL(STR_CREATE);
+	    	
+	    	//id, address_name, admin, country_code, lat,lng
+	    	STR_CREATE = "CREATE TABLE IF NOT EXISTS "    //+DATABASE_NAME+"."
+		    		+HISTORY_TABLE+ " ("
+				    +"id integer not null primary key AUTOINCREMENT, "
+		    		+"name varchar(100) not null, "
+		    		+"admin varchar(50) not null, "
+		    		+"country_code varchar(5) not null, "
+		    		+"lat double NOT NULL, lng double NOT NULL"
+		    		+");";
+	    	this.db.execSQL(STR_CREATE);
+	    	//id, address_name, admin, country_code, lat,lng, machine_code, user_name
+	    	STR_CREATE = "CREATE TABLE IF NOT EXISTS "    //+DATABASE_NAME+"."
+		    		+MY_PLACE_TABLE+ " ("
+				    +"create_time DATETIME not null, "
+		    		+"name varchar(80) not null, "
+		    		+"admin varchar(50) not null, "
+		    		+"country_code varchar(5) not null, " 
+		    		+"lat double NOT NULL, lng double NOT NULL, "
+		    		+"machine_code varchar(50) NOT NULL,"
+		    		+"user_name varchar(50) NOT NULL"
+		    		+");";
+	    	this.db.execSQL(STR_CREATE);
+	    	
 	    	this.db.close();
 		}
+	    public int getMaxID(String table) {
+	    	this.db = getReadableDatabase();
+	    	String sql = "SELECT max(id) FROM " +table;
+	    	Cursor cursor = db.rawQuery(sql, null);
+	    	if (cursor != null)
+	        	cursor.moveToFirst();
+	    	int id = 0;
+	    	try{
+	    	  id = cursor.getInt(0);
+	    	}catch(Exception e){
+	    		Log.i(TAG, "Error:"+e.getMessage()+",sql="+sql);
+	    	}
+	    	cursor.close();
+	        //db.close();
+	        //this.db=null;
+	        return id;
+	    }
 		@Override
 	    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 	    	this.db = db;
@@ -215,7 +259,7 @@ import android.util.Log;
 	    		this.updateSettings(name, value);
 	    	}
 	    }
-	    //id, name, admin, lat,lng, machine_code, user_name
+	    //id, address_name, admin, country_code, lat,lng, machine_code, user_name
 		public List<SavedPlace> getSavedPlaces() {
 			List<SavedPlace> list = new ArrayList<SavedPlace>();
 			//
@@ -229,5 +273,30 @@ import android.util.Log;
 			}
 			String[] stringArray = list_name.toArray(new String[list_name.size()]);
 			return stringArray;
+		}
+		public String[] getHistoryPlaceNames() {
+			List<String> list_name = new ArrayList<String>();
+			for(SavedPlace addr : getSavedPlaces()){
+				list_name.add(addr.getName()); //feature_name
+				//addr.getAdmin();
+			}
+			String[] stringArray = list_name.toArray(new String[list_name.size()]);
+			return stringArray;
+		}
+		//id, address_name, admin, country_code, lat,lng
+		public void addHistoryPlace(Address addr) {
+			String name = GeoOptions.getAddressName(addr);
+	    	if(this.db==null)
+	    	this.db = getWritableDatabase();
+	        ContentValues cv=new ContentValues();
+	        //cv.put("id", id);
+	        cv.put("name", name);
+	        cv.put("admin", addr.getSubAdminArea());
+	        cv.put("country_code", addr.getCountryCode());
+	        cv.put("lat", addr.getLatitude());
+	        cv.put("lng", addr.getLongitude());
+	        long row=db.insert(HISTORY_TABLE, null, cv);
+	        Log.w(TAG, "insertHistory:"+name);
+			
 		}
 	}
