@@ -85,7 +85,7 @@ import android.util.Log;
 		    		+"lat double NOT NULL, lng double NOT NULL"
 		    		+");";
 	    	this.db.execSQL(STR_CREATE);
-	    	//id, address_name, admin, country_code, lat,lng, machine_code, user_name
+	    	//id, address_name, admin, country_code, lat,lng, machine_code, user_name, special
 	    	STR_CREATE = "CREATE TABLE IF NOT EXISTS "    //+DATABASE_NAME+"."
 		    		+MY_PLACE_TABLE+ " ("
 				    +"create_time DATETIME not null, "
@@ -94,7 +94,8 @@ import android.util.Log;
 		    		+"country_code varchar(5) not null, " 
 		    		+"lat double NOT NULL, lng double NOT NULL, "
 		    		+"machine_code varchar(50) NOT NULL,"
-		    		+"user_name varchar(50) NOT NULL"
+		    		+"user_name varchar(50) NOT NULL,"
+		    		+"special integer NOT NULL"
 		    		+");";
 	    	this.db.execSQL(STR_CREATE);
 	    	
@@ -120,7 +121,7 @@ import android.util.Log;
 	    public List<SavedPlace> getHistoryPlaces() {
 			List<SavedPlace> list = new ArrayList<SavedPlace>();
 	    	this.db = getReadableDatabase();
-	    	String sql = "SELECT name,admin,lat,lng FROM " +HISTORY_TABLE;
+	    	String sql = "SELECT name,admin,lat,lng FROM " +HISTORY_TABLE+" order by id desc";
 	    	Cursor cursor = db.rawQuery(sql, null);
 	    	if (cursor.moveToFirst()){
 	    		do{
@@ -279,27 +280,41 @@ import android.util.Log;
 	    		this.updateSettings(name, value);
 	    	}
 	    }
-	    //id, address_name, admin, country_code, lat,lng, machine_code, user_name
+	    //id, address_name, admin, country_code, lat,lng, machine_code, user_name, special
 		public List<SavedPlace> getSavedPlaces() {
 			List<SavedPlace> list = new ArrayList<SavedPlace>();
-			//
+		    	this.db = getReadableDatabase();
+		    	String sql = "SELECT name,admin,lat,lng FROM " +MY_PLACE_TABLE+" where special=0";
+		    	Cursor cursor = db.rawQuery(sql, null);
+		    	if (cursor.moveToFirst()){
+		    		do{
+		    			String name= cursor.getString(0);
+		    			String admin= cursor.getString(1);
+		    			double lat= cursor.getDouble(2);
+		    			double lng= cursor.getDouble(3);
+		    			SavedPlace sp = new SavedPlace(name,admin,lat,lng);
+		    			//Log.i(tag, "name="+name+",admin="+admin+",lat="+lat+",lng="+lng);
+		    			list.add(sp);
+		    		}while(cursor.moveToNext());
+		    	}
+		    	cursor.close();
+		        //db.close();
+		    
 			return list;
 		}
-		
-		public String[] getSavedPlaceNames() {
-			List<String> list_name = new ArrayList<String>();
-			for(SavedPlace addr : getSavedPlaces()){
-				list_name.add(addr.getName());
-			}
-			String[] stringArray = list_name.toArray(new String[list_name.size()]);
-			return stringArray;
+		public SavedPlace[] getSavedPlaceNames() {
+			List<SavedPlace> list =getSavedPlaces();
+			SavedPlace[] array = list.toArray(new SavedPlace[list.size()]);
+			//Log.w(tag, "array="+array[0].getName()+", "+array[1].getName());
+			return array;
 		}
 		public SavedPlace[] getHistoryPlaceNames() {
 			List<SavedPlace> list =getHistoryPlaces();
 			SavedPlace[] array = list.toArray(new SavedPlace[list.size()]);
-			Log.w(tag, "array="+array[0].getName()+", "+array[1].getName());
+			//Log.w(tag, "array="+array[0].getName()+", "+array[1].getName());
 			return array;
 		}
+		
 		//id, address_name, admin, country_code, lat,lng
 		public void addHistoryPlace(Address addr) {
 			String name = GeoOptions.getAddressName(addr);
@@ -316,4 +331,28 @@ import android.util.Log;
 	        Log.w(tag, "insertHistory:"+name);
 			
 		}
+		//id, address_name, admin, country_code, lat,lng
+		public void addMyPlace(Address addr, int special) {
+			String name = GeoOptions.getAddressName(addr);
+	    	if(this.db==null)
+	    	this.db = getWritableDatabase();
+	        ContentValues cv=new ContentValues();
+	        //cv.put("id", id);
+	        cv.put("name", name);
+	        cv.put("admin", addr.getSubAdminArea());
+	        cv.put("country_code", addr.getCountryCode());
+	        cv.put("lat", addr.getLatitude());
+	        cv.put("lng", addr.getLongitude());
+	        cv.put("special", special);
+	        long row=db.insert(MY_PLACE_TABLE, null, cv);
+	        Log.w(tag, "insertMyPlace:"+name+",special="+special);
+		}
+		public int deleteHistoryPlaces() {
+	    	if(this.db==null)
+	    		this.db = this.getWritableDatabase();
+	        String where="1="+1;
+	        int a = db.delete(MY_PLACE_TABLE, where,null);
+	        //db.close();
+	        return a;
+	    }
 	}

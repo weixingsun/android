@@ -80,44 +80,7 @@ public class Markers {
 		myLocOverlay = new MyItemizedOverlay(img, resourceProxy);
 		osm.map.getOverlays().add(myLocOverlay);
 	}
-	/*
-	public int cleanPOIs(boolean all){
-		if(all){
-			this.pois.clear();
-			return 0;
-		}else{
-			int i = 0;
-			BoundingBoxE6 box = osm.getBoundary();
-			for(POI poi:this.pois){
-				if(!osm.InBoundary(new GeoPoint(poi.poiInfo.position.latitude,poi.poiInfo.position.longitude),box)){
-					this.pois.remove(poi);
-					osm.map.getOverlays().remove(poi.poiMarker);
-					i++;
-				}
-			}
-			return i;
-		}
-	}
-	public void addPOIMarker(int resId,PointOfInterest poi) {
-		Marker newMarker = new Marker(osm.map);
-		newMarker.setPosition(new GeoPoint(poi.position.latitude,poi.position.longitude));
-		
-		String name = poi.tags.size()>1?poi.tags.get(1).value:poi.tags.get(0).value;
-		newMarker.setTitle(name+":"+poi.layer);
-		//newMarker.setSnippet(poi.tags)
-		//newMarker.setSubDescription(poi.tags)
-		Drawable img = osm.act.getResources().getDrawable(resId);
-		newMarker.setIcon(img);
-		//Drawable icon = osm.act.getResources().getDrawable(resId);
-		newMarker.setImage(img);
-		osm.map.getOverlays().add(newMarker);
-		//poiMarkerList.add(newMarker);
-	}
-	public void addPOIMarkers() {
-		for(POI poi:this.pois){
-			addPOIMarker(R.drawable.square_outter_blue,poi.poiInfo);
-		}
-	}*/
+
 	public void removePOIMarkers(){
 		for(POI p:osm.mks.pois){
 			osm.map.getOverlays().remove(p.poiMarker);
@@ -191,7 +154,7 @@ public class Markers {
 		//Log.i(tag, "hint=("+node.mInstructions+")");
 		nodeMarker.setSubDescription(Road.getLengthDurationText(node.mLength, node.mDuration));
 		//int code = RouteOptions.getManeuverCode(node.mManeuverType);
-		Log.i(tag, "turn_code=("+node.mManeuverType+")+text="+node.mInstructions);
+		//Log.i(tag, "turn_code=("+node.mManeuverType+")+text="+node.mInstructions);
 		int resId = InfoWindow.getIconByManeuver(node.mManeuverType);
 		Drawable icon = osm.act.getResources().getDrawable(resId);
 		nodeMarker.setImage(icon);

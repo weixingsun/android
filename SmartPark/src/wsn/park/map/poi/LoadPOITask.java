@@ -25,7 +25,7 @@ private OSM osm;
 private MapsForgePOI mfpoi;
 private List<MapTile> tilesNeeded = new ArrayList<MapTile>();
 private List<PointOfInterest> newPOIs = new ArrayList<PointOfInterest>();
-private List<Marker> newMakers;
+//private List<Marker> newMakers;
 private BoundingBoxE6 bbE6Visible;
 private int zoom;
 public LoadPOITask(OSM osm) {
@@ -116,3 +116,42 @@ private void printPOIs(List<PointOfInterest> list) {
 	}
 }
 }
+
+/*
+public int cleanPOIs(boolean all){
+	if(all){
+		this.pois.clear();
+		return 0;
+	}else{
+		int i = 0;
+		BoundingBoxE6 box = osm.getBoundary();
+		for(POI poi:this.pois){
+			if(!osm.InBoundary(new GeoPoint(poi.poiInfo.position.latitude,poi.poiInfo.position.longitude),box)){
+				this.pois.remove(poi);
+				osm.map.getOverlays().remove(poi.poiMarker);
+				i++;
+			}
+		}
+		return i;
+	}
+}
+public void addPOIMarker(int resId,PointOfInterest poi) {
+	Marker newMarker = new Marker(osm.map);
+	newMarker.setPosition(new GeoPoint(poi.position.latitude,poi.position.longitude));
+	
+	String name = poi.tags.size()>1?poi.tags.get(1).value:poi.tags.get(0).value;
+	newMarker.setTitle(name+":"+poi.layer);
+	//newMarker.setSnippet(poi.tags)
+	//newMarker.setSubDescription(poi.tags)
+	Drawable img = osm.act.getResources().getDrawable(resId);
+	newMarker.setIcon(img);
+	//Drawable icon = osm.act.getResources().getDrawable(resId);
+	newMarker.setImage(img);
+	osm.map.getOverlays().add(newMarker);
+	//poiMarkerList.add(newMarker);
+}
+public void addPOIMarkers() {
+	for(POI poi:this.pois){
+		addPOIMarker(R.drawable.square_outter_blue,poi.poiInfo);
+	}
+}*/

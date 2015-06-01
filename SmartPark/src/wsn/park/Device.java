@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import wsn.park.R;
+import wsn.park.maps.Mode;
 import wsn.park.maps.OSM;
 import wsn.park.ui.DelayedTextWatcher;
 import wsn.park.ui.SuggestListAdapter;
@@ -43,6 +44,7 @@ public class Device {
 	ListView listVoice;
 	ListView listSuggest;
 	DbHelper dbHelper;
+	Mode mode;
 	private String tag=Device.class.getSimpleName();
 	public void init(Activity act, OSM osm){
 		this.act=act;
@@ -74,9 +76,22 @@ public class Device {
 				listSuggest.setVisibility(View.INVISIBLE);
 				osm.move(addr.getLatitude(),addr.getLongitude());
 				dbHelper.addHistoryPlace(addr);
+				showPlaceDetailPage();
 			}
 		});
 	}
+	private void showPlaceDetailPage() {
+		if(mode.ID==0){//normal
+			//show navi icon
+		}else if(mode.ID==2){//
+			//show navi icon
+		}else if(mode.ID==3){//pick up home
+			//show home icon
+		}else if(mode.ID==4){//pick up work
+			//show work icon
+		} 
+	}
+
 	private void setImage() {
 		ImageView voiceInput = (ImageView) act.findViewById(R.id.voiceInput);
 		voiceInput.setOnClickListener(new View.OnClickListener() {
