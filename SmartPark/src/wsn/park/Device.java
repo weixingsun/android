@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.osmdroid.bonuspack.overlays.Marker;
+import org.osmdroid.util.GeoPoint;
 
 import wsn.park.R;
 import wsn.park.maps.Mode;
@@ -54,8 +55,14 @@ public class Device {
 	ListView listSuggest;
 	DbHelper dbHelper;
     PopupWindow popup;
-    ImageView iconTravelMode;
 	Mode mode;
+	TextView pointBrief;
+	TextView pointDetail;
+	TextView lat;
+	TextView lng;
+	ImageView iconHome;
+	ImageView iconWork;
+	ImageView iconTravelBy;
 	private String tag=Device.class.getSimpleName();
 	public void init(Activity act, OSM osm){
 		this.act=act;
@@ -63,6 +70,8 @@ public class Device {
 		inputAddress = (EditText) act.findViewById(R.id.inputAddress);
 		listVoice = (ListView) act.findViewById(R.id.listVoiceSuggestion);
 		listSuggest = (ListView) act.findViewById(R.id.listSuggestion);
+		
+
 		setText();
 		closeKeyBoard();
 		setImage();
@@ -85,32 +94,16 @@ public class Device {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Address addr = osm.suggestPoints.get(position);
 				//osm.mks.updateRouteMarker(addr);////////////////////offline navi no marker??????
-				osm.mks.updatePointOverlay(GeoOptions.getMyPlace(addr));
+				SavedPlace sp = GeoOptions.getMyPlace(addr);
+				osm.mks.updatePointOverlay(sp);
 				listSuggest.setVisibility(View.INVISIBLE);
 				osm.move(addr.getLatitude(),addr.getLongitude());
 				dbHelper.addHistoryPlace(addr);
-				showPlaceDetailPage();
+				openPopup(sp);
 				//Log.w(tag, "show popup window");
 			}
 		});
 	}
-	public void showPlaceDetailPage() {
-		if(mode.ID==0){//normal
-			//show navi icon
-			this.openPopup(null);
-		}else if(mode.ID==2){//
-			//show navi icon
-			this.openPopup(null);
-		}else if(mode.ID==3){//pick up home
-			//show home icon
-			this.openPopup(null);
-		}else if(mode.ID==4){//pick up work
-			//show work icon
-			this.openPopup(null);
-		}
-		this.openPopup(null);
-	}
-
 	private void setImage() {
 		ImageView voiceInput = (ImageView) act.findViewById(R.id.voiceInput);
 		voiceInput.setOnClickListener(new View.OnClickListener() {
@@ -209,12 +202,28 @@ public class Device {
 	        popup.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 	        popup.setOutsideTouchable(true);
 	        popup.setFocusable(false);
-			iconTravelMode = (ImageView) popupLayout.findViewById(R.id.ic_travel_mode);
-	        iconTravelMode.setClickable(true);
-	        iconTravelMode.setOnClickListener(new OnClickListener() {
+			pointBrief = (TextView) popupLayout.findViewById(R.id.point_brief);
+			pointDetail = (TextView) popupLayout.findViewById(R.id.point_detail);
+			lat = (TextView) popupLayout.findViewById(R.id.lat);
+			lng = (TextView) popupLayout.findViewById(R.id.lng);
+			iconHome = (ImageView) popupLayout.findViewById(R.id.home);
+			iconWork = (ImageView) popupLayout.findViewById(R.id.work);
+			iconTravelBy  = (ImageView) popupLayout.findViewById(R.id.travel_mode);
+			iconTravelBy.setClickable(true);
+			iconTravelBy.setOnClickListener(new OnClickListener() {
 	            @Override
 	            public void onClick(View v) {
-	            	//gMap.refreshRoute(true);
+	            	//LayoutInflater inflater = LayoutInflater.from(osm.act);
+	    	        //View popupLayout = inflater.inflate(R.layout.popup, null);
+	    			//TextView tv_lat = (TextView) popupLayout.findViewById(R.id.lat);
+	    			//TextView tv_lng = (TextView) popupLayout.findViewById(R.id.lng);
+	    			String str_lat = lat.getText().toString();
+	    			String str_lng = lng.getText().toString();
+	                //Log.w(tag, "lat="+str_lat+", lng="+str_lng);
+	    	        GeoPoint gp = new GeoPoint(Double.valueOf(str_lat),Double.valueOf(str_lng));
+					osm.ro.setWayPoints(new GeoPoint(osm.loc.myPos),gp);
+					osm.startTask("route", gp,"route");
+	            	Mode.setID(Mode.NAVI);
 	            }
 	        });
 	  	}
@@ -222,20 +231,33 @@ public class Device {
             popup.setAnimationStyle(R.style.AnimBottom);
             popup.showAtLocation(osm.act.findViewById(R.id.my_loc), Gravity.BOTTOM, 0, 0); //leaked window
             popup.setFocusable(true);
-            /*if(m!=null){
-	            pointBrief.setText(m.getTitle());
-	            pointDetail.setText(m.getSnippet());
-	            markerid.setText(m.getId());
-	            markertype.setText(type+"");
-	            this.iconDelete.setVisibility(View.VISIBLE);
-            }else{
-            	pointBrief.setText("");
-                pointDetail.setText("");
-                markerid.setText("");
-                this.iconDelete.setVisibility(View.INVISIBLE);
-            }
-            Util.hideIcons(MainActivity.this,type);*/
+    		
+            pointBrief.setText(sp.getBriefName());
+            pointDetail.setText(sp.getAdmin());
+            lat.setText(String.valueOf(sp.getLat()));
+            lng.setText(String.valueOf(sp.getLng()));
+            //Log.w(tag, "lat="+sp.getLat()+", lng="+sp.getLng());
+            hidePopupIcons();
             popup.update();
             Log.w(tag, "openPopup");
     }
+
+		private void hidePopupIcons() {
+			switch(Mode.getID()){
+			case Mode.NORMAL:
+			case Mode.NAVI:
+			case Mode.PRACTICE:
+	            iconHome.setVisibility(View.INVISIBLE);
+	            iconWork.setVisibility(View.INVISIBLE);
+	            break;
+			case Mode.HOME:
+	            iconHome.setVisibility(View.VISIBLE);
+	            iconWork.setVisibility(View.INVISIBLE);
+	            break;
+			case Mode.WORK:
+	            iconHome.setVisibility(View.INVISIBLE);
+	            iconWork.setVisibility(View.VISIBLE);
+	            break;
+			}
+		}
 }

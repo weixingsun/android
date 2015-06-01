@@ -35,9 +35,9 @@ public class HistoryActivity extends BaseActivity {
 				PlaceHolder ph = (PlaceHolder) view.getTag();
 				//Log.w(tag, "place.name="+ph.place.getName());
 				//osm.mks.updateRouteMarker(ph.place);
-				osm.mks.updatePointOverlay(ph.place);
+				SavedPlace sp = ph.place;
+				osm.mks.updatePointOverlay(sp);
 				drawer.close();
-				osm.dv.openPopup(ph.place);
 				finish();
 			}
         });

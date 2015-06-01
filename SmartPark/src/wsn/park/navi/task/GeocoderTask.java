@@ -84,7 +84,8 @@ public class GeocoderTask extends
     		if(foundAddr != null && !this.purpose.equals("countryCode")){
     			foundAddr.setLatitude(position.getLatitude());
     			foundAddr.setLongitude(position.getLongitude());
-    			osm.mks.updateRouteMarker(foundAddr);
+    			//osm.mks.updateRouteMarker(foundAddr);
+    			osm.mks.updatePointOverlay(GeoOptions.getMyPlace(foundAddr));
     		}
 			//Log.i(TAG, "GeoCoderTask.foundAddr="+foundAddr.getFeatureName());
         }

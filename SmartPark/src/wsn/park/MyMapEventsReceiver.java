@@ -28,8 +28,8 @@ public class MyMapEventsReceiver implements MapEventsReceiver{
 		}else{
 			Toast.makeText(osm.act, GeoOptions.NETWORK_UNAVAILABLE, Toast.LENGTH_LONG).show();
 		}
-		osm.ro.setWayPoints(new GeoPoint(osm.loc.myPos),p);
-		osm.startTask("route", new GeoPoint(p),"route");
+		//osm.ro.setWayPoints(new GeoPoint(osm.loc.myPos),p);
+		//osm.startTask("route", new GeoPoint(p),"route");
 		return false;
 	}
 	@Override

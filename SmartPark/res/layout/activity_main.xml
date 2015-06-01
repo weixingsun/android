@@ -43,7 +43,7 @@
                     android:layout_height="wrap_content"
                     android:contentDescription="@null"
                     android:padding="5dp"
-                    android:src="@drawable/home_icon" />
+                    android:src="@drawable/multiple_45" />
 
                 <EditText
                     android:id="@+id/inputAddress"

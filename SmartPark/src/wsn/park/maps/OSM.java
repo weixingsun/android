@@ -61,7 +61,7 @@ public class OSM {
 	protected static final String tag = OSM.class.getSimpleName();
 	public DbHelper dbHelper;
 	public LOC loc = new LOC();
-	public Device dv = new Device();
+	public Device dv = new Device(); //Device.getInstance();
 	public Activity act;
 	MapOptions mo;
 	public RouteOptions ro;

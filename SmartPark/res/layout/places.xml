@@ -26,10 +26,13 @@
 			android:gravity="center"
 			android:text="@string/common"
 			android:textSize="20sp" />
+
 	    <LinearLayout
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:orientation="horizontal" >
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal"
+	        android:padding="@dimen/dp_8" >
+
 			<TextView
 				android:id="@+id/tv_home"
 				android:layout_width="wrap_content"
@@ -48,10 +51,13 @@
 				android:clickable="true"
 				android:textSize="20sp" />
 		</LinearLayout>
+
 	    <LinearLayout
-		    android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:orientation="horizontal" >
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal"
+	        android:padding="@dimen/dp_8" >
+
 			<TextView
 				android:id="@+id/tv_work"
 				android:layout_width="wrap_content"

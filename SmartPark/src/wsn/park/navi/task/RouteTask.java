@@ -17,6 +17,7 @@ import org.osmdroid.views.MapView;
 import wsn.park.maps.OSM;
 import wsn.park.navi.GraphHopperOfflineRoadManager;
 import wsn.park.util.APIOptions;
+import wsn.park.util.GeoOptions;
 import wsn.park.util.MapOptions;
 import wsn.park.util.RouteOptions;
 import wsn.park.util.RuntimeOptions;
@@ -85,7 +86,7 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 		osm.mks.drawStepsPoint(road);
 		osm.loc.passedNodes.clear();
 		if(osm.endAddr!=null){
-			osm.mks.updateRouteMarker(osm.endAddr);
+			osm.mks.updatePointOverlay(GeoOptions.getMyPlace(osm.endAddr));
 		}
     }
 

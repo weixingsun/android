@@ -107,7 +107,7 @@ public class Markers {
 		myLocMarker.setIcon(img);
 		myLocMarker.setDraggable(true);
 		myLocMarker.setOnMarkerDragListener(new OnTestMarkerDragListener(osm));
-		Drawable icon = osm.act.getResources().getDrawable(R.drawable.home_icon);
+		Drawable icon = osm.act.getResources().getDrawable(R.drawable.multiple_45);
 		myLocMarker.setImage(icon);
 		osm.map.getOverlays().add(myLocMarker);
 	}
@@ -121,7 +121,7 @@ public class Markers {
 		routeOverlay = new MyItemizedOverlay(img, resourceProxy);
 		osm.mapView.getOverlays().add(routeOverlay);
 	}*/
-	public void updateRouteMarker(Address addr) {
+/*	public void updateRouteMarker(Address addr) {
 		GeoPoint gp = new GeoPoint(addr.getLatitude(),addr.getLongitude());
 		String detailAddress = addr.getFeatureName()+", "+addr.getThoroughfare();
 		String briefAddress = addr.getLocality()+", "+addr.getCountryName();
@@ -135,22 +135,23 @@ public class Markers {
 		routeMarker.setIcon(icon);
 		Drawable img = osm.act.getResources().getDrawable(R.drawable.ic_arrived);
 		routeMarker.setImage(img);
-		/* ////////////////////////////////not working
-		 * routeMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+		////////////////////////////////not working
+		routeMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
 	        @Override
 	        public boolean onMarkerClick(Marker marker, MapView mapView) {
 	            //Toast.makeText(osm.act, "CLICK", Toast.LENGTH_SHORT).show();
 	        	Log.w(tag, "clicked");
 	            return true;
 	        }
-	    });*/
+	    });
 		Log.w(tag, "adding routeMarker="+routeMarker);
 		osm.map.getOverlays().add(routeMarker);
 		osm.move(gp);								//this will cause marker shown in screen ?????????????
 		this.destinationMarkerList.add(routeMarker);  //this will cause marker not shown in screen ?????????????
 		this.selectedMarker = routeMarker;
-	}
-	public void updatePointOverlay(SavedPlace addr){
+	}*/
+	public void updatePointOverlay(SavedPlace addr){ //clickable
+		osm.map.getOverlays().remove(pointOverlay);
 		GeoPoint gp = new GeoPoint(addr.getLat(),addr.getLng());
 		Drawable d = osm.act.getResources().getDrawable( R.drawable.marker_blue );
 		ArrayList<OverlayItem> pList = new ArrayList<OverlayItem>();
@@ -160,8 +161,11 @@ public class Markers {
 		newOverlay.setMarker(d);
 		pointOverlay.addOverlay(newOverlay);
 		osm.map.getOverlays().add(pointOverlay);
-		osm.map.invalidate();
+		//osm.map.invalidate();
 		osm.move(gp);
+		osm.dv.openPopup(addr);
+		this.destinationMarkerList.add(routeMarker);
+		this.selectedMarker = routeMarker;
 	}
 	private void prepareOverlay(ArrayList<OverlayItem> pList, ResourceProxy resourceProxy,final SavedPlace sp) {
 		pointOverlay = new OsmMapsItemizedOverlay(pList,
@@ -194,7 +198,6 @@ public class Markers {
 		}
 		nodeMarker.setTitle(RouteOptions.getTurnString(node.mManeuverType));
 		nodeMarker.setSnippet(node.mInstructions);
-		//Log.i(tag, "hint=("+node.mInstructions+")");
 		nodeMarker.setSubDescription(Road.getLengthDurationText(node.mLength, node.mDuration));
 		//int code = RouteOptions.getManeuverCode(node.mManeuverType);
 		//Log.i(tag, "turn_code=("+node.mManeuverType+")+text="+node.mInstructions);
@@ -271,7 +274,7 @@ public class Markers {
 			}});
 	}
 	public void showHidePOIs() {}
-	public void updateRouteMarker(SavedPlace addr) {
+	/*public void updateRouteMarker(SavedPlace addr) {
 		GeoPoint gp = new GeoPoint(addr.getLat(),addr.getLng());
 		String detailAddress = addr.getBriefName();
 		String briefAddress = addr.getAdmin();
@@ -290,5 +293,5 @@ public class Markers {
 		osm.move(gp);								//this will cause marker shown in screen ?????????????
 		this.destinationMarkerList.add(routeMarker);  //this will cause marker not shown in screen ?????????????
 		this.selectedMarker = routeMarker;
-	}
+	}*/
 }
