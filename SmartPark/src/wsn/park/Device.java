@@ -6,9 +6,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.osmdroid.bonuspack.overlays.Marker;
+
 import wsn.park.R;
 import wsn.park.maps.Mode;
 import wsn.park.maps.OSM;
+import wsn.park.model.SavedPlace;
 import wsn.park.ui.DelayedTextWatcher;
 import wsn.park.ui.SuggestListAdapter;
 import wsn.park.util.DbHelper;
@@ -20,22 +23,28 @@ import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.speech.RecognizerIntent;
 import android.text.Editable;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.LinearLayout.LayoutParams;
 
 public class Device {
 	Activity act;
@@ -44,6 +53,8 @@ public class Device {
 	ListView listVoice;
 	ListView listSuggest;
 	DbHelper dbHelper;
+    PopupWindow popup;
+    ImageView iconTravelMode;
 	Mode mode;
 	private String tag=Device.class.getSimpleName();
 	public void init(Activity act, OSM osm){
@@ -56,6 +67,7 @@ public class Device {
 		closeKeyBoard();
 		setImage();
 		setList();
+		setPopup();
 		dbHelper = DbHelper.getInstance();
 	}
 	
@@ -72,24 +84,31 @@ public class Device {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Address addr = osm.suggestPoints.get(position);
-				osm.mks.updateRouteMarker(addr);////////////////////offline navi no marker??????
+				//osm.mks.updateRouteMarker(addr);////////////////////offline navi no marker??????
+				osm.mks.updatePointOverlay(GeoOptions.getMyPlace(addr));
 				listSuggest.setVisibility(View.INVISIBLE);
 				osm.move(addr.getLatitude(),addr.getLongitude());
 				dbHelper.addHistoryPlace(addr);
 				showPlaceDetailPage();
+				//Log.w(tag, "show popup window");
 			}
 		});
 	}
-	private void showPlaceDetailPage() {
+	public void showPlaceDetailPage() {
 		if(mode.ID==0){//normal
 			//show navi icon
+			this.openPopup(null);
 		}else if(mode.ID==2){//
 			//show navi icon
+			this.openPopup(null);
 		}else if(mode.ID==3){//pick up home
 			//show home icon
+			this.openPopup(null);
 		}else if(mode.ID==4){//pick up work
 			//show work icon
-		} 
+			this.openPopup(null);
+		}
+		this.openPopup(null);
 	}
 
 	private void setImage() {
@@ -183,4 +202,40 @@ public class Device {
 	          item.put("name", name);
 	          return item;
 	        }
+	  	private void setPopup() {
+	        LayoutInflater inflater = LayoutInflater.from(osm.act);
+	        View popupLayout = inflater.inflate(R.layout.popup, null);
+	        popup =new PopupWindow(popupLayout, LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);
+	        popup.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+	        popup.setOutsideTouchable(true);
+	        popup.setFocusable(false);
+			iconTravelMode = (ImageView) popupLayout.findViewById(R.id.ic_travel_mode);
+	        iconTravelMode.setClickable(true);
+	        iconTravelMode.setOnClickListener(new OnClickListener() {
+	            @Override
+	            public void onClick(View v) {
+	            	//gMap.refreshRoute(true);
+	            }
+	        });
+	  	}
+	    public void openPopup(SavedPlace sp) {
+            popup.setAnimationStyle(R.style.AnimBottom);
+            popup.showAtLocation(osm.act.findViewById(R.id.my_loc), Gravity.BOTTOM, 0, 0); //leaked window
+            popup.setFocusable(true);
+            /*if(m!=null){
+	            pointBrief.setText(m.getTitle());
+	            pointDetail.setText(m.getSnippet());
+	            markerid.setText(m.getId());
+	            markertype.setText(type+"");
+	            this.iconDelete.setVisibility(View.VISIBLE);
+            }else{
+            	pointBrief.setText("");
+                pointDetail.setText("");
+                markerid.setText("");
+                this.iconDelete.setVisibility(View.INVISIBLE);
+            }
+            Util.hideIcons(MainActivity.this,type);*/
+            popup.update();
+            Log.w(tag, "openPopup");
+    }
 }

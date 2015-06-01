@@ -34,8 +34,10 @@ public class HistoryActivity extends BaseActivity {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				PlaceHolder ph = (PlaceHolder) view.getTag();
 				//Log.w(tag, "place.name="+ph.place.getName());
-				osm.mks.updateRouteMarker(ph.place);
+				//osm.mks.updateRouteMarker(ph.place);
+				osm.mks.updatePointOverlay(ph.place);
 				drawer.close();
+				osm.dv.openPopup(ph.place);
 				finish();
 			}
         });

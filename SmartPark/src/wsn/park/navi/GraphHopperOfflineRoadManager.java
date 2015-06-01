@@ -145,7 +145,7 @@ public class GraphHopperOfflineRoadManager extends RoadManager {
 		return list;
 	}
 
-	@Override
+	//@Override
 	public Address getEndAddress() {
 		Address addr = new Address(Locale.getDefault());
 		addr.setLatitude(end.getLatitude());
@@ -154,7 +154,7 @@ public class GraphHopperOfflineRoadManager extends RoadManager {
 		return addr;
 	}
 
-	@Override
+	//@Override
 	public Address getStartAddress() {
 		Address addr = new Address(Locale.getDefault());
 		addr.setLatitude(start.getLatitude());

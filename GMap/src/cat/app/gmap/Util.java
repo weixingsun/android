@@ -243,10 +243,10 @@ public class Util {
 
 	public static void hideIcons(MainActivity act, int type) {
 		if(type>0){
-		act.iconPolice.setVisibility(View.INVISIBLE);
-		act.iconCCTV.setVisibility(View.INVISIBLE);
-		act.iconMedical.setVisibility(View.INVISIBLE);
-		//act.iconPolice.setVisibility(View.INVISIBLE);
+			act.iconPolice.setVisibility(View.INVISIBLE);
+			act.iconCCTV.setVisibility(View.INVISIBLE);
+			act.iconMedical.setVisibility(View.INVISIBLE);
+			//act.iconPolice.setVisibility(View.INVISIBLE);
 		}else{
 			act.iconPolice.setVisibility(View.VISIBLE);
 			act.iconCCTV.setVisibility(View.VISIBLE);

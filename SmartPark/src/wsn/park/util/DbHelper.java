@@ -130,7 +130,7 @@ import android.util.Log;
 	    			double lat= cursor.getDouble(2);
 	    			double lng= cursor.getDouble(3);
 	    			SavedPlace sp = new SavedPlace(name,admin,lat,lng);
-	    			Log.i(tag, "name="+name+",admin="+admin+",lat="+lat+",lng="+lng);
+	    			//Log.i(tag, "name="+name+",admin="+admin+",lat="+lat+",lng="+lng);
 	    			list.add(sp);
 	    		}while(cursor.moveToNext());
 	    	}

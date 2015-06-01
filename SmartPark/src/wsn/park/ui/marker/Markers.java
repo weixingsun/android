@@ -10,12 +10,15 @@ import org.mapsforge.map.reader.PointOfInterest;
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.bonuspack.overlays.Marker;
+import org.osmdroid.bonuspack.overlays.Marker.OnMarkerClickListener;
 import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadNode;
 import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.OverlayItem;
 
 import android.app.Activity;
@@ -26,6 +29,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import wsn.park.MyItemizedOverlay;
 import wsn.park.R;
@@ -52,6 +56,8 @@ public class Markers {
 
 	public Marker myLocMarker;
 	Marker routeMarker;
+
+	OsmMapsItemizedOverlay pointOverlay;
 	public List<Marker> waypointsMarkerList = new ArrayList<Marker>();
 	public List<Marker> destinationMarkerList = new ArrayList<Marker>();
 	//public List<Marker> poiMarkerList = new CopyOnWriteArrayList<Marker>();
@@ -104,7 +110,8 @@ public class Markers {
 		Drawable icon = osm.act.getResources().getDrawable(R.drawable.home_icon);
 		myLocMarker.setImage(icon);
 		osm.map.getOverlays().add(myLocMarker);
-	}/*
+	}
+	/*
 	public void initRouteMarker() {
 		Drawable img = osm.act.getResources().getDrawable(R.drawable.marker_blue);
 		int markerWidth = img.getIntrinsicWidth();
@@ -128,11 +135,47 @@ public class Markers {
 		routeMarker.setIcon(icon);
 		Drawable img = osm.act.getResources().getDrawable(R.drawable.ic_arrived);
 		routeMarker.setImage(img);
-		//Log.w(tag, "adding routeMarker="+routeMarker);
+		/* ////////////////////////////////not working
+		 * routeMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
+	        @Override
+	        public boolean onMarkerClick(Marker marker, MapView mapView) {
+	            //Toast.makeText(osm.act, "CLICK", Toast.LENGTH_SHORT).show();
+	        	Log.w(tag, "clicked");
+	            return true;
+	        }
+	    });*/
+		Log.w(tag, "adding routeMarker="+routeMarker);
 		osm.map.getOverlays().add(routeMarker);
 		osm.move(gp);								//this will cause marker shown in screen ?????????????
 		this.destinationMarkerList.add(routeMarker);  //this will cause marker not shown in screen ?????????????
 		this.selectedMarker = routeMarker;
+	}
+	public void updatePointOverlay(SavedPlace addr){
+		GeoPoint gp = new GeoPoint(addr.getLat(),addr.getLng());
+		Drawable d = osm.act.getResources().getDrawable( R.drawable.marker_blue );
+		ArrayList<OverlayItem> pList = new ArrayList<OverlayItem>();
+		ResourceProxy resourceProxy = (ResourceProxy) new DefaultResourceProxyImpl(osm.act);
+		prepareOverlay(pList,resourceProxy,addr);
+		OverlayItem newOverlay = new OverlayItem(addr.getBriefName(), addr.getAdmin(), gp);
+		newOverlay.setMarker(d);
+		pointOverlay.addOverlay(newOverlay);
+		osm.map.getOverlays().add(pointOverlay);
+		osm.map.invalidate();
+		osm.move(gp);
+	}
+	private void prepareOverlay(ArrayList<OverlayItem> pList, ResourceProxy resourceProxy,final SavedPlace sp) {
+		pointOverlay = new OsmMapsItemizedOverlay(pList,
+        new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>(){
+            @Override
+            public boolean onItemSingleTapUp(final int index, final OverlayItem item){
+            	osm.dv.openPopup(sp);
+                return true; // We 'handled' this event.
+            }
+            @Override
+            public boolean onItemLongPress(final int index, final OverlayItem item){
+                return true;
+            }
+        }, resourceProxy);
 	}
 	public void drawStepsPoint(Road road) { // called from tasks
 		for (int i = 0; i < road.mNodes.size(); i++) {

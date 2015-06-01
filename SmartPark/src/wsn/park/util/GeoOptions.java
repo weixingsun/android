@@ -3,6 +3,8 @@ package wsn.park.util;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
+import wsn.park.model.SavedPlace;
+
 import android.location.Address;
 
 public class GeoOptions {
@@ -42,6 +44,10 @@ public class GeoOptions {
     		display=a.getAddressLine(0)+", "+a.getAddressLine(1)+", "+a.getAddressLine(2)+", "+a.getCountryName();
     	}
     	return display;
+	}
+	public static SavedPlace getMyPlace(Address addr){
+		SavedPlace sp = new SavedPlace(getAddressName(addr), addr.getAdminArea(), addr.getLatitude(), addr.getLongitude());
+		return sp;
 	}
 	/*public static String getGeocoder() {
 		if(geocoder==null) geocoder=GeoOptions.GOOGLE;

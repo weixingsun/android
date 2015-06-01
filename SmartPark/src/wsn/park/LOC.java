@@ -102,12 +102,12 @@ public class LOC implements LocationListener {
 		if (countryCode == null) {
 			countryCode = CountryCode.getByGeoPoint(gp);
 		}
-		if(osm.mks.myLocMarker==null){
-			osm.mks.initMyLocMarker(loc);
-		}
-		osm.mks.myLocMarker.setPosition(gp);
-		osm.move(gp);
-		(new FindMyStepTask(osm, osm.mks.myLocMarker.getPosition(),osm.mks.myLocMarker)).execute();
+		//if(osm.mks.myLocMarker==null){
+		//	osm.mks.initMyLocMarker(loc);
+		//}
+		//osm.mks.myLocMarker.setPosition(gp);
+		//osm.move(gp);
+		//(new FindMyStepTask(osm, osm.mks.myLocMarker.getPosition(),osm.mks.myLocMarker)).execute();
 
 		dbHelper.updateGPS(0, myPos);
 	}
