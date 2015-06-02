@@ -80,7 +80,7 @@ public void createPOIMarker(int resId,PointOfInterest poi) {
 	newMarker.setOnMarkerClickListener(new OnMarkerClickListener(){
 		@Override
 		public boolean onMarkerClick(Marker arg0, MapView arg1) {
-			osm.mks.selectedMarker = arg0;
+			//osm.mks.selectedMarker = arg0;
 			arg0.showInfoWindow();
 			return false;
 		}});
@@ -89,7 +89,7 @@ public void createPOIMarker(int resId,PointOfInterest poi) {
 }
 public void clearMarkers(){
 	osm.mks.pois.clear();
-	osm.mks.removePOIMarkers();
+	//osm.mks.removePOIMarkers();
 	//Log.w(TAG, "POI.size="+osm.mks.pois.size()+",LatN="+bbE6Visible.getLatNorthE6()+",LatS="+bbE6Visible.getLatSouthE6()+",LngE="+bbE6Visible.getLonEastE6()+",LngW="+bbE6Visible.getLonWestE6());
 	//osm.map.invalidate();
 }

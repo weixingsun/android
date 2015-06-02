@@ -46,7 +46,7 @@ public class GeoOptions {
     	return display;
 	}
 	public static SavedPlace getMyPlace(Address addr){
-		SavedPlace sp = new SavedPlace(getAddressName(addr), addr.getAdminArea(), addr.getLatitude(), addr.getLongitude());
+		SavedPlace sp = new SavedPlace(getAddressName(addr), addr.getAdminArea(), addr.getLatitude(), addr.getLongitude(),addr.getCountryCode());
 		return sp;
 	}
 	/*public static String getGeocoder() {

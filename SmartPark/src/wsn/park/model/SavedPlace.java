@@ -1,29 +1,55 @@
 package wsn.park.model;
 
+import org.osmdroid.util.GeoPoint;
+
 public class SavedPlace {
-	public SavedPlace(int id,String name,String admin,double lat,double lng,String machine,String user){
+	public SavedPlace(int id,String name,String admin,double lat,double lng,String countryCode,String machine,String user,int special){
 		this.id=id;
 		this.name=name;
 		this.admin=admin;
 		this.lat=lat;
 		this.lng=lng;
+		this.countryCode=countryCode;
 		this.machine_code=machine;
 		this.user_name=user;
+		this.special = special;
 	}
-	public SavedPlace(String name,String admin,double lat,double lng){
+	public SavedPlace(String name,String admin,double lat,double lng,String countryCode){
 		this.name=name;
 		this.admin=admin;
 		this.lat=lat;
 		this.lng=lng;
+		this.countryCode=countryCode;
 	}
+	public SavedPlace(String name,String admin,double lat,double lng,String countryCode,int special){
+		this.name=name;
+		this.admin=admin;
+		this.lat=lat;
+		this.lng=lng;
+		this.countryCode=countryCode;
+		this.special = special;
+	}
+	public SavedPlace(String name,String admin,GeoPoint p,String countryCode,int special){
+		this.name=name;
+		this.admin=admin;
+		this.lat=p.getLatitude();
+		this.lng=p.getLongitude();
+		this.countryCode=countryCode;
+		this.special = special;
+	}
+	public static final int NONE = 0;
+	public static final int NORMAL = 10;
+	public static final int HOME = 11;
+	public static final int WORK = 12;
+	
 	//id, name, admin, lat,lng, machine_code, user_name
-	private int id;
-	private String name,admin, machine_code, user_name;
+	private int id,special;
+	private String name,admin, machine_code, user_name,countryCode;
 	private double lat,lng;
-	private int getId() {
+	public int getId() {
 		return id;
 	}
-	private void setId(int id) {
+	public void setId(int id) {
 		this.id = id;
 	}
 	public String getName() {
@@ -68,5 +94,19 @@ public class SavedPlace {
 	public void setLng(double lng) {
 		this.lng = lng;
 	}
-	
+	public String getCountryCode() {
+		return countryCode;
+	}
+	public void setCountryCode(String country_code) {
+		this.countryCode = country_code;
+	}
+	public int getSpecial() {
+		return special;
+	}
+	public void setSpecial(int special) {
+		this.special = special;
+	}
+	public GeoPoint getPosition(){
+		return new GeoPoint(this.lat,this.lng);
+	}
 }

@@ -3,6 +3,8 @@ package wsn.park.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.osmdroid.util.GeoPoint;
+
 import wsn.park.model.SavedPlace;
 
 import android.content.ContentValues;
@@ -12,6 +14,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Address;
 import android.location.Location;
+import android.provider.Settings.Secure;
 import android.util.Log;
 
 	public class DbHelper extends SQLiteOpenHelper {
@@ -23,12 +26,15 @@ import android.util.Log;
 	    private final static int DATABASE_VERSION=1;
 	    private final static String GPS_TABLE="gps_data";
 	    private final static String HISTORY_TABLE="history_place"; //just local history
-	    private final static String MY_PLACE_TABLE="my_place"; // upload to cloud
+	    public final static String MY_PLACE_TABLE="my_place"; // upload to cloud
 	    private final static String SETTINGS_TABLE="settings";
 	    private static String STR_CREATE;
+
+		private String android_id; 
 	    //gps_data(data_id,lat,lng,country_code)	//id=0, lastknownlocation,
 	    private DbHelper(Context context){
 	    	super(context, DATABASE_NAME,null, DATABASE_VERSION);
+	    	android_id = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID); 
 	    	this.createTables();
 	    }
 	    public static DbHelper getInstance(Context context){
@@ -62,7 +68,7 @@ import android.util.Log;
 	    	STR_CREATE = "CREATE TABLE IF NOT EXISTS "    //+DATABASE_NAME+"."
 		    		+GPS_TABLE+ " ("
 		    		+"data_id integer not null primary key, "
-		    		+"lat double NOT NULL, lng double NOT NULL, "
+		    		+"lat double NOT NULL, lng double NOT NULL, " //float(10,7)
 		    		+"country_code varchar(3) "
 		    		+");";
 	    	this.db.execSQL(STR_CREATE);
@@ -85,16 +91,17 @@ import android.util.Log;
 		    		+"lat double NOT NULL, lng double NOT NULL"
 		    		+");";
 	    	this.db.execSQL(STR_CREATE);
-	    	//id, address_name, admin, country_code, lat,lng, machine_code, user_name, special
+	    	//id, address_name, admin, country_code, lat,lng, machine_code, user_name, special(10-normal, 11-home,12-work)
 	    	STR_CREATE = "CREATE TABLE IF NOT EXISTS "    //+DATABASE_NAME+"."
 		    		+MY_PLACE_TABLE+ " ("
-				    +"create_time DATETIME not null, "
+				    //+"create_time TIMESTAMP DEFAULT (datetime('now','localtime')) , "  //CURRENT_TIMESTAMP is in GMT
+				    +"id integer not null primary key AUTOINCREMENT, "
 		    		+"name varchar(80) not null, "
 		    		+"admin varchar(50), "
 		    		+"country_code varchar(5) not null, " 
 		    		+"lat double NOT NULL, lng double NOT NULL, "
 		    		+"machine_code varchar(50) NOT NULL,"
-		    		+"user_name varchar(50) NOT NULL,"
+		    		+"user_name varchar(50),"
 		    		+"special integer NOT NULL"
 		    		+");";
 	    	this.db.execSQL(STR_CREATE);
@@ -121,7 +128,7 @@ import android.util.Log;
 	    public List<SavedPlace> getHistoryPlaces() {
 			List<SavedPlace> list = new ArrayList<SavedPlace>();
 	    	this.db = getReadableDatabase();
-	    	String sql = "SELECT name,admin,lat,lng FROM " +HISTORY_TABLE+" order by id desc";
+	    	String sql = "SELECT name,admin,lat,lng,country_code FROM " +HISTORY_TABLE+" order by id desc";
 	    	Cursor cursor = db.rawQuery(sql, null);
 	    	if (cursor.moveToFirst()){
 	    		do{
@@ -129,7 +136,8 @@ import android.util.Log;
 	    			String admin= cursor.getString(1);
 	    			double lat= cursor.getDouble(2);
 	    			double lng= cursor.getDouble(3);
-	    			SavedPlace sp = new SavedPlace(name,admin,lat,lng);
+	    			String country_code = cursor.getString(4);
+	    			SavedPlace sp = new SavedPlace(name,admin,lat,lng,country_code);
 	    			//Log.i(tag, "name="+name+",admin="+admin+",lat="+lat+",lng="+lng);
 	    			list.add(sp);
 	    		}while(cursor.moveToNext());
@@ -148,15 +156,18 @@ import android.util.Log;
 	        String sql=" DROP TABLE IF EXISTS "+tableName+";VACUUM;";
 	        db.execSQL(sql);
 	    }
-	    public String getCountryCode() {
+	    public String getLastPosition() {
 	    	this.db = getReadableDatabase();
-	    	String sql = "SELECT country_code FROM " +GPS_TABLE+" where data_id=0";
+	    	String sql = "SELECT country_code,lat,lng FROM " +GPS_TABLE+" where data_id=0";
 	    	Cursor cursor = db.rawQuery(sql, null);
 	    	if (cursor != null)
 	        	cursor.moveToFirst();
 	    	String name = null;
 	    	try{
-	    	  name = cursor.getString(0);
+	    	  String code = cursor.getString(0);
+	    	  double lat = cursor.getDouble(1);
+	    	  double lng = cursor.getDouble(2);
+	    	  name = code+","+lat+","+lng;
 	    	}catch(Exception e){
 	    		Log.i(tag, "Error:"+e.getMessage()+",sql="+sql);
 	    	}
@@ -165,27 +176,24 @@ import android.util.Log;
 	        this.db=null;
 	        return name;
 	    }
-	    public void addCountryCode(String countryCode) {
-	    	insertGPS(0, -1,-1,countryCode);
+	    public void addLastPosition(String pos) {
+	        String[] posArr = pos.split(",");
+	    	insertGPS(0, Double.valueOf(posArr[1]),Double.valueOf(posArr[2]),posArr[0]);
 	    }
 	    public void updateCountryCode(String countryCode) {
-	    	if(getCountryCode()!=null){
-	    		updateOnlyCountryCode(countryCode);
+	    	if(getLastPosition()!=null){
+	    		updateLastPosition(countryCode);
 	    	}else{
-	    		addCountryCode(countryCode);
+	    		addLastPosition(countryCode);
 	    	}
 	    }
-	    public void updateOnlyCountryCode(String countryCode) {
-	    	if(this.db==null)
-	    		this.db = this.getWritableDatabase();
-	        String where="data_id=?";
-	        String[] whereValue={Integer.toString(0)};
-	        ContentValues cv=new ContentValues();
-	        cv.put("country_code", countryCode);
-	        db.update(GPS_TABLE, cv, where, whereValue);
+	    //updateGPS(int id,double lat,double lng, String countryCode)
+	    public void updateLastPosition(String pos) { //pos=nz,0,0
+	    	String[] posArr = pos.split(",");
+	    	updateGPS(0,Double.valueOf(posArr[1]),Double.valueOf(posArr[2]),posArr[0]);
 	    }
 	    
-	    //(sensor_type,sensor_metric_seq,sensor_metric_data)
+		//(sensor_type,sensor_metric_seq,sensor_metric_data)
 	    private long insertGPS(int id, double lat,double lng)
 	    {
 	        String countryCode = CountryCode.getByLatLng(lat, lng);
@@ -229,7 +237,7 @@ import android.util.Log;
 	        this.updateGPS(id, lat, lng, countryCode);
 	    }
 	    public void updateGPS(int id,Location loc){
-	    	if(getCountryCode()==null){
+	    	if(getLastPosition()==null){
 	    		this.insertGPS(id, loc.getLatitude(), loc.getLongitude());
 	    	}else{
 	    		this.updateGPS(id, loc.getLatitude(), loc.getLongitude());
@@ -280,11 +288,14 @@ import android.util.Log;
 	    		this.updateSettings(name, value);
 	    	}
 	    }
-	    //id, address_name, admin, country_code, lat,lng, machine_code, user_name, special
-		public List<SavedPlace> getSavedPlaces() {
+	    //my_place(id, address_name, admin, country_code, lat,lng, machine_code, user_name, special)
+	    //special=10 normal
+	    //special=11 home
+	    //special=12 work
+		public List<SavedPlace> getSavedPlaces(String condition) {
 			List<SavedPlace> list = new ArrayList<SavedPlace>();
 		    	this.db = getReadableDatabase();
-		    	String sql = "SELECT name,admin,lat,lng FROM " +MY_PLACE_TABLE+" where special=0";
+		    	String sql = "SELECT name,admin,lat,lng,country_code,special,id FROM " +MY_PLACE_TABLE+" where "+condition+" order by id desc";
 		    	Cursor cursor = db.rawQuery(sql, null);
 		    	if (cursor.moveToFirst()){
 		    		do{
@@ -292,21 +303,28 @@ import android.util.Log;
 		    			String admin= cursor.getString(1);
 		    			double lat= cursor.getDouble(2);
 		    			double lng= cursor.getDouble(3);
-		    			SavedPlace sp = new SavedPlace(name,admin,lat,lng);
+		    			String country_code = cursor.getString(4);
+		    			int special = cursor.getInt(5);
+		    			int id = cursor.getInt(6);
+		    			//int id,String name,String admin,double lat,double lng,String countryCode,String machine,String user,int special
+		    			SavedPlace sp = new SavedPlace(id,name,admin,lat,lng,country_code,null,null,special);
 		    			//Log.i(tag, "name="+name+",admin="+admin+",lat="+lat+",lng="+lng);
 		    			list.add(sp);
 		    		}while(cursor.moveToNext());
 		    	}
 		    	cursor.close();
 		        //db.close();
-		    
 			return list;
 		}
 		public SavedPlace[] getSavedPlaceNames() {
-			List<SavedPlace> list =getSavedPlaces();
+			List<SavedPlace> list =getSavedPlaces("special="+SavedPlace.NORMAL);
 			SavedPlace[] array = list.toArray(new SavedPlace[list.size()]);
 			//Log.w(tag, "array="+array[0].getName()+", "+array[1].getName());
 			return array;
+		}
+		public SavedPlace getSavedPlace(GeoPoint gp) {
+			List<SavedPlace> list =getSavedPlaces("lat="+gp.getLatitude()+" and lng="+gp.getLongitude());
+			return list.get(0);
 		}
 		public SavedPlace[] getHistoryPlaceNames() {
 			List<SavedPlace> list =getHistoryPlaces();
@@ -332,27 +350,42 @@ import android.util.Log;
 			
 		}
 		//id, address_name, admin, country_code, lat,lng
-		public void addMyPlace(Address addr, int special) {
-			String name = GeoOptions.getAddressName(addr);
+		public int addMyPlace(SavedPlace addr) {
+			//String name = GeoOptions.getAddressName(addr);
 	    	if(this.db==null)
 	    	this.db = getWritableDatabase();
 	        ContentValues cv=new ContentValues();
-	        //cv.put("id", id);
-	        cv.put("name", name);
-	        cv.put("admin", addr.getSubAdminArea());
+	        cv.put("id", addr.getId());
+	        cv.put("name", addr.getBriefName());
+	        cv.put("admin", addr.getAdmin());
 	        cv.put("country_code", addr.getCountryCode());
-	        cv.put("lat", addr.getLatitude());
-	        cv.put("lng", addr.getLongitude());
-	        cv.put("special", special);
+	        cv.put("lat", addr.getLat());
+	        cv.put("lng", addr.getLng());
+	        cv.put("machine_code", android_id);
+	        //cv.put("user_name", user_name);
+	        cv.put("special", addr.getSpecial());
 	        long row=db.insert(MY_PLACE_TABLE, null, cv);
-	        Log.w(tag, "insertMyPlace:"+name+",special="+special);
+	        Log.w(tag, "insertMyPlace:"+addr.getBriefName()+"id="+addr.getId()+",special="+addr.getSpecial());
+	        return addr.getId();
 		}
 		public int deleteHistoryPlaces() {
 	    	if(this.db==null)
 	    		this.db = this.getWritableDatabase();
-	        String where="1="+1;
+	        String where="1=1";
 	        int a = db.delete(MY_PLACE_TABLE, where,null);
 	        //db.close();
 	        return a;
 	    }
+		public int deleteMyPlaces(int id) {
+	    	if(this.db==null)
+	    		this.db = this.getWritableDatabase();
+	        String where="id="+id;
+	        int a = db.delete(MY_PLACE_TABLE, where,null);
+	        //db.close();
+	        Log.i(tag, "deleted "+a+" rows: "+where);
+	        return a;
+	    }
+		public List<SavedPlace> getAllSavedPlaces(){
+			return getSavedPlaces("1=1");
+		}
 	}

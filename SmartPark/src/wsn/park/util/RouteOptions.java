@@ -253,6 +253,31 @@ public class RouteOptions {
 		}
 		return str;
 	}
+	public static int getGoogleManeuverTypeFromText(String origtext) {
+		//Head <b>east</b> on <b>Elizabeth St</b> toward <b>Picton Ave</b>
+		//Turn <b>left</b> onto <b>Picton Ave</b>
+		//Turn <b>right</b> onto <b>Riccarton Rd</b>
+		//Turn <b>right</b>
+		//Turn <b>left</b>
+		//At the roundabout, take the <b>2nd</b> exit onto <b>Riccarton Ave</b>
+		//<b>Kahu Rd</b> turns slightly <b>right</b> and becomes <b>Kotare St</b><div style="font-size:0.9em">Destination will be on the right</div>
+		int type = 0;
+		String search_text = origtext.indexOf("Destination")>0?origtext.split("Destination")[0]:origtext;
+		if(search_text.startsWith("Head")){
+			type = 1;
+		}else if(search_text.indexOf("left")>0){
+			if(search_text.indexOf("slightly")>0) type = 3;
+			else type = 4;
+		}else if(search_text.indexOf("right")>0){
+			if(search_text.indexOf("slightly")>0) type = 6;
+			else type = 7;
+		}else if(search_text.indexOf("roundabout")>0 ){
+			if(search_text.indexOf("1st")>0) type = 27;
+			else if(search_text.indexOf("2nd")>0) type = 28;
+			else if(search_text.indexOf("3rd")>0) type = 29;
+		}
+		return type;
+	}
 }
 /*
 Guidance Route Data										Narrative

@@ -33,11 +33,12 @@ public class LOC implements LocationListener {
 	private static final String tag = LOC.class.getSimpleName();
 	DbHelper dbHelper;
 	private LocationManager lm;
-	public Location myPos;
+	public static Location myPos;
+	public static GeoPoint myLastPos;
 	private int speed;
 	Activity act;
 	OSM osm;
-	Wifi wifi;
+	//Wifi wifi;
 	public Drawer dr = Drawer.INSTANCE();
 	public static String countryCode = null;
 	String provider;
@@ -49,7 +50,7 @@ public class LOC implements LocationListener {
 	public void init(Activity act, OSM osm) {
 		this.act = act;
 		this.osm = osm;
-		wifi = new Wifi(act);
+		//wifi = new Wifi(act);
 		this.dbHelper = DbHelper.getInstance();
 		if (openGPSEnabled()) {
 			provider = getGoodProvider() ; //LocationManager.GPS_PROVIDER; //this.getProvider();
@@ -69,11 +70,13 @@ public class LOC implements LocationListener {
 				}
 				dbHelper.updateGPS(0, myPos);
 			}else{
-				countryCode = dbHelper.getCountryCode();
-				if(countryCode==null){
+				String[] lastPos = dbHelper.getLastPosition().split(",");
+				myLastPos = new GeoPoint(Double.valueOf(lastPos[1]),Double.valueOf(lastPos[2]));
+				countryCode = lastPos[0];
+				//if(countryCode==null){
 					//show supported country list in left drawer
 					//dr.show("Country");
-				}
+				//}
 			}
 		}
 	}
@@ -168,6 +171,12 @@ public class LOC implements LocationListener {
 		this.road = null;
 	}
 
+	public static Location getMyPos() {
+		return myPos;
+	}
+	public static GeoPoint getMyLastPos() {
+		return myLastPos;
+	}
 }
 
 /*

@@ -86,7 +86,7 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 		osm.mks.drawStepsPoint(road);
 		osm.loc.passedNodes.clear();
 		if(osm.endAddr!=null){
-			osm.mks.updatePointOverlay(GeoOptions.getMyPlace(osm.endAddr));
+			osm.mks.updateDestinationOverlay(GeoOptions.getMyPlace(osm.endAddr));
 		}
     }
 

@@ -48,7 +48,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        osm.loc.wifi.unregister();
+        //osm.loc.wifi.unregister();
         super.onDestroy();
     }
     @Override

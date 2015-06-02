@@ -114,7 +114,7 @@ public class MathUtil {
     }
     
     public static boolean compare(double a, double b){
-    	double epsilon = 0.0000000000001;
+    	double epsilon = 0.00000000001;
 	    if(abs(a - b) < epsilon){
 	    	return true;
 	    }

@@ -18,6 +18,7 @@ import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.ItemizedIconOverlay.OnItemGestureListener;
 import org.osmdroid.views.overlay.ItemizedOverlayWithFocus;
 import org.osmdroid.views.overlay.OverlayItem;
 
@@ -31,145 +32,93 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import wsn.park.LOC;
 import wsn.park.MyItemizedOverlay;
 import wsn.park.R;
 import wsn.park.map.poi.POI;
 import wsn.park.maps.OSM;
 import wsn.park.model.SavedPlace;
+import wsn.park.util.DbHelper;
 import wsn.park.util.MapOptions;
+import wsn.park.util.MathUtil;
 import wsn.park.util.RouteOptions;
 
 public class Markers {
 	private static final String tag = Markers.class.getSimpleName();
-	static OSM osm;
-	static Markers mks;
+	private static OSM osm;
+	private static Markers mks;
+	private DbHelper dbHelper;
 	private Markers(){
+		dbHelper = DbHelper.getInstance();
 	}
 	public static Markers getInstance(OSM osm) {
 		Markers.osm = osm;
-		if(mks==null) mks = new  Markers();
+		if(mks==null) mks = new Markers();
 		return mks;
 	}
-
-	MyItemizedOverlay myLocOverlay;
-	//OverlayItem myLocationMarker;
-
 	public Marker myLocMarker;
-	Marker routeMarker;
-
-	OsmMapsItemizedOverlay pointOverlay;
+	//private OsmMapsItemizedOverlay pointOverlay;
+	public  OsmMapsItemizedOverlay selectedMarker;
 	public List<Marker> waypointsMarkerList = new ArrayList<Marker>();
-	public List<Marker> destinationMarkerList = new ArrayList<Marker>();
-	//public List<Marker> poiMarkerList = new CopyOnWriteArrayList<Marker>();
+	public List<OsmMapsItemizedOverlay> destinationMarkerList = new ArrayList<OsmMapsItemizedOverlay>();
+	public List<OsmMapsItemizedOverlay> savedPlaceMarkers = new CopyOnWriteArrayList<OsmMapsItemizedOverlay>();
 	public CopyOnWriteArrayList<POI> pois = new CopyOnWriteArrayList<POI>();
 	
 	Polyline routePolyline;
-	public Marker selectedMarker;
 	
-	//List<Marker> markers= new ArrayList<Marker>();
-/*	public void addMarker(GeoPoint p){
-		Marker mk = new Marker(mapView);
-		mk.setPosition(p);
-		mk.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-		//mk.setIcon(icon);
-		mk.setIcon(mapView.getResources().getDrawable(R.drawable.ic_launcher));
-		mk.setTitle("Start point");
-		mapView.getOverlays().add(mk);
-		//markers.add(mk);
-	}*/
 	public void initMylocMarker() {
-		Drawable img = osm.act.getResources().getDrawable(R.drawable.blue_point_32);
-		int markerWidth = img.getIntrinsicWidth();
-		int markerHeight = img.getIntrinsicHeight();
-		img.setBounds(0, markerHeight, markerWidth, 0);
-		ResourceProxy resourceProxy = new DefaultResourceProxyImpl(osm.act);
-		myLocOverlay = new MyItemizedOverlay(img, resourceProxy);
-		osm.map.getOverlays().add(myLocOverlay);
-	}
-
-	public void removePOIMarkers(){
-		for(POI p:osm.mks.pois){
-			osm.map.getOverlays().remove(p.poiMarker);
-		}
-		osm.mks.pois.clear();
-	}
-	/*public void updateMyLocationMarker(GeoPoint loc) {
-		myLocOverlay.removeItem(myLocationMarker);
-		myLocationMarker = new OverlayItem("me", "me", loc);
-		myLocOverlay.addItem(myLocationMarker);
-	}*/
-	public void initMyLocMarker(Location loc) {
+		Location loc = LOC.getMyPos();
 		if(loc==null) return;
+		GeoPoint p = new GeoPoint(loc.getLatitude(),loc.getLongitude());
 		osm.map.getOverlays().remove(myLocMarker);
 		myLocMarker = new Marker(osm.map);
-		myLocMarker.setPosition(new GeoPoint(loc));
+		myLocMarker.setPosition(p);
 		Drawable img = osm.act.getResources().getDrawable(R.drawable.blue_radio_48);//ic_my_position_auto_follow
 		myLocMarker.setIcon(img);
 		myLocMarker.setDraggable(true);
 		myLocMarker.setOnMarkerDragListener(new OnTestMarkerDragListener(osm));
-		Drawable icon = osm.act.getResources().getDrawable(R.drawable.multiple_45);
-		myLocMarker.setImage(icon);
+		//Drawable icon = osm.act.getResources().getDrawable(R.drawable.multiple_45);
+		//myLocMarker.setImage(icon);
 		osm.map.getOverlays().add(myLocMarker);
 	}
-	/*
-	public void initRouteMarker() {
-		Drawable img = osm.act.getResources().getDrawable(R.drawable.marker_blue);
-		int markerWidth = img.getIntrinsicWidth();
-		int markerHeight = img.getIntrinsicHeight();
-		img.setBounds(0, markerHeight, markerWidth, 0);
-		ResourceProxy resourceProxy = new DefaultResourceProxyImpl(osm.act);
-		routeOverlay = new MyItemizedOverlay(img, resourceProxy);
-		osm.mapView.getOverlays().add(routeOverlay);
-	}*/
-/*	public void updateRouteMarker(Address addr) {
-		GeoPoint gp = new GeoPoint(addr.getLatitude(),addr.getLongitude());
-		String detailAddress = addr.getFeatureName()+", "+addr.getThoroughfare();
-		String briefAddress = addr.getLocality()+", "+addr.getCountryName();
-		osm.map.getOverlays().remove(routeMarker);
-		routeMarker = new Marker(osm.map);
-		routeMarker.setPosition(gp);
-		routeMarker.setEnabled(true);
-		routeMarker.setTitle(detailAddress);
-		routeMarker.setSnippet(briefAddress);
-		Drawable icon = osm.act.getResources().getDrawable(R.drawable.marker_blue);
-		routeMarker.setIcon(icon);
-		Drawable img = osm.act.getResources().getDrawable(R.drawable.ic_arrived);
-		routeMarker.setImage(img);
-		////////////////////////////////not working
-		routeMarker.setOnMarkerClickListener(new Marker.OnMarkerClickListener() {
-	        @Override
-	        public boolean onMarkerClick(Marker marker, MapView mapView) {
-	            //Toast.makeText(osm.act, "CLICK", Toast.LENGTH_SHORT).show();
-	        	Log.w(tag, "clicked");
-	            return true;
-	        }
-	    });
-		Log.w(tag, "adding routeMarker="+routeMarker);
-		osm.map.getOverlays().add(routeMarker);
-		osm.move(gp);								//this will cause marker shown in screen ?????????????
-		this.destinationMarkerList.add(routeMarker);  //this will cause marker not shown in screen ?????????????
-		this.selectedMarker = routeMarker;
-	}*/
-	public void updatePointOverlay(SavedPlace addr){ //clickable
-		osm.map.getOverlays().remove(pointOverlay);
-		GeoPoint gp = new GeoPoint(addr.getLat(),addr.getLng());
-		Drawable d = osm.act.getResources().getDrawable( R.drawable.marker_blue );
-		ArrayList<OverlayItem> pList = new ArrayList<OverlayItem>();
-		ResourceProxy resourceProxy = (ResourceProxy) new DefaultResourceProxyImpl(osm.act);
-		prepareOverlay(pList,resourceProxy,addr);
-		OverlayItem newOverlay = new OverlayItem(addr.getBriefName(), addr.getAdmin(), gp);
-		newOverlay.setMarker(d);
-		pointOverlay.addOverlay(newOverlay);
-		osm.map.getOverlays().add(pointOverlay);
-		//osm.map.invalidate();
-		osm.move(gp);
-		osm.dv.openPopup(addr);
-		this.destinationMarkerList.add(routeMarker);
-		this.selectedMarker = routeMarker;
+	
+	public OsmMapsItemizedOverlay updateDestinationOverlay(SavedPlace addr){ //clickable
+		if(selectedMarker!=null&& selectedMarker.getSp().getSpecial()<SavedPlace.NORMAL){
+			osm.map.getOverlays().remove(selectedMarker);//delete last not saved pin
+		}
+		selectedMarker=findMyPlace(addr);
+		if(selectedMarker==null){
+			GeoPoint gp = new GeoPoint(addr.getLat(),addr.getLng());
+			Drawable d = osm.act.getResources().getDrawable( R.drawable.marker_blue );
+			selectedMarker = constructOverlay(addr);
+			OverlayItem newOverlay = new OverlayItem(addr.getBriefName(), addr.getAdmin(), gp);
+			newOverlay.setMarker(d);
+			selectedMarker.addOverlay(newOverlay);
+			selectedMarker.setSp(addr);
+			osm.map.getOverlays().add(selectedMarker);
+			//osm.map.invalidate();
+		}else{
+			addr.setSpecial(selectedMarker.getSp().getSpecial());
+		}
+		osm.move(addr.getPosition());
+		osm.dv.openPopup(selectedMarker);
+		this.destinationMarkerList.add(selectedMarker);
+		return selectedMarker;
 	}
-	private void prepareOverlay(ArrayList<OverlayItem> pList, ResourceProxy resourceProxy,final SavedPlace sp) {
-		pointOverlay = new OsmMapsItemizedOverlay(pList,
-        new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>(){
+	public OsmMapsItemizedOverlay findMyPlace(SavedPlace addr) {
+		for(OsmMapsItemizedOverlay a:savedPlaceMarkers){
+			if(MathUtil.compare(addr.getLat(), a.getSp().getLat()) && MathUtil.compare(addr.getLng(), a.getSp().getLng())){
+				Log.i(tag, "found");
+				return a;
+			}
+		}
+		Log.i(tag, "not found");
+		return null;
+	}
+	private OsmMapsItemizedOverlay constructOverlay(final SavedPlace sp) {
+		ResourceProxy resourceProxy = (ResourceProxy) new DefaultResourceProxyImpl(osm.act);
+		ArrayList<OverlayItem> pList = new ArrayList<OverlayItem>();
+		OnItemGestureListener<OverlayItem> listener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>(){
             @Override
             public boolean onItemSingleTapUp(final int index, final OverlayItem item){
             	osm.dv.openPopup(sp);
@@ -179,7 +128,8 @@ public class Markers {
             public boolean onItemLongPress(final int index, final OverlayItem item){
                 return true;
             }
-        }, resourceProxy);
+        };
+		return new OsmMapsItemizedOverlay(pList,listener, resourceProxy);
 	}
 	public void drawStepsPoint(Road road) { // called from tasks
 		for (int i = 0; i < road.mNodes.size(); i++) {
@@ -194,7 +144,7 @@ public class Markers {
 		Drawable nodeIcon = osm.act.getResources().getDrawable(R.drawable.red_point_16);
 		nodeMarker.setIcon(nodeIcon);
 		if(node.mManeuverType==0){//Google API
-			node.mManeuverType = getGoogleManeuverTypeFromText(node.mInstructions);
+			node.mManeuverType = RouteOptions.getGoogleManeuverTypeFromText(node.mInstructions);
 		}
 		nodeMarker.setTitle(RouteOptions.getTurnString(node.mManeuverType));
 		nodeMarker.setSnippet(node.mInstructions);
@@ -214,31 +164,7 @@ public class Markers {
 		 * });
 		 */
 	}
-	private int getGoogleManeuverTypeFromText(String origtext) {
-		//Head <b>east</b> on <b>Elizabeth St</b> toward <b>Picton Ave</b>
-		//Turn <b>left</b> onto <b>Picton Ave</b>
-		//Turn <b>right</b> onto <b>Riccarton Rd</b>
-		//Turn <b>right</b>
-		//Turn <b>left</b>
-		//At the roundabout, take the <b>2nd</b> exit onto <b>Riccarton Ave</b>
-		//<b>Kahu Rd</b> turns slightly <b>right</b> and becomes <b>Kotare St</b><div style="font-size:0.9em">Destination will be on the right</div>
-		int type = 0;
-		String search_text = origtext.indexOf("Destination")>0?origtext.split("Destination")[0]:origtext;
-		if(search_text.startsWith("Head")){
-			type = 1;
-		}else if(search_text.indexOf("left")>0){
-			if(search_text.indexOf("slightly")>0) type = 3;
-			else type = 4;
-		}else if(search_text.indexOf("right")>0){
-			if(search_text.indexOf("slightly")>0) type = 6;
-			else type = 7;
-		}else if(search_text.indexOf("roundabout")>0 ){
-			if(search_text.indexOf("1st")>0) type = 27;
-			else if(search_text.indexOf("2nd")>0) type = 28;
-			else if(search_text.indexOf("3rd")>0) type = 29;
-		}
-		return type;
-	}
+	
 	private void removeAllMarkers() {
 		for (Marker mk : waypointsMarkerList) {
 			osm.map.getOverlays().remove(mk);
@@ -262,7 +188,7 @@ public class Markers {
 		osm.map.invalidate();
 		routePolyline = pl;
 	}
-	public void setNaviImage(){
+/*	public void setNaviImage(){
 		ImageView navi = (ImageView) osm.act.findViewById(R.id.navi);
 		navi.setOnClickListener(new OnClickListener(){
 			@Override
@@ -272,7 +198,14 @@ public class Markers {
 					osm.startTask("route", selectedMarker.getPosition(),"route");
 				}
 			}});
-	}
+	}*/
+
+	/*public void removePOIMarkers(){
+		for(POI p:osm.mks.pois){
+			osm.map.getOverlays().remove(p.poiMarker);
+		}
+		osm.mks.pois.clear();
+	}*/
 	public void showHidePOIs() {}
 	/*public void updateRouteMarker(SavedPlace addr) {
 		GeoPoint gp = new GeoPoint(addr.getLat(),addr.getLng());
@@ -294,4 +227,23 @@ public class Markers {
 		this.destinationMarkerList.add(routeMarker);  //this will cause marker not shown in screen ?????????????
 		this.selectedMarker = routeMarker;
 	}*/
+	public void showAllSavedPlaces(){
+		//savedPlaceMarkers
+		List<SavedPlace> list = dbHelper.getAllSavedPlaces();
+		for(SavedPlace sp:list){
+			GeoPoint gp = new GeoPoint(sp.getLat(),sp.getLng());
+			Drawable d = osm.act.getResources().getDrawable( R.drawable.star_yellow_20 );
+			OsmMapsItemizedOverlay base = constructOverlay(sp);
+			OverlayItem newOverlay = new OverlayItem("", "", gp);
+			newOverlay.setMarker(d);
+			base.addOverlay(newOverlay);
+			base.setSp(sp);
+			savedPlaceMarkers.add(base);
+			osm.map.getOverlays().add(base);
+		}
+	}
+	public void changeMarkerIcon(int resId) {
+		Drawable d = osm.act.getResources().getDrawable( resId );
+		osm.mks.selectedMarker.firstOverlay().setMarker(d);
+	}
 }

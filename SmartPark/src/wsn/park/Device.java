@@ -15,6 +15,7 @@ import wsn.park.maps.OSM;
 import wsn.park.model.SavedPlace;
 import wsn.park.ui.DelayedTextWatcher;
 import wsn.park.ui.SuggestListAdapter;
+import wsn.park.ui.marker.OsmMapsItemizedOverlay;
 import wsn.park.util.DbHelper;
 import wsn.park.util.GeoOptions;
 import wsn.park.util.MapOptions;
@@ -60,8 +61,12 @@ public class Device {
 	TextView pointDetail;
 	TextView lat;
 	TextView lng;
+	TextView country_code;
+	TextView special;
+	TextView tv_id;
 	ImageView iconHome;
 	ImageView iconWork;
+	ImageView iconStar;
 	ImageView iconTravelBy;
 	private String tag=Device.class.getSimpleName();
 	public void init(Activity act, OSM osm){
@@ -71,7 +76,6 @@ public class Device {
 		listVoice = (ListView) act.findViewById(R.id.listVoiceSuggestion);
 		listSuggest = (ListView) act.findViewById(R.id.listSuggestion);
 		
-
 		setText();
 		closeKeyBoard();
 		setImage();
@@ -95,11 +99,11 @@ public class Device {
 				Address addr = osm.suggestPoints.get(position);
 				//osm.mks.updateRouteMarker(addr);////////////////////offline navi no marker??????
 				SavedPlace sp = GeoOptions.getMyPlace(addr);
-				osm.mks.updatePointOverlay(sp);
+				OsmMapsItemizedOverlay pin = osm.mks.updateDestinationOverlay(sp);
 				listSuggest.setVisibility(View.INVISIBLE);
 				osm.move(addr.getLatitude(),addr.getLongitude());
 				dbHelper.addHistoryPlace(addr);
-				openPopup(sp);
+				openPopup(pin);
 				//Log.w(tag, "show popup window");
 			}
 		});
@@ -186,7 +190,6 @@ public class Device {
 	        	String display = GeoOptions.getAddressName(a);
 	        	Log.w(tag, a.toString());
 	        	list.add(putData(display));
-	        	
 	        }
 	        return list;
 	      }
@@ -206,58 +209,138 @@ public class Device {
 			pointDetail = (TextView) popupLayout.findViewById(R.id.point_detail);
 			lat = (TextView) popupLayout.findViewById(R.id.lat);
 			lng = (TextView) popupLayout.findViewById(R.id.lng);
+			country_code = (TextView) popupLayout.findViewById(R.id.country_code);
+			special = (TextView) popupLayout.findViewById(R.id.special);
+			tv_id = (TextView) popupLayout.findViewById(R.id.tv_id);
 			iconHome = (ImageView) popupLayout.findViewById(R.id.home);
 			iconWork = (ImageView) popupLayout.findViewById(R.id.work);
+			iconStar = (ImageView) popupLayout.findViewById(R.id.star);
 			iconTravelBy  = (ImageView) popupLayout.findViewById(R.id.travel_mode);
 			iconTravelBy.setClickable(true);
 			iconTravelBy.setOnClickListener(new OnClickListener() {
 	            @Override
 	            public void onClick(View v) {
-	            	//LayoutInflater inflater = LayoutInflater.from(osm.act);
-	    	        //View popupLayout = inflater.inflate(R.layout.popup, null);
-	    			//TextView tv_lat = (TextView) popupLayout.findViewById(R.id.lat);
-	    			//TextView tv_lng = (TextView) popupLayout.findViewById(R.id.lng);
-	    			String str_lat = lat.getText().toString();
-	    			String str_lng = lng.getText().toString();
-	                //Log.w(tag, "lat="+str_lat+", lng="+str_lng);
-	    	        GeoPoint gp = new GeoPoint(Double.valueOf(str_lat),Double.valueOf(str_lng));
-					osm.ro.setWayPoints(new GeoPoint(osm.loc.myPos),gp);
-					osm.startTask("route", gp,"route");
+	            	SavedPlace sp = getPlaceFromPopupPage();
+					osm.ro.setWayPoints(new GeoPoint(LOC.myPos),sp.getPosition());
+					osm.startTask("route", sp.getPosition(),"route");
 	            	Mode.setID(Mode.NAVI);
 	            }
 	        });
+			/*iconHome.setOnClickListener(new OnClickListener(){
+				@Override
+				public void onClick(View v) {
+					//insert home place into sqlite: special=1
+	    			SavedPlace sp = getPlaceFromPopupPage();
+	    			if(sp.getSpecial()==SavedPlace.HOME){
+	    				dbHelper.deleteMyPlaces(sp.getId());
+	    			}else{
+	    				dbHelper.addMyPlace(sp, SavedPlace.HOME);
+	    			}
+				}});
+			iconWork.setOnClickListener(new OnClickListener(){
+				@Override
+				public void onClick(View v) {
+					//insert work place into sqlite: special=12
+					SavedPlace sp = getPlaceFromPopupPage();
+	    			if(sp.getSpecial()==SavedPlace.WORK){
+	    				dbHelper.deleteMyPlaces(sp.getId());
+	    			}else{
+	    				dbHelper.addMyPlace(sp, SavedPlace.WORK);
+	    			}
+				}});*/
+			iconStar.setOnClickListener(new OnClickListener(){
+				@Override
+				public void onClick(View v) {
+					SavedPlace sp = getPlaceFromPopupPage();
+	    			if(sp.getSpecial()>SavedPlace.NORMAL-1){
+	    				dbHelper.deleteMyPlaces(sp.getId());
+	    				popup.dismiss();
+	    				osm.mks.selectedMarker.removeAllItems();
+	    				osm.mks.savedPlaceMarkers.remove(osm.mks.selectedMarker);
+	    				osm.map.getOverlays().remove(osm.mks.selectedMarker);
+	    				osm.map.invalidate();
+	    			}else{
+	    				sp.setSpecial(SavedPlace.NORMAL);
+	    				dbHelper.addMyPlace(sp);
+	    				osm.mks.selectedMarker.setSp(sp);
+	    				osm.mks.savedPlaceMarkers.add(osm.mks.selectedMarker);
+	    				showMyMarker(sp);
+	    			}
+				}});
 	  	}
-	    public void openPopup(SavedPlace sp) {
+	    protected void showMyMarker(SavedPlace sp) {
+			iconStar.setImageResource(R.drawable.star_empty_48);
+			special.setText(String.valueOf(SavedPlace.NORMAL));
+			osm.mks.changeMarkerIcon(R.drawable.star_yellow_20);
+			osm.map.invalidate();
+		}
+
+		public SavedPlace getPlaceFromPopupPage(){
+	    	int str_id = Integer.valueOf(tv_id.getText().toString());
+			String str_country_code = country_code.getText().toString();
+			//if(str_special.length()==0) str_special="0";
+			int i_special = Integer.valueOf(special.getText().toString());
+			double dlat = Double.valueOf(lat.getText().toString());
+			double dlng = Double.valueOf(lng.getText().toString());
+	        String briefName = pointBrief.getText().toString();
+	        String adminName = pointDetail.getText().toString();
+	        //Log.w(tag, "getPlaceFromPopupPage.str_country_code="+str_country_code);
+			SavedPlace sp = new SavedPlace(str_id,briefName, adminName, dlat,dlng,str_country_code,null,null,i_special);
+	        //Log.w(tag, "getPlaceFromPopupPage.sp.country_code="+sp.getCountryCode());
+			return sp;
+	    }
+	    public void openPopup(OsmMapsItemizedOverlay pin) {
             popup.setAnimationStyle(R.style.AnimBottom);
             popup.showAtLocation(osm.act.findViewById(R.id.my_loc), Gravity.BOTTOM, 0, 0); //leaked window
             popup.setFocusable(true);
-    		
+            SavedPlace sp = pin.getSp();
             pointBrief.setText(sp.getBriefName());
             pointDetail.setText(sp.getAdmin());
             lat.setText(String.valueOf(sp.getLat()));
             lng.setText(String.valueOf(sp.getLng()));
-            //Log.w(tag, "lat="+sp.getLat()+", lng="+sp.getLng());
-            hidePopupIcons();
+            country_code.setText(sp.getCountryCode());
+            //Log.e(tag, "openPopup() country_code="+sp.getCountryCode());
+            special.setText(String.valueOf(sp.getSpecial()));
+            if(sp.getId()==0) sp.setId(dbHelper.getMaxID(DbHelper.MY_PLACE_TABLE)+1);
+            tv_id.setText(String.valueOf(sp.getId()));
+            //Log.w(tag, "special="+sp.getSpecial());
+            hidePopupIcons(sp);
             popup.update();
-            Log.w(tag, "openPopup");
-    }
-
-		private void hidePopupIcons() {
+            osm.mks.selectedMarker = pin;
+	    }
+	    public void openPopup(SavedPlace sp) {
+	    	OsmMapsItemizedOverlay pin = osm.mks.findMyPlace(sp);
+	    	this.openPopup(pin);
+	    }
+		private void hidePopupIcons(SavedPlace sp) {
 			switch(Mode.getID()){
 			case Mode.NORMAL:
 			case Mode.NAVI:
 			case Mode.PRACTICE:
-	            iconHome.setVisibility(View.INVISIBLE);
-	            iconWork.setVisibility(View.INVISIBLE);
+	            iconHome.setVisibility(View.GONE);//INVISIBLE is occupying the space
+	            iconWork.setVisibility(View.GONE);
 	            break;
 			case Mode.HOME:
 	            iconHome.setVisibility(View.VISIBLE);
-	            iconWork.setVisibility(View.INVISIBLE);
+	            iconWork.setVisibility(View.GONE);
 	            break;
 			case Mode.WORK:
-	            iconHome.setVisibility(View.INVISIBLE);
+	            iconHome.setVisibility(View.GONE);
 	            iconWork.setVisibility(View.VISIBLE);
 	            break;
 			}
+			switch(sp.getSpecial()){
+			case SavedPlace.NORMAL: //cancel save
+				iconStar.setImageResource(R.drawable.star_empty_48);
+				break;
+			case SavedPlace.HOME:   //cancel home
+				iconHome.setImageResource(R.drawable.ic_black_trash_64);
+				break;
+			case SavedPlace.WORK:   //cancel work
+				iconWork.setImageResource(R.drawable.ic_black_trash_64);
+				break;
+			default: iconStar.setImageResource(R.drawable.star_48);
+			}
+            	
 		}
 }

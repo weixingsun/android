@@ -105,7 +105,8 @@ public class OSM {
 		setMap(mtpb);
 		mks=Markers.getInstance(this);
 		mks.initMylocMarker();
-		mks.setNaviImage();
+		mks.showAllSavedPlaces();
+		//mks.setNaviImage();
 		//mks.initRouteMarker();
         dv.init(act,this);
 

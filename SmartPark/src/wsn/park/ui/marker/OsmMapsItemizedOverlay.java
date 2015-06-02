@@ -7,18 +7,19 @@ import org.osmdroid.api.IMapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 
+import wsn.park.model.SavedPlace;
+
 import android.graphics.Point;
 
 public class OsmMapsItemizedOverlay extends ItemizedIconOverlay<OverlayItem>
 {
+	private SavedPlace sp;
     private ArrayList<OverlayItem> mItemList = new ArrayList<OverlayItem>();
-
+    private int temp = 0;	//default is temp marker.
     public OsmMapsItemizedOverlay(ArrayList<OverlayItem> pList,
-            ItemizedIconOverlay.OnItemGestureListener<OverlayItem> pOnItemGestureListener, ResourceProxy pResourceProxy)
-    {
-        super(pList, pOnItemGestureListener, pResourceProxy);
+            OnItemGestureListener<OverlayItem> listener, ResourceProxy pResourceProxy){
+        super(pList, listener, pResourceProxy);
         mItemList = pList;
-        // TODO Auto-generated constructor stub
     }
 
     public void addOverlay(OverlayItem aOverlayItem)
@@ -26,7 +27,11 @@ public class OsmMapsItemizedOverlay extends ItemizedIconOverlay<OverlayItem>
         mItemList.add(aOverlayItem);
         populate();
     }
-
+    public OverlayItem firstOverlay()
+    {
+        return mItemList.get(0);
+        //populate();
+    }
     public void removeOverlay(OverlayItem aOverlayItem)
     {
         mItemList.remove(aOverlayItem);
@@ -40,8 +45,7 @@ public class OsmMapsItemizedOverlay extends ItemizedIconOverlay<OverlayItem>
     }
 
     @Override
-    public int size()
-    {
+    public int size(){
         if (mItemList != null)
             return mItemList.size();
         else
@@ -51,8 +55,15 @@ public class OsmMapsItemizedOverlay extends ItemizedIconOverlay<OverlayItem>
     @Override
     public boolean onSnapToItem(int arg0, int arg1, Point arg2, IMapView arg3)
     {
-        // TODO Auto-generated method stub
         return false;
     }
+
+	public SavedPlace getSp() {
+		return sp;
+	}
+
+	public void setSp(SavedPlace sp) {
+		this.sp = sp;
+	}
 
 }

@@ -85,7 +85,7 @@ public class GeocoderTask extends
     			foundAddr.setLatitude(position.getLatitude());
     			foundAddr.setLongitude(position.getLongitude());
     			//osm.mks.updateRouteMarker(foundAddr);
-    			osm.mks.updatePointOverlay(GeoOptions.getMyPlace(foundAddr));
+    			osm.mks.updateDestinationOverlay(GeoOptions.getMyPlace(foundAddr));
     		}
 			//Log.i(TAG, "GeoCoderTask.foundAddr="+foundAddr.getFeatureName());
         }

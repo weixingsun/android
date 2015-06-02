@@ -40,7 +40,7 @@ public class MyPlacesActivity extends BaseActivity {
 				drawer.close();
 				finish();
 			}});
-        tv_home_address = (TextView) findViewById(R.id.tv_home_address); 
+        tv_home_address = (TextView) findViewById(R.id.tv_home_address);
         tv_work = (TextView) findViewById(R.id.tv_work);
         tv_work.setOnClickListener(new OnClickListener(){
 			@Override
@@ -51,13 +51,13 @@ public class MyPlacesActivity extends BaseActivity {
 			}});
         tv_work_address = (TextView) findViewById(R.id.tv_work_address);
         lv_star_place = (ListView) findViewById(R.id.list_star_places);
-        lv_star_place.setAdapter(new PlaceAdapter(this,R.layout.list_item, places ));
+        lv_star_place.setAdapter(new PlaceAdapter(this,R.layout.list_item, places));
         lv_star_place.setOnItemClickListener(new OnItemClickListener(){ 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				PlaceHolder ph = (PlaceHolder) view.getTag();
 				//Log.w(tag, "place.name="+ph.place.getName());
-				osm.mks.updatePointOverlay(ph.place);
+				osm.mks.updateDestinationOverlay(ph.place);
 				drawer.close();
 				finish();
 			}
