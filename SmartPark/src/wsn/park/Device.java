@@ -105,6 +105,7 @@ public class Device {
 				dbHelper.addHistoryPlace(addr);
 				openPopup(pin);
 				//Log.w(tag, "show popup window");
+				closeKeyBoard();
 			}
 		});
 	}
