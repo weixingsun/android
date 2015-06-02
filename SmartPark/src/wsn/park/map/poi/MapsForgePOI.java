@@ -11,9 +11,6 @@ import org.mapsforge.map.reader.MapReadResult;
 import org.mapsforge.map.reader.PointOfInterest;
 import org.osmdroid.tileprovider.MapTile;
 
-import wsn.park.maps.MathUtil;
-
-
 import android.util.Log;
 
 public class MapsForgePOI {

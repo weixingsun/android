@@ -107,7 +107,7 @@ public class Markers {
 	}
 	public OsmMapsItemizedOverlay findMyPlace(SavedPlace addr) {
 		for(OsmMapsItemizedOverlay a:savedPlaceMarkers){
-			if(MathUtil.compare(addr.getLat(), a.getSp().getLat()) && MathUtil.compare(addr.getLng(), a.getSp().getLng())){
+			if(MathUtil.compare(addr.getPosition(), a.getSp().getPosition())){
 				Log.i(tag, "found");
 				return a;
 			}

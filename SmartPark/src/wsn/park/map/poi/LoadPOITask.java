@@ -12,9 +12,9 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 
 import wsn.park.R;
-import wsn.park.maps.MathUtil;
 import wsn.park.maps.OSM;
 import wsn.park.maps.ProviderUtil;
+import wsn.park.util.MathUtil;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;

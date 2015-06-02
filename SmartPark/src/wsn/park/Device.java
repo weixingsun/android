@@ -309,6 +309,13 @@ public class Device {
             osm.mks.selectedMarker = pin;
 	    }
 	    public void openPopup(SavedPlace sp) {
+	    	if(osm.mks.selectedMarker!=null){
+		    	GeoPoint a=osm.mks.selectedMarker.getSp().getPosition();
+		    	if(wsn.park.util.MathUtil.compare(a, sp.getPosition())){
+		    		this.openPopup(osm.mks.selectedMarker);
+		    		return;
+		    	}
+	    	}
 	    	OsmMapsItemizedOverlay pin = osm.mks.findMyPlace(sp);
 	    	this.openPopup(pin);
 	    }

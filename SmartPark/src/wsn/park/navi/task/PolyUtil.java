@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import org.osmdroid.util.GeoPoint;
 
 import static java.lang.Math.*;
-import static wsn.park.maps.MathUtil.*;
+import static wsn.park.util.MathUtil.*;
 
 public class PolyUtil {
 

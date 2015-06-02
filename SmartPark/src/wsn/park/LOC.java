@@ -7,7 +7,6 @@ import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadNode;
 import org.osmdroid.util.GeoPoint;
 
-import wsn.park.maps.MathUtil;
 import wsn.park.maps.OSM;
 import wsn.park.navi.task.FindMyStepTask;
 import wsn.park.ui.Drawer;
