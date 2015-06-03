@@ -7,6 +7,7 @@ import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadNode;
 import org.osmdroid.util.GeoPoint;
 
+import wsn.park.maps.Mode;
 import wsn.park.maps.OSM;
 import wsn.park.navi.task.FindMyStepTask;
 import wsn.park.ui.Drawer;
@@ -104,13 +105,12 @@ public class LOC implements LocationListener {
 		if (countryCode == null) {
 			countryCode = CountryCode.getByGeoPoint(gp);
 		}
-		//if(osm.mks.myLocMarker==null){
-		//	osm.mks.initMyLocMarker(loc);
-		//}
-		//osm.mks.myLocMarker.setPosition(gp);
-		//osm.move(gp);
-		//(new FindMyStepTask(osm, osm.mks.myLocMarker.getPosition(),osm.mks.myLocMarker)).execute();
-
+		osm.mks.myLocMarker.setPosition(gp);
+		if(Mode.getID()==Mode.NAVI){
+			osm.move(gp);
+			(new FindMyStepTask(osm, osm.mks.myLocMarker.getPosition(),osm.mks.myLocMarker)).execute();
+			
+		}
 		dbHelper.updateGPS(0, myPos);
 	}
 	@Override

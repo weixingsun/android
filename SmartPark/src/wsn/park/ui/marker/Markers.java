@@ -89,7 +89,7 @@ public class Markers {
 		selectedMarker=findMyPlace(addr);
 		if(selectedMarker==null){
 			GeoPoint gp = new GeoPoint(addr.getLat(),addr.getLng());
-			Drawable d = osm.act.getResources().getDrawable( R.drawable.marker_blue );
+			Drawable d = osm.act.getResources().getDrawable( R.drawable.marker_azure_48 );
 			selectedMarker = constructOverlay(addr);
 			OverlayItem newOverlay = new OverlayItem(addr.getBriefName(), addr.getAdmin(), gp);
 			newOverlay.setMarker(d);
@@ -101,7 +101,7 @@ public class Markers {
 			addr.setSpecial(selectedMarker.getSp().getSpecial());
 		}
 		osm.move(addr.getPosition());
-		osm.dv.openPopup(selectedMarker);
+		osm.dv.openPlacePopup(selectedMarker);
 		this.destinationMarkerList.add(selectedMarker);
 		return selectedMarker;
 	}
@@ -121,7 +121,7 @@ public class Markers {
 		OnItemGestureListener<OverlayItem> listener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>(){
             @Override
             public boolean onItemSingleTapUp(final int index, final OverlayItem item){
-            	osm.dv.openPopup(sp);
+            	osm.dv.openPlacePopup(sp);
                 return true; // We 'handled' this event.
             }
             @Override
@@ -176,6 +176,7 @@ public class Markers {
 	public void removeAllRouteMarkers(){
 		removeAllMarkers();
 		removePrevPolyline();
+		osm.map.invalidate();
 	}
 	public void removePrevPolyline(){
 		if (routePolyline != null){

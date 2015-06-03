@@ -40,6 +40,7 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, Float> {
 		this.osm = osm;
 		this.myGP=point;
 	}
+	//drag marker
 	public FindMyStepTask(OSM osm, GeoPoint point,Marker marker) {
 		this(osm,point);
 		this.marker = marker;
@@ -99,12 +100,14 @@ private void playHintSounds(int index) {
 	if(index<osm.loc.road.mNodes.size()-1){
 		//RoadNode nextNode = osm.loc.road.mNodes.get(osm.loc.currIndex+1);
 		//if(this.toCurrent>SavedOptions.GPS_TOLERANCE && this.toPrev>SavedOptions.GPS_TOLERANCE){
-		if(this.toCurrent<SavedOptions.VOICE_DISTANCE){
+		if(this.toCurrent<SavedOptions.VOICE_DISTANCE && !MyPlayer.isPlayed(index)){
 			//if(this.toCurrent>200 && this.toCurrent < 500) return;
+			MyPlayer.setPlayedId(index);
 			marker.setTitle("in "+this.toCurrent+" m, "+this.currNode.mInstructions);
 			BigDecimal bd = new BigDecimal(this.toCurrent).setScale(-2, BigDecimal.ROUND_HALF_UP);  //Õû°Ù
 			MyPlayer.play(osm.act, this.currNode, bd.intValue());
 			Toast.makeText(osm.act, "playing "+index+":"+bd.intValue(), Toast.LENGTH_LONG).show();
+			
 		}
 	}
 }
@@ -128,6 +131,7 @@ private RoadNode findLastNode() {
 		osm.mks.removeAllRouteMarkers();
 		osm.mks.removePrevPolyline();
 		osm.loc.cleanupRoad();
+		MyPlayer.clearPlayedList();
 		this.cleanupRoad();
 	}
 	private void cleanupRoad() {
@@ -139,17 +143,19 @@ private RoadNode findLastNode() {
 		//http://translate.google.com/translate_tts?tl=en&q=Hello%20World
 		if(toCurrent>0){
 			int index = osm.loc.passedNodes.size();
-				playHintSounds(index);
-				String snippet = "node "+(index)+"/"+osm.loc.road.mNodes.size()+":("+osm.loc.passedNodes.size()+")toCurr="+toCurrent+",toPrev="+this.toPrev;
-				marker.setSnippet(snippet);
-				int resId = InfoWindow.getIconByManeuver(currNode.mManeuverType);
-				Drawable flagImg = osm.act.getResources().getDrawable(resId);
-				marker.setImage(flagImg);
-				marker.showInfoWindow();
-				if(this.endFlag){
-					cleanupAllonRoad();
-					//osm.move();
-				}
+			playHintSounds(index);
+			String snippet = "node "+(index)+"/"+osm.loc.road.mNodes.size()+":("+osm.loc.passedNodes.size()+")toCurr="+toCurrent+",toPrev="+this.toPrev;
+			marker.setSnippet(snippet);
+			int resId = InfoWindow.getIconByManeuver(currNode.mManeuverType);
+			Drawable flagImg = osm.act.getResources().getDrawable(resId);
+			marker.setImage(flagImg);
+			marker.showInfoWindow();
+			String dist = "In "+this.toCurrent+"m";
+			osm.dv.updateNaviInstruction(dist,resId);
+			if(this.endFlag){
+				cleanupAllonRoad();
+				//osm.move();
+			}
 		}
 		
     }

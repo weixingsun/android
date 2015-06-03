@@ -9,12 +9,15 @@ import org.osmdroid.util.GeoPoint;
 
 import wsn.park.LOC;
 import wsn.park.maps.OSM;
+import wsn.park.model.SavedPlace;
+import wsn.park.ui.marker.OsmMapsItemizedOverlay;
 import wsn.park.util.GeoOptions;
 import wsn.park.util.SavedOptions;
 
 import android.location.Address;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 public class GeocoderTask extends
@@ -80,14 +83,15 @@ public class GeocoderTask extends
     				LOC.countryCode=foundAddr.getCountryCode();
     			Log.i(TAG, "==================country_code="+LOC.countryCode);
     		}
-    		//Log.w(TAG, "foundAddr.code="+foundAddr.getCountryCode()+","+this.purpose);
+    		Log.w(TAG, "foundAddr.code="+foundAddr.getCountryCode()+","+this.purpose);
     		if(foundAddr != null && !this.purpose.equals("countryCode")){
     			foundAddr.setLatitude(position.getLatitude());
     			foundAddr.setLongitude(position.getLongitude());
-    			//osm.mks.updateRouteMarker(foundAddr);
-    			osm.mks.updateDestinationOverlay(GeoOptions.getMyPlace(foundAddr));
+    			SavedPlace sp = GeoOptions.getMyPlace(foundAddr);
+    			OsmMapsItemizedOverlay pin = osm.mks.updateDestinationOverlay(sp);
+    			osm.dv.openPlacePopup(pin);
+    			osm.mks.updateDestinationOverlay(sp);
     		}
-			//Log.i(TAG, "GeoCoderTask.foundAddr="+foundAddr.getFeatureName());
         }
     }
    

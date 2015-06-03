@@ -55,7 +55,8 @@ public class Device {
 	ListView listVoice;
 	ListView listSuggest;
 	DbHelper dbHelper;
-    PopupWindow popup;
+    PopupWindow placePop;
+    PopupWindow naviPop;
 	Mode mode;
 	TextView pointBrief;
 	TextView pointDetail;
@@ -64,10 +65,13 @@ public class Device {
 	TextView country_code;
 	TextView special;
 	TextView tv_id;
+	TextView tv_instruction;
 	ImageView iconHome;
 	ImageView iconWork;
 	ImageView iconStar;
 	ImageView iconTravelBy;
+	ImageView iconCloseNavi;
+	ImageView iconNaviFlag;
 	private String tag=Device.class.getSimpleName();
 	public void init(Activity act, OSM osm){
 		this.act=act;
@@ -103,7 +107,7 @@ public class Device {
 				listSuggest.setVisibility(View.INVISIBLE);
 				osm.move(addr.getLatitude(),addr.getLongitude());
 				dbHelper.addHistoryPlace(addr);
-				openPopup(pin);
+				openPlacePopup(pin);
 				//Log.w(tag, "show popup window");
 				closeKeyBoard();
 			}
@@ -202,10 +206,10 @@ public class Device {
 	  	private void setPopup() {
 	        LayoutInflater inflater = LayoutInflater.from(osm.act);
 	        View popupLayout = inflater.inflate(R.layout.popup, null);
-	        popup =new PopupWindow(popupLayout, LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);
-	        popup.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-	        popup.setOutsideTouchable(true);
-	        popup.setFocusable(false);
+	        placePop =new PopupWindow(popupLayout, LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);
+	        placePop.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+	        placePop.setOutsideTouchable(true);
+	        placePop.setFocusable(false);
 			pointBrief = (TextView) popupLayout.findViewById(R.id.point_brief);
 			pointDetail = (TextView) popupLayout.findViewById(R.id.point_detail);
 			lat = (TextView) popupLayout.findViewById(R.id.lat);
@@ -225,37 +229,17 @@ public class Device {
 					osm.ro.setWayPoints(new GeoPoint(LOC.myPos),sp.getPosition());
 					osm.startTask("route", sp.getPosition(),"route");
 	            	Mode.setID(Mode.NAVI);
+	            	openPopupNaviMode();
+	            	placePop.dismiss();
 	            }
 	        });
-			/*iconHome.setOnClickListener(new OnClickListener(){
-				@Override
-				public void onClick(View v) {
-					//insert home place into sqlite: special=1
-	    			SavedPlace sp = getPlaceFromPopupPage();
-	    			if(sp.getSpecial()==SavedPlace.HOME){
-	    				dbHelper.deleteMyPlaces(sp.getId());
-	    			}else{
-	    				dbHelper.addMyPlace(sp, SavedPlace.HOME);
-	    			}
-				}});
-			iconWork.setOnClickListener(new OnClickListener(){
-				@Override
-				public void onClick(View v) {
-					//insert work place into sqlite: special=12
-					SavedPlace sp = getPlaceFromPopupPage();
-	    			if(sp.getSpecial()==SavedPlace.WORK){
-	    				dbHelper.deleteMyPlaces(sp.getId());
-	    			}else{
-	    				dbHelper.addMyPlace(sp, SavedPlace.WORK);
-	    			}
-				}});*/
 			iconStar.setOnClickListener(new OnClickListener(){
 				@Override
 				public void onClick(View v) {
 					SavedPlace sp = getPlaceFromPopupPage();
 	    			if(sp.getSpecial()>SavedPlace.NORMAL-1){
 	    				dbHelper.deleteMyPlaces(sp.getId());
-	    				popup.dismiss();
+	    				placePop.dismiss();
 	    				osm.mks.selectedMarker.removeAllItems();
 	    				osm.mks.savedPlaceMarkers.remove(osm.mks.selectedMarker);
 	    				osm.map.getOverlays().remove(osm.mks.selectedMarker);
@@ -269,7 +253,8 @@ public class Device {
 	    			}
 				}});
 	  	}
-	    protected void showMyMarker(SavedPlace sp) {
+
+		protected void showMyMarker(SavedPlace sp) {
 			iconStar.setImageResource(R.drawable.star_empty_48);
 			special.setText(String.valueOf(SavedPlace.NORMAL));
 			osm.mks.changeMarkerIcon(R.drawable.star_yellow_20);
@@ -290,10 +275,37 @@ public class Device {
 	        //Log.w(tag, "getPlaceFromPopupPage.sp.country_code="+sp.getCountryCode());
 			return sp;
 	    }
-	    public void openPopup(OsmMapsItemizedOverlay pin) {
-            popup.setAnimationStyle(R.style.AnimBottom);
-            popup.showAtLocation(osm.act.findViewById(R.id.my_loc), Gravity.BOTTOM, 0, 0); //leaked window
-            popup.setFocusable(true);
+
+	    private void openPopupNaviMode() {
+	        LayoutInflater inflater = LayoutInflater.from(osm.act);
+	        View naviLayout = inflater.inflate(R.layout.navi, null);
+	        naviPop =new PopupWindow(naviLayout, LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);
+	        naviPop.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+	        //navi.setOutsideTouchable(false);
+	        naviPop.setFocusable(false);
+	        naviPop.setAnimationStyle(R.style.AnimBottom);
+	        naviPop.showAtLocation(osm.act.findViewById(R.id.my_loc), Gravity.BOTTOM, 0, 0); //leaked window
+	        //navi.setFocusable(true);
+	        naviPop.update();
+	        tv_instruction = (TextView) naviLayout.findViewById(R.id.navi_instruction);
+	        iconNaviFlag = (ImageView) naviLayout.findViewById(R.id.navi_flag); 
+	        iconCloseNavi = (ImageView) naviLayout.findViewById(R.id.close_navi);
+	        iconCloseNavi.setOnClickListener(new OnClickListener(){
+	        	@Override
+	        	public void onClick(View v) {
+	        		Mode.setID(Mode.NORMAL);
+	        		naviPop.dismiss();
+	        		osm.mks.removeAllRouteMarkers();
+	        	}});
+		}
+	    public void updateNaviInstruction(String instruction,int resId){
+	    	tv_instruction.setText(instruction);
+	    	iconNaviFlag.setImageResource(resId);
+	    }
+	    public void openPlacePopup(OsmMapsItemizedOverlay pin) {
+            placePop.setAnimationStyle(R.style.AnimBottom);
+            placePop.showAtLocation(osm.act.findViewById(R.id.my_loc), Gravity.BOTTOM, 0, 0); //leaked window
+            placePop.setFocusable(true);
             SavedPlace sp = pin.getSp();
             pointBrief.setText(sp.getBriefName());
             pointDetail.setText(sp.getAdmin());
@@ -306,19 +318,19 @@ public class Device {
             tv_id.setText(String.valueOf(sp.getId()));
             //Log.w(tag, "special="+sp.getSpecial());
             hidePopupIcons(sp);
-            popup.update();
+            placePop.update();
             osm.mks.selectedMarker = pin;
 	    }
-	    public void openPopup(SavedPlace sp) {
+	    public void openPlacePopup(SavedPlace sp) {
 	    	if(osm.mks.selectedMarker!=null){
 		    	GeoPoint a=osm.mks.selectedMarker.getSp().getPosition();
 		    	if(wsn.park.util.MathUtil.compare(a, sp.getPosition())){
-		    		this.openPopup(osm.mks.selectedMarker);
+		    		this.openPlacePopup(osm.mks.selectedMarker);
 		    		return;
 		    	}
 	    	}
 	    	OsmMapsItemizedOverlay pin = osm.mks.findMyPlace(sp);
-	    	this.openPopup(pin);
+	    	this.openPlacePopup(pin);
 	    }
 		private void hidePopupIcons(SavedPlace sp) {
 			switch(Mode.getID()){
@@ -352,3 +364,26 @@ public class Device {
             	
 		}
 }
+
+/*iconHome.setOnClickListener(new OnClickListener(){
+	@Override
+	public void onClick(View v) {
+		//insert home place into sqlite: special=1
+		SavedPlace sp = getPlaceFromPopupPage();
+		if(sp.getSpecial()==SavedPlace.HOME){
+			dbHelper.deleteMyPlaces(sp.getId());
+		}else{
+			dbHelper.addMyPlace(sp, SavedPlace.HOME);
+		}
+	}});
+iconWork.setOnClickListener(new OnClickListener(){
+	@Override
+	public void onClick(View v) {
+		//insert work place into sqlite: special=12
+		SavedPlace sp = getPlaceFromPopupPage();
+		if(sp.getSpecial()==SavedPlace.WORK){
+			dbHelper.deleteMyPlaces(sp.getId());
+		}else{
+			dbHelper.addMyPlace(sp, SavedPlace.WORK);
+		}
+	}});*/

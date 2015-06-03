@@ -16,7 +16,8 @@ public class GeoOptions {
 	public static final String GRAPHHOPPER = "GraphHopper"; //not used
 	public static final String OFFLINE = "Offline";			//not used
 	
-	public static final String NETWORK_UNAVAILABLE = "Network Not Available, please try offline map and routing.";
+	public static final String NETWORK_UNAVAILABLE = "Network Not Available, please try later or use offline map and routing.";
+	public static final CharSequence OFFLINE_GEOCODING_UNAVAILABLE = "Offline Geocoding is not available yet, we may implement it in next release.";
 	//private static String geocoder;
 	public static LinkedHashMap<String, String> GEO_CODERS = new LinkedHashMap<String,String>();
 	static{

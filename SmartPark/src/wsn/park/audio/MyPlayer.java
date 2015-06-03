@@ -1,5 +1,8 @@
 package wsn.park.audio;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.osmdroid.bonuspack.routing.RoadNode;
 
 import wsn.park.R;
@@ -21,6 +24,16 @@ public class MyPlayer {
 	private static ExoPlayer player;
 	public static void play(Activity act, String name){
 		
+	}
+	private static List<Integer> playedList = new ArrayList<Integer>();
+	public static void setPlayedId(int id){
+		playedList.add(id);
+	}
+	public static void clearPlayedList(){
+		playedList.clear();
+	}
+	public static boolean isPlayed(int id){
+		return playedList.contains(id);
 	}
 	public static void play(Activity act, int distance,int maneuverType) {
 		//String fileFullPath = folder+"type_"+maneuverType+"_dist_"+distance+".mp3";
