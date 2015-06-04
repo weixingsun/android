@@ -69,6 +69,7 @@ public class OSM {
 	public RuntimeOptions rto;
 	GenericMapView genericMapView; 
 	IMapController mapController;
+	public List<Polyline> lines;
 	public Polyline polyline;
 	public Markers mks;
 	public List<Address> suggestPoints;
@@ -89,7 +90,7 @@ public class OSM {
 		SavedOptions.selectedNavi = dbHelper.getSettings(SavedOptions.NAVI);
 
 		rto = RuntimeOptions.getInstance(act);
-        loc.init(act,this);
+        loc.init(this);
 		mo = MapOptions.getInstance(this);
 		ro = RouteOptions.getInstance(this);
 		mo.initTileSources(act);
@@ -142,6 +143,7 @@ public class OSM {
 			public boolean onZoom(ZoomEvent arg0) {
 				return false;
 			}}, 300));
+		this.move();
 	}
 
 	public void initScaleBar(){	//have to invoke after map initialized, call in GlobalLayoutListener
@@ -165,9 +167,15 @@ public class OSM {
 		//Log.i(tag, "moved to my location: ");
 	}
 	public void move() {
-		if(loc.myPos==null) return;
-		GeoPoint gp = new GeoPoint(loc.myPos);
-		move(gp);
+		if(LOC.myPos==null ){
+			if(LOC.myLastPos!=null)
+				move(LOC.myLastPos);
+			else
+				return;
+		}else{
+			move(new GeoPoint(LOC.myPos));
+		}
+		
 	}
 	
 	public void refreshTileSource(String name){

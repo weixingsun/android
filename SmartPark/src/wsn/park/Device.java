@@ -226,7 +226,9 @@ public class Device {
 	            @Override
 	            public void onClick(View v) {
 	            	SavedPlace sp = getPlaceFromPopupPage();
-					osm.ro.setWayPoints(new GeoPoint(LOC.myPos),sp.getPosition());
+	            	if(LOC.myLastPos==null && LOC.myPos==null) return; //wait for GPS aquire data
+	            	GeoPoint gp = LOC.myPos==null?LOC.myLastPos:new GeoPoint(LOC.myPos);
+					osm.ro.setWayPoints(gp,sp.getPosition());
 					osm.startTask("route", sp.getPosition(),"route");
 	            	Mode.setID(Mode.NAVI);
 	            	openPopupNaviMode();
@@ -255,9 +257,9 @@ public class Device {
 	  	}
 
 		protected void showMyMarker(SavedPlace sp) {
-			iconStar.setImageResource(R.drawable.star_empty_48);
+			iconStar.setImageResource(R.drawable.heart_broken_48);
 			special.setText(String.valueOf(SavedPlace.NORMAL));
-			osm.mks.changeMarkerIcon(R.drawable.star_yellow_20);
+			osm.mks.changeMarkerIcon(R.drawable.heart_24_x);
 			osm.map.invalidate();
 		}
 
@@ -303,6 +305,8 @@ public class Device {
 	    	iconNaviFlag.setImageResource(resId);
 	    }
 	    public void openPlacePopup(OsmMapsItemizedOverlay pin) {
+	    	//act.getResources().getDrawable(R.drawable.hearts_48);
+	    	//pin.changeIcon(icon);
             placePop.setAnimationStyle(R.style.AnimBottom);
             placePop.showAtLocation(osm.act.findViewById(R.id.my_loc), Gravity.BOTTOM, 0, 0); //leaked window
             placePop.setFocusable(true);
@@ -351,7 +355,7 @@ public class Device {
 			}
 			switch(sp.getSpecial()){
 			case SavedPlace.NORMAL: //cancel save
-				iconStar.setImageResource(R.drawable.star_empty_48);
+				iconStar.setImageResource(R.drawable.heart_broken_48);
 				break;
 			case SavedPlace.HOME:   //cancel home
 				iconHome.setImageResource(R.drawable.ic_black_trash_64);
@@ -359,7 +363,7 @@ public class Device {
 			case SavedPlace.WORK:   //cancel work
 				iconWork.setImageResource(R.drawable.ic_black_trash_64);
 				break;
-			default: iconStar.setImageResource(R.drawable.star_48);
+			default: iconStar.setImageResource(R.drawable.heart_48);
 			}
             	
 		}

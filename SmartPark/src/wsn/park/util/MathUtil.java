@@ -19,6 +19,7 @@ package wsn.park.util;
 
 import static java.lang.Math.*;
 
+import org.mapsforge.map.reader.PointOfInterest;
 import org.osmdroid.util.GeoPoint;
 
 import android.util.Log;
@@ -126,7 +127,7 @@ public class MathUtil {
 	    return false;
     }
     public static boolean compare(GeoPoint a, GeoPoint b){
-    	Log.d(tag, "a.lat="+a.getLatitude()+",b.lat="+b.getLatitude());
+    	//Log.d(tag, "a.lat="+a.getLatitude()+",b.lat="+b.getLatitude());
     	if(compare(a.getLatitude(),b.getLatitude()) && compare(a.getLongitude(),b.getLongitude())){
 	    	return true;
 	    }
@@ -140,4 +141,19 @@ public class MathUtil {
 	    }
 		return false;
 	}
+	//mapsforge v3
+	public static boolean compare(PointOfInterest a, PointOfInterest b){
+		if(MathUtil.compare(a.position, b.position)){
+			return true;
+		}
+		return false;
+	}
+	//mapsforge v5
+	/*public static boolean compare(org.mapsforge.core.model.LatLong a,
+			org.mapsforge.core.model.LatLong b) {
+    	if(compare(a.latitude,b.latitude) && compare(a.longitude,b.longitude)){
+	    	return true;
+	    }
+		return false;
+	}*/
 }

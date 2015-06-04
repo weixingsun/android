@@ -10,9 +10,11 @@ import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadNode;
 import org.osmdroid.util.GeoPoint;
 
+import wsn.park.LOC;
 import wsn.park.audio.MyPlayer;
 import wsn.park.maps.OSM;
 import wsn.park.ui.marker.InfoWindow;
+import wsn.park.util.MathUtil;
 import wsn.park.util.SavedOptions;
 
 
@@ -60,9 +62,11 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, Float> {
 	private void findCurrentStep(GeoPoint p) {
 		this.currNode = findCurrentNode();
 		this.toCurrent = getDistance(p, this.currNode.mLocation);
-		if(osm.loc.passedNodes.size()>0){
+		int index = osm.loc.passedNodes.size();
+		if(index>0){
 			this.lastNode = findLastNode();
 			this.toPrev = getDistance(p, this.lastNode.mLocation);
+			//Polyline sub = getSubPoliline(osm.polyline,osm.loc.road,index);
 			osm.loc.onRoad=isInStep(osm.polyline, p);
 			if(!osm.loc.onRoad) {
 				Log.i(TAG, "redraw route...");
@@ -74,7 +78,6 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, Float> {
 		}else{
 			this.toPrev=0;
 		}
-		//Log.i(TAG, "toCurrent="+this.toCurrent+":toPrev="+this.toPrev);
 		if(this.toCurrent<SavedOptions.GPS_TOLERANCE){
 			osm.loc.passedNodes.add(this.currNode);
 			osm.loc.onRoad=true;
@@ -83,7 +86,6 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, Float> {
 			Log.i(TAG, "the end of route");
 			this.endFlag = true;
 		}
-		
 		return;
 	}
 
@@ -92,7 +94,7 @@ protected Float doInBackground(GeoPoint... params) {
 	if(osm.loc.road==null || osm.loc.road.mNodes.size()<1){return null;}
 	//boolean onRoad=isInStep(osm.loc.road, myGP);	//如果误差超过30米，会认为不在线路上，重新寻路
 	//osm.loc.onRoad = onRoad;
-	findHintMarkers();
+	findCurrentStep(LOC.getMyPoint());
 	return null;
 }
 
@@ -110,9 +112,6 @@ private void playHintSounds(int index) {
 			
 		}
 	}
-}
-private void findHintMarkers() {
-	findCurrentStep(marker.getPosition());
 }
 private RoadNode findCurrentNode() {
 	for (RoadNode n:osm.loc.road.mNodes){

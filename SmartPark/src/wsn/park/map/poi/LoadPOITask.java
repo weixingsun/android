@@ -93,16 +93,11 @@ public void clearMarkers(){
 	//Log.w(TAG, "POI.size="+osm.mks.pois.size()+",LatN="+bbE6Visible.getLatNorthE6()+",LatS="+bbE6Visible.getLatSouthE6()+",LngE="+bbE6Visible.getLonEastE6()+",LngW="+bbE6Visible.getLonWestE6());
 	//osm.map.invalidate();
 }
-public boolean compare(PointOfInterest a, PointOfInterest b){
-	if(MathUtil.compare(a.position, b.position)){
-		return true;
-	}
-	return false;
-}
+
 public boolean checkDuplicate(PointOfInterest a, List<PointOfInterest> list){
 	boolean ret = false;
 	for(PointOfInterest p:list){
-		if(compare(a,p)){
+		if(MathUtil.compare(a,p)){
 			ret=true;
 		}
 	}

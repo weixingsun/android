@@ -10,6 +10,7 @@ import org.osmdroid.views.overlay.OverlayItem;
 import wsn.park.model.SavedPlace;
 
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
 
 public class OsmMapsItemizedOverlay extends ItemizedIconOverlay<OverlayItem>
 {
@@ -31,6 +32,9 @@ public class OsmMapsItemizedOverlay extends ItemizedIconOverlay<OverlayItem>
     {
         return mItemList.get(0);
         //populate();
+    }
+    public void changeIcon(Drawable icon){
+    	firstOverlay().setMarker(icon);
     }
     public void removeOverlay(OverlayItem aOverlayItem)
     {

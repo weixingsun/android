@@ -67,18 +67,21 @@ public class Markers {
 	Polyline routePolyline;
 	
 	public void initMylocMarker() {
-		Location loc = LOC.getMyPos();
-		if(loc==null) return;
-		GeoPoint p = new GeoPoint(loc.getLatitude(),loc.getLongitude());
+		if(LOC.myPos==null){
+			if(LOC.myLastPos==null)
+				return;
+		}else{
+			LOC.myLastPos=new GeoPoint(LOC.myPos);
+		}
 		osm.map.getOverlays().remove(myLocMarker);
 		myLocMarker = new Marker(osm.map);
-		myLocMarker.setPosition(p);
+		myLocMarker.setPosition(LOC.myLastPos);
 		Drawable img = osm.act.getResources().getDrawable(R.drawable.blue_radio_48);//ic_my_position_auto_follow
 		myLocMarker.setIcon(img);
 		myLocMarker.setDraggable(true);
 		myLocMarker.setOnMarkerDragListener(new OnTestMarkerDragListener(osm));
-		//Drawable icon = osm.act.getResources().getDrawable(R.drawable.multiple_45);
-		//myLocMarker.setImage(icon);
+		myLocMarker.setOnMarkerClickListener(null);
+		//myLocMarker.closeInfoWindow();
 		osm.map.getOverlays().add(myLocMarker);
 	}
 	
@@ -208,32 +211,13 @@ public class Markers {
 		osm.mks.pois.clear();
 	}*/
 	public void showHidePOIs() {}
-	/*public void updateRouteMarker(SavedPlace addr) {
-		GeoPoint gp = new GeoPoint(addr.getLat(),addr.getLng());
-		String detailAddress = addr.getBriefName();
-		String briefAddress = addr.getAdmin();
-		osm.map.getOverlays().remove(routeMarker);
-		routeMarker = new Marker(osm.map);
-		routeMarker.setPosition(gp);
-		routeMarker.setEnabled(true);
-		routeMarker.setTitle(detailAddress);
-		routeMarker.setSnippet(briefAddress);
-		Drawable icon = osm.act.getResources().getDrawable(R.drawable.marker_blue);
-		routeMarker.setIcon(icon);
-		Drawable img = osm.act.getResources().getDrawable(R.drawable.ic_arrived);
-		routeMarker.setImage(img);
-		//Log.w(tag, "adding routeMarker="+routeMarker);
-		osm.map.getOverlays().add(routeMarker);
-		osm.move(gp);								//this will cause marker shown in screen ?????????????
-		this.destinationMarkerList.add(routeMarker);  //this will cause marker not shown in screen ?????????????
-		this.selectedMarker = routeMarker;
-	}*/
+
 	public void showAllSavedPlaces(){
 		//savedPlaceMarkers
 		List<SavedPlace> list = dbHelper.getAllSavedPlaces();
 		for(SavedPlace sp:list){
 			GeoPoint gp = new GeoPoint(sp.getLat(),sp.getLng());
-			Drawable d = osm.act.getResources().getDrawable( R.drawable.star_yellow_20 );
+			Drawable d = osm.act.getResources().getDrawable( R.drawable.heart_24_x );
 			OsmMapsItemizedOverlay base = constructOverlay(sp);
 			OverlayItem newOverlay = new OverlayItem("", "", gp);
 			newOverlay.setMarker(d);

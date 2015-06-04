@@ -118,8 +118,8 @@ public class MapOptions {
 	}
 
 	public static void move() {
-		if(osm.loc.myPos==null || osm.mks.myLocMarker ==null) return;
-		GeoPoint gp = new GeoPoint(osm.loc.myPos);
+		if(LOC.myPos==null || osm.mks.myLocMarker ==null) return;
+		GeoPoint gp = LOC.getMyPoint();
 		osm.mks.myLocMarker.setPosition(gp);
 		move(gp);
 	}

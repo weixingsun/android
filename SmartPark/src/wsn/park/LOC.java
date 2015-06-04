@@ -3,6 +3,7 @@ package wsn.park;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadNode;
 import org.osmdroid.util.GeoPoint;
@@ -36,7 +37,6 @@ public class LOC implements LocationListener {
 	public static Location myPos;
 	public static GeoPoint myLastPos;
 	private int speed;
-	Activity act;
 	OSM osm;
 	//Wifi wifi;
 	public Drawer dr = Drawer.INSTANCE();
@@ -47,8 +47,7 @@ public class LOC implements LocationListener {
 	public Road road;
 	//public Integer currIndex = -1;
 	public List<RoadNode> passedNodes = new ArrayList<RoadNode>();
-	public void init(Activity act, OSM osm) {
-		this.act = act;
+	public void init(OSM osm) {
 		this.osm = osm;
 		//wifi = new Wifi(act);
 		this.dbHelper = DbHelper.getInstance();
@@ -71,27 +70,28 @@ public class LOC implements LocationListener {
 				}
 				dbHelper.updateGPS(0, myPos);
 			}else{
-				String[] lastPos = dbHelper.getLastPosition().split(",");
-				myLastPos = new GeoPoint(Double.valueOf(lastPos[1]),Double.valueOf(lastPos[2]));
-				countryCode = lastPos[0];
-				//if(countryCode==null){
-					//show supported country list in left drawer
-					//dr.show("Country");
-				//}
+				String strLastPos = dbHelper.getLastPosition();
+				if(strLastPos != null){
+					String[] lastPosDB = strLastPos.split(",");
+					LOC.myLastPos = new GeoPoint(Double.valueOf(lastPosDB[1]),Double.valueOf(lastPosDB[2]));
+					countryCode = lastPosDB[0];
+					Log.i(tag, "str="+strLastPos+",lastPos="+myLastPos+",code="+countryCode);
+					//osm.move(myLastPos);
+				}
 			}
 		}
 	}
 
 	private boolean openGPSEnabled() {
-		lm = (LocationManager) act.getSystemService(Context.LOCATION_SERVICE);
+		lm = (LocationManager) osm.act.getSystemService(Context.LOCATION_SERVICE);
 		if (lm.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER)) {
 			// ||lm.isProviderEnabled(android.location.LocationManager.NETWORK_PROVIDER)
 			// Log.i(tag, "GPS enabled");
 			return true;
 		}
-		Toast.makeText(act, "Please enable GPS.", Toast.LENGTH_SHORT).show();
+		Toast.makeText(osm.act, "Please enable GPS.", Toast.LENGTH_SHORT).show();
 		Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-		act.startActivityForResult(intent, 0);
+		osm.act.startActivityForResult(intent, 0);
 		return false;
 	}
 
@@ -102,13 +102,13 @@ public class LOC implements LocationListener {
 	@Override
 	public void onLocationChanged(Location loc) {
 		myPos = loc;
-		GeoPoint gp = new GeoPoint(loc.getLatitude(),loc.getLongitude());
+		myLastPos = new GeoPoint(loc.getLatitude(),loc.getLongitude());
 		if (countryCode == null)
-			countryCode = CountryCode.getByGeoPoint(gp);
-		osm.mks.myLocMarker.setPosition(gp);
+			countryCode = CountryCode.getByGeoPoint(myLastPos);
+		osm.mks.myLocMarker.setPosition(myLastPos);
 		if(Mode.getID()==Mode.NAVI){
-			osm.move(gp);
-			(new FindMyStepTask(osm, osm.mks.myLocMarker.getPosition(),osm.mks.myLocMarker)).execute();
+			osm.move(myLastPos);
+			(new FindMyStepTask(osm, LOC.getMyPoint(),osm.mks.myLocMarker)).execute();
 		}
 		dbHelper.updateGPS(0, myPos);
 	}
@@ -122,7 +122,7 @@ public class LOC implements LocationListener {
 
 	@Override
 	public void onProviderDisabled(String provider) {
-		Toast.makeText(act, "Location Disabled", Toast.LENGTH_LONG).show();
+		Toast.makeText(osm.act, "Location Disabled", Toast.LENGTH_LONG).show();
 	}
 
 	private String getNetworkProvider() {
@@ -173,12 +173,9 @@ public class LOC implements LocationListener {
 		this.navigating = false;
 		this.road = null;
 	}
-
-	public static Location getMyPos() {
-		return myPos;
-	}
-	public static GeoPoint getMyLastPos() {
-		return myLastPos;
+	public static GeoPoint getMyPoint() {
+		GeoPoint gp = new GeoPoint(LOC.myPos.getLatitude(),LOC.myPos.getLongitude());
+		return gp;
 	}
 }
 

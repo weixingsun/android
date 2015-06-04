@@ -86,7 +86,7 @@
             android:layout_height="wrap_content"
             android:contentDescription="@string/star"
             android:padding="@dimen/dp_20"
-            android:src="@drawable/star_48" />
+            android:src="@drawable/heart_48" />
 
         <ImageView
             android:id="@+id/home"

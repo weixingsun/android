@@ -16,8 +16,9 @@ import android.util.Log;
 public class MapsForgePOI {
 	private static final String TAG = MapsForgePOI.class.getSimpleName();
 	MapDatabase mapDatabase;
-	List<String> tags = new ArrayList<String>();//amenity=parking
+	//List<String> tags = new ArrayList<String>();//amenity=parking
 	
+	List<String> amenityTags = new ArrayList<String>();
 	List<String> highwayTags = new ArrayList<String>();
 	//amenity, building, highway(bus_stop,speed_camera),junction(roundabout), historic,leisure,shop,sport,tourism
 	
@@ -30,8 +31,9 @@ public class MapsForgePOI {
 		this.mapDatabase = mapDatabase;
 		initTags();
 	}
+	//http://wiki.openstreetmap.org/wiki/Tag:amenity%3Dparking
 	public void initTags(){
-		if(tags.size()==0){
+		//if(tags.size()==0){
 			//tags.add("amenity");  //amenity=parking
 			//tags.add("building");
 			//tags.add("highway");
@@ -42,8 +44,9 @@ public class MapsForgePOI {
 			//tags.add("sport");
 			//tags.add("tourism");
 			//highwayTags.add("bus_stop");
-			highwayTags.add("speed_camera");
-		}
+			//highwayTags.add("speed_camera");
+		//}
+		amenityTags.add("parking");
 	}
 	public List<PointOfInterest> getPOI(int x, int y, int zoomLevel){
 		Tile tile = new Tile(x, y, (byte)zoomLevel);
