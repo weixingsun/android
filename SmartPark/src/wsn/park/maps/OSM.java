@@ -118,7 +118,7 @@ public class OSM {
 		//Log.w(tag, "provider="+mtpb.getTileSource().name());
 		mapController = map.getController();
 		mapController.setZoom(16);
-		map.setBuiltInZoomControls(true);
+		//map.setBuiltInZoomControls(true);
 		map.setMultiTouchControls(true);
 		map.setClickable(true);
 		map.setLongClickable(true);

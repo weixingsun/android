@@ -22,7 +22,7 @@ import android.widget.FrameLayout;
  */
 public class GenericMapView extends FrameLayout {
 
-	protected MapView mMapView;
+	protected FixedMapView mMapView;
 
 	public GenericMapView(Context context, AttributeSet attrs)
 	{
@@ -35,7 +35,7 @@ public class GenericMapView extends FrameLayout {
 		}
 		ResourceProxy resourceProxy = new DefaultResourceProxyImpl(this.getContext());
 		int tileSizePixels=aTileProvider.getTileSource().getTileSizePixels();
-		MapView newMapView = new MapView(this.getContext(), tileSizePixels, resourceProxy, aTileProvider);
+		FixedMapView newMapView = new FixedMapView(this.getContext(), tileSizePixels, resourceProxy, aTileProvider);
 		
 		if (mMapView != null){
 			//restore as much parameters as possible from previous map:

@@ -23,6 +23,8 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:contentDescription="@string/navigate"
+            android:textSize="50sp"
+            android:textColor="#000000"
             android:padding="@dimen/dp_20" />
 
         <ImageView

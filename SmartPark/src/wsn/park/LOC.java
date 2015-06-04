@@ -16,7 +16,6 @@ import wsn.park.util.DbHelper;
 import wsn.park.util.MapOptions;
 import wsn.park.wifi.Wifi;
 
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -28,6 +27,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
+//import com.google.android.gms.location.LocationRequest;
 
 public class LOC implements LocationListener {
 	private static final String tag = LOC.class.getSimpleName();
@@ -54,6 +54,7 @@ public class LOC implements LocationListener {
 		this.dbHelper = DbHelper.getInstance();
 		if (openGPSEnabled()) {
 			provider = getGoodProvider() ; //LocationManager.GPS_PROVIDER; //this.getProvider();
+			//createLocationRequest(1000,2000);
 			if(provider.equals(LocationManager.NETWORK_PROVIDER)){
 				provider = LocationManager.GPS_PROVIDER;
 			}
@@ -102,14 +103,12 @@ public class LOC implements LocationListener {
 	public void onLocationChanged(Location loc) {
 		myPos = loc;
 		GeoPoint gp = new GeoPoint(loc.getLatitude(),loc.getLongitude());
-		if (countryCode == null) {
+		if (countryCode == null)
 			countryCode = CountryCode.getByGeoPoint(gp);
-		}
 		osm.mks.myLocMarker.setPosition(gp);
 		if(Mode.getID()==Mode.NAVI){
 			osm.move(gp);
 			(new FindMyStepTask(osm, osm.mks.myLocMarker.getPosition(),osm.mks.myLocMarker)).execute();
-			
 		}
 		dbHelper.updateGPS(0, myPos);
 	}
@@ -153,7 +152,12 @@ public class LOC implements LocationListener {
         criteria.setSpeedAccuracy(Criteria.ACCURACY_HIGH);
         return lm.getBestProvider(criteria, true);
 	}
-
+	/*protected void createLocationRequest(int min, int max) {
+	    LocationRequest mLocationRequest = new LocationRequest();
+	    mLocationRequest.setInterval(max);
+	    mLocationRequest.setFastestInterval(min);
+	    mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+	}*/
 	public int getSpeed() {
 		return speed;
 	}
