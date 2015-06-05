@@ -104,11 +104,11 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 		return list;
 	}
 	private void print(List<GeoPoint> whole, List<Polyline> list) {
-		Log.i(tag, "whole="+whole.size()+",devided("+list.size()+")");
-		for(Polyline line:list){
-			List<GeoPoint> l  = line.getPoints();
-			Log.i(tag, "("+l.size()+")");
-		}
+		Log.i(tag, "all points="+whole.size()+",devided("+list.size()+")");
+//		for(Polyline line:list){
+//			List<GeoPoint> l  = line.getPoints();
+//			//Log.i(tag, "("+l.size()+")");
+//		}
 	}
 
 	@Override
@@ -118,6 +118,7 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 			osm.startDownloadActivity(RouteOptions.getRouteDownloadFileShortName());
 			return;
 		}
+		//osm.dv.closeNaviPopup();
 		osm.mks.removeAllRouteMarkers();
 		osm.mks.removePrevPolyline();
 		if(road==null) return;

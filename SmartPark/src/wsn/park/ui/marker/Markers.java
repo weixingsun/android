@@ -79,7 +79,7 @@ public class Markers {
 		Drawable img = osm.act.getResources().getDrawable(R.drawable.blue_radio_48);//ic_my_position_auto_follow
 		myLocMarker.setIcon(img);
 		myLocMarker.setDraggable(true);
-		myLocMarker.setOnMarkerDragListener(new OnTestMarkerDragListener(osm));
+		myLocMarker.setOnMarkerDragListener(new OnTestMarkerDragListener());
 		myLocMarker.setOnMarkerClickListener(null);
 		//myLocMarker.closeInfoWindow();
 		osm.map.getOverlays().add(myLocMarker);

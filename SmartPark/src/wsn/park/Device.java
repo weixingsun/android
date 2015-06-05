@@ -57,7 +57,7 @@ public class Device {
 	DbHelper dbHelper;
     PopupWindow placePop;
     PopupWindow naviPop;
-	Mode mode;
+	//Mode mode;
 	TextView pointBrief;
 	TextView pointDetail;
 	TextView lat;
@@ -225,6 +225,7 @@ public class Device {
 			iconTravelBy.setOnClickListener(new OnClickListener() {
 	            @Override
 	            public void onClick(View v) {
+	        		if(naviPop!=null) naviPop.dismiss();
 	            	SavedPlace sp = getPlaceFromPopupPage();
 	            	if(LOC.myLastPos==null && LOC.myPos==null) return; //wait for GPS aquire data
 	            	GeoPoint gp = LOC.myPos==null?LOC.myLastPos:new GeoPoint(LOC.myPos);
@@ -365,7 +366,6 @@ public class Device {
 				break;
 			default: iconStar.setImageResource(R.drawable.heart_48);
 			}
-            	
 		}
 }
 

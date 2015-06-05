@@ -12,10 +12,10 @@ import android.util.Log;
 public class OnTestMarkerDragListener implements OnMarkerDragListener {
 
 	private static final String tag = OnTestMarkerDragListener.class.getSimpleName();
-	OSM osm;
-	public OnTestMarkerDragListener(OSM osm) {
-		this.osm = osm;
-	}
+	//OSM osm;
+	//public OnTestMarkerDragListener(OSM osm) {
+	//	this.osm = osm;
+	//}
 
 	@Override
 	public void onMarkerDrag(Marker marker) {
@@ -24,7 +24,7 @@ public class OnTestMarkerDragListener implements OnMarkerDragListener {
 
 	@Override
 	public void onMarkerDragEnd(Marker marker) {
-		(new FindMyStepTask(osm, marker.getPosition(),marker)).execute();
+		(new FindMyStepTask()).execute();
 		//Log.i(tag, "onMarkerDragEnd");
 	}
 
