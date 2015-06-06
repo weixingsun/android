@@ -84,4 +84,12 @@ public class ParkingPlace {
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
+	@Override
+	public String toString(){
+		String line1=ParkingPlace.class.getSimpleName()+"("+lat+","+lng+")["+"id="+id;
+		String line2=",type="+type+",status="+status;
+		String line3=",operator="+operator+",admin="+admin+",country="+country+"]";
+		return line1+line2+line3;
+		
+	}
 }

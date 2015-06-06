@@ -29,7 +29,7 @@ public class MyPlacesActivity extends BaseActivity {
 	private TextView tv_work_address;
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.places);
+        setContentView(R.layout.myplaces);
         
         SavedPlace[] places = dbHelper.getSavedPlaceNames();
         tv_home = (TextView) findViewById(R.id.tv_home);

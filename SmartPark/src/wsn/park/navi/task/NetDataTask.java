@@ -35,6 +35,7 @@ public class NetDataTask extends AsyncTask<String, Void, List<ParkingPlace>>{
     }
 	@Override
 	protected List<ParkingPlace> doInBackground(String... params) {
+		this.url = params[0];
 		return downloadJson();
 	}
 	private List<ParkingPlace> downloadJson() {
@@ -67,12 +68,6 @@ public class NetDataTask extends AsyncTask<String, Void, List<ParkingPlace>>{
         }
 		return null;
 	}
-	@Override  
-    protected void onPostExecute(List<ParkingPlace> points) {
-        super.onPostExecute(points);
-        
-	}
-	
 	//SELECT id,status,lat,lng,operator,type,admin,country,comment
 	private List<ParkingPlace> getPlaceFronJson(String body) throws JSONException{
 		List<ParkingPlace> points = new ArrayList<ParkingPlace> ();
@@ -94,4 +89,10 @@ public class NetDataTask extends AsyncTask<String, Void, List<ParkingPlace>>{
     	}
 		return points;
 	}
+	@Override  
+    protected void onPostExecute(List<ParkingPlace> points) {
+        super.onPostExecute(points);
+        
+	}
+	
 }

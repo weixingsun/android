@@ -13,6 +13,7 @@ import wsn.park.R;
 import wsn.park.maps.Mode;
 import wsn.park.maps.OSM;
 import wsn.park.model.SavedPlace;
+import wsn.park.navi.task.ParkingAPI;
 import wsn.park.ui.DelayedTextWatcher;
 import wsn.park.ui.SuggestListAdapter;
 import wsn.park.ui.marker.OsmMapsItemizedOverlay;
@@ -52,26 +53,12 @@ public class Device {
 	Activity act;
 	OSM osm;
 	EditText inputAddress;
-	ListView listVoice;
-	ListView listSuggest;
+	ListView listVoice,listSuggest;
 	DbHelper dbHelper;
-    PopupWindow placePop;
-    PopupWindow naviPop;
+    PopupWindow placePop,naviPop;
 	//Mode mode;
-	TextView pointBrief;
-	TextView pointDetail;
-	TextView lat;
-	TextView lng;
-	TextView country_code;
-	TextView special;
-	TextView tv_id;
-	TextView tv_instruction;
-	ImageView iconHome;
-	ImageView iconWork;
-	ImageView iconStar;
-	ImageView iconTravelBy;
-	ImageView iconCloseNavi;
-	ImageView iconNaviFlag;
+	TextView pointBrief,pointDetail,lat,lng,country_code,special,tv_id,tv_instruction;
+	ImageView iconHome,iconWork,iconStar,iconPark,iconTravelBy,iconCloseNavi,iconNaviFlag;
 	private String tag=Device.class.getSimpleName();
 	public void init(Activity act, OSM osm){
 		this.act=act;
@@ -79,7 +66,6 @@ public class Device {
 		inputAddress = (EditText) act.findViewById(R.id.inputAddress);
 		listVoice = (ListView) act.findViewById(R.id.listVoiceSuggestion);
 		listSuggest = (ListView) act.findViewById(R.id.listSuggestion);
-		
 		setText();
 		closeKeyBoard();
 		setImage();
@@ -205,7 +191,7 @@ public class Device {
 	        }
 	  	private void setPopup() {
 	        LayoutInflater inflater = LayoutInflater.from(osm.act);
-	        View popupLayout = inflater.inflate(R.layout.popup, null);
+	        View popupLayout = inflater.inflate(R.layout.popup_place, null);
 	        placePop =new PopupWindow(popupLayout, LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);
 	        placePop.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 	        placePop.setOutsideTouchable(true);
@@ -220,6 +206,14 @@ public class Device {
 			iconHome = (ImageView) popupLayout.findViewById(R.id.home);
 			iconWork = (ImageView) popupLayout.findViewById(R.id.work);
 			iconStar = (ImageView) popupLayout.findViewById(R.id.star);
+			iconPark = (ImageView) popupLayout.findViewById(R.id.parking);
+			iconPark.setOnClickListener(new OnClickListener(){
+				@Override
+				public void onClick(View v) {
+					SavedPlace sp = getPlaceFromPopupPage();
+					ParkingAPI.getInstance().search(sp.getPosition(), 0);
+				}
+			});
 			iconTravelBy  = (ImageView) popupLayout.findViewById(R.id.travel_mode);
 			iconTravelBy.setClickable(true);
 			iconTravelBy.setOnClickListener(new OnClickListener() {
@@ -281,7 +275,7 @@ public class Device {
 
 	    private void openPopupNaviMode() {
 	        LayoutInflater inflater = LayoutInflater.from(osm.act);
-	        View naviLayout = inflater.inflate(R.layout.navi, null);
+	        View naviLayout = inflater.inflate(R.layout.popup_navi, null);
 	        naviPop =new PopupWindow(naviLayout, LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);
 	        naviPop.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
 	        //navi.setOutsideTouchable(false);

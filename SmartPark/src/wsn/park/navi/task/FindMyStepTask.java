@@ -57,18 +57,23 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 			}else{ //1.left route, redraw
 				comments="redraw route";
 				redrawRoutes(p);
+				return null;
 			}
 		}else{//on route
 			comments = "on route";
-			this.currNode = osm.loc.road.mNodes.get(osm.loc.onRoadIndex);//osm.loc.road.mNodes.size() = osm.lines.size()+1
+			this.currNode = osm.loc.road.mNodes.get(osm.loc.onRoadIndex);
+			//osm.loc.road.mNodes.size() = osm.lines.size()+1
 			//if(onRoadIndex==0) currNode=road.mNodes(0)
 			//if(onRoadIndex==1) currNode=road.mNodes(1)
 			//if(onRoadIndex==2) currNode=road.mNodes(2)
 		}
-		if(this.toCurrent<SavedOptions.GPS_TOLERANCE){	//near intersection,keep old
+		if(this.toCurrent<SavedOptions.VOICE_DISTANCE){	//near intersection,keep old
 			comments +=" still in old intersection";
-			if(!osm.loc.passedNodes.contains(this.currNode))
+			if(!osm.loc.passedNodes.contains(this.currNode)){
 				osm.loc.passedNodes.add(this.currNode);
+				int index = osm.loc.passedNodes.size();
+				playHintSounds(index);
+			}
 		}else{	//away intersection, point to next intersection
 			comments +=" point to next intersection";
 			this.currNode = osm.loc.road.mNodes.get(osm.loc.onRoadIndex+1);//osm.loc.road.mNodes.size() = osm.lines.size()+1
@@ -145,8 +150,7 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 		//http://translate.google.com/translate_tts?tl=en&q=Hello%20World
 		//if(toCurrent>0){
 		Toast.makeText(osm.act, comments, Toast.LENGTH_LONG).show();
-		int index = osm.loc.passedNodes.size();
-		playHintSounds(index);
+		
 		//String snippet = "node "+(index)+"/"+osm.loc.road.mNodes.size()+":("+osm.loc.passedNodes.size()+")toCurr="+toCurrent;
 		//marker.setSnippet(snippet);
 		int resId = InfoWindow.getIconByManeuver(currNode.mManeuverType);
