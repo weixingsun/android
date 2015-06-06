@@ -25,24 +25,7 @@ public class Geocoders {
 	public Geocoders(Activity act) {
 		this.act = act;
 	}
-	/*public List<Address> getFromLocationNameGoogle(String name){
-		List<Address> list = null;
-		try {
-			list = (new android.location.Geocoder(act)).getFromLocationName(name, 3);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return list;
-	}*/
-	public List<Address> getFromLocationNameGoogleAPI(String name){
-		List<Address> list = null;
-		try {
-			list = GoogleAPISearchByAddress.search(name);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return list;
-	}
+
 	public List<Address> getFromLocationName(String provider, String name){
 		this.provider = provider;
 		List<Address> list = null;
