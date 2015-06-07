@@ -29,7 +29,7 @@ public class ParkingAPI {
 		t.execute(URL);
 		return null;
 	}
-	//https://servicedata.vhostall.com/wsn/wsn_park_select.php?lat=-43.525827&lng=172.584113
+	//http://servicedata.vhostall.com/wsn/wsn_park_select.php?lat=-43.525827&lng=172.584113
     public String getSelectURL(GeoPoint point,int range) {
         //String region = "&country="+LOC.countryCode;
         String url = "https://servicedata.vhostall.com/wsn/wsn_park_select.php?lat="+point.getLatitude()+"&lng="+point.getLongitude()+"&range="+range;
