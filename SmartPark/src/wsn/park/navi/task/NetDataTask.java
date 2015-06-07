@@ -16,8 +16,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.util.GeoPoint;
 
+import wsn.park.maps.OSM;
+import wsn.park.model.Data;
 import wsn.park.model.ParkingPlace;
+import wsn.park.ui.ParkingActivity;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -26,6 +30,7 @@ public class NetDataTask extends AsyncTask<String, Void, List<ParkingPlace>>{
 	private HttpClient client;
 	private String url;
 	private String errMsg;
+	private OSM osm = OSM.getInstance();
     @Override  
     protected void onPreExecute() {
         client = new DefaultHttpClient();
@@ -41,6 +46,7 @@ public class NetDataTask extends AsyncTask<String, Void, List<ParkingPlace>>{
 	private List<ParkingPlace> downloadJson() {
 		HttpGet get = new HttpGet(url);
     	StringBuilder sb = new StringBuilder();
+    	String str=null;
         try {
             HttpResponse response = client.execute(get);
             response.addHeader("Accept-Language", "zh-CN");
@@ -50,17 +56,18 @@ public class NetDataTask extends AsyncTask<String, Void, List<ParkingPlace>>{
             while((line=bf.readLine())!=null){
             	sb.append(line);
             }
+            str=sb.toString();
             int statusecode = response.getStatusLine().getStatusCode();
             if (statusecode == 200 ) {
-            	return getPlaceFronJson(sb.toString());
+            	return getPlaceFronJson(str);
             }else{
             	Log.w(tag,"statusecode="+statusecode);
             }
         }catch (JSONException e) {
         	if(sb.toString().startsWith("<!DOCTYPE")){
-        		errMsg="Server temporary unavailable.";
+        		errMsg="ServerError:"+str;
         	}else{
-        		errMsg="JSONException:"+e.getMessage();
+        		errMsg="JSONException:"+str;
         	}
             Log.e(tag, errMsg);
 		}catch(Exception e){
@@ -86,13 +93,18 @@ public class NetDataTask extends AsyncTask<String, Void, List<ParkingPlace>>{
         	String comment = row.getString("comment");
         	ParkingPlace pp = new ParkingPlace(id,type,status,lat,lng,operator,admin,country,comment);
         	points.add(pp);
+        	Log.i(tag, "parking="+pp.toString());
     	}
 		return points;
 	}
 	@Override  
     protected void onPostExecute(List<ParkingPlace> points) {
         super.onPostExecute(points);
-        
+        //ParkingActivity pa = 
+        if(points==null) return;
+        Data.getInstance().setParkingPlaces(points);
+        Intent intent = new Intent(osm.act, wsn.park.ui.ParkingActivity.class);
+        osm.act.startActivity(intent);
 	}
 	
 }

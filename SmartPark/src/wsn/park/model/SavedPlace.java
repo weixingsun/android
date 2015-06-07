@@ -2,7 +2,7 @@ package wsn.park.model;
 
 import org.osmdroid.util.GeoPoint;
 
-public class SavedPlace {
+public class SavedPlace implements Place {
 	public SavedPlace(int id,String name,String admin,double lat,double lng,String countryCode,String machine,String user,int special){
 		this.id=id;
 		this.name=name;

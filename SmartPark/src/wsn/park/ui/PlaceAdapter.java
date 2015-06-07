@@ -1,6 +1,7 @@
 package wsn.park.ui;
 
 import wsn.park.R;
+import wsn.park.model.Place;
 import wsn.park.model.SavedPlace;
 import android.app.Activity;
 import android.content.Context;
@@ -12,14 +13,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class PlaceAdapter extends ArrayAdapter<SavedPlace>{
+public class PlaceAdapter extends ArrayAdapter<Place>{
 
     Context context;
     int layoutResourceId;   
-    SavedPlace data[] = null;
+    Place[] data = null;
 	private String tag = PlaceAdapter.class.getSimpleName();
    
-    public PlaceAdapter(Context context, int layoutResourceId, SavedPlace[] data) {
+    public PlaceAdapter(Context context, int layoutResourceId, Place[] data) {
         super(context, layoutResourceId, data);
         this.layoutResourceId = layoutResourceId;
         this.context = context;
@@ -47,7 +48,7 @@ public class PlaceAdapter extends ArrayAdapter<SavedPlace>{
             holder = (PlaceHolder)row.getTag();
         }
        
-        SavedPlace p = data[position]; //position start with 0
+        Place p = data[position]; //position start with 0
         holder.place = p;
         //Log.i(tag , "item="+p.getName());
         holder.txtTitle.setText(p.getName());
@@ -59,6 +60,6 @@ public class PlaceAdapter extends ArrayAdapter<SavedPlace>{
     {
         ImageView imgIcon;
         TextView txtTitle;
-        SavedPlace place;
+        Place place;
     }
 }

@@ -35,7 +35,7 @@ public class HistoryActivity extends BaseActivity {
 				PlaceHolder ph = (PlaceHolder) view.getTag();
 				//Log.w(tag, "place.name="+ph.place.getName());
 				//osm.mks.updateRouteMarker(ph.place);
-				SavedPlace sp = ph.place;
+				SavedPlace sp = (SavedPlace) ph.place;
 				osm.mks.updateDestinationOverlay(sp);
 				drawer.close();
 				finish();

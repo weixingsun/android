@@ -2,19 +2,19 @@ package wsn.park.model;
 
 import org.osmdroid.util.GeoPoint;
 
-public class ParkingPlace {
+public class ParkingPlace implements Place{
 
 	public ParkingPlace(int id, int type, int status, double lat,
 			double lng, String operator, String admin, String country, String comment) {
-		this.id=id;
-		this.setType(type);
-		this.setStatus(status);
-		this.lat=lat;
-		this.lng=lng;
-		this.setOperator(operator);
-		this.admin=admin;
-		this.country=country;
-		this.setComment(comment);
+		setId(id);
+		setType(type);
+		setStatus(status);
+		setLat(lat);
+		setLng(lng);
+		setOperator(operator);
+		setAdmin(admin);
+		setCountry(country);
+		setComment(comment);
 	}
 	public static final int UNAVAILABLE = 0;
 	public static final int AVAILABLE = 1;
@@ -87,9 +87,12 @@ public class ParkingPlace {
 	@Override
 	public String toString(){
 		String line1=ParkingPlace.class.getSimpleName()+"("+lat+","+lng+")["+"id="+id;
-		String line2=",type="+type+",status="+status;
-		String line3=",operator="+operator+",admin="+admin+",country="+country+"]";
+		String line2=",type="+type+",status="+status+",operator="+operator;
+		String line3=",admin="+admin+",country="+country+",comment="+comment+"]";
 		return line1+line2+line3;
-		
+	}
+	@Override
+	public String getName() {//get distance from the point of search
+		return getOperator()+": "+getComment();
 	}
 }

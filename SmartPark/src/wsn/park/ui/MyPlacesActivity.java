@@ -57,7 +57,8 @@ public class MyPlacesActivity extends BaseActivity {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				PlaceHolder ph = (PlaceHolder) view.getTag();
 				//Log.w(tag, "place.name="+ph.place.getName());
-				osm.mks.updateDestinationOverlay(ph.place);
+				SavedPlace sp = (SavedPlace) ph.place;
+				osm.mks.updateDestinationOverlay(sp);
 				drawer.close();
 				finish();
 			}

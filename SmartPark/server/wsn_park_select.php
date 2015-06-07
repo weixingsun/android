@@ -39,7 +39,7 @@ if ($result->num_rows > 0) {
 	}
 	echo "]}\r\n";
 } else {
-    echo "no results". $sql;
+    echo "no results:sql=". $sql;
 }
 $conn->close();
 ?>

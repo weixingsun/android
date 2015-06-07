@@ -49,15 +49,13 @@ import wsn.park.util.RuntimeOptions;
 import wsn.park.util.SavedOptions;
 
 public class OSM {
-	   private static OSM singleton;
-
-	   private OSM(){ }
-
-	   public static synchronized OSM getInstance( ) {
-	      if (singleton == null)
-	          singleton=new OSM();
-	      return singleton;
-	   }
+	private static OSM singleton;
+	private OSM(){ }
+	public static synchronized OSM getInstance( ) {
+		if (singleton == null)
+			singleton=new OSM();
+		return singleton;
+	}
 	protected static final String tag = OSM.class.getSimpleName();
 	public DbHelper dbHelper;
 	public LOC loc = new LOC();
@@ -212,11 +210,10 @@ public class OSM {
 	    act.startActivity(intent);
 	}
 	public void startHistoryActivity() {
-
 		Intent intent = new Intent(act, wsn.park.ui.HistoryActivity.class);
 	    act.startActivity(intent);
-		
 	}
+	//activity.osm.startHistoryActivity();
 	public void startMyPlacesActivity() {
 		Intent intent = new Intent(act, wsn.park.ui.MyPlacesActivity.class);
 		act.startActivity(intent);

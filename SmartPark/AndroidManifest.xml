@@ -40,7 +40,7 @@
         <activity android:name="wsn.park.ui.SettingsActivity"  />
         <activity android:name="wsn.park.ui.MyPlacesActivity"  />
         <activity android:name="wsn.park.ui.HistoryActivity"  />
-
+		<activity android:name="wsn.park.ui.ParkingActivity"  />
         <!--  <receiver android:name="wsn.park.wifi.Wifi">
             <intent-filter >
                 <action android:name="android.net.wifi.RSSI_CHANGED" />
