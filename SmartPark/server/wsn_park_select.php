@@ -27,8 +27,10 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 //1 lat = 110.57 km, 1 lng = 111.32 km
-//1km = 0.009 lat = 0.009 lng
-$select = "SELECT id,status,lat,lng,operator,type,admin,country,comment FROM wsn_parking_space_info";
+//1km = 0.009 lat = 0.009 lng (0.01)
+//diff/0.00001=m
+$comment='SQRT(POW('.$lat.'-lat,2)+POW('.$lng.'-lng,2))*100000 as comment';
+$select = "SELECT id,status,lat,lng,operator,type,admin,country,".$comment." FROM wsn_parking_space_info";
 $where = " where lat between ". ($lat -0.01) ." and ". ($lat +0.01) ." and lng between ". ($lng-0.01) ." and ". ($lng+0.01);
 $sql=$select.$where;
 $result = $conn->query($sql);

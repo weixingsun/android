@@ -41,6 +41,8 @@ public class ParkingAPI {
         String url = "http://servicedata.vhostall.com/wsn/wsn_park_select.php?lat="
         			+point.getLatitude()+"&lng="+point.getLongitude()+"&range="+range;
         //Log.i(tag,"Parking URL === " + url);
+        //sql=SELECT id,status,lat,lng,operator,type,admin,country,SQRT(POW(-43.525827-lat,2)+POW(172.584213-lng,2))*100000 as comment 
+        //FROM wsn_parking_space_info where lat between -43.535827 and -43.515827 and lng between 172.574213 and 172.594213
         return url;
     }
 	public List<ParkingPlace> getSearchResult() {
