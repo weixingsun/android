@@ -56,10 +56,9 @@ public class LOC implements LocationListener {
 			if(provider.equals(LocationManager.NETWORK_PROVIDER)){
 				provider = LocationManager.GPS_PROVIDER;
 			}
-			//Log.i(tag, "gps provider="+provider);
 			myPos = lm.getLastKnownLocation(provider);
 			startGPSLocation();
-			if(myPos!=null){ ///////////////////////////////////////////////////////////////////////
+			if(myPos!=null){
 				countryCode = CountryCode.getByLatLng(myPos.getLatitude(), myPos.getLongitude());
 				//Log.w(tag, "countryCode="+countryCode);
 				if(osm.rto.isNetworkAvailable()){
@@ -172,6 +171,7 @@ public class LOC implements LocationListener {
 		this.road = null;
 	}
 	public static GeoPoint getMyPoint() {
+		if(LOC.myPos==null) return LOC.myLastPos;
 		GeoPoint gp = new GeoPoint(LOC.myPos.getLatitude(),LOC.myPos.getLongitude());
 		return gp;
 	}

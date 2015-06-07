@@ -12,7 +12,7 @@ import android.widget.ListView;
 import wsn.park.R;
 import wsn.park.maps.BaseActivity;
 import wsn.park.maps.OSM;
-import wsn.park.model.Data;
+import wsn.park.model.DataBus;
 import wsn.park.model.ParkingPlace;
 import wsn.park.model.SavedPlace;
 import wsn.park.ui.PlaceAdapter.PlaceHolder;
@@ -26,11 +26,11 @@ public class ParkingActivity extends BaseActivity {
 	//private Drawer drawer = Drawer.INSTANCE(); 
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.history);
-        
-        ParkingPlace[] places = Data.getInstance().getParkingPlaceNames();
+        setContentView(R.layout.parking);
+        DataBus d = DataBus.getInstance();
+        ParkingPlace[] places = d.getParkingPlaceNames();
         lv_parking_place = (ListView) findViewById(R.id.list_parking_places);
-        //Log.w(tag, "names=("+names[0]+"),lv_history_place="+lv_history_place);
+        //Log.w(tag, "Data.places="+places);
         //String[] ns = {"test","test","test"};
         lv_parking_place.setAdapter(new PlaceAdapter(this,R.layout.list_item, places ));
         lv_parking_place.setOnItemClickListener(new OnItemClickListener(){
@@ -45,5 +45,6 @@ public class ParkingActivity extends BaseActivity {
 				finish();
 			}
         });
+        osm.dv.closePopupPlace();
 	}
 }

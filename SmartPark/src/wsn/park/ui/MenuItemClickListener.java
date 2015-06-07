@@ -7,6 +7,7 @@ import wsn.park.LOC;
 import wsn.park.MainActivity;
 import wsn.park.R;
 import wsn.park.maps.OSM;
+import wsn.park.navi.task.ParkingAPI;
 import wsn.park.util.DbHelper;
 import wsn.park.util.GeoOptions;
 import wsn.park.util.MapOptions;
@@ -35,12 +36,9 @@ public class MenuItemClickListener implements OnItemClickListener {
 			R.array.whats_hot_items
 			};
 	private static final String TAG = MenuItemClickListener.class.getSimpleName();
-	MainActivity activity;
+	OSM osm = OSM.getInstance();
 	List<String> data=new ArrayList<String>();
 	ListView lv;
-	public MenuItemClickListener(MainActivity activity) {
-		this.activity = activity;
-	}
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
@@ -54,15 +52,16 @@ public class MenuItemClickListener implements OnItemClickListener {
 		Log.i(TAG, "menu="+name);
 		switch(name){
 		case SavedOptions.MYPLACES: 
-			activity.osm.startMyPlacesActivity(); 
+			osm.startMyPlacesActivity(); 
 			break;
 		case SavedOptions.HISTORY: 
-			activity.osm.startHistoryActivity(); 
+			osm.startHistoryActivity(); 
 			break;
 		case SavedOptions.PARKING: //activity.osm.startSettingsActivity(); 
+			ParkingAPI.getInstance().search(LOC.getMyPoint(), 0);
 			break;
 		case SavedOptions.SETTINGS: 
-			activity.osm.startSettingsActivity(); 
+			osm.startSettingsActivity(); 
 			break;
 		}
 		

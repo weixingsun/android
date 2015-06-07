@@ -34,6 +34,7 @@ import android.widget.Toast;
 import wsn.park.Device;
 import wsn.park.LOC;
 import wsn.park.MyMapEventsReceiver;
+import wsn.park.NET;
 import wsn.park.R;
 import wsn.park.map.poi.POI;
 import wsn.park.maps.vendor.GenericMapView;
@@ -58,6 +59,7 @@ public class OSM {
 	}
 	protected static final String tag = OSM.class.getSimpleName();
 	public DbHelper dbHelper;
+	public NET net;
 	public LOC loc = new LOC();
 	public Device dv = new Device(); //Device.getInstance();
 	public Activity act;
@@ -81,6 +83,8 @@ public class OSM {
 	
 	public void init(Activity act) {
 		this.act = act;
+		net = NET.instance();
+        net.init(act);
 		this.dbHelper = DbHelper.getInstance(act);
 		SavedOptions.selectedBy = dbHelper.getSettings(SavedOptions.BY);
 		SavedOptions.selectedMap = dbHelper.getSettings(SavedOptions.MAP);
@@ -108,7 +112,6 @@ public class OSM {
 		//mks.setNaviImage();
 		//mks.initRouteMarker();
         dv.init(act,this);
-
 	}
 	public void setMap(MapTileProviderBase mtpb) {
 		if(mtpb==null) return;

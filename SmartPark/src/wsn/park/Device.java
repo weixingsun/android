@@ -361,6 +361,13 @@ public class Device {
 			default: iconStar.setImageResource(R.drawable.heart_48);
 			}
 		}
+
+		public void closePopupPlace() {
+			this.placePop.dismiss();
+		}
+		public void closePopupNavi() {
+			this.naviPop.dismiss();
+		}
 }
 
 /*iconHome.setOnClickListener(new OnClickListener(){

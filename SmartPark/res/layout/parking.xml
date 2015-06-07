@@ -10,7 +10,7 @@
 		android:layout_height="50dp"
 		android:background="#000000"
 		android:gravity="center"
-		android:text="@string/history"
+		android:text="@string/parking_nearby"
 		android:textSize="30sp" />
 	
 

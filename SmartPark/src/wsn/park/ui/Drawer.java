@@ -35,7 +35,7 @@ public class Drawer {
 		mMainSettings = act.getResources().getStringArray(R.array.menu_items);
 		mDrawerListParent = (ListView) act.findViewById(R.id.left_drawer_parent);
 		mDrawerListParent.setAdapter(new ArrayAdapter<String>(act,R.layout.drawer_list_item, mMainSettings));
-		mDrawerListParent.setOnItemClickListener(new MenuItemClickListener(act));
+		mDrawerListParent.setOnItemClickListener(new MenuItemClickListener());
 		mDrawerLayout = (DrawerLayout)act.findViewById(R.id.drawer_layout);
 		ImageView iv = (ImageView) act.findViewById(R.id.settings);
 		iv.setOnClickListener(new View.OnClickListener() {

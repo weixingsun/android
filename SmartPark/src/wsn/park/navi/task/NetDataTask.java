@@ -17,13 +17,14 @@ import org.json.JSONObject;
 import org.osmdroid.util.GeoPoint;
 
 import wsn.park.maps.OSM;
-import wsn.park.model.Data;
+import wsn.park.model.DataBus;
 import wsn.park.model.ParkingPlace;
 import wsn.park.ui.ParkingActivity;
 
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 public class NetDataTask extends AsyncTask<String, Void, List<ParkingPlace>>{
 	private String tag = NetDataTask.class.getSimpleName();
@@ -100,9 +101,11 @@ public class NetDataTask extends AsyncTask<String, Void, List<ParkingPlace>>{
 	@Override  
     protected void onPostExecute(List<ParkingPlace> points) {
         super.onPostExecute(points);
-        //ParkingActivity pa = 
-        if(points==null) return;
-        Data.getInstance().setParkingPlaces(points);
+        if(points==null) {
+        	Toast.makeText(osm.act, "No parking space available around", Toast.LENGTH_LONG).show();
+        	return;
+        }
+        DataBus.getInstance().setParkingPlaces(points);
         Intent intent = new Intent(osm.act, wsn.park.ui.ParkingActivity.class);
         osm.act.startActivity(intent);
 	}
