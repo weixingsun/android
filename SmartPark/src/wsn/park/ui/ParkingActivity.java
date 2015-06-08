@@ -40,7 +40,7 @@ public class ParkingActivity extends BaseActivity {
 				//Log.w(tag, "place.name="+ph.place.getName());
 				//osm.mks.updateRouteMarker(ph.place);
 				ParkingPlace sp = (ParkingPlace) ph.place;
-				//osm.mks.updateDestinationOverlay(sp);
+				osm.mks.updateDestinationOverlay(sp);
 				//drawer.close();
 				finish();
 			}

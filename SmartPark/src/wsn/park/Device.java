@@ -12,6 +12,7 @@ import org.osmdroid.util.GeoPoint;
 import wsn.park.R;
 import wsn.park.maps.Mode;
 import wsn.park.maps.OSM;
+import wsn.park.model.Place;
 import wsn.park.model.SavedPlace;
 import wsn.park.navi.task.ParkingAPI;
 import wsn.park.ui.DelayedTextWatcher;
@@ -305,22 +306,24 @@ public class Device {
             placePop.setAnimationStyle(R.style.AnimBottom);
             placePop.showAtLocation(osm.act.findViewById(R.id.my_loc), Gravity.BOTTOM, 0, 0); //leaked window
             placePop.setFocusable(true);
-            SavedPlace sp = pin.getSp();
-            pointBrief.setText(sp.getBriefName());
-            pointDetail.setText(sp.getAdmin());
-            lat.setText(String.valueOf(sp.getLat()));
-            lng.setText(String.valueOf(sp.getLng()));
-            country_code.setText(sp.getCountryCode());
-            //Log.e(tag, "openPopup() country_code="+sp.getCountryCode());
-            special.setText(String.valueOf(sp.getSpecial()));
-            if(sp.getId()==0) sp.setId(dbHelper.getMaxID(DbHelper.MY_PLACE_TABLE)+1);
-            tv_id.setText(String.valueOf(sp.getId()));
-            //Log.w(tag, "special="+sp.getSpecial());
-            hidePopupIcons(sp);
+            Place p = pin.getSp();
+            pointBrief.setText(p.getName());
+            pointDetail.setText(p.getAdmin());
+            lat.setText(String.valueOf(p.getLat()));
+            lng.setText(String.valueOf(p.getLng()));
+            country_code.setText(p.getCountryCode());
+            if(p instanceof SavedPlace){
+            	SavedPlace sp = (SavedPlace) p;
+            	special.setText(String.valueOf(sp.getSpecial()));
+            	hidePopupIcons(sp);
+                //Log.w(tag, "special="+sp.getSpecial());
+            }
+            if(p.getId()==0) p.setId(dbHelper.getMaxID(DbHelper.MY_PLACE_TABLE)+1);
+            tv_id.setText(String.valueOf(pin.getSp().getId()));
             placePop.update();
             osm.mks.selectedMarker = pin;
 	    }
-	    public void openPlacePopup(SavedPlace sp) {
+	    public void openPlacePopup(Place sp) {
 	    	if(osm.mks.selectedMarker!=null){
 		    	GeoPoint a=osm.mks.selectedMarker.getSp().getPosition();
 		    	if(wsn.park.util.MathUtil.compare(a, sp.getPosition())){

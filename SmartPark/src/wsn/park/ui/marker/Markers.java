@@ -37,6 +37,9 @@ import wsn.park.MyItemizedOverlay;
 import wsn.park.R;
 import wsn.park.map.poi.POI;
 import wsn.park.maps.OSM;
+import wsn.park.model.DataBus;
+import wsn.park.model.ParkingPlace;
+import wsn.park.model.Place;
 import wsn.park.model.SavedPlace;
 import wsn.park.util.DbHelper;
 import wsn.park.util.MapOptions;
@@ -57,6 +60,7 @@ public class Markers {
 		return mks;
 	}
 	public Marker myLocMarker;
+	public Marker hintMarker;
 	//private OsmMapsItemizedOverlay pointOverlay;
 	public  OsmMapsItemizedOverlay selectedMarker;
 	public List<Marker> waypointsMarkerList = new ArrayList<Marker>();
@@ -86,8 +90,13 @@ public class Markers {
 	}
 	
 	public OsmMapsItemizedOverlay updateDestinationOverlay(SavedPlace addr){ //clickable
-		if(selectedMarker!=null&& selectedMarker.getSp().getSpecial()<SavedPlace.NORMAL){
-			osm.map.getOverlays().remove(selectedMarker);//delete last not saved pin
+		SavedPlace sp=null;
+		if(selectedMarker!=null){
+			if(selectedMarker.getSp() instanceof SavedPlace){
+				sp = (SavedPlace) selectedMarker.getSp();
+				if(sp.getSpecial()<SavedPlace.NORMAL)
+					osm.map.getOverlays().remove(selectedMarker);//delete last not saved pin
+			}
 		}
 		selectedMarker=findMyPlace(addr);
 		if(selectedMarker==null){
@@ -101,16 +110,38 @@ public class Markers {
 			osm.map.getOverlays().add(selectedMarker);
 			//osm.map.invalidate();
 		}else{
-			addr.setSpecial(selectedMarker.getSp().getSpecial());
+			addr.setSpecial(sp.getSpecial());
 		}
 		osm.move(addr.getPosition());
 		osm.dv.openPlacePopup(selectedMarker);
 		this.destinationMarkerList.add(selectedMarker);
 		return selectedMarker;
 	}
-	public OsmMapsItemizedOverlay findMyPlace(SavedPlace addr) {
+	public void updateDestinationOverlay(Place p) {
+		Log.i(tag, "adding place marker1");
+		if(selectedMarker!=null){
+			if(selectedMarker.getSp() instanceof SavedPlace){
+				SavedPlace sp = (SavedPlace) selectedMarker.getSp();
+				if(sp.getSpecial()<SavedPlace.NORMAL)
+					osm.map.getOverlays().remove(selectedMarker);//delete last not saved pin
+			}else if(selectedMarker.getSp() instanceof ParkingPlace){
+				osm.map.getOverlays().remove(selectedMarker);
+			}
+		}
+		GeoPoint gp = new GeoPoint(p.getLat(),p.getLng());
+		Drawable d = osm.act.getResources().getDrawable( R.drawable.rect_green_32 );
+		selectedMarker = constructOverlay(p);
+		Log.i(tag, "adding place marker1");
+		OverlayItem newOverlay = new OverlayItem(p.getName(), p.getAdmin(), gp);
+		newOverlay.setMarker(d);
+		selectedMarker.addOverlay(newOverlay);
+		selectedMarker.setSp(p);
+		osm.map.getOverlays().add(selectedMarker);
+		osm.move(gp);
+	}
+	public OsmMapsItemizedOverlay findMyPlace(Place addr) {
 		for(OsmMapsItemizedOverlay a:savedPlaceMarkers){
-			if(MathUtil.compare(addr.getPosition(), a.getSp().getPosition())){
+			if(MathUtil.compare(a.getSp().getPosition(), addr.getPosition())){
 				Log.i(tag, "found");
 				return a;
 			}
@@ -118,13 +149,13 @@ public class Markers {
 		Log.i(tag, "not found");
 		return null;
 	}
-	private OsmMapsItemizedOverlay constructOverlay(final SavedPlace sp) {
+	private OsmMapsItemizedOverlay constructOverlay(final Place p) {
 		ResourceProxy resourceProxy = (ResourceProxy) new DefaultResourceProxyImpl(osm.act);
 		ArrayList<OverlayItem> pList = new ArrayList<OverlayItem>();
 		OnItemGestureListener<OverlayItem> listener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>(){
             @Override
             public boolean onItemSingleTapUp(final int index, final OverlayItem item){
-            	osm.dv.openPlacePopup(sp);
+            	osm.dv.openPlacePopup(p);
                 return true; // We 'handled' this event.
             }
             @Override
@@ -139,6 +170,18 @@ public class Markers {
 			addWayPointMarker(road,i);
 			//
 		}
+	}
+	public void updateHintMarker(){
+		if(hintMarker==null){
+			hintMarker = new Marker(osm.map);
+			osm.map.getOverlays().add(hintMarker);
+			Drawable nodeIcon = osm.act.getResources().getDrawable(R.drawable.star_yellow_16);
+			hintMarker.setIcon(nodeIcon);
+			//Log.w(tag, "addHintMarker()");
+		}
+		//Log.w(tag, "updateHintMarker()="+DataBus.getInstance().getHintPoint());
+		if(DataBus.getInstance().getHintPoint()!=null)
+			hintMarker.setPosition(DataBus.getInstance().getHintPoint());
 	}
 	public void addWayPointMarker(Road road,int seq){
 		RoadNode node = road.mNodes.get(seq); 
@@ -231,4 +274,5 @@ public class Markers {
 		Drawable d = osm.act.getResources().getDrawable( resId );
 		osm.mks.selectedMarker.firstOverlay().setMarker(d);
 	}
+
 }

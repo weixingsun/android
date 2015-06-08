@@ -2,6 +2,8 @@ package wsn.park.model;
 
 import java.util.List;
 
+import org.osmdroid.util.GeoPoint;
+
 public class DataBus {
 	private static DataBus singleton;
 	private DataBus(){ }
@@ -12,7 +14,8 @@ public class DataBus {
 	}
 	private SavedPlace place;
 	private List<ParkingPlace> parkingPlaces;
-	
+	private GeoPoint hintPoint;
+	private GeoPoint endPoint;
 	public SavedPlace getPlace() {
 		return place;
 	}
@@ -29,5 +32,16 @@ public class DataBus {
 		ParkingPlace[] placesArr = new ParkingPlace[parkingPlaces.size()];
 		return parkingPlaces.toArray(placesArr);
 	}
-
+	public GeoPoint getHintPoint() {
+		return hintPoint;
+	}
+	public void setHintPoint(GeoPoint hintPoint) {
+		this.hintPoint = hintPoint;
+	}
+	public void setEndPoint(GeoPoint endPoint) {
+		this.endPoint = endPoint;
+	}
+	public GeoPoint getEndPoint() {
+		return endPoint;
+	}
 }

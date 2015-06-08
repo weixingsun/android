@@ -3,6 +3,7 @@ package wsn.park.ui.marker;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.Marker.OnMarkerDragListener;
 
+import wsn.park.maps.Mode;
 import wsn.park.maps.OSM;
 import wsn.park.navi.task.FindMyStepTask;
 
@@ -12,10 +13,6 @@ import android.util.Log;
 public class OnTestMarkerDragListener implements OnMarkerDragListener {
 
 	private static final String tag = OnTestMarkerDragListener.class.getSimpleName();
-	//OSM osm;
-	//public OnTestMarkerDragListener(OSM osm) {
-	//	this.osm = osm;
-	//}
 
 	@Override
 	public void onMarkerDrag(Marker marker) {
@@ -25,7 +22,7 @@ public class OnTestMarkerDragListener implements OnMarkerDragListener {
 	@Override
 	public void onMarkerDragEnd(Marker marker) {
 		(new FindMyStepTask()).execute();
-		//Log.i(tag, "onMarkerDragEnd");
+		Mode.setID(Mode.PRACTICE);
 	}
 
 	@Override

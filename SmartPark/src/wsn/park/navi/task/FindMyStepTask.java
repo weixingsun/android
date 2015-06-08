@@ -12,7 +12,9 @@ import org.osmdroid.util.GeoPoint;
 
 import wsn.park.LOC;
 import wsn.park.audio.MyPlayer;
+import wsn.park.maps.Mode;
 import wsn.park.maps.OSM;
+import wsn.park.model.DataBus;
 import wsn.park.ui.marker.InfoWindow;
 import wsn.park.util.MathUtil;
 import wsn.park.util.SavedOptions;
@@ -26,7 +28,7 @@ import android.widget.Toast;
 
 public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 	OSM osm;
-	private Marker marker;
+	//private Marker marker;
 	RoadNode currNode;
 	//RoadNode prevNode;
 	boolean endFlag = false;
@@ -35,55 +37,28 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 	private static final String tag = FindMyStepTask.class.getSimpleName();
 
 	public FindMyStepTask() {
-		super();
 		this.osm = OSM.getInstance();
-		this.marker = osm.mks.myLocMarker;
 	}
 
 	@Override
 	protected String doInBackground(GeoPoint... params) {
 		if(osm.loc.road==null || osm.loc.road.mNodes.size()<1){return null;}
-		String comments = findCurrentStep(LOC.getMyPoint()); ////如果误差超过30米，会认为不在线路上，重新寻路
-		return comments;
+		return findCurrentStep(osm.mks.myLocMarker.getPosition()); //如果误差超过30米，会认为不在线路上，重新寻路
 	}
 	private String findCurrentStep(GeoPoint p) {
-		String comments = null;
 		osm.loc.onRoadIndex=isInStep(osm.lines, p);//0 means (#1,#2)
-		Log.i(tag, "FindMyStepTask.findCurrentStep():phase="+osm.loc.onRoadIndex+1);
+		String comments = "phase="+osm.loc.onRoadIndex;
 		if(osm.loc.onRoadIndex<0){
-			if(osm.loc.passedNodes.size()<1){ //2.at very beginning
-				comments="at very beginning";
-				this.currNode = osm.loc.road.mNodes.get(0);
-			}else{ //1.left route, redraw
-				comments="redraw route";
-				redrawRoutes(p);
-				return null;
-			}
-		}else{//on route
-			comments = "on route";
-			this.currNode = osm.loc.road.mNodes.get(osm.loc.onRoadIndex);
-			//osm.loc.road.mNodes.size() = osm.lines.size()+1
-			//if(onRoadIndex==0) currNode=road.mNodes(0)
-			//if(onRoadIndex==1) currNode=road.mNodes(1)
-			//if(onRoadIndex==2) currNode=road.mNodes(2)
-		}
-		if(this.toCurrent<SavedOptions.VOICE_DISTANCE){	//near intersection,keep old
-			comments +=" still in old intersection";
-			if(!osm.loc.passedNodes.contains(this.currNode)){
-				osm.loc.passedNodes.add(this.currNode);
-				int index = osm.loc.passedNodes.size();
-				playHintSounds(index);
-			}
-		}else{	//away intersection, point to next intersection
-			comments +=" point to next intersection";
-			this.currNode = osm.loc.road.mNodes.get(osm.loc.onRoadIndex+1);//osm.loc.road.mNodes.size() = osm.lines.size()+1
+			comments="redraw route";
+			redrawRoutes(p);
+			return null;
+		} else {//on route
+			this.currNode = osm.loc.road.mNodes.get(osm.loc.onRoadIndex+1);
 		}
 		this.toCurrent = getDistance(p, this.currNode.mLocation);
-		//this.prevNode = findPrevNode();
-		//this.toPrev = getDistance(p, this.prevNode.mLocation);
-		//int index = osm.loc.passedNodes.size();
-		if(osm.loc.passedNodes.size()==osm.loc.road.mNodes.size() && this.toCurrent<SavedOptions.GPS_TOLERANCE){
-			Log.i(tag, "the end of route");
+		boolean isEnd = MathUtil.compare(DataBus.getInstance().getEndPoint(), this.currNode.mLocation);
+		if(isEnd && this.toCurrent<SavedOptions.GPS_TOLERANCE){
+			comments += "the end of route";
 			this.endFlag = true;
 		}
 		return comments;
@@ -99,7 +74,7 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 		int ret=-1;
 		for(int i=0;i<lines.size();i++){
 			boolean on = PolyUtil.isLocationOnPath(point, lines.get(i).getPoints(), false,SavedOptions.GPS_TOLERANCE);
-			if(on) ret=i;
+			if(on) return i;
 		}
 		return ret;
 	}
@@ -117,18 +92,18 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 	}
 	
 	private void playHintSounds(int index) {
-		if(index<osm.loc.road.mNodes.size()-1){
+		//if(index<osm.loc.road.mNodes.size()-1){
 			//RoadNode nextNode = osm.loc.road.mNodes.get(osm.loc.currIndex+1);
 			//if(this.toCurrent>SavedOptions.GPS_TOLERANCE && this.toPrev>SavedOptions.GPS_TOLERANCE){
-			if(this.toCurrent<SavedOptions.VOICE_DISTANCE && !MyPlayer.isPlayed(index)){
+			if(this.currNode!=null && this.toCurrent<SavedOptions.VOICE_DISTANCE && !Mode.isPlayed(index)){
 				//if(this.toCurrent>200 && this.toCurrent < 500) return;
-				MyPlayer.setPlayedId(index);
-				marker.setTitle("in "+this.toCurrent+" m, "+this.currNode.mInstructions);
+				Mode.setPlayedId(index);
+				//marker.setTitle("in "+this.toCurrent+" m, "+this.currNode.mInstructions);
 				BigDecimal bd = new BigDecimal(this.toCurrent).setScale(-2, BigDecimal.ROUND_HALF_UP);  //整百
 				MyPlayer.play(osm.act, this.currNode, bd.intValue());
-				Toast.makeText(osm.act, "playing "+index+":"+bd.intValue(), Toast.LENGTH_LONG).show();
+				//Toast.makeText(osm.act, "playing "+index+":"+bd.intValue(), Toast.LENGTH_LONG).show();
 			}
-		}
+		//}
 	}
 
 //	private RoadNode findPrevNode() {
@@ -138,7 +113,8 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 		osm.mks.removeAllRouteMarkers();
 		osm.mks.removePrevPolyline();
 		osm.loc.cleanupRoad();
-		MyPlayer.clearPlayedList();
+		Mode.clearPlayedList();
+		osm.dv.closePopupNavi();
 		this.cleanupRoad();
 	}
 	private void cleanupRoad() {
@@ -147,24 +123,25 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 	}
 	@Override
     protected void onPostExecute(String comments) {
+		if(currNode==null) return;
 		//http://translate.google.com/translate_tts?tl=en&q=Hello%20World
-		//if(toCurrent>0){
-		Toast.makeText(osm.act, comments, Toast.LENGTH_LONG).show();
+		if(!osm.loc.passedNodes.contains(this.currNode)){
+			osm.loc.passedNodes.add(this.currNode);
+			playHintSounds(osm.loc.passedNodes.size());
+		}
 		
-		//String snippet = "node "+(index)+"/"+osm.loc.road.mNodes.size()+":("+osm.loc.passedNodes.size()+")toCurr="+toCurrent;
-		//marker.setSnippet(snippet);
+		//Toast.makeText(osm.act, comments, Toast.LENGTH_LONG).show();
 		int resId = InfoWindow.getIconByManeuver(currNode.mManeuverType);
-		//Drawable flagImg = osm.act.getResources().getDrawable(resId);
-		//marker.setImage(flagImg);
-		//marker.showInfoWindow();
-		String dist = "In "+this.toCurrent+"m";
+		String dist = "In "+this.toCurrent+"m "+comments;
 		osm.dv.updateNaviInstruction(dist,resId);
 		if(this.endFlag){
 			cleanupAllonRoad();
 			//confirm parking button
 		}
-		//}
+		DataBus.getInstance().setHintPoint(this.currNode.mLocation);
+		osm.mks.updateHintMarker();
     }
+
 	public int getDistance(GeoPoint start, GeoPoint end){
 		float[] results = new float[1];
 		Location.distanceBetween(start.getLatitude(), start.getLongitude(),

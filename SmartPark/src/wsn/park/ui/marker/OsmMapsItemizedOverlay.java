@@ -7,6 +7,7 @@ import org.osmdroid.api.IMapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 
+import wsn.park.model.Place;
 import wsn.park.model.SavedPlace;
 
 import android.graphics.Point;
@@ -14,7 +15,7 @@ import android.graphics.drawable.Drawable;
 
 public class OsmMapsItemizedOverlay extends ItemizedIconOverlay<OverlayItem>
 {
-	private SavedPlace sp;
+	private Place sp;
     private ArrayList<OverlayItem> mItemList = new ArrayList<OverlayItem>();
     private int temp = 0;	//default is temp marker.
     public OsmMapsItemizedOverlay(ArrayList<OverlayItem> pList,
@@ -62,11 +63,11 @@ public class OsmMapsItemizedOverlay extends ItemizedIconOverlay<OverlayItem>
         return false;
     }
 
-	public SavedPlace getSp() {
+	public Place getSp() {
 		return sp;
 	}
 
-	public void setSp(SavedPlace sp) {
+	public void setSp(Place sp) {
 		this.sp = sp;
 	}
 

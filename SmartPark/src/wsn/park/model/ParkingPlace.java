@@ -13,7 +13,7 @@ public class ParkingPlace implements Place{
 		setLng(lng);
 		setOperator(operator);
 		setAdmin(admin);
-		setCountry(country);
+		setCountryCode(country);
 		setComment(comment);
 	}
 	public static final int UNAVAILABLE = 0;
@@ -51,12 +51,10 @@ public class ParkingPlace implements Place{
 	public void setLng(double lng) {
 		this.lng = lng;
 	}
-	public String getCountry() {
-		return country;
-	}
-	public void setCountry(String country_code) {
+	public void setCountryCode(String country_code) {
 		this.country = country_code;
 	}
+	@Override
 	public GeoPoint getPosition(){
 		return new GeoPoint(this.lat,this.lng);
 	}
@@ -95,4 +93,9 @@ public class ParkingPlace implements Place{
 	public String getName() {//get distance from the point of search
 		return getOperator()+": "+getComment();
 	}
+	@Override
+	public String getCountryCode() {
+		return this.country;
+	}
+	
 }

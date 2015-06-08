@@ -78,7 +78,7 @@ public class OSM {
 	public boolean switchTileProvider=false;
 	public ScaleBarOverlay scaleBarOverlay;
 	public Address startAddr;
-	public Address endAddr;
+	//public Address endAddr;
 	public File offlineMapFile;
 	
 	public void init(Activity act) {

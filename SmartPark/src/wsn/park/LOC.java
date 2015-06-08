@@ -24,6 +24,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -51,17 +52,14 @@ public class LOC implements LocationListener {
 		//wifi = new Wifi(act);
 		this.dbHelper = DbHelper.getInstance();
 		if (openGPSEnabled()) {
-			provider = getGoodProvider() ; //LocationManager.GPS_PROVIDER; //this.getProvider();
 			//createLocationRequest(1000,2000);
-			if(provider.equals(LocationManager.NETWORK_PROVIDER)){
-				provider = LocationManager.GPS_PROVIDER;
-			}
-			myPos = lm.getLastKnownLocation(provider);
-			startGPSLocation();
+			myPos = getLocation();
+			provider = getGoodProvider(); //LocationManager.GPS_PROVIDER; //this.getProvider();
+			
 			if(myPos!=null){
 				countryCode = CountryCode.getByLatLng(myPos.getLatitude(), myPos.getLongitude());
 				//Log.w(tag, "countryCode="+countryCode);
-				if(osm.rto.isNetworkAvailable()){
+				if(isNetworkAvailable()){
 					if(countryCode==null ){
 						osm.startTask("geo", new GeoPoint(myPos),"countryCode");
 					}
@@ -73,10 +71,11 @@ public class LOC implements LocationListener {
 					String[] lastPosDB = strLastPos.split(",");
 					LOC.myLastPos = new GeoPoint(Double.valueOf(lastPosDB[1]),Double.valueOf(lastPosDB[2]));
 					countryCode = lastPosDB[0];
-					Log.i(tag, "str="+strLastPos+",lastPos="+myLastPos+",code="+countryCode);
+					Log.i(tag, "getPosition from DB="+strLastPos+",lastPos="+myLastPos+",code="+countryCode);
 					//osm.move(myLastPos);
 				}
 			}
+			startGPSLocation();
 		}
 	}
 
@@ -94,7 +93,7 @@ public class LOC implements LocationListener {
 	}
 
 	private void startGPSLocation() {
-		lm.requestLocationUpdates(provider, 2000, 10, this);
+		lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 10, this);
 	}
 
 	@Override
@@ -108,10 +107,24 @@ public class LOC implements LocationListener {
 			osm.move(myLastPos);
 			(new FindMyStepTask()).execute();
 		}
+		//playHintSounds(osm.loc.passedNodes.size());
 		dbHelper.updateGPS(0, myPos);
 	}
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
+		if(this.provider.equals(lm.NETWORK_PROVIDER)){
+			this.provider=lm.GPS_PROVIDER;
+			startGPSLocation();
+		}
+		if(status==LocationProvider.TEMPORARILY_UNAVAILABLE || status==LocationProvider.OUT_OF_SERVICE){
+			//if(provider.equals(LocationManager.NETWORK_PROVIDER)){
+				//this.provider = LocationManager.GPS_PROVIDER;
+//				if(getGoodProvider().equals(LocationManager.NETWORK_PROVIDER))
+//					this.provider = LocationManager.GPS_PROVIDER;
+//				Log.i(tag, "provider="+provider);
+//				Toast.makeText(osm.act, "Location Provider changed to: "+provider, Toast.LENGTH_SHORT).show();
+			//}
+		}
 	}
 
 	@Override
@@ -123,15 +136,6 @@ public class LOC implements LocationListener {
 		Toast.makeText(osm.act, "Location Disabled", Toast.LENGTH_LONG).show();
 	}
 
-	private String getNetworkProvider() {
-		Criteria criteria = new Criteria();
-		criteria.setAccuracy(Criteria.ACCURACY_FINE); // good quality
-		criteria.setAltitudeRequired(false); // no altitude
-		criteria.setBearingRequired(false); //
-		criteria.setCostAllowed(true);
-		criteria.setPowerRequirement(Criteria.POWER_LOW);
-		return lm.getBestProvider(criteria, true);
-	}
 	private String getGoodProvider(){
         //All your normal criteria setup
         Criteria criteria = new Criteria();
@@ -174,6 +178,29 @@ public class LOC implements LocationListener {
 		if(LOC.myPos==null) return LOC.myLastPos;
 		GeoPoint gp = new GeoPoint(LOC.myPos.getLatitude(),LOC.myPos.getLongitude());
 		return gp;
+	}
+    private boolean isNetworkAvailable(){
+        return lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+    }
+    private Location getLocation(){   
+        if(NET.instance().isNetworkConnected()){
+        	lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 10, this);
+        	Location l = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+			Log.w(tag, "getPosition from NET,lastLat="+l.getLatitude());
+            return l;
+        }
+        return null;
+        //if(isGPSValiable())
+        //    location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+    }
+	private String getNetworkProvider() {
+		Criteria criteria = new Criteria();
+		criteria.setAccuracy(Criteria.ACCURACY_FINE); // good quality
+		criteria.setAltitudeRequired(false); // no altitude
+		criteria.setBearingRequired(false); //
+		criteria.setCostAllowed(true);
+		criteria.setPowerRequirement(Criteria.POWER_LOW);
+		return lm.getBestProvider(criteria, true);
 	}
 }
 
