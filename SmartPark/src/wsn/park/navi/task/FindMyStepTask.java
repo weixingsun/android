@@ -28,12 +28,9 @@ import android.widget.Toast;
 
 public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 	OSM osm;
-	//private Marker marker;
 	RoadNode currNode;
-	//RoadNode prevNode;
 	boolean endFlag = false;
 	private int toCurrent = 0;
-	//private int toPrev = 0;
 	private static final String tag = FindMyStepTask.class.getSimpleName();
 
 	public FindMyStepTask() {
@@ -68,7 +65,7 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 		osm.ro.redraw(start);
 		RouteTask task = new RouteTask(osm, osm.ro);
 		task.execute();
-		osm.loc.passedNodes.clear();
+		//osm.loc.passedNodes.clear();
 	}
 	public int isInStep(List<Polyline> lines, GeoPoint point){
 		int ret=-1;
@@ -91,29 +88,20 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 		return PolyUtil.isLocationOnPath(point, line.getPoints(), geodesic,SavedOptions.GPS_TOLERANCE); //tolerance=30 meters
 	}
 	
-	private void playHintSounds(int index) {
-		//if(index<osm.loc.road.mNodes.size()-1){
-			//RoadNode nextNode = osm.loc.road.mNodes.get(osm.loc.currIndex+1);
-			//if(this.toCurrent>SavedOptions.GPS_TOLERANCE && this.toPrev>SavedOptions.GPS_TOLERANCE){
-			if(this.currNode!=null && this.toCurrent<SavedOptions.VOICE_DISTANCE && !Mode.isPlayed(index)){
-				//if(this.toCurrent>200 && this.toCurrent < 500) return;
-				Mode.setPlayedId(index);
-				//marker.setTitle("in "+this.toCurrent+" m, "+this.currNode.mInstructions);
-				BigDecimal bd = new BigDecimal(this.toCurrent).setScale(-2, BigDecimal.ROUND_HALF_UP);  //整百
-				MyPlayer.play(osm.act, this.currNode, bd.intValue());
-				//Toast.makeText(osm.act, "playing "+index+":"+bd.intValue(), Toast.LENGTH_LONG).show();
-			}
-		//}
+	private void playHintSounds(int index, int dist) {
+		if(this.currNode!=null && this.toCurrent<SavedOptions.VOICE_DISTANCE && !DataBus.isPlayed(index,dist)){
+			DataBus.setPlayedId(index,dist);
+			//BigDecimal bd = new BigDecimal(this.toCurrent).setScale(-2, BigDecimal.ROUND_HALF_UP);  //整百
+			MyPlayer.play(osm.act, this.currNode, dist);
+			Toast.makeText(osm.act, "playing "+index+":"+dist, Toast.LENGTH_LONG).show();
+		}
 	}
 
-//	private RoadNode findPrevNode() {
-//		return osm.loc.passedNodes.get(osm.loc.passedNodes.size()-1);
-//	}
 	private void cleanupAllonRoad() {
 		osm.mks.removeAllRouteMarkers();
 		osm.mks.removePrevPolyline();
 		osm.loc.cleanupRoad();
-		Mode.clearPlayedList();
+		DataBus.clearPlayedList();
 		osm.dv.closePopupNavi();
 		this.cleanupRoad();
 	}
@@ -125,12 +113,8 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
     protected void onPostExecute(String comments) {
 		if(currNode==null) return;
 		//http://translate.google.com/translate_tts?tl=en&q=Hello%20World
-		if(!osm.loc.passedNodes.contains(this.currNode)){
-			osm.loc.passedNodes.add(this.currNode);
-			playHintSounds(osm.loc.passedNodes.size());
-		}
-		
-		//Toast.makeText(osm.act, comments, Toast.LENGTH_LONG).show();
+		BigDecimal bd = new BigDecimal(this.toCurrent).setScale(-2, BigDecimal.ROUND_HALF_UP);  //整百
+		playHintSounds(osm.loc.onRoadIndex+1,bd.intValue());
 		int resId = InfoWindow.getIconByManeuver(currNode.mManeuverType);
 		String dist = "In "+this.toCurrent+"m "+comments;
 		osm.dv.updateNaviInstruction(dist,resId);

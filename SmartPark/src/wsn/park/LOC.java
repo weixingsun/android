@@ -46,7 +46,7 @@ public class LOC implements LocationListener {
 	public int onRoadIndex=0;
 	public Road road;
 	//public Integer currIndex = -1;
-	public List<RoadNode> passedNodes = new ArrayList<RoadNode>();
+	//public List<RoadNode> passedNodes = new ArrayList<RoadNode>();
 	public void init(OSM osm) {
 		this.osm = osm;
 		//wifi = new Wifi(act);
@@ -102,8 +102,9 @@ public class LOC implements LocationListener {
 		myLastPos = new GeoPoint(loc.getLatitude(),loc.getLongitude());
 		if (countryCode == null)
 			countryCode = CountryCode.getByGeoPoint(myLastPos);
-		osm.mks.myLocMarker.setPosition(myLastPos);
 		if(Mode.getID()==Mode.NAVI){
+			osm.mks.myLocMarker.setPosition(myLastPos);
+			osm.map.invalidate();
 			osm.move(myLastPos);
 			(new FindMyStepTask()).execute();
 		}
@@ -170,7 +171,7 @@ public class LOC implements LocationListener {
 
 	public void cleanupRoad() {
 		this.onRoadIndex=0;
-		this.passedNodes.clear();
+		//this.passedNodes.clear();
 		//this.currIndex = -1;
 		this.road = null;
 	}

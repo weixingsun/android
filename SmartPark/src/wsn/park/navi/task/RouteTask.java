@@ -125,7 +125,7 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 		if(road==null) return;
 		osm.mks.addPolyline(pl);
 		osm.mks.drawStepsPoint(road);
-		osm.loc.passedNodes.clear();
+		//osm.loc.passedNodes.clear();
 		GeoPoint end = road.mNodes.get(road.mNodes.size()-1).mLocation;
 		DataBus.getInstance().setEndPoint(end);
     }

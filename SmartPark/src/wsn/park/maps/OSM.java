@@ -120,7 +120,7 @@ public class OSM {
 		//Log.w(tag, "provider="+mtpb.getTileSource().name());
 		mapController = map.getController();
 		mapController.setZoom(16);
-		//map.setBuiltInZoomControls(true);
+		map.setBuiltInZoomControls(true);
 		map.setMultiTouchControls(true);
 		map.setClickable(true);
 		map.setLongClickable(true);
@@ -135,9 +135,9 @@ public class OSM {
 		map.setMapListener(new DelayedMapListener(new MapListener(){
 			@Override
 			public boolean onScroll(ScrollEvent arg0) {
-				BoundingBoxE6 box = arg0.getSource().getBoundingBox();
+				//BoundingBoxE6 box = arg0.getSource().getBoundingBox();
 				//Log.i(tag, "onScroll="+box);
-				mks.showHidePOIs();
+				//mks.showHidePOIs();
 				return false;
 			}
 			@Override

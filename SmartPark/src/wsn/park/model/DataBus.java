@@ -1,5 +1,6 @@
 package wsn.park.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.osmdroid.util.GeoPoint;
@@ -16,6 +17,7 @@ public class DataBus {
 	private List<ParkingPlace> parkingPlaces;
 	private GeoPoint hintPoint;
 	private GeoPoint endPoint;
+	private static List<Integer> playedList = new ArrayList<Integer>();
 	public SavedPlace getPlace() {
 		return place;
 	}
@@ -43,5 +45,14 @@ public class DataBus {
 	}
 	public GeoPoint getEndPoint() {
 		return endPoint;
+	}
+	public static void setPlayedId(int id,int dist){
+		playedList.add(id*10000+dist);
+	}
+	public static void clearPlayedList(){
+		playedList.clear();
+	}
+	public static boolean isPlayed(int id,int dist){
+		return playedList.contains(id*10000+dist);
 	}
 }
