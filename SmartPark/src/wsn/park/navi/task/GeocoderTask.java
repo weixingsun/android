@@ -83,7 +83,7 @@ public class GeocoderTask extends
     				LOC.countryCode=foundAddr.getCountryCode();
     			Log.i(TAG, "==================country_code="+LOC.countryCode);
     		}
-    		Log.w(TAG, "foundAddr.code="+foundAddr.getCountryCode()+","+this.purpose);
+    		//Log.w(TAG, "foundAddr.code="+foundAddr.getCountryCode()+","+this.purpose);
     		if(foundAddr != null && !this.purpose.equals("countryCode")){
     			foundAddr.setLatitude(position.getLatitude());
     			foundAddr.setLongitude(position.getLongitude());

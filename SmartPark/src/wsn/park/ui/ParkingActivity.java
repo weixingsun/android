@@ -38,7 +38,7 @@ public class ParkingActivity extends BaseActivity {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				PlaceHolder ph = (PlaceHolder) view.getTag();
 				//Log.w(tag, "place.name="+ph.place.getName());
-				//osm.mks.updateRouteMarker(ph.place);
+				DataBus.getInstance().setPlace(ph.place);
 				ParkingPlace sp = (ParkingPlace) ph.place;
 				osm.mks.updateDestinationOverlay(sp);
 				//drawer.close();

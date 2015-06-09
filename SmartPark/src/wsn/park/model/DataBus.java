@@ -13,15 +13,15 @@ public class DataBus {
 			singleton=new DataBus();
 		return singleton;
 	}
-	private SavedPlace place;
+	private Place place;
 	private List<ParkingPlace> parkingPlaces;
 	private GeoPoint hintPoint;
 	private GeoPoint endPoint;
 	private static List<Integer> playedList = new ArrayList<Integer>();
-	public SavedPlace getPlace() {
+	public Place getPlace() {
 		return place;
 	}
-	public void setPlace(SavedPlace place) {
+	public void setPlace(Place place) {
 		this.place = place;
 	}
 	public List<ParkingPlace> getParkingPlaces() {

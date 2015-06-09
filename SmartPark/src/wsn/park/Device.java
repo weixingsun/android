@@ -303,6 +303,7 @@ public class Device {
 	    public void openPlacePopup(OsmMapsItemizedOverlay pin) {
 	    	//act.getResources().getDrawable(R.drawable.hearts_48);
 	    	//pin.changeIcon(icon);
+	    	osm.mks.removeTempMarker(pin);
             placePop.setAnimationStyle(R.style.AnimBottom);
             placePop.showAtLocation(osm.act.findViewById(R.id.my_loc), Gravity.BOTTOM, 0, 0); //leaked window
             placePop.setFocusable(true);
@@ -323,15 +324,15 @@ public class Device {
             placePop.update();
             osm.mks.selectedMarker = pin;
 	    }
-	    public void openPlacePopup(Place sp) {
+	    public void openPlacePopup(GeoPoint gp) {
 	    	if(osm.mks.selectedMarker!=null){
 		    	GeoPoint a=osm.mks.selectedMarker.getSp().getPosition();
-		    	if(wsn.park.util.MathUtil.compare(a, sp.getPosition())){
+		    	if(wsn.park.util.MathUtil.compare(a, gp)){
 		    		this.openPlacePopup(osm.mks.selectedMarker);
 		    		return;
 		    	}
 	    	}
-	    	OsmMapsItemizedOverlay pin = osm.mks.findMyPlace(sp);
+	    	OsmMapsItemizedOverlay pin = osm.mks.findMyPlace(gp);
 	    	this.openPlacePopup(pin);
 	    }
 		private void hidePopupIcons(SavedPlace sp) {

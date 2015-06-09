@@ -51,6 +51,7 @@ public class Markers {
 	private static OSM osm;
 	private static Markers mks;
 	private DbHelper dbHelper;
+	private OsmMapsItemizedOverlay tempMarker;
 	private Markers(){
 		dbHelper = DbHelper.getInstance();
 	}
@@ -89,7 +90,7 @@ public class Markers {
 		osm.map.getOverlays().add(myLocMarker);
 	}
 	
-	public OsmMapsItemizedOverlay updateDestinationOverlay(SavedPlace addr){ //clickable
+/*	public OsmMapsItemizedOverlay updateDestinationOverlay(SavedPlace addr){ //clickable
 		SavedPlace sp=null;
 		if(selectedMarker!=null){
 			if(selectedMarker.getSp() instanceof SavedPlace){
@@ -101,7 +102,7 @@ public class Markers {
 		selectedMarker=findMyPlace(addr);
 		if(selectedMarker==null){
 			GeoPoint gp = new GeoPoint(addr.getLat(),addr.getLng());
-			Drawable d = osm.act.getResources().getDrawable( R.drawable.marker_azure_48 );
+			Drawable d = osm.act.getResources().getDrawable( R.drawable.marker_green_48 );
 			selectedMarker = constructOverlay(addr);
 			OverlayItem newOverlay = new OverlayItem(addr.getBriefName(), addr.getAdmin(), gp);
 			newOverlay.setMarker(d);
@@ -116,32 +117,32 @@ public class Markers {
 		osm.dv.openPlacePopup(selectedMarker);
 		this.destinationMarkerList.add(selectedMarker);
 		return selectedMarker;
-	}
-	public void updateDestinationOverlay(Place p) {
-		Log.i(tag, "adding place marker1");
-		if(selectedMarker!=null){
-			if(selectedMarker.getSp() instanceof SavedPlace){
-				SavedPlace sp = (SavedPlace) selectedMarker.getSp();
-				if(sp.getSpecial()<SavedPlace.NORMAL)
-					osm.map.getOverlays().remove(selectedMarker);//delete last not saved pin
-			}else if(selectedMarker.getSp() instanceof ParkingPlace){
-				osm.map.getOverlays().remove(selectedMarker);
-			}
+	}*/
+	public OsmMapsItemizedOverlay updateDestinationOverlay(Place p) {
+		//Log.i(tag, "update place marker");
+		if(this.tempMarker!=null){
+			osm.map.getOverlays().remove(tempMarker);//delete last not saved pin
 		}
 		GeoPoint gp = new GeoPoint(p.getLat(),p.getLng());
-		Drawable d = osm.act.getResources().getDrawable( R.drawable.rect_green_32 );
-		selectedMarker = constructOverlay(p);
-		Log.i(tag, "adding place marker1");
+		Drawable d = osm.act.getResources().getDrawable( R.drawable.marker_green_48 );
+		selectedMarker = constructOverlay(gp);
+		//Log.i(tag, "adding place marker1");
 		OverlayItem newOverlay = new OverlayItem(p.getName(), p.getAdmin(), gp);
 		newOverlay.setMarker(d);
 		selectedMarker.addOverlay(newOverlay);
 		selectedMarker.setSp(p);
 		osm.map.getOverlays().add(selectedMarker);
 		osm.move(gp);
+		this.destinationMarkerList.add(selectedMarker);
+		if(!this.savedPlaceMarkers.contains(this.selectedMarker)){
+			this.tempMarker=selectedMarker;
+			//Log.i(tag, "this is a temp marker");
+		}
+		return selectedMarker;
 	}
-	public OsmMapsItemizedOverlay findMyPlace(Place addr) {
+	public OsmMapsItemizedOverlay findMyPlace(GeoPoint gp) {
 		for(OsmMapsItemizedOverlay a:savedPlaceMarkers){
-			if(MathUtil.compare(a.getSp().getPosition(), addr.getPosition())){
+			if(MathUtil.compare(a.getSp().getPosition(), gp)){
 				Log.i(tag, "found");
 				return a;
 			}
@@ -149,13 +150,13 @@ public class Markers {
 		Log.i(tag, "not found");
 		return null;
 	}
-	private OsmMapsItemizedOverlay constructOverlay(final Place p) {
+	private OsmMapsItemizedOverlay constructOverlay(final GeoPoint gp) {
 		ResourceProxy resourceProxy = (ResourceProxy) new DefaultResourceProxyImpl(osm.act);
 		ArrayList<OverlayItem> pList = new ArrayList<OverlayItem>();
 		OnItemGestureListener<OverlayItem> listener = new ItemizedIconOverlay.OnItemGestureListener<OverlayItem>(){
             @Override
             public boolean onItemSingleTapUp(final int index, final OverlayItem item){
-            	osm.dv.openPlacePopup(p);
+            	osm.dv.openPlacePopup(gp);
                 return true; // We 'handled' this event.
             }
             @Override
@@ -184,7 +185,7 @@ public class Markers {
 			hintMarker.setPosition(DataBus.getInstance().getHintPoint());
 	}
 	public void addWayPointMarker(Road road,int seq){
-		RoadNode node = road.mNodes.get(seq); 
+		RoadNode node = road.mNodes.get(seq);
 		Marker nodeMarker = new Marker(osm.map);
 		nodeMarker.setPosition(node.mLocation);
 		Drawable nodeIcon = osm.act.getResources().getDrawable(R.drawable.red_point_16);
@@ -218,6 +219,7 @@ public class Markers {
 		/*for (Marker mk : this.destinationMarkerList.keySet()){
 			osm.mapView.getOverlays().remove(mk);
 		}*/
+		osm.map.getOverlays().remove(hintMarker);
 	}	
 	public void removeAllRouteMarkers(){
 		removeAllMarkers();
@@ -261,7 +263,7 @@ public class Markers {
 		for(SavedPlace sp:list){
 			GeoPoint gp = new GeoPoint(sp.getLat(),sp.getLng());
 			Drawable d = osm.act.getResources().getDrawable( R.drawable.heart_24_x );
-			OsmMapsItemizedOverlay base = constructOverlay(sp);
+			OsmMapsItemizedOverlay base = constructOverlay(gp);
 			OverlayItem newOverlay = new OverlayItem("", "", gp);
 			newOverlay.setMarker(d);
 			base.addOverlay(newOverlay);
@@ -273,6 +275,11 @@ public class Markers {
 	public void changeMarkerIcon(int resId) {
 		Drawable d = osm.act.getResources().getDrawable( resId );
 		osm.mks.selectedMarker.firstOverlay().setMarker(d);
+	}
+	public void removeTempMarker(OsmMapsItemizedOverlay tapMarker) {
+		if(tapMarker.equals(this.tempMarker)) return;
+		osm.map.getOverlays().remove(tempMarker);
+		osm.map.invalidate();
 	}
 
 }
