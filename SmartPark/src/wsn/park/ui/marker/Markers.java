@@ -219,6 +219,7 @@ public class Markers {
 		removeAllMarkers();
 		removePrevPolyline();
 		osm.map.invalidate();
+		DataBus.clearPlayedList();
 	}
 	public void removePrevPolyline(){
 		if (routePolyline != null){

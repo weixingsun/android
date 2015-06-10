@@ -95,6 +95,7 @@ import android.util.Log;
 		    		+"user_name varchar(50),"
 		    		+"special integer NOT NULL"
 		    		+");";
+	    	//DECIMAL(10,7)
 	    	this.db.execSQL(STR_CREATE);
 	    	
 	    	this.db.close();

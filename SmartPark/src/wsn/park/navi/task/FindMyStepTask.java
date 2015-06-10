@@ -63,6 +63,7 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 	public void redrawRoutes(GeoPoint start){
 		Log.i(tag, "redraw route...");
 		osm.ro.redraw(start);
+		cleanupAllonRoad();
 		RouteTask task = new RouteTask(osm, osm.ro);
 		task.execute();
 		//osm.loc.passedNodes.clear();
@@ -101,7 +102,6 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 		osm.mks.removeAllRouteMarkers();
 		osm.mks.removePrevPolyline();
 		osm.loc.cleanupRoad();
-		DataBus.clearPlayedList();
 		osm.dv.closePopupNavi();
 		this.cleanupRoad();
 	}
