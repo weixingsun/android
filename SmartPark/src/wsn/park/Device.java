@@ -235,7 +235,7 @@ public class Device {
 				@Override
 				public void onClick(View v) {
 					SavedPlace sp = getPlaceFromPopupPage();
-	    			if(sp.getSpecial()>SavedPlace.NORMAL-1){
+	    			if(sp.getSpecial()>Place.NORMAL-1){
 	    				dbHelper.deleteMyPlaces(sp.getId());
 	    				placePop.dismiss();
 	    				osm.mks.selectedMarker.removeAllItems();
@@ -243,7 +243,7 @@ public class Device {
 	    				osm.map.getOverlays().remove(osm.mks.selectedMarker);
 	    				osm.map.invalidate();
 	    			}else{
-	    				sp.setSpecial(SavedPlace.NORMAL);
+	    				sp.setSpecial(Place.NORMAL);
 	    				dbHelper.addMyPlace(sp);
 	    				osm.mks.selectedMarker.setSp(sp);
 	    				osm.mks.savedPlaceMarkers.add(osm.mks.selectedMarker);
@@ -254,7 +254,7 @@ public class Device {
 
 		protected void showMyMarker(SavedPlace sp) {
 			iconStar.setImageResource(R.drawable.heart_broken_48);
-			special.setText(String.valueOf(SavedPlace.NORMAL));
+			special.setText(String.valueOf(Place.NORMAL));
 			osm.mks.changeMarkerIcon(R.drawable.heart_24_x);
 			osm.map.invalidate();
 		}
@@ -262,7 +262,6 @@ public class Device {
 		public SavedPlace getPlaceFromPopupPage(){
 	    	int str_id = Integer.valueOf(tv_id.getText().toString());
 			String str_country_code = country_code.getText().toString();
-			//if(str_special.length()==0) str_special="0";
 			int i_special = Integer.valueOf(special.getText().toString());
 			double dlat = Double.valueOf(lat.getText().toString());
 			double dlng = Double.valueOf(lng.getText().toString());
@@ -313,12 +312,8 @@ public class Device {
             lat.setText(String.valueOf(p.getLat()));
             lng.setText(String.valueOf(p.getLng()));
             country_code.setText(p.getCountryCode());
-            if(p instanceof SavedPlace){
-            	SavedPlace sp = (SavedPlace) p;
-            	special.setText(String.valueOf(sp.getSpecial()));
-            	hidePopupIcons(sp);
-                //Log.w(tag, "special="+sp.getSpecial());
-            }
+        	special.setText(String.valueOf(p.getSpecial()));
+        	hidePopupIcons(p);
             if(p.getId()==0) p.setId(dbHelper.getMaxID(DbHelper.MY_PLACE_TABLE)+1);
             tv_id.setText(String.valueOf(pin.getSp().getId()));
             placePop.update();
@@ -335,7 +330,7 @@ public class Device {
 	    	OsmMapsItemizedOverlay pin = osm.mks.findMyPlace(gp);
 	    	this.openPlacePopup(pin);
 	    }
-		private void hidePopupIcons(SavedPlace sp) {
+		private void hidePopupIcons(Place sp) {
 			switch(Mode.getID()){
 			case Mode.NORMAL:
 			case Mode.NAVI:
@@ -353,13 +348,13 @@ public class Device {
 	            break;
 			}
 			switch(sp.getSpecial()){
-			case SavedPlace.NORMAL: //cancel save
+			case Place.NORMAL: //cancel save
 				iconStar.setImageResource(R.drawable.heart_broken_48);
 				break;
-			case SavedPlace.HOME:   //cancel home
+			case Place.HOME:   //cancel home
 				iconHome.setImageResource(R.drawable.ic_black_trash_64);
 				break;
-			case SavedPlace.WORK:   //cancel work
+			case Place.WORK:   //cancel work
 				iconWork.setImageResource(R.drawable.ic_black_trash_64);
 				break;
 			default: iconStar.setImageResource(R.drawable.heart_48);
@@ -379,10 +374,10 @@ public class Device {
 	public void onClick(View v) {
 		//insert home place into sqlite: special=1
 		SavedPlace sp = getPlaceFromPopupPage();
-		if(sp.getSpecial()==SavedPlace.HOME){
+		if(sp.getSpecial()==Place.HOME){
 			dbHelper.deleteMyPlaces(sp.getId());
 		}else{
-			dbHelper.addMyPlace(sp, SavedPlace.HOME);
+			dbHelper.addMyPlace(sp, Place.HOME);
 		}
 	}});
 iconWork.setOnClickListener(new OnClickListener(){
@@ -390,9 +385,9 @@ iconWork.setOnClickListener(new OnClickListener(){
 	public void onClick(View v) {
 		//insert work place into sqlite: special=12
 		SavedPlace sp = getPlaceFromPopupPage();
-		if(sp.getSpecial()==SavedPlace.WORK){
+		if(sp.getSpecial()==Place.WORK){
 			dbHelper.deleteMyPlaces(sp.getId());
 		}else{
-			dbHelper.addMyPlace(sp, SavedPlace.WORK);
+			dbHelper.addMyPlace(sp, Place.WORK);
 		}
 	}});*/

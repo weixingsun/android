@@ -37,10 +37,6 @@ public class SavedPlace implements Place {
 		this.countryCode=countryCode;
 		this.special = special;
 	}
-	public static final int NONE = 0;
-	public static final int NORMAL = 10;
-	public static final int HOME = 11;
-	public static final int WORK = 12;
 	
 	//id, name, admin, lat,lng, machine_code, user_name
 	private int id,special;

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.osmdroid.util.GeoPoint;
 
+import wsn.park.model.Place;
 import wsn.park.model.SavedPlace;
 
 import android.content.ContentValues;
@@ -46,16 +47,6 @@ import android.util.Log;
 	    public static DbHelper getInstance(){
 	    	return dbHelper;
 	    }
-	    /*@Override  
-	    public SQLiteDatabase getWritableDatabase() {
-	        final SQLiteDatabase db;  
-	        if(mDefaultWritableDatabase != null){  
-	            db = mDefaultWritableDatabase;  
-	        } else {  
-	            db = super.getWritableDatabase();  
-	        }  
-	        return db;  
-	    }*/
 	    @Override
 	    public void onCreate(SQLiteDatabase db) {
 	    	//recreateTables(db);
@@ -317,7 +308,7 @@ import android.util.Log;
 			return list;
 		}
 		public SavedPlace[] getSavedPlaceNames() {
-			List<SavedPlace> list =getSavedPlaces("special="+SavedPlace.NORMAL);
+			List<SavedPlace> list =getSavedPlaces("special="+Place.NORMAL);
 			SavedPlace[] array = list.toArray(new SavedPlace[list.size()]);
 			//Log.w(tag, "array="+array[0].getName()+", "+array[1].getName());
 			return array;

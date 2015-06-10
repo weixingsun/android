@@ -34,19 +34,19 @@ public class MapsForgePOI {
 	//http://wiki.openstreetmap.org/wiki/Tag:amenity%3Dparking
 	public void initTags(){
 		//if(tags.size()==0){
-			//tags.add("amenity");  //amenity=parking
+			//tags.add("amenity");
 			//tags.add("building");
-			//tags.add("highway");
-			//tags.add("junction"); //junction=roundabout
 			//tags.add("historic");
 			//tags.add("leisure");
 			//tags.add("shop");
 			//tags.add("sport");
 			//tags.add("tourism");
-			//highwayTags.add("bus_stop");
-			//highwayTags.add("speed_camera");
+			/////////////////////////tags.add("highway");
+			/////////////////////////tags.add("junction"); //junction=roundabout
+			/////////////////////////highwayTags.add("bus_stop");
+			/////////////////////////highwayTags.add("speed_camera");
 		//}
-		amenityTags.add("parking");
+		//amenityTags.add("parking");//amenity=parking
 	}
 	public List<PointOfInterest> getPOI(int x, int y, int zoomLevel){
 		Tile tile = new Tile(x, y, (byte)zoomLevel);

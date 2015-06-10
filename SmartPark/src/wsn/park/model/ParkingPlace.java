@@ -97,5 +97,13 @@ public class ParkingPlace implements Place{
 	public String getCountryCode() {
 		return this.country;
 	}
+	@Override
+	public void setSpecial(int special) {
+		
+	}
+	@Override
+	public int getSpecial() {
+		return Place.PARK;
+	}
 	
 }

@@ -103,11 +103,11 @@ public class LOC implements LocationListener {
 		if (countryCode == null)
 			countryCode = CountryCode.getByGeoPoint(myLastPos);
 		if(Mode.getID()==Mode.NAVI){
-			osm.mks.myLocMarker.setPosition(myLastPos);
-			osm.map.invalidate();
 			osm.move(myLastPos);
 			(new FindMyStepTask()).execute();
 		}
+		osm.mks.myLocMarker.setPosition(myLastPos);
+		osm.map.invalidate();
 		//playHintSounds(osm.loc.passedNodes.size());
 		dbHelper.updateGPS(0, myPos);
 	}

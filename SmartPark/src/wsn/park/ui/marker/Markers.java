@@ -36,6 +36,7 @@ import wsn.park.LOC;
 import wsn.park.MyItemizedOverlay;
 import wsn.park.R;
 import wsn.park.map.poi.POI;
+import wsn.park.maps.Mode;
 import wsn.park.maps.OSM;
 import wsn.park.model.DataBus;
 import wsn.park.model.ParkingPlace;
@@ -92,13 +93,6 @@ public class Markers {
 	
 /*	public OsmMapsItemizedOverlay updateDestinationOverlay(SavedPlace addr){ //clickable
 		SavedPlace sp=null;
-		if(selectedMarker!=null){
-			if(selectedMarker.getSp() instanceof SavedPlace){
-				sp = (SavedPlace) selectedMarker.getSp();
-				if(sp.getSpecial()<SavedPlace.NORMAL)
-					osm.map.getOverlays().remove(selectedMarker);//delete last not saved pin
-			}
-		}
 		selectedMarker=findMyPlace(addr);
 		if(selectedMarker==null){
 			GeoPoint gp = new GeoPoint(addr.getLat(),addr.getLng());
@@ -277,7 +271,8 @@ public class Markers {
 		osm.mks.selectedMarker.firstOverlay().setMarker(d);
 	}
 	public void removeTempMarker(OsmMapsItemizedOverlay tapMarker) {
-		if(tapMarker.equals(this.tempMarker)) return;
+		if(tapMarker!=null && tapMarker.equals(this.tempMarker)) return;
+		if(Mode.getID()==Mode.NAVI) return;
 		osm.map.getOverlays().remove(tempMarker);
 		osm.map.invalidate();
 	}

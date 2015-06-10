@@ -1,0 +1,210 @@
+
+    {
+      "key": "man_made",
+      "values": {
+        "water_tower": "Water Tower",
+        "water_well": "Water Well",
+        "breakwater": "Breakwater",
+        "lighthouse": "Lighthouse",
+        "pier": "Pier",
+        "pipeline": "Pipeline",
+        "storage_tank": "Storage Tank",
+        "tower": "Tower",
+        "watermill": "Watermill",
+        "windmill": "Windmill"
+      }
+    },
+    {
+      "key": "amenity",
+      "values": {
+        "hospital": "Hospital",
+        "pharmacy": "Pharmacy",
+        "public_building": "Public Building",
+        "courthouse": "Courthouse",
+        "police": "Police Station",
+        "fire_station": "Fire Station",
+        "place_of_worship": "Place of worship",
+        "kindergarten": "Kindergarten",
+        "school": "School",
+        "university": "University",
+        "drinking_water": "Drinking Water",
+        "toilets": "Toilets",
+        "library": "Library",
+        "post_office": "Post office",
+        "bank": "Bank",
+        "atm": "ATM",
+        "restaurant": "Restaurant",
+        "cafe": "Caf¨¦",
+        "cinema": "Cinema",
+        "fast_food": "Fast food restaurant",
+        "fuel": "Gas station",
+        "grave_yard": "Grave yard",
+        "parking": "Parking",
+        "post_box": "Post box",
+        "pub": "Pub",
+        "shelter": "Shelter",
+        "vending_machine": "Vending Machine"
+      }
+    },
+    {
+      "key": "historic",
+      "values": {
+        "monument": "Monument"
+      }
+    },
+    {
+      "key": "tourism",
+      "values": {
+        "hotel": "Hotel",
+        "museum": "Museum",
+        "information": "Tourist information",
+        "viewpoint": "Viewpoint"
+      }
+    },
+    {
+      "key": "leisure",
+      "values": {
+        "garden": "Leisure park",
+        "golf_course": "Golf Course",
+        "nature_reserve": "Nature Reserve",
+        "park": "Leisure park",
+        "pitch": "Sports pitch",
+        "playground": "Playground",
+        "sports_centre": "Sports centre",
+        "swimming_pool": "Swimming pool",
+        "track": "Sports track",
+        "water_park": "Swimming pool"
+      }
+    },
+    {
+      "key": "shop",
+      "values": {
+        "alcohol": "Alcohol",
+        "bakery": "Bakery",
+        "beauty": "Beauty Parlor",
+        "beverages": "Beverages Shop",
+        "book": "Book",
+        "boutique": "Boutique",
+        "butcher": "Butcher",
+        "chemist": "Chemist",
+        "furniture": "Furniture Store",
+        "bicycle": "Bicycle",
+        "car": "Cars",
+        "car_parts": "Car Parts",
+        "clothes": "Clothes",
+        "computer": "Computer Shop",
+        "confectionery": "Confections",
+        "convenience": "Convenience store",
+        "copyshop": "Copy Shop",
+        "curtain": "Curtain Store",
+        "deli": "Deli",
+        "department_store": "Department Store",
+        "doityourself": "DoitYourself Shop",
+        "dry_cleaning": "Dry Cleaning",
+        "fabric": "Fabric",
+        "frame": "Frames",
+        "florist": "Florist",
+        "funeral_directors": "Funeral Directors",
+        "hairdresser": "Hairdresser",
+        "hearing_aids": "Hearing aids",
+        "kitchen": "Kitchen Store",
+        "garden_centre": "Garden Centre",
+        "gift": "Gift Shop",
+        "greengrocer": "Greengrocer",
+        "jewelry": "Jewelry",
+        "laundry": "Laundry",
+        "mall": "Shopping Mall",
+        "mobile_phone": "Mobile Phone Shop",
+        "motorcycle": "Motor Cycle",
+        "music": "Music",
+        "musical_instrument": "Musical Instruments",
+        "optician": "Optician",
+        "outdoor": "Outdoor Shop",
+        "pawnbroker": "Pawnbroker",
+        "paint": "Paint Shop",
+        "photo": "Photo Shop",
+        "tailor": "Tailor",
+        "travel_agency": "Travel Agency",
+        "seafood": "Seafood",
+        "supermarket": "Supermarket",
+        "toys": "Toys",
+        "trade": "Trade",
+        "variety_store": "Variety Store"
+      }
+    },
+    {
+      "key": "craft",
+      "values": {
+        "basket_maker": "Basket Maker",
+        "beekeeper": "Bee Keeper",
+        "blacksmith": "Blacksmith",
+        "bookbinder": "Book Binder",
+        "brewery": "Brewery",
+        "carpenter": "carpenter",
+        "clockmaker": "Clockmaker",
+        "distillery": "Distillery",
+        "key_cutter": "Key Cutter",
+        "photographer": "Photographer",
+        "pottery": "Pottery",
+        "saddler": "Saddler",
+        "shoemaker": "Shoemaker",
+        "stonemason": "Stonemason",
+        "upholsterer": "Upholsterer"
+      }
+    },
+    {
+      "key": "office",
+      "values": {
+        "accountant": "Accountant",
+        "administration": "Administrative Office",
+        "architect": "Architect",
+        "company": "Private Company",
+        "employment_agency": "Employment Agency",
+        "estate_agent": "Estate Agent",
+        "foundation": "Foundation Office",
+        "government": "Government Office",
+        "insurance": "Insurance",
+        "it": "IT Specialist",
+        "lawyer": "Lawyer",
+        "newspaper": "Newspaper",
+        "ngo": "NGO",
+        "research": "Research Lab",
+        "telecommunication": "Telecommunication",
+        "travel_agent": "Travel Agent"
+      }
+    },
+    {
+      "key": "railway",
+      "values": {
+        "station": "Railway station",
+        "tram_stop": "Tram stop"
+      }
+    },
+    {
+      "key": "building",
+      "values": {
+        "apartments": "Apartment Building",
+        "university": "University Building"
+      }
+    },
+    {
+      "key": "admin_level",
+      "values": {
+        "2": "Country boundary",
+        "3": "State boundary",
+        "4": "Province / State boundary",
+        "5": "Region boundary",
+        "6": "District boundary",
+        "7": "Metropolitan areas boundary",
+        "8": "City boundary",
+        "9": "Intra-City boundary",
+        "10": "Suburb boundary",
+        "11": "Suburb boundary"
+      }
+    },
+    {
+      "key": "boundary",
+      "values": {
+        "administrative": "Administrative boundary"
+      }
+    }

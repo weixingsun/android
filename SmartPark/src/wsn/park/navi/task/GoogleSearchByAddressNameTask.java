@@ -52,7 +52,7 @@ public class GoogleSearchByAddressNameTask extends
     String url;
     String address;
     List<Address> list = new ArrayList<Address>();
-    private Collection<AddressComponent> address_components = new ArrayList<AddressComponent>();
+    //private Collection<AddressComponent> address_components = new ArrayList<AddressComponent>();
     public GoogleSearchByAddressNameTask(OSM osm,String address) {
     	this.osm = osm;
     	this.address=address;
