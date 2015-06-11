@@ -28,6 +28,8 @@ import org.osmdroid.util.GeoPoint;
 
 import wsn.park.LOC;
 import wsn.park.maps.OSM;
+import wsn.park.model.SavedPlace;
+import wsn.park.util.GeoOptions;
 
 
 import android.app.Activity;
@@ -45,13 +47,14 @@ import android.widget.Toast;
  * @author Weixing Sun
  */  
 public class GoogleSearchByAddressNameTask extends
-        AsyncTask<String, Void, List<Address>> {
+        AsyncTask<String, Void, List<SavedPlace>> {
     private static final String TAG = GoogleSearchByAddressNameTask.class.getSimpleName();
     OSM osm;
 	HttpClient client;
     String url;
     String address;
     List<Address> list = new ArrayList<Address>();
+    List<SavedPlace> splist = new ArrayList<SavedPlace>();
     //private Collection<AddressComponent> address_components = new ArrayList<AddressComponent>();
     public GoogleSearchByAddressNameTask(OSM osm,String address) {
     	this.osm = osm;
@@ -59,7 +62,7 @@ public class GoogleSearchByAddressNameTask extends
         this.url = getLocationURL(address);
     }
     @Override  
-    public List<Address> doInBackground(String... params) {
+    public List<SavedPlace> doInBackground(String... params) {
     	if(this.address.length()<2) return null;
     	StringBuilder sb = new StringBuilder();
         HttpGet get = new HttpGet(url);
@@ -107,7 +110,8 @@ public class GoogleSearchByAddressNameTask extends
 	    			addr.setLongitude(ll.getLongitude());
 	    			list.add(addr);
             	}
-    			return list;
+            	splist = GeoOptions.getSavedPlaceFromAddress(list);
+    			return splist;
             } else {
             	Log.w(TAG,"doInBackground:statusecode="+statusecode);
                 return null;
@@ -121,7 +125,7 @@ public class GoogleSearchByAddressNameTask extends
 			e.printStackTrace();
 		}  
         //Log.i(TAG,"doInBackground:"+routes);
-        return list;  
+        return splist;  
     }  
   
     @Override  
@@ -133,13 +137,13 @@ public class GoogleSearchByAddressNameTask extends
     }
   
     @Override  
-    protected void onPostExecute(List<Address> list) {
+    protected void onPostExecute(List<SavedPlace> list) {
         super.onPostExecute(list);  
         if (list == null) {
             //Toast.makeText(gmap.activity, "No route found.", Toast.LENGTH_LONG).show();
         }else{
-    		osm.dv.fillList(list);
-    		osm.suggestPoints = list;
+    		osm.dv.fillList(splist);
+    		osm.suggestPoints = splist;
         }
     }
     

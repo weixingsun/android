@@ -135,7 +135,6 @@ public class DownloadManagerUI extends BaseActivity {
         downloadCancel = (Button)findViewById(R.id.download_cancel);
         downloadProgress = (ProgressBar)findViewById(R.id.download_progress);
         downloadTip = (TextView)findViewById(R.id.download_tip);
-        //downloadTip.setText(getString(R.string.tip_download_file) + Environment.getExternalStoragePublicDirectory(DOWNLOAD_FOLDER_NAME));
         downloadSize = (TextView)findViewById(R.id.download_size);
         downloadPrecent = (TextView)findViewById(R.id.download_precent);
     }

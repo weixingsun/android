@@ -27,9 +27,6 @@ public class MyMapEventsReceiver implements MapEventsReceiver{
 	}
 	@Override
 	public boolean longPressHelper(GeoPoint p) {
-		//if(SavedOptions.selectedNavi!=null && SavedOptions.selectedNavi.equals(RouteOptions.OFFLINE)){
-			//osm.mks.updateRouteMarker(addr);
-		//}else 
 		if (osm.rto.isNetworkAvailable() ) {	//|| loc.myPos == null
 			if(Mode.getID()!=Mode.NAVI)
 				osm.startTask("geo", new GeoPoint(p),"route");

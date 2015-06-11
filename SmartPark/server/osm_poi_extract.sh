@@ -4,7 +4,7 @@ osmconvert nz_poi.osm --csv-headline -o=nz_poi.csv --all-to-nodes --csv="@lat @l
 
 sqlite3 poi.db
 .separator ','
-create virtual table poi using fts3(lat DECIMAL(10,7),lng DECIMAL(10,7),pname TEXT,website varchar(80));
+create virtual table poi2 using fts3(lat DECIMAL(10,7),lng DECIMAL(10,7),pname TEXT,website varchar(80), admin varchar(50),country_code char(5));
 CREATE VIRTUAL TABLE poi2 (lat DECIMAL(10,7),lng DECIMAL(10,7),name TEXT,website varchar(80));
 .import nz_poi.csv poi
 select * from poi where pname like 'Peppers%' LIMIT 0,10;

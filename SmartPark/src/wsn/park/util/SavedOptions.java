@@ -18,6 +18,8 @@ public class SavedOptions {
 	public static String MAPSFORGE_FILE_PATH = "osmdroid/maps/";	//	/sdcard/osmdroid/maps/nz.map
 	public static String GH_ROUTE_DATA_PATH = "osmdroid/routes/" ;	//	/sdcard/osmdroid/routes/nz.zip
 	public static String HINT_FILE_PATH = sdcard + "/osmdroid/hints/";
+	public static String POI_FILE_PATH = "osmdroid/poi/";
+	public static String POI_FILE_EXT = ".db";
 	public static String MAPSFORGE_FILE_EXT = ".map";
 	public static String GH_ROUTE_DATA_NAME = "edges";  //geometry/locationIndex/names/nodes/properties
 	public static String GH_ROUTE_DATA_ZIP_EXT = ".zip";

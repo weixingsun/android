@@ -1,6 +1,7 @@
 package wsn.park.navi.task;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -33,6 +34,7 @@ public class GeocoderTask extends
     String ByName = "name";
     String address;
     List<Address> list;
+    List<SavedPlace> splist;
     String provider = SavedOptions.selectedGeo;
     
     public GeocoderTask(OSM osm,String address) {
@@ -57,6 +59,7 @@ public class GeocoderTask extends
     	if(searchBy.equals(ByName)){
 			//list = gc.getFromLocationName(provider,this.address);
     		list = gc.getFromLocationName(provider,this.address);
+    		splist = GeoOptions.getSavedPlaceFromAddress(list);
     		//GoogleSearchByAddressNameTask task = new GoogleSearchByAddressNameTask(osm,this.address);
 			//task.execute();
 		}else if (searchBy.equals(ByPoint)){
@@ -65,14 +68,14 @@ public class GeocoderTask extends
 		}
         return null;
     }
-  
+	
     @Override  
     protected void onPostExecute(String ret) {
         super.onPostExecute(ret);
         if(searchBy.equals(ByName)){
-        	if(list!=null && list.size()>0){
-        		osm.dv.fillList(list);
-        		osm.suggestPoints = list;
+        	if(list!=null && splist.size()>0){
+        		osm.dv.fillList(splist);
+        		osm.suggestPoints = splist;
         	}
     		//activity.map.updateMarker(marker,foundPoint);
     		//activity.map.activity.openPopup(marker,type);

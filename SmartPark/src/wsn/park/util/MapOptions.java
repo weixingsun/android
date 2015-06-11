@@ -39,8 +39,7 @@ public class MapOptions {
 
 	private static final String tag = MapOptions.class.getSimpleName();
 
-	static String path = SavedOptions.sdcard + "/"
-			+ SavedOptions.MAPSFORGE_FILE_PATH;
+	//static String path = SavedOptions.sdcard + "/"+ SavedOptions.MAPSFORGE_FILE_PATH;
 	//public static String MF_ROUTE_URL = "http://www.androidmaps.co.uk/maps/australia-oceania/new-zealand.zip";
 	public static String MF_ROUTE_URL = "http://servicedata.vhostall.com/map/"; // nz.map
 	public static final String URL_MAPSFORGE_WEB = "http://ftp-stud.hs-esslingen.de/pub/Mirrors/download.mapsforge.org/maps/";

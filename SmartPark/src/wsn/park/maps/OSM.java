@@ -38,6 +38,7 @@ import wsn.park.NET;
 import wsn.park.R;
 import wsn.park.map.poi.POI;
 import wsn.park.maps.vendor.GenericMapView;
+import wsn.park.model.SavedPlace;
 import wsn.park.navi.task.GeocoderTask;
 import wsn.park.navi.task.RouteTask;
 import wsn.park.ui.GlobalLayoutListener;
@@ -72,7 +73,7 @@ public class OSM {
 	public List<Polyline> lines;
 	public Polyline polyline;
 	public Markers mks;
-	public List<Address> suggestPoints;
+	public List<SavedPlace> suggestPoints;
 	public MapView map;
 	public MapTileProviderBase mapProvider;
 	public boolean switchTileProvider=false;
@@ -185,10 +186,16 @@ public class OSM {
 		switchTileProvider=true;
 	}
 
-	public void startTask(String type,String address){
-		if(type.equals("geo")){
+	public void startTask(String type,String address,String online){
+		if(online.equals("online")){
 			GeocoderTask task = new GeocoderTask(this, address);
 			task.execute();
+		}else {
+			List<SavedPlace> list = DbHelper.getInstance().getPOIs(address);
+			if(list!=null && list.size()>0){
+        		dv.fillList(list);
+        		suggestPoints = list;
+        	}
 		}
 	}
 	public void startTask(String type,GeoPoint point,String purpose){

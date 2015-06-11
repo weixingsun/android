@@ -87,12 +87,12 @@ public class Device {
 		listSuggest.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Address addr = osm.suggestPoints.get(position);
+				SavedPlace addr = osm.suggestPoints.get(position);
 				//osm.mks.updateRouteMarker(addr);////////////////////offline navi no marker??????
-				SavedPlace sp = GeoOptions.getMyPlace(addr);
-				OsmMapsItemizedOverlay pin = osm.mks.updateDestinationOverlay(sp);
+				//SavedPlace sp = GeoOptions.getMyPlace(addr);
+				OsmMapsItemizedOverlay pin = osm.mks.updateDestinationOverlay(addr);
 				listSuggest.setVisibility(View.INVISIBLE);
-				osm.move(addr.getLatitude(),addr.getLongitude());
+				osm.move(addr.getLat(),addr.getLng());
 				dbHelper.addHistoryPlace(addr);
 				openPlacePopup(pin);
 				//Log.w(tag, "show popup window");
@@ -121,29 +121,27 @@ public class Device {
 		inputAddress.addTextChangedListener(new DelayedTextWatcher(2000) {
 			@Override
 			public void afterTextChangedDelayed(Editable s) {
-				if(RuntimeOptions.getInstance(osm.act).isNetworkAvailable()){
-					osm.startTask("geo",inputAddress.getText().toString());
-				}else{
-					Toast.makeText(osm.act, GeoOptions.NETWORK_UNAVAILABLE, Toast.LENGTH_LONG).show();
-				}
+				startSearch(inputAddress.getText().toString());
 			}
 		});
 		inputAddress.setOnKeyListener(new OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (keyCode == 66) { // Enter
-					if(RuntimeOptions.getInstance(osm.act).isNetworkAvailable()){
-						osm.startTask("geo",inputAddress.getText().toString());
-					}else{
-						Toast.makeText(osm.act, GeoOptions.NETWORK_UNAVAILABLE, Toast.LENGTH_LONG).show();
-					}
+					//startSearch(inputAddress.getText().toString());
 					closeKeyBoard();
 				}
 				return false;
 			}
 		});
 	}
-
+	private void startSearch(String text){
+		if(RuntimeOptions.getInstance(osm.act).isNetworkAvailable()){
+			osm.startTask("geo",text,"online");
+		}else{
+			osm.startTask("poi",text,"offline");
+		}
+	}
 		public void closeKeyBoard() {
 			EditText inputAddress = (EditText) act.findViewById(R.id.inputAddress);
 			InputMethodManager imm = (InputMethodManager) act.getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -167,7 +165,7 @@ public class Device {
 	    	listVoice.setVisibility(View.INVISIBLE);
 	    	closeKeyBoard();
 		}
-	    public void fillList(List<Address> addrs){
+	    public void fillList(List<SavedPlace> addrs){
 	        ArrayList<Map<String, String>> list = buildData(addrs);
 	        String[] from = { "name"};
 	        int[] to = { android.R.id.text1 };
@@ -176,11 +174,11 @@ public class Device {
 	        listSuggest.setAdapter(adapter);
 	        listSuggest.setVisibility(View.VISIBLE);
 	    }
-	    private ArrayList<Map<String, String>> buildData(List<Address> addrs) {
+	    private ArrayList<Map<String, String>> buildData(List<SavedPlace> addrs) {
 	        ArrayList<Map<String, String>> list = new ArrayList<Map<String, String>>();
-	        for(Address a:addrs){
-	        	String display = GeoOptions.getAddressName(a);
-	        	Log.w(tag, a.toString());
+	        for(SavedPlace a:addrs){
+	        	String display = a.getName(); //GeoOptions.getAddressName(a);
+	        	//Log.w(tag, a.toString());
 	        	list.add(putData(display));
 	        }
 	        return list;

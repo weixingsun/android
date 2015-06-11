@@ -21,8 +21,9 @@
     <string name="app_status_downloaded">downloaded</string>
     <string name="app_status_download_fail">download fail, click to download again</string>
     
-    <string name="geo">Geocoding</string>
-    <string name="map">Map Provider</string>
+    <!-- <string name="geo">Geocoding</string> -->
+    <string name="geo">Address Search Engine</string>
+    <string name="map">Map Source</string>
     <string name="by">Travel By</string>
     <string name="navi">Navigation</string>
     <string name="save">Save</string>
@@ -35,8 +36,6 @@
     <string name="parking">Parking</string>
     <string name="parking_nearby">Parking NearBy</string>
     
-    
-    
     <string name="history">History</string>
      
     <!-- Main Nav Drawer Menu Items -->
@@ -48,11 +47,11 @@
         <item >Help</item>
     </string-array>
     <string-array name="geo_items">
+        <item >Offline</item>
         <item >Google</item>
         <item >Nominatim</item>
         <item >MapQuest</item>
-        <!--<item >Offline Route</item>
-        <item >GraphHopper</item>-->
+        <!-- <item >GraphHopper</item>-->
     </string-array>
         <string-array name="navi_items">
         <item >OSM</item>

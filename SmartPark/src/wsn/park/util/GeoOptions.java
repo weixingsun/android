@@ -1,7 +1,9 @@
 package wsn.park.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import wsn.park.model.SavedPlace;
 
@@ -49,6 +51,19 @@ public class GeoOptions {
 	public static SavedPlace getMyPlace(Address addr){
 		SavedPlace sp = new SavedPlace(getAddressName(addr), addr.getAdminArea(), addr.getLatitude(), addr.getLongitude(),addr.getCountryCode());
 		return sp;
+	}
+	public static List<SavedPlace> getSavedPlaceFromAddress(List<Address> l){
+		List<SavedPlace> list = new ArrayList<SavedPlace>();
+		for(Address a:l){
+			String name=GeoOptions.getAddressName(a);
+			String admin=a.getAdminArea();
+			double lat=a.getLatitude();
+			double lng=a.getLongitude();
+			String countryCode= a.getCountryCode();
+			SavedPlace sp = new SavedPlace(name,admin,lat,lng,countryCode);
+			list.add(sp);
+		}
+		return list;
 	}
 	/*public static String getGeocoder() {
 		if(geocoder==null) geocoder=GeoOptions.GOOGLE;

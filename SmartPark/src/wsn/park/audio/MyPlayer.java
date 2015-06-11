@@ -20,7 +20,6 @@ import com.google.android.exoplayer.TrackRenderer;
 
 public class MyPlayer {
 	private static final String tag = MyPlayer.class.getSimpleName();
-	//private static final String folder = SavedOptions.HINT_FILE_PATH;
 	private static ExoPlayer player;
 	public static void play(Activity act, int distance,int maneuverType) {
 		//String fileFullPath = folder+"type_"+maneuverType+"_dist_"+distance+".mp3";

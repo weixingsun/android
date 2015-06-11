@@ -8,6 +8,7 @@ import org.osmdroid.bonuspack.location.GeocoderNominatim;
 import org.osmdroid.util.GeoPoint;
 
 import wsn.park.LOC;
+import wsn.park.model.SavedPlace;
 import wsn.park.util.GeoOptions;
 
 import android.app.Activity;
@@ -21,6 +22,7 @@ public class Geocoders {
 	
 	String provider;
 	List<Address> list;
+	List<SavedPlace> splist;
 	Activity act;
 	public Geocoders(Activity act) {
 		this.act = act;
