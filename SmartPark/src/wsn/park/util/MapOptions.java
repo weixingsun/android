@@ -3,6 +3,7 @@ package wsn.park.util;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.osmdroid.ResourceProxy;
 import org.osmdroid.tileprovider.MapTileProviderBase;
@@ -90,7 +91,7 @@ public class MapOptions {
 		MapTileProviderBase provider = null;
 
 		if (name!=null && name.equals(MapOptions.MAP_MAPSFORGE) ) {
-			//Log.w(tag, "getTileProvider.name="+name+",activity="+osm.act);
+			Log.w(tag, "getTileProvider.name="+name+",activity="+osm.act);
 			// MapsForge offline data need recreate a mapview
 			provider = MapOptions.getForgeMapTileProvider(osm);
 			if (provider == null) {
@@ -165,8 +166,7 @@ public class MapOptions {
 	 */
 	public static MapTileProviderBase getForgeMapTileProvider(OSM osm) {
 		String mapFileName = getMapFileName();
-		Log.i(tag, "mapFile=" + mapFileName);
-
+		Log.w(tag, "mapFile=" + mapFileName);
 		if (mapFileName == null)
 			return null;
 		wsn.park.maps.vendor.MapsForgeTileProvider mfProvider = new wsn.park.maps.vendor.MapsForgeTileProvider(
@@ -184,8 +184,8 @@ public class MapOptions {
 		File mapFile = new File(mapFileFullName);
 		if (mapFile.exists()) {
 			return mapFileFullName;
-		}
-		return null;
+		}else 
+			return getFirstMapFileFullName();
 	}
 
 	public static String getNeededMapFileFullName() {
@@ -195,5 +195,26 @@ public class MapOptions {
 
 	public static String getNeededMapFileShortName() {
 		return LOC.countryCode + SavedOptions.MAPSFORGE_FILE_EXT;
+	}
+	public static String getFirstMapFileFullName() {
+		String folder = SavedOptions.sdcard + "/" + SavedOptions.MAPSFORGE_FILE_PATH;
+		List<File> list=getAllMapFiles(new File(folder));
+		String fullname = list.size()==0?null:list.get(0).getAbsolutePath();
+		Log.w(tag, "first file name="+fullname);
+		return fullname;
+	}
+	private static List<File> getAllMapFiles(File parentDir) {
+	    ArrayList<File> inFiles = new ArrayList<File>();
+	    File[] files = parentDir.listFiles();
+	    for (File file : files) {
+	        if (file.isDirectory()) {
+	            //inFiles.addAll(getListFiles(file));
+	        } else {
+	            if(file.getName().endsWith(SavedOptions.MAPSFORGE_FILE_EXT)){
+	                inFiles.add(file);
+	            }
+	        }
+	    }
+	    return inFiles;
 	}
 }

@@ -23,7 +23,7 @@ import android.widget.Toast;
 
 public class GeocoderTask extends
         AsyncTask<String, Void, String> {
-    private static final String TAG = GeocoderTask.class.getSimpleName();
+    private static final String tag = GeocoderTask.class.getSimpleName();
     Geocoders gc;
     String purpose;
     OSM osm;
@@ -81,13 +81,11 @@ public class GeocoderTask extends
     		//activity.map.activity.openPopup(marker,type);
     		//activity.map.addRouteMarker(foundPoint);
         }else if(searchBy.equals(ByPoint)){
-    		if(LOC.countryCode == null){
-    			if(foundAddr!=null)
-    				LOC.countryCode=foundAddr.getCountryCode();
-    			Log.i(TAG, "==================country_code="+LOC.countryCode);
-    		}
-    		//Log.w(TAG, "foundAddr.code="+foundAddr.getCountryCode()+","+this.purpose);
-    		if(foundAddr != null && !this.purpose.equals("countryCode")){
+        	if(this.purpose.equals("countryCode")){
+        		if(foundAddr!=null)
+        			LOC.countryCode=foundAddr.getCountryCode();
+        		Log.w(tag, "LOC.countryCode ="+LOC.countryCode);
+        	}else if(foundAddr != null){
     			foundAddr.setLatitude(position.getLatitude());
     			foundAddr.setLongitude(position.getLongitude());
     			SavedPlace sp = GeoOptions.getMyPlace(foundAddr);

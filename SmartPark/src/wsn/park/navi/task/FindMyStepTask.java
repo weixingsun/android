@@ -30,7 +30,9 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 	OSM osm;
 	RoadNode currNode;
 	boolean endFlag = false;
+	boolean reDraw = false;
 	private int toCurrent = 0;
+	DataBus bus = DataBus.getInstance();
 	private static final String tag = FindMyStepTask.class.getSimpleName();
 
 	public FindMyStepTask() {
@@ -40,6 +42,7 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 	@Override
 	protected String doInBackground(GeoPoint... params) {
 		if(osm.loc.road==null || osm.loc.road.mNodes.size()<1){return null;}
+		bus.setFindingMyStep(true);
 		return findCurrentStep(osm.mks.myLocMarker.getPosition()); //如果误差超过30米，会认为不在线路上，重新寻路
 	}
 	private String findCurrentStep(GeoPoint p) {
@@ -62,6 +65,7 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 	}
 	public void redrawRoutes(GeoPoint start){
 		Log.i(tag, "redraw route...");
+		this.reDraw=true;
 		osm.ro.redraw(start);
 		cleanupAllonRoad();
 		RouteTask task = new RouteTask(osm, osm.ro);
@@ -102,7 +106,7 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 		osm.mks.removeAllRouteMarkers();
 		osm.mks.removePrevPolyline();
 		osm.loc.cleanupRoad();
-		osm.dv.closePopupNavi();
+		//osm.dv.closePopupNavi(); //backend thread cannot call UI thread
 		this.cleanupRoad();
 	}
 	private void cleanupRoad() {
@@ -112,6 +116,10 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 	@Override
     protected void onPostExecute(String comments) {
 		if(currNode==null) return;
+		if(this.reDraw){
+			osm.dv.closePopupNavi();
+			this.reDraw=false;
+		}
 		//http://translate.google.com/translate_tts?tl=en&q=Hello%20World
 		BigDecimal bd = new BigDecimal(this.toCurrent).setScale(-2, BigDecimal.ROUND_HALF_UP);  //整百
 		playHintSounds(osm.loc.onRoadIndex+1,bd.intValue());
@@ -124,6 +132,7 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 		}
 		DataBus.getInstance().setHintPoint(this.currNode.mLocation);
 		osm.mks.updateHintMarker();
+		bus.setFindingMyStep(false);
     }
 
 	public int getDistance(GeoPoint start, GeoPoint end){

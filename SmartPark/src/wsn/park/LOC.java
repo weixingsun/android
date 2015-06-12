@@ -10,6 +10,7 @@ import org.osmdroid.util.GeoPoint;
 
 import wsn.park.maps.Mode;
 import wsn.park.maps.OSM;
+import wsn.park.model.DataBus;
 import wsn.park.navi.task.FindMyStepTask;
 import wsn.park.ui.Drawer;
 import wsn.park.util.CountryCode;
@@ -36,7 +37,7 @@ public class LOC implements LocationListener {
 	DbHelper dbHelper;
 	private LocationManager lm;
 	public static Location myPos;
-	public static GeoPoint myLastPos;
+	//public static GeoPoint myLastPos;
 	private int speed;
 	OSM osm;
 	//Wifi wifi;
@@ -47,35 +48,37 @@ public class LOC implements LocationListener {
 	public Road road;
 	//public Integer currIndex = -1;
 	//public List<RoadNode> passedNodes = new ArrayList<RoadNode>();
+	private static DataBus bus = DataBus.getInstance();
 	public void init(OSM osm) {
 		this.osm = osm;
 		//wifi = new Wifi(act);
-		this.dbHelper = DbHelper.getInstance();
+		this.dbHelper = DbHelper.getInstance(osm.act);
+		getLocFromDB();
+		//countryCode = CountryCode.getBySim(osm.act);
+		Log.w(tag, "===========LOC.countryCode="+countryCode);
 		if (openGPSEnabled()) {
 			//createLocationRequest(1000,2000);
-			myPos = getLocation();
 			provider = getGoodProvider(); //LocationManager.GPS_PROVIDER; //this.getProvider();
-			
-			if(myPos!=null){
-				countryCode = CountryCode.getByLatLng(myPos.getLatitude(), myPos.getLongitude());
-				//Log.w(tag, "countryCode="+countryCode);
-				if(isNetworkAvailable()){
-					if(countryCode==null ){
-						osm.startTask("geo", new GeoPoint(myPos),"countryCode");
-					}
-				}
-				dbHelper.updateGPS(0, myPos);
-			}else{
-				String strLastPos = dbHelper.getLastPosition();
-				if(strLastPos != null){
-					String[] lastPosDB = strLastPos.split(",");
-					LOC.myLastPos = new GeoPoint(Double.valueOf(lastPosDB[1]),Double.valueOf(lastPosDB[2]));
-					countryCode = lastPosDB[0];
-					Log.i(tag, "getPosition from DB="+strLastPos+",lastPos="+myLastPos+",code="+countryCode);
-					//osm.move(myLastPos);
-				}
-			}
 			startGPSLocation();
+		}
+	}
+
+	private void getLocFromDB() {
+		String strLastPos = dbHelper.getLastPosition();
+		if(strLastPos != null){
+			String[] lastPosDB = strLastPos.split(",");
+			bus.setMyPoint(new GeoPoint(Double.valueOf(lastPosDB[1]),Double.valueOf(lastPosDB[2])));
+			countryCode = lastPosDB[0];
+			Log.i(tag, "getPosition from DB="+strLastPos+",lastPos="+bus.getMyPoint()+",code="+countryCode);
+			//osm.move(myLastPos);
+		}
+		if(countryCode==null && NET.instance().isNetworkConnected()){
+			//myPos = getNetLocation();
+			//Log.w(tag, "===========LOC.myPos="+myPos);
+			//osm.startTask("geo", new GeoPoint(myPos),"countryCode");
+			//countryCode = CountryCode.getByLatLng(myPos.getLatitude(), myPos.getLongitude());
+			//Log.w(tag, "countryCode="+countryCode);
+			//dbHelper.updateGPS(0, myPos);
 		}
 	}
 
@@ -99,14 +102,15 @@ public class LOC implements LocationListener {
 	@Override
 	public void onLocationChanged(Location loc) {
 		myPos = loc;
-		myLastPos = new GeoPoint(loc.getLatitude(),loc.getLongitude());
+		bus.setMyPoint(new GeoPoint(loc.getLatitude(),loc.getLongitude()));
 		if (countryCode == null)
-			countryCode = CountryCode.getByGeoPoint(myLastPos);
+			countryCode = CountryCode.getByGeoPoint(bus.getMyPoint());
 		if(Mode.getID()==Mode.NAVI){
-			osm.move(myLastPos);
-			(new FindMyStepTask()).execute();
+			osm.move(bus.getMyPoint());
+			if(!bus.isFindingMyStep())
+				(new FindMyStepTask()).execute();
 		}
-		osm.mks.myLocMarker.setPosition(myLastPos);
+		osm.mks.myLocMarker.setPosition(bus.getMyPoint());
 		osm.map.invalidate();
 		//playHintSounds(osm.loc.passedNodes.size());
 		dbHelper.updateGPS(0, myPos);
@@ -176,18 +180,18 @@ public class LOC implements LocationListener {
 		this.road = null;
 	}
 	public static GeoPoint getMyPoint() {
-		if(LOC.myPos==null) return LOC.myLastPos;
+		if(LOC.myPos==null) return bus.getMyPoint();
 		GeoPoint gp = new GeoPoint(LOC.myPos.getLatitude(),LOC.myPos.getLongitude());
 		return gp;
 	}
     private boolean isNetworkAvailable(){
         return lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
-    private Location getLocation(){   
+    private Location getNetLocation(){   
         if(NET.instance().isNetworkConnected()){
         	lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 500, 10, this);
         	Location l = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-			Log.w(tag, "getPosition from NET,lastLat="+l.getLatitude());
+			//Log.w(tag, "getPosition from NET,lastLat="+l.getLatitude());
             return l;
         }
         return null;

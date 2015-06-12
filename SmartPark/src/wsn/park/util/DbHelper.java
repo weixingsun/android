@@ -1,10 +1,12 @@
 package wsn.park.util;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.osmdroid.util.GeoPoint;
 
+import wsn.park.LOC;
 import wsn.park.model.Place;
 import wsn.park.model.SavedPlace;
 
@@ -23,7 +25,7 @@ import android.util.Log;
 		static DbHelper dbHelper;
 		private SQLiteDatabase setting_db = null;
 		private SQLiteDatabase poi_db = null;
-		private final static String POI_DB_NAME="nz.db";
+		String poiDbFile = null;
 		private final static String SETTING_DB_NAME="osmap.db";
 	    private final static int DATABASE_VERSION=1;
 	    private final static String GPS_TABLE="gps_data";
@@ -37,7 +39,7 @@ import android.util.Log;
 	    //gps_data(data_id,lat,lng,country_code)	//id=0, lastknownlocation,
 	    private DbHelper(Context context){
 	    	super(context, SETTING_DB_NAME,null, DATABASE_VERSION);
-	    	android_id = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID); 
+	    	android_id = Secure.getString(context.getContentResolver(), Secure.ANDROID_ID);
 	    	this.createTables();
 	    }
 	    public static DbHelper getInstance(Context context){
@@ -388,25 +390,21 @@ import android.util.Log;
 		public String getPoiDbPath(String cc){
 			return SavedOptions.sdcard+"/"+SavedOptions.POI_FILE_PATH+this.getPoiDbName(cc);
 		}
-		public void testPoiDb(){
-			int size = getPOIs("peppers").size();
-			Log.w(tag, "POI test:"+size);
-		}
+		
 	    public List<SavedPlace> getPOIs(String name) {
 			List<SavedPlace> list = new ArrayList<SavedPlace>();
 			if(this.poi_db==null){
-			String dbFile = SavedOptions.sdcard +"/"+SavedOptions.POI_FILE_PATH+ POI_DB_NAME;
-	    	this.poi_db = SQLiteDatabase.openDatabase(dbFile, null, SQLiteDatabase.OPEN_READONLY);
+				this.poi_db = SQLiteDatabase.openDatabase(poiDbFile, null, SQLiteDatabase.OPEN_READONLY);
 			}
-	    	String sql = "SELECT lat,lng,pname FROM " +POI_TABLE+" where pname match '"+name+"' limit 0,10"; //,admin,country_code
+	    	String sql = "SELECT lat,lng,pname,admin,country_code FROM " +POI_TABLE+" where pname match '"+name+"' limit 0,10"; //,admin,country_code
 	    	Cursor cursor = poi_db.rawQuery(sql, null);
 	    	if (cursor.moveToFirst()){
 	    		do{
 	    			double lat= cursor.getDouble(0);
 	    			double lng= cursor.getDouble(1);
 	    			String fullName= cursor.getString(2);
-	    			String admin= "nz"; //cursor.getString(3);
-	    			String country_code = "nz"; //cursor.getString(4);
+	    			String admin= cursor.getString(3);
+	    			String country_code = cursor.getString(4);
 	    			SavedPlace sp = new SavedPlace(fullName,admin,lat,lng,country_code);
 	    			//Log.i(tag, "name="+name+",admin="+admin+",lat="+lat+",lng="+lng);
 	    			list.add(sp);
@@ -415,5 +413,12 @@ import android.util.Log;
 	    	cursor.close();
 	        return list;
 	    }
+		public boolean existPOI() {
+			if(poiDbFile==null)
+				poiDbFile = SavedOptions.sdcard +"/"+SavedOptions.POI_FILE_PATH+ LOC.countryCode+".db";
+			File db = new File(poiDbFile);
+			Log.w(tag, "db file="+poiDbFile);
+			return db.exists();
+		}
 
 	}

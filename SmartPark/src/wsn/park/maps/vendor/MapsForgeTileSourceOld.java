@@ -78,6 +78,7 @@ public class MapsForgeTileSourceOld extends BitmapTileSourceBase {
 			mapFile = null;
 		}
 		osm.offlineMapFile = mapFile;
+		Log.w(tag, "osm.offlineMapFile="+mapFile);
 		//poi = new MapsForgePOI(this.mapDatabase);
 		renderer = new DatabaseRenderer(mapDatabase);
 		minZoom = renderer.getStartZoomLevel();

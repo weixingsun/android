@@ -12,6 +12,7 @@ import org.osmdroid.util.GeoPoint;
 import wsn.park.R;
 import wsn.park.maps.Mode;
 import wsn.park.maps.OSM;
+import wsn.park.model.DataBus;
 import wsn.park.model.Place;
 import wsn.park.model.SavedPlace;
 import wsn.park.navi.task.ParkingAPI;
@@ -53,6 +54,7 @@ import android.widget.LinearLayout.LayoutParams;
 public class Device {
 	Activity act;
 	OSM osm;
+	DataBus bus = DataBus.getInstance();
 	EditText inputAddress;
 	ListView listVoice,listSuggest;
 	DbHelper dbHelper;
@@ -121,26 +123,19 @@ public class Device {
 		inputAddress.addTextChangedListener(new DelayedTextWatcher(2000) {
 			@Override
 			public void afterTextChangedDelayed(Editable s) {
-				startSearch(inputAddress.getText().toString());
+				osm.startTask("poi",inputAddress.getText().toString());
 			}
 		});
 		inputAddress.setOnKeyListener(new OnKeyListener() {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (keyCode == 66) { // Enter
-					//startSearch(inputAddress.getText().toString());
+					osm.startTask("poi",inputAddress.getText().toString());
 					closeKeyBoard();
 				}
 				return false;
 			}
 		});
-	}
-	private void startSearch(String text){
-		if(RuntimeOptions.getInstance(osm.act).isNetworkAvailable()){
-			osm.startTask("geo",text,"online");
-		}else{
-			osm.startTask("poi",text,"offline");
-		}
 	}
 		public void closeKeyBoard() {
 			EditText inputAddress = (EditText) act.findViewById(R.id.inputAddress);
@@ -220,8 +215,8 @@ public class Device {
 	            public void onClick(View v) {
 	        		if(naviPop!=null) naviPop.dismiss();
 	            	SavedPlace sp = getPlaceFromPopupPage();
-	            	if(LOC.myLastPos==null && LOC.myPos==null) return; //wait for GPS aquire data
-	            	GeoPoint gp = LOC.myPos==null?LOC.myLastPos:new GeoPoint(LOC.myPos);
+	            	if(bus.getMyPoint()==null && LOC.myPos==null) return; //wait for GPS aquire data
+	            	GeoPoint gp = LOC.myPos==null?bus.getMyPoint():new GeoPoint(LOC.myPos);
 					osm.ro.setWayPoints(gp,sp.getPosition());
 					osm.startTask("route", sp.getPosition(),"route");
 	            	Mode.setID(Mode.NAVI);

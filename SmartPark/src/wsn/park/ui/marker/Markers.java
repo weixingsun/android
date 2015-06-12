@@ -53,6 +53,7 @@ public class Markers {
 	private static Markers mks;
 	private DbHelper dbHelper;
 	private OsmMapsItemizedOverlay tempMarker;
+	private DataBus bus = DataBus.getInstance();
 	private Markers(){
 		dbHelper = DbHelper.getInstance();
 	}
@@ -74,14 +75,14 @@ public class Markers {
 	
 	public void initMylocMarker() {
 		if(LOC.myPos==null){
-			if(LOC.myLastPos==null)
+			if(bus.getMyPoint()==null)
 				return;
 		}else{
-			LOC.myLastPos=new GeoPoint(LOC.myPos);
+			bus.setMyPoint(new GeoPoint(LOC.myPos));
 		}
 		osm.map.getOverlays().remove(myLocMarker);
 		myLocMarker = new Marker(osm.map);
-		myLocMarker.setPosition(LOC.myLastPos);
+		myLocMarker.setPosition(bus.getMyPoint());
 		Drawable img = osm.act.getResources().getDrawable(R.drawable.blue_radio_48);//ic_my_position_auto_follow
 		myLocMarker.setIcon(img);
 		myLocMarker.setDraggable(true);

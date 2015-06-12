@@ -64,6 +64,8 @@ public class RouteTask extends AsyncTask<GeoPoint, String, Polyline>{
 			road = roadManager.getRoad(ro.list);
 		}catch(IllegalStateException e){
 			return null;
+		}catch(RuntimeException e){
+			return null;
 		}
 		if(road==null || road.mNodes==null) return null;
 		osm.loc.road = road;

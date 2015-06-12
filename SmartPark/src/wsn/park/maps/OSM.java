@@ -38,6 +38,7 @@ import wsn.park.NET;
 import wsn.park.R;
 import wsn.park.map.poi.POI;
 import wsn.park.maps.vendor.GenericMapView;
+import wsn.park.model.DataBus;
 import wsn.park.model.SavedPlace;
 import wsn.park.navi.task.GeocoderTask;
 import wsn.park.navi.task.RouteTask;
@@ -81,9 +82,11 @@ public class OSM {
 	public Address startAddr;
 	//public Address endAddr;
 	public File offlineMapFile;
+	private DataBus bus = DataBus.getInstance();
 	
 	public void init(Activity act) {
 		this.act = act;
+        loc.init(this);
 		net = NET.instance();
         net.init(act);
 		this.dbHelper = DbHelper.getInstance(act);
@@ -93,7 +96,6 @@ public class OSM {
 		SavedOptions.selectedNavi = dbHelper.getSettings(SavedOptions.NAVI);
 
 		rto = RuntimeOptions.getInstance(act);
-        loc.init(this);
 		mo = MapOptions.getInstance(this);
 		ro = RouteOptions.getInstance(this);
 		mo.initTileSources(act);
@@ -170,14 +172,13 @@ public class OSM {
 	}
 	public void move() {
 		if(LOC.myPos==null ){
-			if(LOC.myLastPos!=null)
-				move(LOC.myLastPos);
+			if(bus.getMyPoint()!=null)
+				move(bus.getMyPoint());
 			else
 				return;
 		}else{
 			move(new GeoPoint(LOC.myPos));
 		}
-		
 	}
 	
 	public void refreshTileSource(String name){
@@ -186,16 +187,24 @@ public class OSM {
 		switchTileProvider=true;
 	}
 
-	public void startTask(String type,String address,String online){
-		if(online.equals("online")){
+	public void startTask(String type,String address){
+		if(address.length()<1) return;
+		List<SavedPlace> list=null;
+		if(dbHelper.existPOI()){
+    		Log.w(tag, "find locally first");
+			list = dbHelper.getPOIs(address);
+			if(list!=null && list.size()>0){
+	    		dv.fillList(list);
+	    		suggestPoints = list;
+	    	}else if(net.isNetworkConnected()){
+	    		Log.w(tag, "cannot find locally, then find online");
+	    		GeocoderTask task = new GeocoderTask(this, address);
+				task.execute();
+	    	}
+		}else if(net.isNetworkConnected()){	//no local database, then find online
+			Log.w(tag, "no local database found");
 			GeocoderTask task = new GeocoderTask(this, address);
 			task.execute();
-		}else {
-			List<SavedPlace> list = DbHelper.getInstance().getPOIs(address);
-			if(list!=null && list.size()>0){
-        		dv.fillList(list);
-        		suggestPoints = list;
-        	}
 		}
 	}
 	public void startTask(String type,GeoPoint point,String purpose){

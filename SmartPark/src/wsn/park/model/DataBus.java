@@ -13,6 +13,8 @@ public class DataBus {
 			singleton=new DataBus();
 		return singleton;
 	}
+	private GeoPoint myPoint;
+	private boolean findingMyStep;
 	private Place place;
 	private List<ParkingPlace> parkingPlaces;
 	private GeoPoint hintPoint;
@@ -54,5 +56,17 @@ public class DataBus {
 	}
 	public static boolean isPlayed(int id,int dist){
 		return playedList.contains(id*10000+dist);
+	}
+	public boolean isFindingMyStep() {
+		return findingMyStep;
+	}
+	public void setFindingMyStep(boolean findingMyStep) {
+		this.findingMyStep = findingMyStep;
+	}
+	public GeoPoint getMyPoint() {
+		return myPoint;
+	}
+	public void setMyPoint(GeoPoint myPoint) {
+		this.myPoint = myPoint;
 	}
 }
