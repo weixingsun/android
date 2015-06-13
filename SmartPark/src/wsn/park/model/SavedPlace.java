@@ -53,9 +53,9 @@ public class SavedPlace implements Place {
 	}
 
 	public String getBriefName() {
-		String[] names = name.split(",");
-		
-		return names[0]+", "+names[1];
+		//String[] names = name.split(",");
+		//return names[0]+", "+names[1];
+		return name;
 	}
 	public void setName(String name) {
 		this.name = name;

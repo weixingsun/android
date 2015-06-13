@@ -9,3 +9,6 @@ CREATE VIRTUAL TABLE poi2 (lat DECIMAL(10,7),lng DECIMAL(10,7),name TEXT,website
 .import nz_poi.csv poi
 select * from poi where pname like 'Peppers%' LIMIT 0,10;
 select * from poi where pname match 'Peppers' LIMIT 0,10;
+
+python spider.py
+sed '/^$/d' nz_poi_0612.csv > nz_poi_0612_trim.csv
