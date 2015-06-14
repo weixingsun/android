@@ -106,20 +106,13 @@ public class LOC implements LocationListener {
 		bus.setMyPoint(new GeoPoint(loc.getLatitude(),loc.getLongitude()));
 		if (countryCode == null)
 			countryCode = CountryCode.getByGeoPoint(bus.getMyPoint());
-		working();
+		(new FindMyStepTask()).execute();
 		osm.mks.myLocMarker.setPosition(bus.getMyPoint());
 		osm.map.invalidate();
 		//playHintSounds(osm.loc.passedNodes.size());
 		dbHelper.updateGPS(0, myPos);
 	}
-	private void working() {
-		if(Mode.getID()!=Mode.NAVI){return;}
-		osm.move(bus.getMyPoint());
-		Timestamp now = new Timestamp(System.currentTimeMillis());
-		int lap = bus.getFindMyStepTime().compareTo(now);
-		Log.w(tag, "lap="+lap);
-		if(lap>1000) (new FindMyStepTask()).execute();
-	}
+
 
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {

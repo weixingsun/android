@@ -42,9 +42,12 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 
 	@Override
 	protected String doInBackground(GeoPoint... params) {
+		
 		if(osm.loc.road==null || osm.loc.road.mNodes.size()<1){return null;}
-		Timestamp ts = new Timestamp(System.currentTimeMillis());
-		bus.setFindMyStep(ts);
+		if(isWorking()){
+			Log.i(tag, "finding my step, skip this call");
+			return null;
+		}
 		return findCurrentStep(osm.mks.myLocMarker.getPosition()); //如果误差超过30米，会认为不在线路上，重新寻路
 	}
 	private String findCurrentStep(GeoPoint p) {
@@ -118,6 +121,7 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 	}
 	@Override
     protected void onPostExecute(String comments) {
+		//if(this.isWorking()) return;
 		if(currNode==null) return;
 		if(this.reDraw){
 			osm.dv.closePopupNavi();
@@ -144,5 +148,18 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 		                end.getLatitude(), end.getLongitude(), results);
 		return Math.round(results[0]);
 	}
-
+	private boolean isWorking() {
+		//if(Mode.getID()!=Mode.NAVI){return;}
+		osm.move(bus.getMyPoint());
+		long now = new Timestamp(System.currentTimeMillis()).getTime();
+		long pre = bus.getFindMyStepTime().getTime();
+		Log.w(tag, "lap="+(now-pre));
+		if((now-pre)<2000){
+			currNode=null;
+			return true;
+		}else{
+			bus.setFindMyStepTime(new Timestamp(now));
+			return false;
+		}
+	}
 }

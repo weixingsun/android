@@ -59,9 +59,11 @@ public class DataBus {
 		return playedList.contains(id*10000+dist);
 	}
 	public Timestamp getFindMyStepTime() {
+		if(this.findMyStepTime==null) 
+			findMyStepTime= new Timestamp(System.currentTimeMillis());
 		return findMyStepTime;
 	}
-	public void setFindMyStep(Timestamp ts) {
+	public void setFindMyStepTime(Timestamp ts) {
 		this.findMyStepTime = ts;
 	}
 	public GeoPoint getMyPoint() {
