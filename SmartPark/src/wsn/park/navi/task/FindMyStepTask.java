@@ -1,6 +1,7 @@
 package wsn.park.navi.task;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +43,8 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 	@Override
 	protected String doInBackground(GeoPoint... params) {
 		if(osm.loc.road==null || osm.loc.road.mNodes.size()<1){return null;}
-		bus.setFindingMyStep(true);
+		Timestamp ts = new Timestamp(System.currentTimeMillis());
+		bus.setFindMyStep(ts);
 		return findCurrentStep(osm.mks.myLocMarker.getPosition()); //如果误差超过30米，会认为不在线路上，重新寻路
 	}
 	private String findCurrentStep(GeoPoint p) {
@@ -55,6 +57,7 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 		} else {//on route
 			this.currNode = osm.loc.road.mNodes.get(osm.loc.onRoadIndex+1);
 		}
+		if(currNode==null) return null;
 		this.toCurrent = getDistance(p, this.currNode.mLocation);
 		boolean isEnd = MathUtil.compare(DataBus.getInstance().getEndPoint(), this.currNode.mLocation);
 		if(isEnd && this.toCurrent<SavedOptions.GPS_TOLERANCE){
@@ -132,7 +135,7 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 		}
 		DataBus.getInstance().setHintPoint(this.currNode.mLocation);
 		osm.mks.updateHintMarker();
-		bus.setFindingMyStep(false);
+		//bus.setFindingMyStep(false);
     }
 
 	public int getDistance(GeoPoint start, GeoPoint end){

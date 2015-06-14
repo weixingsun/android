@@ -1,5 +1,6 @@
 package wsn.park.model;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class DataBus {
 		return singleton;
 	}
 	private GeoPoint myPoint;
-	private boolean findingMyStep;
+	private Timestamp findMyStepTime;
 	private Place place;
 	private List<ParkingPlace> parkingPlaces;
 	private GeoPoint hintPoint;
@@ -57,11 +58,11 @@ public class DataBus {
 	public static boolean isPlayed(int id,int dist){
 		return playedList.contains(id*10000+dist);
 	}
-	public boolean isFindingMyStep() {
-		return findingMyStep;
+	public Timestamp getFindMyStepTime() {
+		return findMyStepTime;
 	}
-	public void setFindingMyStep(boolean findingMyStep) {
-		this.findingMyStep = findingMyStep;
+	public void setFindMyStep(Timestamp ts) {
+		this.findMyStepTime = ts;
 	}
 	public GeoPoint getMyPoint() {
 		return myPoint;

@@ -396,7 +396,7 @@ import android.util.Log;
 			if(this.poi_db==null){
 				this.poi_db = SQLiteDatabase.openDatabase(poiDbFile, null, SQLiteDatabase.OPEN_READONLY);
 			}
-	    	String sql = "SELECT lat,lng,pname,admin,country_code FROM " +POI_TABLE+" where pname match '"+name+"' limit 0,10"; //,admin,country_code
+	    	String sql = "SELECT lat,lng,pname,admin,country_code FROM " +POI_TABLE+" where pname match '*"+name+"*' limit 0,10"; //,admin,country_code
 	    	Cursor cursor = poi_db.rawQuery(sql, null);
 	    	if (cursor.moveToFirst()){
 	    		do{

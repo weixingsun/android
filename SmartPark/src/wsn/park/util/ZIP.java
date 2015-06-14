@@ -90,15 +90,13 @@ public class ZIP {
 				if (ze.isDirectory()) {
 					dirChecker(ze.getName());
 				} else {
-					FileOutputStream fout = new FileOutputStream(
-							_targetLocation + "/" + ze.getName());
+					FileOutputStream fout = new FileOutputStream(_targetLocation + "/" + ze.getName());
 					BufferedOutputStream bufout = new BufferedOutputStream(fout);
 					byte[] buffer = new byte[1024];
 					int read = 0;
 					while ((read = zin.read(buffer)) != -1) {
 						bufout.write(buffer, 0, read);
 					}
-
 					zin.closeEntry();
 					bufout.close();
 					fout.close();

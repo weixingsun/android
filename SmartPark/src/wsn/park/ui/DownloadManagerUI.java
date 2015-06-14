@@ -87,7 +87,6 @@ public class DownloadManagerUI extends BaseActivity {
         handler = new MyHandler();
         downloadManager = (DownloadManager)getSystemService(DOWNLOAD_SERVICE);
         downloadManagerPro = new DownloadManagerPro(downloadManager);
-
         // see android mainfest.xml, accept minetype of cn.trinea.download.file
         Intent intent = getIntent();
         if (intent != null) {
@@ -229,6 +228,13 @@ public class DownloadManagerUI extends BaseActivity {
                     	ZIP d = new ZIP(zipFile, unzipLocation);
                     	d.unzip();
                     	File zip = new File(zipFile);
+                    	//move nz.db to poi folder 
+                    	File poi = new File(unzipLocation+"/"+COUNTRY_CODE+".db");
+                    	String path = SavedOptions.POI_FILE_PATH+"/";
+                    	String poiFullPath = Environment.getExternalStoragePublicDirectory(path).getAbsolutePath();
+                    	Log.w(tag, "move poi"+poi.getAbsolutePath()+", to path="+poiFullPath);
+                    	createFolder(poiFullPath);
+                    	poi.renameTo(new File(poiFullPath+"/"+COUNTRY_CODE+".db"));
                     	zip.delete();
                     }
                 }
@@ -377,5 +383,22 @@ public class DownloadManagerUI extends BaseActivity {
         return downloadManagerStatus == DownloadManager.STATUS_RUNNING
                 || downloadManagerStatus == DownloadManager.STATUS_PAUSED
                 || downloadManagerStatus == DownloadManager.STATUS_PENDING;
+    }
+    public static void createFolder(String directoryName){
+    	File theDir = new File(directoryName);
+    	// if the directory does not exist, create it
+    	if (!theDir.exists()) {
+    		System.out.println("creating directory: " + directoryName);
+    		boolean result = false;
+		    try{
+		        theDir.mkdir();
+		        result = true;
+		    }catch(Exception se){
+		        Log.e(tag, "error when creating folder:"+se.getMessage());
+		    }        
+		    if(result) {    
+		        System.out.println("DIR created");  
+		    }
+		}
     }
 }
