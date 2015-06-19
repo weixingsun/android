@@ -192,6 +192,7 @@ public class OSM {
 		List<SavedPlace> list=null;
 		if(dbHelper.existPOI()){
     		Log.w(tag, "find locally first");
+    		//dbHelper.loadExt();
 			list = dbHelper.getPOIs(address);
 			if(list!=null && list.size()>0){
 	    		dv.fillList(list);

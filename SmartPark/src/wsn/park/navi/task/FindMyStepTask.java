@@ -44,7 +44,7 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 	protected String doInBackground(GeoPoint... params) {
 		
 		if(osm.loc.road==null || osm.loc.road.mNodes.size()<1){return null;}
-		if(isWorking()){
+		if(isWorking() || isRedrawing()){
 			Log.i(tag, "finding my step, skip this call");
 			return null;
 		}
@@ -52,9 +52,9 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 	}
 	private String findCurrentStep(GeoPoint p) {
 		osm.loc.onRoadIndex=isInStep(osm.lines, p);//0 means (#1,#2)
-		String comments = "phase="+osm.loc.onRoadIndex;
+		//String comments = "phase="+osm.loc.onRoadIndex;
 		if(osm.loc.onRoadIndex<0){
-			comments="redraw route";
+			//comments="redraw route";
 			redrawRoutes(p);
 			return null;
 		} else {//on route
@@ -64,10 +64,10 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 		this.toCurrent = getDistance(p, this.currNode.mLocation);
 		boolean isEnd = MathUtil.compare(DataBus.getInstance().getEndPoint(), this.currNode.mLocation);
 		if(isEnd && this.toCurrent<SavedOptions.GPS_TOLERANCE){
-			comments += "the end of route";
+			//comments += "the end of route";
 			this.endFlag = true;
 		}
-		return comments;
+		return null;
 	}
 	public void redrawRoutes(GeoPoint start){
 		Log.i(tag, "redraw route...");
@@ -131,7 +131,7 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 		BigDecimal bd = new BigDecimal(this.toCurrent).setScale(-2, BigDecimal.ROUND_HALF_UP);  //Õû°Ù
 		playHintSounds(osm.loc.onRoadIndex+1,bd.intValue());
 		int resId = InfoWindow.getIconByManeuver(currNode.mManeuverType);
-		String dist = "In "+this.toCurrent+"m "+comments;
+		String dist = "In "+this.toCurrent+"m "+Mode.getModeName();
 		osm.dv.updateNaviInstruction(dist,resId);
 		if(this.endFlag){
 			cleanupAllonRoad();
@@ -150,15 +150,29 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 	}
 	private boolean isWorking() {
 		//if(Mode.getID()!=Mode.NAVI){return;}
-		osm.move(bus.getMyPoint());
+		//osm.move(bus.getMyPoint());
 		long now = new Timestamp(System.currentTimeMillis()).getTime();
 		long pre = bus.getFindMyStepTime().getTime();
 		Log.w(tag, "lap="+(now-pre));
-		if((now-pre)<2000){
+		if((now-pre)<SavedOptions.FIND_DELAY_TIME){
 			currNode=null;
 			return true;
 		}else{
 			bus.setFindMyStepTime(new Timestamp(now));
+			return false;
+		}
+	}
+	private boolean isRedrawing() {
+		//if(Mode.getID()!=Mode.NAVI){return;}
+		//osm.move(bus.getMyPoint());
+		long now = new Timestamp(System.currentTimeMillis()).getTime();
+		long pre = bus.getRedrawTime().getTime();
+		Log.w(tag, "lap="+(now-pre));
+		if((now-pre)<SavedOptions.REDRAW_DELAY_TIME){
+			currNode=null;
+			return true;
+		}else{
+			bus.setRedrawTime(new Timestamp(now));
 			return false;
 		}
 	}

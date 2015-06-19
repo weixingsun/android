@@ -10,19 +10,21 @@ import wsn.park.R;
 
 public class SavedOptions {
 	private static final String tag = SavedOptions.class.getSimpleName();
-	public static final int GPS_TOLERANCE = 30;
-	public static final int VOICE_DISTANCE = 100;
-	public static String sdcard = Environment.getExternalStorageDirectory().getPath();
-	public static String MAPSFORGE_FILE_URL = "http://servicedata.vhostall.com/map/"; // + nz.map
-	public static String GH_ROUTE_DATA_URL = "http://servicedata.vhostall.com/route/"; // + nz.zip
-	public static String MAPSFORGE_FILE_PATH = "osmdroid/maps/";	//	/sdcard/osmdroid/maps/nz.map
-	public static String GH_ROUTE_DATA_PATH = "osmdroid/routes/" ;	//	/sdcard/osmdroid/routes/nz.zip
-	public static String HINT_FILE_PATH = sdcard + "/osmdroid/hints/";
-	public static String POI_FILE_PATH = "osmdroid/poi/";
-	public static String POI_FILE_EXT = ".db";
-	public static String MAPSFORGE_FILE_EXT = ".map";
-	public static String GH_ROUTE_DATA_NAME = "edges";  //geometry/locationIndex/names/nodes/properties
-	public static String GH_ROUTE_DATA_ZIP_EXT = ".zip";
+	public static int GPS_TOLERANCE = 30;
+	public static int VOICE_DISTANCE = 100;
+	public static int REDRAW_DELAY_TIME = 5000;
+	public static int FIND_DELAY_TIME = 2000;
+	public static final String sdcard = Environment.getExternalStorageDirectory().getPath();
+	public static final String MAPSFORGE_FILE_URL = "http://servicedata.vhostall.com/map/"; // + nz.map
+	public static final String GH_ROUTE_DATA_URL = "http://servicedata.vhostall.com/route/"; // + nz.zip
+	public static final String MAPSFORGE_FILE_PATH = "osmdroid/maps/";	//	/sdcard/osmdroid/maps/nz.map
+	public static final String GH_ROUTE_DATA_PATH = "osmdroid/routes/" ;	//	/sdcard/osmdroid/routes/nz.zip
+	public static final String HINT_FILE_PATH = sdcard + "/osmdroid/hints/";
+	public static final String POI_FILE_PATH = "osmdroid/poi/";
+	public static final String POI_FILE_EXT = ".db";
+	public static final String MAPSFORGE_FILE_EXT = ".map";
+	public static final String GH_ROUTE_DATA_NAME = "edges";  //geometry/locationIndex/names/nodes/properties
+	public static final String GH_ROUTE_DATA_ZIP_EXT = ".zip";
 	//default=Open Street Map
 	public static String selectedBy;
 	public static String selectedMap;

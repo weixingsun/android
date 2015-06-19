@@ -14,8 +14,6 @@ public class Mode {
 	public static final int NORMAL = 0;
 	public static final int NAVI = 1;
 	public static final int PRACTICE = 2;
-	public static final int HOME = 3;
-	public static final int WORK = 4;
 	private static Mode mode;
 	private Mode(){ }
 	public static synchronized Mode getInstance( ) {
@@ -30,5 +28,14 @@ public class Mode {
 	}
 	//define a id for difference purposes in the map view page
 	private static int ID=0;
-	
+	public static String getModeName(){
+		String name = null;
+		switch(ID){
+		case NORMAL:	name="Normal";
+		case NAVI:		name="Navi";
+		case PRACTICE:	name="Practice";
+				
+		}
+		return name; 
+	}
 }

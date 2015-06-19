@@ -16,6 +16,7 @@ public class DataBus {
 	}
 	private GeoPoint myPoint;
 	private Timestamp findMyStepTime;
+	private Timestamp redrawTime;
 	private Place place;
 	private List<ParkingPlace> parkingPlaces;
 	private GeoPoint hintPoint;
@@ -65,6 +66,14 @@ public class DataBus {
 	}
 	public void setFindMyStepTime(Timestamp ts) {
 		this.findMyStepTime = ts;
+	}
+	public Timestamp getRedrawTime() {
+		if(this.redrawTime==null) 
+			redrawTime= new Timestamp(System.currentTimeMillis());
+		return redrawTime;
+	}
+	public void setRedrawTime(Timestamp ts) {
+		this.redrawTime = ts;
 	}
 	public GeoPoint getMyPoint() {
 		return myPoint;

@@ -36,7 +36,7 @@ public class MyPlacesActivity extends BaseActivity {
         tv_home.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				Mode.setID(Mode.HOME);
+				//Mode.setID(Mode.HOME);
 				drawer.close();
 				finish();
 			}});
@@ -45,7 +45,7 @@ public class MyPlacesActivity extends BaseActivity {
         tv_work.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				Mode.setID(Mode.WORK);
+				//Mode.setID(Mode.WORK);
 				drawer.close();
 				finish();
 			}});

@@ -21,6 +21,14 @@ public class SavedPlace implements Place {
 		this.lng=lng;
 		this.countryCode=countryCode;
 	}
+	public SavedPlace(String name,String admin,double lat,double lng,String countryCode,double dist){
+		this.name=name;
+		this.admin=admin;
+		this.lat=lat;
+		this.lng=lng;
+		this.countryCode=countryCode;
+		this.dist=dist;
+	}
 	public SavedPlace(String name,String admin,double lat,double lng,String countryCode,int special){
 		this.name=name;
 		this.admin=admin;
@@ -41,7 +49,7 @@ public class SavedPlace implements Place {
 	//id, name, admin, lat,lng, machine_code, user_name
 	private int id,special;
 	private String name,admin, machine_code, user_name,countryCode;
-	private double lat,lng;
+	private double lat,lng,dist;
 	public int getId() {
 		return id;
 	}
@@ -104,5 +112,11 @@ public class SavedPlace implements Place {
 	}
 	public GeoPoint getPosition(){
 		return new GeoPoint(this.lat,this.lng);
+	}
+	public double getDist() {
+		return dist;
+	}
+	public void setDist(double dist) {
+		this.dist = dist;
 	}
 }

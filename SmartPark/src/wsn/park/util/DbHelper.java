@@ -7,6 +7,7 @@ import java.util.List;
 import org.osmdroid.util.GeoPoint;
 
 import wsn.park.LOC;
+import wsn.park.model.DataBus;
 import wsn.park.model.Place;
 import wsn.park.model.SavedPlace;
 
@@ -390,13 +391,18 @@ import android.util.Log;
 		public String getPoiDbPath(String cc){
 			return SavedOptions.sdcard+"/"+SavedOptions.POI_FILE_PATH+this.getPoiDbName(cc);
 		}
-		
-	    public List<SavedPlace> getPOIs(String name) {
+		public SQLiteDatabase getPoiDB(){
+			if(poi_db==null) 
+				poi_db=SQLiteDatabase.openDatabase(poiDbFile, null, SQLiteDatabase.OPEN_READONLY);
+			return poi_db;
+		}
+		//download sqlite3.h/sqlite3.c/sqlite3ext.h
+		//gcc -fPIC -lm -shared extension-functions.c -o libsqlitefunctions.so
+		//SELECT load_extension('./libsqlitefunctions.so');
+	    public List<SavedPlace> getPOIs(String name,GeoPoint point) {
 			List<SavedPlace> list = new ArrayList<SavedPlace>();
-			if(this.poi_db==null){
-				this.poi_db = SQLiteDatabase.openDatabase(poiDbFile, null, SQLiteDatabase.OPEN_READONLY);
-			}
-	    	String sql = "SELECT lat,lng,pname,admin,country_code FROM " +POI_TABLE+" where pname match '*"+name+"*' limit 0,10"; //,admin,country_code
+			poi_db = getPoiDB();
+	    	String sql = "SELECT lat,lng,pname,admin,country_code FROM " +POI_TABLE+" where pname match '*"+name+"*' "; //,admin,country_code
 	    	Cursor cursor = poi_db.rawQuery(sql, null);
 	    	if (cursor.moveToFirst()){
 	    		do{
@@ -413,6 +419,37 @@ import android.util.Log;
 	    	cursor.close();
 	        return list;
 	    }
+	    public List<SavedPlace> getPOIs(String name) {
+			List<SavedPlace> list = new ArrayList<SavedPlace>();
+			getPoiDB();
+			String sqlDist = null;
+			if(DataBus.getInstance().getMyPoint()!=null){
+				GeoPoint gp = DataBus.getInstance().getMyPoint();
+				String sqlLat = gp.getLatitude()+"-lat";
+				String sqlLng = gp.getLongitude()+"-lng";
+				sqlDist = "("+sqlLat+")*("+sqlLat+")+("+sqlLng+")*("+sqlLng+") ";
+			}else{
+				sqlDist = "0";
+			}
+	    	String sql = "SELECT lat,lng,pname,admin,country_code,"+sqlDist+" as dist FROM " +POI_TABLE+" where pname match '*"+name+"*' order by "+sqlDist+" asc limit 0,10"; //,admin,country_code
+	    	Log.w(tag, "sql="+sql);
+	    	Cursor cursor = poi_db.rawQuery(sql, null);
+	    	if (cursor.moveToFirst()){
+	    		do{
+	    			double lat= cursor.getDouble(0);
+	    			double lng= cursor.getDouble(1);
+	    			String fullName= cursor.getString(2);
+	    			String admin= cursor.getString(3);
+	    			String country_code = cursor.getString(4);
+	    			double dist = cursor.getDouble(5);
+	    			SavedPlace sp = new SavedPlace(fullName,admin,lat,lng,country_code,Math.floor(Math.sqrt(dist)*100000));
+	    			//Log.i(tag, "name="+name+",admin="+admin+",lat="+lat+",lng="+lng);
+	    			list.add(sp);
+	    		}while(cursor.moveToNext());
+	    	}
+	    	cursor.close();
+	        return list;
+	    }
 		public boolean existPOI() {
 			if(poiDbFile==null)
 				poiDbFile = SavedOptions.sdcard +"/"+SavedOptions.POI_FILE_PATH+ LOC.countryCode+".db";
@@ -420,5 +457,13 @@ import android.util.Log;
 			Log.w(tag, "db file="+poiDbFile);
 			return db.exists();
 		}
-
+		public void loadExt(){
+			String folder= SavedOptions.sdcard +"/"+SavedOptions.POI_FILE_PATH+"/libsqlitefunctions.so";
+			String sql = "SELECT load_extension('"+folder+"');";
+			poi_db = getPoiDB();
+			//poi_db.execSQL(sql);
+			//Log.w(tag, "poi_db load "+folder);
+			//SQLiteCustomFunction f ;
+		}
+		//addCustomFunction
 	}

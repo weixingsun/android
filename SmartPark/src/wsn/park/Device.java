@@ -174,6 +174,7 @@ public class Device {
 	        for(SavedPlace a:addrs){
 	        	String display = a.getName(); //GeoOptions.getAddressName(a);
 	        	//Log.w(tag, a.toString());
+	        	if(a.getDist()>0)	display+=" ("+a.getDist()+"m)";
 	        	list.add(putData(display));
 	        }
 	        return list;
@@ -331,14 +332,14 @@ public class Device {
 	            iconHome.setVisibility(View.GONE);//INVISIBLE is occupying the space
 	            iconWork.setVisibility(View.GONE);
 	            break;
-			case Mode.HOME:
-	            iconHome.setVisibility(View.VISIBLE);
-	            iconWork.setVisibility(View.GONE);
-	            break;
-			case Mode.WORK:
-	            iconHome.setVisibility(View.GONE);
-	            iconWork.setVisibility(View.VISIBLE);
-	            break;
+//			case Mode.HOME:
+//	            iconHome.setVisibility(View.VISIBLE);
+//	            iconWork.setVisibility(View.GONE);
+//	            break;
+//			case Mode.WORK:
+//	            iconHome.setVisibility(View.GONE);
+//	            iconWork.setVisibility(View.VISIBLE);
+//	            break;
 			}
 			switch(sp.getSpecial()){
 			case Place.NORMAL: //cancel save

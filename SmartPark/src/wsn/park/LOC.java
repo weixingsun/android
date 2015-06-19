@@ -60,7 +60,7 @@ public class LOC implements LocationListener {
 		if (openGPSEnabled()) {
 			//createLocationRequest(1000,2000);
 			provider = getGoodProvider(); //LocationManager.GPS_PROVIDER; //this.getProvider();
-			startGPSLocation();
+			//startGPSLocation();
 		}
 	}
 
@@ -104,6 +104,9 @@ public class LOC implements LocationListener {
 	public void onLocationChanged(Location loc) {
 		myPos = loc;
 		bus.setMyPoint(new GeoPoint(loc.getLatitude(),loc.getLongitude()));
+		if(Mode.getID()==Mode.NAVI){
+			osm.move();
+		}
 		if (countryCode == null)
 			countryCode = CountryCode.getByGeoPoint(bus.getMyPoint());
 		(new FindMyStepTask()).execute();
@@ -128,6 +131,7 @@ public class LOC implements LocationListener {
 //				Log.i(tag, "provider="+provider);
 //				Toast.makeText(osm.act, "Location Provider changed to: "+provider, Toast.LENGTH_SHORT).show();
 			//}
+			startGPSLocation();
 		}
 	}
 
