@@ -15,8 +15,8 @@ public class DataBus {
 		return singleton;
 	}
 	private GeoPoint myPoint;
-	private Timestamp findMyStepTime;
-	private Timestamp redrawTime;
+	private long findMyStepTime=0;
+	private long redrawTime=0;
 	private Place place;
 	private List<ParkingPlace> parkingPlaces;
 	private GeoPoint hintPoint;
@@ -59,20 +59,20 @@ public class DataBus {
 	public static boolean isPlayed(int id,int dist){
 		return playedList.contains(id*10000+dist);
 	}
-	public Timestamp getFindMyStepTime() {
-		if(this.findMyStepTime==null) 
-			findMyStepTime= new Timestamp(System.currentTimeMillis());
+	public long getFindingMS() {
+		if(this.findMyStepTime==0) 
+			findMyStepTime= System.currentTimeMillis();
 		return findMyStepTime;
 	}
-	public void setFindMyStepTime(Timestamp ts) {
+	public void setFindMyStepTime(long ts) {
 		this.findMyStepTime = ts;
 	}
-	public Timestamp getRedrawTime() {
-		if(this.redrawTime==null) 
-			redrawTime= new Timestamp(System.currentTimeMillis());
+	public long getRedrawTime() {
+		if(this.redrawTime==0) 
+			redrawTime= System.currentTimeMillis();
 		return redrawTime;
 	}
-	public void setRedrawTime(Timestamp ts) {
+	public void setRedrawTime(long ts) {
 		this.redrawTime = ts;
 	}
 	public GeoPoint getMyPoint() {

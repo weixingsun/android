@@ -12,8 +12,8 @@ public class SavedOptions {
 	private static final String tag = SavedOptions.class.getSimpleName();
 	public static int GPS_TOLERANCE = 30;
 	public static int VOICE_DISTANCE = 100;
-	public static int REDRAW_DELAY_TIME = 5000;
-	public static int FIND_DELAY_TIME = 2000;
+	public static int REDRAW_DELAY_TIME = 3000;
+	public static int FIND_DELAY_TIME = 1000;
 	public static final String sdcard = Environment.getExternalStorageDirectory().getPath();
 	public static final String MAPSFORGE_FILE_URL = "http://servicedata.vhostall.com/map/"; // + nz.map
 	public static final String GH_ROUTE_DATA_URL = "http://servicedata.vhostall.com/route/"; // + nz.zip

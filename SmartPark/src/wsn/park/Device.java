@@ -120,7 +120,7 @@ public class Device {
 	}
 
 	private void setText() {
-		inputAddress.addTextChangedListener(new DelayedTextWatcher(2000) {
+		inputAddress.addTextChangedListener(new DelayedTextWatcher(1000) {
 			@Override
 			public void afterTextChangedDelayed(Editable s) {
 				osm.startTask("poi",inputAddress.getText().toString());

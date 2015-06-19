@@ -135,6 +135,7 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 		osm.dv.updateNaviInstruction(dist,resId);
 		if(this.endFlag){
 			cleanupAllonRoad();
+			osm.dv.closePopupNavi();
 			//confirm parking button
 		}
 		DataBus.getInstance().setHintPoint(this.currNode.mLocation);
@@ -149,30 +150,24 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 		return Math.round(results[0]);
 	}
 	private boolean isWorking() {
-		//if(Mode.getID()!=Mode.NAVI){return;}
-		//osm.move(bus.getMyPoint());
-		long now = new Timestamp(System.currentTimeMillis()).getTime();
-		long pre = bus.getFindMyStepTime().getTime();
-		Log.w(tag, "lap="+(now-pre));
-		if((now-pre)<SavedOptions.FIND_DELAY_TIME){
+		long pre = bus.getFindingMS();
+		//Log.w(tag, "lap="+(System.currentTimeMillis()-pre));
+		if((System.currentTimeMillis()-pre)<SavedOptions.FIND_DELAY_TIME){
 			currNode=null;
 			return true;
 		}else{
-			bus.setFindMyStepTime(new Timestamp(now));
+			bus.setFindMyStepTime(System.currentTimeMillis());
 			return false;
 		}
 	}
 	private boolean isRedrawing() {
-		//if(Mode.getID()!=Mode.NAVI){return;}
-		//osm.move(bus.getMyPoint());
-		long now = new Timestamp(System.currentTimeMillis()).getTime();
-		long pre = bus.getRedrawTime().getTime();
-		Log.w(tag, "lap="+(now-pre));
-		if((now-pre)<SavedOptions.REDRAW_DELAY_TIME){
+		long pre = bus.getRedrawTime();
+		//Log.w(tag, "lap="+(System.currentTimeMillis()-pre));
+		if((System.currentTimeMillis()-pre)<SavedOptions.REDRAW_DELAY_TIME){
 			currNode=null;
 			return true;
 		}else{
-			bus.setRedrawTime(new Timestamp(now));
+			bus.setRedrawTime(System.currentTimeMillis());
 			return false;
 		}
 	}

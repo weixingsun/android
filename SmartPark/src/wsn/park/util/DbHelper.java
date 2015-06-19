@@ -431,8 +431,16 @@ import android.util.Log;
 			}else{
 				sqlDist = "0";
 			}
-	    	String sql = "SELECT lat,lng,pname,admin,country_code,"+sqlDist+" as dist FROM " +POI_TABLE+" where pname match '*"+name+"*' order by "+sqlDist+" asc limit 0,10"; //,admin,country_code
+			String uname = name.replaceAll("'", "''").replaceAll("\"", "\"\"");
+			String select = "SELECT lat,lng,pname,admin,country_code,"+sqlDist+" as dist ";
+			String from   = "  from "+POI_TABLE;
+			//String where= " where " +POI_TABLE +" match ?"; //"table MATCH 'column1:? OR column2:?'"
+			String where  = " where pname match '*"+uname+"*'";
+			String order  = " order by "+sqlDist+" asc limit 0,20";
+	    	String sql = select + from+ where + order; //,admin,country_code
 	    	Log.w(tag, "sql="+sql);
+	    	//String[] args = new String[]{name}; //tbl MATCH 'col: company';
+	    	
 	    	Cursor cursor = poi_db.rawQuery(sql, null);
 	    	if (cursor.moveToFirst()){
 	    		do{

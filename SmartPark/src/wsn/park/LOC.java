@@ -3,6 +3,8 @@ package wsn.park;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.bonuspack.routing.Road;
@@ -28,6 +30,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
@@ -42,6 +46,7 @@ public class LOC implements LocationListener {
 	private int speed;
 	OSM osm;
 	//Wifi wifi;
+	
 	public Drawer dr = Drawer.INSTANCE();
 	public static String countryCode = null;
 	String provider;
@@ -62,8 +67,33 @@ public class LOC implements LocationListener {
 			provider = getGoodProvider(); //LocationManager.GPS_PROVIDER; //this.getProvider();
 			//startGPSLocation();
 		}
+		TimerTask tt = new TimerTask(){
+			@Override
+			public void run() {
+				//startGPSLocation();
+				Message message = new Message();  
+                message.what = 22222;  
+                doActionHandler.sendMessage(message);
+			}};
+		Timer timer = new Timer();
+		//timer.schedule(task, delay, period); 
+		//timer.schedule(task, delay);
+		timer.schedule(tt, 5000);//0,3000 check gps status after 3s 
 	}
-
+    private Handler doActionHandler = new Handler() {  
+        @Override  
+        public void handleMessage(Message msg) {  
+            super.handleMessage(msg);  
+            int msgId = msg.what;  
+            switch (msgId) {  
+                case 22222:  
+                	startGPSLocation(); 
+                    break;  
+                default:  
+                    break;  
+            }  
+        }  
+    }; 
 	private void getLocFromDB() {
 		String strLastPos = dbHelper.getLastPosition();
 		if(strLastPos != null){
@@ -115,7 +145,6 @@ public class LOC implements LocationListener {
 		//playHintSounds(osm.loc.passedNodes.size());
 		dbHelper.updateGPS(0, myPos);
 	}
-
 
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
