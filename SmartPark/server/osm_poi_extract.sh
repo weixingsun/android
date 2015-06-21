@@ -18,6 +18,18 @@ create virtual table poi using fts3(lat DECIMAL(10,7),lng DECIMAL(10,7),type var
 select * from poi where pname like 'Peppers%' LIMIT 0,10;
 select * from poi where pname match 'Peppers' LIMIT 0,10;
 
+select substr(lat,0,8) as lat1, substr(lng,0,8) as lng1, pname from poi group by lat1,lng1,pname having count(1)>1
+select substr(lat,0,9) as lat1, substr(lng,0,9) as lng1, pname from poi group by lat1,lng1,pname having count(1)>1
+7908	-43.5351214	172.5996298	convenience	NZ	Canterbury	Elizabeth Street Dairy
+21986	-43.53513	172.5996883	convenience	NZ	Canterbury	Elizabeth Street Dairy
+create table dup as select substr(lat,0,8) as lat1, substr(lng,0,8) as lng1, pname from poi group by lat1,lng1,pname having count(1)>1;
+
+create table dup_all_detail as select poi.rowid as poi_rid, poi.* from poi join dup on poi.pname=dup.pname and substr(poi.lng,0,8)=dup.lng1 and substr(poi.lat,0,8)=dup.lat1 order by poi.pname;
+
+select count(1) from dup_all_detail where rowid not in ( select min(rowid) from dup_all_detail group by pname );
+create table poi_delete as select poi_rid from dup_all_detail where rowid not in ( select min(rowid) from dup_all_detail group by pname );
+delete from poi where rowid in (select poi_rid from poi_delete);
+
 .separator ','
 .output yes.csv
 select * from poi_yes;
