@@ -112,6 +112,7 @@ public class OSM {
 		mks=Markers.getInstance(this);
 		mks.initMylocMarker();
 		mks.showAllSavedPlaces();
+		genericMapView.getMapView().setAllMarkers(mks.savedPlaceMarkers);
 		//mks.setNaviImage();
 		//mks.initRouteMarker();
         dv.init(act,this);
@@ -135,18 +136,7 @@ public class OSM {
 		MapEventsOverlay OverlayEventos = new MapEventsOverlay(act.getBaseContext(), mReceive);
 		map.getOverlays().add(OverlayEventos);
 		map.invalidate();
-		map.setMapListener(new DelayedMapListener(new MapListener(){
-			@Override
-			public boolean onScroll(ScrollEvent arg0) {
-				//BoundingBoxE6 box = arg0.getSource().getBoundingBox();
-				//Log.i(tag, "onScroll="+box);
-				//mks.showHidePOIs();
-				return false;
-			}
-			@Override
-			public boolean onZoom(ZoomEvent arg0) {
-				return false;
-			}}, 300));
+		
 		this.move();
 	}
 

@@ -58,7 +58,7 @@ public class MyPlacesActivity extends BaseActivity {
 				PlaceHolder ph = (PlaceHolder) view.getTag();
 				//Log.w(tag, "place.name="+ph.place.getName());
 				SavedPlace sp = (SavedPlace) ph.place;
-				osm.mks.updateDestinationOverlay(sp);
+				osm.mks.updateTargetMarker(sp);
 				drawer.close();
 				finish();
 			}

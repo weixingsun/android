@@ -31,9 +31,9 @@ public class Mode {
 	public static String getModeName(){
 		String name = null;
 		switch(ID){
-		case NORMAL:	name="Normal";
-		case NAVI:		name="Navi";
-		case PRACTICE:	name="Practice";
+		case NORMAL:	name="Normal"; break;
+		case NAVI:		name="Navi";break;
+		case PRACTICE:	name="Practice";break;
 				
 		}
 		return name; 

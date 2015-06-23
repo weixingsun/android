@@ -39,7 +39,7 @@ protected String doInBackground(String... params) {
 	zoom = osm.map.getZoomLevel();
 	bbE6Visible = osm.getBoundary();
 	//Log.w(TAG, "doInBackground");
-	clearMarkers();
+	//clearMarkers();
 	ProviderUtil.calculateNeededTilesForZoomLevelInBoundingBox(tilesNeeded, zoom, bbE6Visible);
 	for(MapTile pTile:tilesNeeded){
 		List<PointOfInterest> POIs = mfpoi.getPOI(pTile);
@@ -60,9 +60,9 @@ protected String doInBackground(String... params) {
 protected void onPostExecute(String ret) {
     super.onPostExecute(ret);
     //Log.w(TAG, "POI.size="+osm.mks.pois.size());
-    for(POI p:osm.mks.pois){
-    	osm.map.getOverlays().add(p.poiMarker);
-    }
+    //for(POI p:osm.mks.pois){
+    //	osm.map.getOverlays().add(p.poiMarker);
+    //}
 	osm.map.invalidate();
     
 }
@@ -85,10 +85,10 @@ public void createPOIMarker(int resId,PointOfInterest poi) {
 			return false;
 		}});
 	POI newPOI = new POI(poi,newMarker);
-	osm.mks.pois.add(newPOI);
+	//osm.mks.pois.add(newPOI);
 }
 public void clearMarkers(){
-	osm.mks.pois.clear();
+	//osm.mks.pois.clear();
 	//osm.mks.removePOIMarkers();
 	//Log.w(TAG, "POI.size="+osm.mks.pois.size()+",LatN="+bbE6Visible.getLatNorthE6()+",LatS="+bbE6Visible.getLatSouthE6()+",LngE="+bbE6Visible.getLonEastE6()+",LngW="+bbE6Visible.getLonWestE6());
 	//osm.map.invalidate();

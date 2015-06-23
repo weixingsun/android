@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.osmdroid.bonuspack.location.GeocoderNominatim;
+import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.util.GeoPoint;
 
 import wsn.park.LOC;
@@ -89,9 +90,8 @@ public class GeocoderTask extends
     			foundAddr.setLatitude(position.getLatitude());
     			foundAddr.setLongitude(position.getLongitude());
     			SavedPlace sp = GeoOptions.getMyPlace(foundAddr);
-    			OsmMapsItemizedOverlay pin = osm.mks.updateDestinationOverlay(sp);
-    			osm.dv.openPlacePopup(pin);
-    			osm.mks.updateDestinationOverlay(sp);
+    			osm.mks.updateTargetMarker(sp);
+    			osm.dv.openPlacePopup(sp);
     		}
         }
     }

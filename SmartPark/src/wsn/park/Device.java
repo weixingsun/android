@@ -19,6 +19,7 @@ import wsn.park.navi.task.ParkingAPI;
 import wsn.park.ui.DelayedTextWatcher;
 import wsn.park.ui.SuggestListAdapter;
 import wsn.park.ui.marker.OsmMapsItemizedOverlay;
+import wsn.park.ui.marker.PlaceMarker;
 import wsn.park.util.DbHelper;
 import wsn.park.util.GeoOptions;
 import wsn.park.util.MapOptions;
@@ -29,6 +30,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.speech.RecognizerIntent;
 import android.text.Editable;
@@ -92,11 +94,11 @@ public class Device {
 				SavedPlace addr = osm.suggestPoints.get(position);
 				//osm.mks.updateRouteMarker(addr);////////////////////offline navi no marker??????
 				//SavedPlace sp = GeoOptions.getMyPlace(addr);
-				OsmMapsItemizedOverlay pin = osm.mks.updateDestinationOverlay(addr);
 				listSuggest.setVisibility(View.INVISIBLE);
 				osm.move(addr.getLat(),addr.getLng());
 				dbHelper.addHistoryPlace(addr);
-				openPlacePopup(pin);
+				osm.mks.updateTargetMarker(addr);
+				openPlacePopup(addr);
 				//Log.w(tag, "show popup window");
 				closeKeyBoard();
 			}
@@ -232,14 +234,13 @@ public class Device {
 	    			if(sp.getSpecial()>Place.NORMAL-1){
 	    				dbHelper.deleteMyPlaces(sp.getId());
 	    				placePop.dismiss();
-	    				osm.mks.selectedMarker.removeAllItems();
 	    				osm.mks.savedPlaceMarkers.remove(osm.mks.selectedMarker);
 	    				osm.map.getOverlays().remove(osm.mks.selectedMarker);
 	    				osm.map.invalidate();
 	    			}else{
 	    				sp.setSpecial(Place.NORMAL);
 	    				dbHelper.addMyPlace(sp);
-	    				osm.mks.selectedMarker.setSp(sp);
+	    				//osm.mks.selectedMarker.setSp(sp);
 	    				osm.mks.savedPlaceMarkers.add(osm.mks.selectedMarker);
 	    				showMyMarker(sp);
 	    			}
@@ -249,7 +250,7 @@ public class Device {
 		protected void showMyMarker(SavedPlace sp) {
 			iconStar.setImageResource(R.drawable.heart_broken_48);
 			special.setText(String.valueOf(Place.NORMAL));
-			osm.mks.changeMarkerIcon(R.drawable.heart_24_x);
+			osm.mks.changeMarkerIcon(R.drawable.star_red_24);
 			osm.map.invalidate();
 		}
 
@@ -293,14 +294,13 @@ public class Device {
 	    	tv_instruction.setText(instruction);
 	    	iconNaviFlag.setImageResource(resId);
 	    }
-	    public void openPlacePopup(OsmMapsItemizedOverlay pin) {
+	    public void openPlacePopup(Place p) {
 	    	//act.getResources().getDrawable(R.drawable.hearts_48);
-	    	//pin.changeIcon(icon);
-	    	osm.mks.removeTempMarker(pin);
+	    	//osm.mks.removeTempMarker(pin);
+	    	//osm.mks.hideLastMarkerSecondIcon();
             placePop.setAnimationStyle(R.style.AnimBottom);
             placePop.showAtLocation(osm.act.findViewById(R.id.my_loc), Gravity.BOTTOM, 0, 0); //leaked window
             placePop.setFocusable(true);
-            Place p = pin.getSp();
             pointBrief.setText(p.getName());
             pointDetail.setText(p.getAdmin());
             lat.setText(String.valueOf(p.getLat()));
@@ -309,20 +309,20 @@ public class Device {
         	special.setText(String.valueOf(p.getSpecial()));
         	hidePopupIcons(p);
             if(p.getId()==0) p.setId(dbHelper.getMaxID(DbHelper.MY_PLACE_TABLE)+1);
-            tv_id.setText(String.valueOf(pin.getSp().getId()));
+            tv_id.setText(String.valueOf(p.getId()));
             placePop.update();
-            osm.mks.selectedMarker = pin;
+            //osm.mks.selectedMarker = pin;
 	    }
 	    public void openPlacePopup(GeoPoint gp) {
 	    	if(osm.mks.selectedMarker!=null){
-		    	GeoPoint a=osm.mks.selectedMarker.getSp().getPosition();
+		    	GeoPoint a=osm.mks.selectedMarker.getPosition();
 		    	if(wsn.park.util.MathUtil.compare(a, gp)){
-		    		this.openPlacePopup(osm.mks.selectedMarker);
+		    		this.openPlacePopup(osm.mks.selectedMarker.getPlace());
 		    		return;
 		    	}
 	    	}
-	    	OsmMapsItemizedOverlay pin = osm.mks.findMyPlace(gp);
-	    	this.openPlacePopup(pin);
+	    	PlaceMarker pin = osm.mks.findMyPlace(gp);
+	    	this.openPlacePopup(pin.getPlace());
 	    }
 		private void hidePopupIcons(Place sp) {
 			switch(Mode.getID()){

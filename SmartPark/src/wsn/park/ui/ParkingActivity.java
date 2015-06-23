@@ -40,8 +40,8 @@ public class ParkingActivity extends BaseActivity {
 				//Log.w(tag, "place.name="+ph.place.getName());
 				DataBus.getInstance().setPlace(ph.place);
 				ParkingPlace sp = (ParkingPlace) ph.place;
-				osm.mks.updateDestinationOverlay(sp);
-				osm.dv.openPlacePopup(sp.getPosition());
+				osm.mks.updateTargetMarker(sp);
+				osm.dv.openPlacePopup(sp);
 				finish();
 			}
         });

@@ -100,7 +100,7 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 	}
 	
 	private void playHintSounds(int index, int dist) {
-		if(this.currNode!=null && this.toCurrent<SavedOptions.VOICE_DISTANCE && !DataBus.isPlayed(index,dist)){
+		if(this.currNode!=null  && !DataBus.isPlayed(index,dist)){ //&& this.toCurrent<SavedOptions.VOICE_DISTANCE
 			DataBus.setPlayedId(index,dist);
 			//BigDecimal bd = new BigDecimal(this.toCurrent).setScale(-2, BigDecimal.ROUND_HALF_UP);  //Õû°Ù
 			MyPlayer.play(osm.act, this.currNode, dist);
