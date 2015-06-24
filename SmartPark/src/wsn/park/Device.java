@@ -254,6 +254,8 @@ public class Device {
 	    				Drawable d = osm.act.getResources().getDrawable( R.drawable.star_red_24 );
 	    				osm.mks.selectedMarker.setIcon(d);
 	    				osm.map.invalidate();
+	    				sp.setStar(true);
+	    				osm.mks.selectedMarker.setPlace(sp);
 	    				osm.mks.savedPlaceMarkers.add(osm.mks.selectedMarker);
 	    				iconStar.setImageResource(R.drawable.heart_broken_48);
 	    				special.setText(String.valueOf(Place.NORMAL));

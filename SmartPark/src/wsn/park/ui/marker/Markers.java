@@ -75,6 +75,7 @@ public class Markers {
 		selectedMarker = new PlaceMarker(p);
 		selectedMarker.setPosition(p.getPosition());
 		selectedMarker.setIcon(d);
+		selectedMarker.setInfoWindow(null);
 //		selectedMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
 		osm.map.getOverlays().add(selectedMarker);
 		osm.move(gp);

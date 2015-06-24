@@ -103,8 +103,8 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 		if(this.currNode!=null  && !DataBus.isPlayed(index,dist)){ //&& this.toCurrent<SavedOptions.VOICE_DISTANCE
 			DataBus.setPlayedId(index,dist);
 			//BigDecimal bd = new BigDecimal(this.toCurrent).setScale(-2, BigDecimal.ROUND_HALF_UP);  //Õû°Ù
-			MyPlayer.play(osm.act, this.currNode, dist);
-			Toast.makeText(osm.act, "playing "+index+":"+dist, Toast.LENGTH_LONG).show();
+			String display = MyPlayer.play(osm.act, this.currNode, dist);
+			Toast.makeText(osm.act, "playing "+index+":"+dist+"ERR:"+display, Toast.LENGTH_LONG).show();
 		}
 	}
 

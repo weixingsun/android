@@ -21,8 +21,8 @@ import com.google.android.exoplayer.TrackRenderer;
 public class MyPlayer {
 	private static final String tag = MyPlayer.class.getSimpleName();
 	private static ExoPlayer player;
-	public static void play(Activity act, int distance,int maneuverType) {
-		//String fileFullPath = folder+"type_"+maneuverType+"_dist_"+distance+".mp3";
+	public static String play(Activity act, int distance,int maneuverType) {
+		String ret = null;
 		String fileName = "type_"+maneuverType+"_dist_"+distance;	//+".mp3"
 		/*File mp3  = new File(filePath);
 		if(!mp3.exists()) {
@@ -32,7 +32,8 @@ public class MyPlayer {
 		Uri uri = Uri.fromFile(new File(filePath));*/
 		Uri uri = getUriByName("raw/"+fileName);
 		if(!checkRawList(fileName)) {
-			return;
+			ret = "not in raw list:"+fileName;
+			return ret;
 		}
 	    FrameworkSampleSource sampleSource = new FrameworkSampleSource(act, uri, null, 1);
 	    // Build the track renderers
@@ -56,13 +57,14 @@ public class MyPlayer {
 					//Log.i(tag, "player released");
 				}
 			}});
+	    return null;
 	}
 	public static void test(Activity act){
 		//play(act,folder+"turn-left.mp3");
 	}
-	public static void play(Activity act, RoadNode node, int dist) {
+	public static String play(Activity act, RoadNode node, int dist) {
 		// "in 400 m" + "turn right"
-		play(act,dist, node.mManeuverType);  //distance+turn
+		return play(act,dist, node.mManeuverType);  //distance+turn
 	}
 	public static Uri getUriByName(String res){
 		return Uri.parse("android.resource://cat.app.osmap/"+res);  //drawable/icon
