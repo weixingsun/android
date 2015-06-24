@@ -59,6 +59,7 @@ public class MyPlacesActivity extends BaseActivity {
 				//Log.w(tag, "place.name="+ph.place.getName());
 				SavedPlace sp = (SavedPlace) ph.place;
 				osm.mks.updateTargetMarker(sp);
+				osm.dv.openPlacePopup(sp);
 				drawer.close();
 				finish();
 			}

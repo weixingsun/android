@@ -105,5 +105,15 @@ public class ParkingPlace implements Place{
 	public int getSpecial() {
 		return Place.PARK;
 	}
+	@Override
+	public boolean isStar() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public void setStar(boolean star) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }

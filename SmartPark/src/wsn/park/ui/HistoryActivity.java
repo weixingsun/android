@@ -37,6 +37,7 @@ public class HistoryActivity extends BaseActivity {
 				//osm.mks.updateRouteMarker(ph.place);
 				SavedPlace sp = (SavedPlace) ph.place;
 				osm.mks.updateTargetMarker(sp);
+				osm.dv.openPlacePopup(sp);
 				drawer.close();
 				finish();
 			}

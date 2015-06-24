@@ -20,4 +20,6 @@ public interface Place {
 	public void setId(int i);
 	public void setSpecial(int special);
 	public int getSpecial();
+	public boolean isStar();
+	public void setStar(boolean star);
 }

@@ -304,7 +304,7 @@ import android.util.Log;
 		    			int special = cursor.getInt(5);
 		    			int id = cursor.getInt(6);
 		    			//int id,String name,String admin,double lat,double lng,String countryCode,String machine,String user,int special
-		    			SavedPlace sp = new SavedPlace(id,name,admin,lat,lng,country_code,null,null,special);
+		    			SavedPlace sp = new SavedPlace(id,name,admin,lat,lng,country_code,null,null,special,true);
 		    			//Log.i(tag, "name="+name+",admin="+admin+",lat="+lat+",lng="+lng);
 		    			list.add(sp);
 		    		}while(cursor.moveToNext());

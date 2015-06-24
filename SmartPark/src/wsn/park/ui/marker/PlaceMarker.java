@@ -2,6 +2,8 @@ package wsn.park.ui.marker;
 
 import org.osmdroid.bonuspack.overlays.Marker;
 
+import android.graphics.drawable.Drawable;
+
 import wsn.park.maps.OSM;
 import wsn.park.model.Place;
 
@@ -17,5 +19,4 @@ public class PlaceMarker extends Marker{
 	public void setPlace(Place p) {
 		this.p = p;
 	}
-
 }

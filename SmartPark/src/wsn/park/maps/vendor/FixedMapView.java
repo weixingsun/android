@@ -56,18 +56,22 @@ public final class FixedMapView extends MapView {
             	Point p = new Point();
             	p.set(x, y);
             	//GeoPoint gp = (GeoPoint)getProjection().fromPixels((int)x, (int)y);
+            	//GeoPoint gp1 = (GeoPoint)getProjection().fromPixels((int)x-50, (int)y-50);
+            	//GeoPoint gp2 = (GeoPoint)getProjection().fromPixels((int)x+50, (int)y+50);
+            	//select * from poi where (lat between gp1.lat and gp2.lat) and (lng between gp1.lng and gp2.lng) order by (lat+lng -gp.lat-gp.lng) asc limit 1
             	//Point p = pointFromGeoPoint(gp, this);
             	if(allMarkers!=null)
-            	for (Marker m:allMarkers){
-            		Point p2 = getProjection().toPixels(m.getPosition(), p);//will change p value
+            	for (PlaceMarker pm:allMarkers){
+            		Point p2 = getProjection().toPixels(pm.getPosition(), p);//will change p value
             		Point press = new Point();
             		press.set(x, y);
-            		if(comparePoint(press,p2,40)){
+            		if(comparePoint(press,p2,50)){
             			//Log.w(tag, "pressed("+m.getPosition()+")");
-            			Drawable icon = this.getContext().getResources().getDrawable( R.drawable.marker_sky_80 );
-            			m.setIcon(icon);
-            			this.invalidate();
-            			OSM.getInstance().dv.openPlacePopup(m.getPosition());
+            			//Drawable icon = this.getContext().getResources().getDrawable( R.drawable.marker_sky_80 );
+            			//pm.setIcon(icon);
+            			//this.invalidate();
+            			OSM.getInstance().mks.updateTargetMarker(pm);
+            			OSM.getInstance().dv.openPlacePopup(pm.getPosition());
             			break;
             		}
             	}

@@ -62,9 +62,11 @@ public class Device {
 	DbHelper dbHelper;
     PopupWindow placePop,naviPop;
 	//Mode mode;
-	TextView pointBrief,pointDetail,lat,lng,country_code,special,tv_id,tv_instruction;
+	TextView pointBrief,pointDetail,lat,lng,country_code,special,tv_id,tv_instruction,star;
 	ImageView iconHome,iconWork,iconStar,iconPark,iconTravelBy,iconCloseNavi,iconNaviFlag;
 	private String tag=Device.class.getSimpleName();
+	private String STARRED = "true";
+	private String NO_STAR = "false";
 	public void init(Activity act, OSM osm){
 		this.act=act;
 		this.osm=osm;
@@ -200,6 +202,7 @@ public class Device {
 			country_code = (TextView) popupLayout.findViewById(R.id.country_code);
 			special = (TextView) popupLayout.findViewById(R.id.special);
 			tv_id = (TextView) popupLayout.findViewById(R.id.tv_id);
+			star = (TextView) popupLayout.findViewById(R.id.starred); 
 			iconHome = (ImageView) popupLayout.findViewById(R.id.home);
 			iconWork = (ImageView) popupLayout.findViewById(R.id.work);
 			iconStar = (ImageView) popupLayout.findViewById(R.id.star);
@@ -231,28 +234,34 @@ public class Device {
 				@Override
 				public void onClick(View v) {
 					SavedPlace sp = getPlaceFromPopupPage();
-	    			if(sp.getSpecial()>Place.NORMAL-1){
-	    				dbHelper.deleteMyPlaces(sp.getId());
-	    				placePop.dismiss();
+	    			//if(sp.getSpecial()>Place.NORMAL-1){
+					if(sp.isStar()){
 	    				osm.mks.savedPlaceMarkers.remove(osm.mks.selectedMarker);
+	    				Drawable d = osm.act.getResources().getDrawable(R.drawable.transparent_16);
+	    				d.setAlpha(0);
+	    				osm.mks.selectedMarker.setIcon(d);
 	    				osm.map.getOverlays().remove(osm.mks.selectedMarker);
+	    				osm.mks.selectedMarker=null;
 	    				osm.map.invalidate();
+	    				placePop.dismiss();
+	    				dbHelper.deleteMyPlaces(sp.getId());
+	    				Log.w(tag, "delete place.star="+sp.isStar());
 	    			}else{
 	    				sp.setSpecial(Place.NORMAL);
 	    				dbHelper.addMyPlace(sp);
 	    				//osm.mks.selectedMarker.setSp(sp);
+	    				star.setText(STARRED);
+	    				Drawable d = osm.act.getResources().getDrawable( R.drawable.star_red_24 );
+	    				osm.mks.selectedMarker.setIcon(d);
+	    				osm.map.invalidate();
 	    				osm.mks.savedPlaceMarkers.add(osm.mks.selectedMarker);
-	    				showMyMarker(sp);
+	    				iconStar.setImageResource(R.drawable.heart_broken_48);
+	    				special.setText(String.valueOf(Place.NORMAL));
+	    				osm.mks.tempMarker=null;
+	    				Log.w(tag, "add place.star="+sp.isStar());
 	    			}
 				}});
 	  	}
-
-		protected void showMyMarker(SavedPlace sp) {
-			iconStar.setImageResource(R.drawable.heart_broken_48);
-			special.setText(String.valueOf(Place.NORMAL));
-			osm.mks.changeMarkerIcon(R.drawable.star_red_24);
-			osm.map.invalidate();
-		}
 
 		public SavedPlace getPlaceFromPopupPage(){
 	    	int str_id = Integer.valueOf(tv_id.getText().toString());
@@ -262,8 +271,9 @@ public class Device {
 			double dlng = Double.valueOf(lng.getText().toString());
 	        String briefName = pointBrief.getText().toString();
 	        String adminName = pointDetail.getText().toString();
+	        boolean starB = star.getText().toString().equals(STARRED)?true:false;
 	        //Log.w(tag, "getPlaceFromPopupPage.str_country_code="+str_country_code);
-			SavedPlace sp = new SavedPlace(str_id,briefName, adminName, dlat,dlng,str_country_code,null,null,i_special);
+			SavedPlace sp = new SavedPlace(str_id,briefName, adminName, dlat,dlng,str_country_code,null,null,i_special,starB);
 	        //Log.w(tag, "getPlaceFromPopupPage.sp.country_code="+sp.getCountryCode());
 			return sp;
 	    }
@@ -307,6 +317,7 @@ public class Device {
             lng.setText(String.valueOf(p.getLng()));
             country_code.setText(p.getCountryCode());
         	special.setText(String.valueOf(p.getSpecial()));
+        	star.setText(String.valueOf(p.isStar()));
         	hidePopupIcons(p);
             if(p.getId()==0) p.setId(dbHelper.getMaxID(DbHelper.MY_PLACE_TABLE)+1);
             tv_id.setText(String.valueOf(p.getId()));

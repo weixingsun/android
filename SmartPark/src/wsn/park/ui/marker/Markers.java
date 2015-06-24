@@ -1,43 +1,26 @@
 package wsn.park.ui.marker;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.osmdroid.DefaultResourceProxyImpl;
-import org.osmdroid.ResourceProxy;
 import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.Polyline;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadNode;
-import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapView;
 
-import android.app.Activity;
 import android.graphics.drawable.Drawable;
-import android.location.Address;
-import android.location.Location;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 import wsn.park.LOC;
-import wsn.park.MyItemizedOverlay;
 import wsn.park.R;
-import wsn.park.map.poi.POI;
 import wsn.park.maps.Mode;
 import wsn.park.maps.OSM;
 import wsn.park.model.DataBus;
-import wsn.park.model.ParkingPlace;
 import wsn.park.model.Place;
 import wsn.park.model.SavedPlace;
 import wsn.park.util.DbHelper;
-import wsn.park.util.MapOptions;
 import wsn.park.util.MathUtil;
 import wsn.park.util.RouteOptions;
 
@@ -46,7 +29,7 @@ public class Markers {
 	private static OSM osm;
 	private static Markers mks;
 	private DbHelper dbHelper;
-	private Marker tempMarker;
+	public Marker tempMarker;
 	private DataBus bus = DataBus.getInstance();
 	private Markers(){
 		dbHelper = DbHelper.getInstance();
@@ -58,7 +41,6 @@ public class Markers {
 	}
 	public Marker myLocMarker;
 	public Marker hintMarker;
-	//private OsmMapsItemizedOverlay pointOverlay;
 	public PlaceMarker selectedMarker;
 	public List<Marker> waypointsMarkerList = new ArrayList<Marker>();
 	public List<Marker> destinationMarkerList = new ArrayList<Marker>();
@@ -86,18 +68,30 @@ public class Markers {
 		osm.map.getOverlays().add(myLocMarker);
 	}
 	
-
 	public Marker updateTargetMarker(Place p) {
-		//removeTempMarker(null);
-		this.changeMarkerIcon(R.drawable.star_red_24);
+		this.changeLastMarkerIcon(R.drawable.star_red_24);
 		GeoPoint gp = new GeoPoint(p.getLat(),p.getLng());
 		Drawable d = osm.act.getResources().getDrawable( R.drawable.marker_sky_80 );
-		selectedMarker = new PlaceMarker(p);//constructOverlay(gp);
+		selectedMarker = new PlaceMarker(p);
 		selectedMarker.setPosition(p.getPosition());
 		selectedMarker.setIcon(d);
 //		selectedMarker.setAnchor(Marker.ANCHOR_CENTER, 1.0f);
 		osm.map.getOverlays().add(selectedMarker);
 		osm.move(gp);
+		this.destinationMarkerList.add(selectedMarker);
+		if(!this.savedPlaceMarkers.contains(this.selectedMarker)){
+			this.tempMarker=selectedMarker;
+			//Log.i(tag, "this is a temp marker");
+		}
+		return selectedMarker;
+	}
+	public Marker updateTargetMarker(PlaceMarker pm) {
+		this.changeLastMarkerIcon(R.drawable.star_red_24);
+		Drawable d = osm.act.getResources().getDrawable( R.drawable.marker_sky_80 );
+		selectedMarker = pm;
+		selectedMarker.setIcon(d);
+		osm.map.getOverlays().add(selectedMarker);
+		osm.move(pm.getPosition());
 		this.destinationMarkerList.add(selectedMarker);
 		if(!this.savedPlaceMarkers.contains(this.selectedMarker)){
 			this.tempMarker=selectedMarker;
@@ -115,9 +109,7 @@ public class Markers {
 		Log.i(tag, "not found");
 		return null;
 	}
-	private OsmMapsItemizedOverlay constructOverlay(final GeoPoint gp) {
-		return new OsmMapsItemizedOverlay();
-	}
+
 	public void drawStepsPoint(Road road) { // called from tasks
 		for (int i = 0; i < road.mNodes.size(); i++) {
 			addWayPointMarker(road,i);
@@ -219,12 +211,17 @@ public class Markers {
 			osm.map.getOverlays().add(base);
 		}
 	}
-	public void changeMarkerIcon(int resId) {
+	public void changeLastMarkerIcon(int resId) {
+		//Log.d(tag, "selectedMarker="+selectedMarker);
 		if(this.selectedMarker==null) return;
+		//if it was a temp marker, then delete it.
+		if(selectedMarker.equals(this.tempMarker)){
+			osm.map.getOverlays().remove(tempMarker);
+		}
 		Drawable d = osm.act.getResources().getDrawable( resId );
 		selectedMarker.setIcon(d);
 	}
-	public void removeTempMarker(OsmMapsItemizedOverlay tapMarker) {
+	public void removeTempMarker(PlaceMarker tapMarker) {
 		if(tapMarker!=null && tapMarker.equals(this.tempMarker)) return;
 		if(Mode.getID()==Mode.NAVI) return;
 		osm.map.getOverlays().remove(tempMarker);

@@ -72,6 +72,12 @@
             android:layout_height="wrap_content"
             android:text="@null"
             android:textColor="#00000000" />
+		<TextView
+            android:id="@+id/starred"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@null"
+            android:textColor="#00000000" />
     </LinearLayout>
 
      <LinearLayout

@@ -3,7 +3,7 @@ package wsn.park.model;
 import org.osmdroid.util.GeoPoint;
 
 public class SavedPlace implements Place {
-	public SavedPlace(int id,String name,String admin,double lat,double lng,String countryCode,String machine,String user,int special){
+	public SavedPlace(int id,String name,String admin,double lat,double lng,String countryCode,String machine,String user,int special,boolean star){
 		this.id=id;
 		this.name=name;
 		this.admin=admin;
@@ -13,6 +13,7 @@ public class SavedPlace implements Place {
 		this.machine_code=machine;
 		this.user_name=user;
 		this.special = special;
+		this.star = star;
 	}
 	public SavedPlace(String name,String admin,double lat,double lng,String countryCode){
 		this.name=name;
@@ -50,6 +51,7 @@ public class SavedPlace implements Place {
 	private int id,special;
 	private String name,admin, machine_code, user_name,countryCode;
 	private double lat,lng,dist;
+	private boolean star;
 	public int getId() {
 		return id;
 	}
@@ -118,5 +120,11 @@ public class SavedPlace implements Place {
 	}
 	public void setDist(double dist) {
 		this.dist = dist;
+	}
+	public boolean isStar() {
+		return star;
+	}
+	public void setStar(boolean star) {
+		this.star = star;
 	}
 }
