@@ -60,6 +60,14 @@ public final class FixedMapView extends MapView {
             	//GeoPoint gp2 = (GeoPoint)getProjection().fromPixels((int)x+50, (int)y+50);
             	//select * from poi where (lat between gp1.lat and gp2.lat) and (lng between gp1.lng and gp2.lng) order by (lat+lng -gp.lat-gp.lng) asc limit 1
             	//Point p = pointFromGeoPoint(gp, this);
+            	if(OSM.getInstance().mks.tempMarker!=null){
+                	Point pTemp = getProjection().toPixels(OSM.getInstance().mks.tempMarker.getPosition(), p);//will change p value
+                	p.set(x, y);
+                	if(comparePoint(p,pTemp,50)){
+            			OSM.getInstance().dv.openPlacePopup(OSM.getInstance().mks.tempMarker.getPlace());
+                	}
+                	p.set(x, y);
+            	}
             	if(allMarkers!=null)
             	for (PlaceMarker pm:allMarkers){
             		Point p2 = getProjection().toPixels(pm.getPosition(), p);//will change p value

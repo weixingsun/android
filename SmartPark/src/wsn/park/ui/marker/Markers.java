@@ -29,7 +29,7 @@ public class Markers {
 	private static OSM osm;
 	private static Markers mks;
 	private DbHelper dbHelper;
-	public Marker tempMarker;
+	public PlaceMarker tempMarker;
 	private DataBus bus = DataBus.getInstance();
 	private Markers(){
 		dbHelper = DbHelper.getInstance();
@@ -83,6 +83,8 @@ public class Markers {
 		if(!this.savedPlaceMarkers.contains(this.selectedMarker)){
 			this.tempMarker=selectedMarker;
 			//Log.i(tag, "this is a temp marker");
+		}else{
+			this.tempMarker=null;
 		}
 		return selectedMarker;
 	}
@@ -97,6 +99,8 @@ public class Markers {
 		if(!this.savedPlaceMarkers.contains(this.selectedMarker)){
 			this.tempMarker=selectedMarker;
 			//Log.i(tag, "this is a temp marker");
+		}else{
+			this.tempMarker=null;
 		}
 		return selectedMarker;
 	}
