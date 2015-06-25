@@ -30,7 +30,7 @@ public class MyPlayer {
 			return;
 		}
 		Uri uri = Uri.fromFile(new File(filePath));*/
-		Uri uri = getUriByName("raw/"+fileName);
+		Uri uri = getUriByName(act.getPackageName(),"raw/"+fileName);
 		if(!checkRawList(fileName)) {
 			ret = "not in raw list:"+fileName;
 			return ret;
@@ -54,7 +54,7 @@ public class MyPlayer {
 			public void onPlayerStateChanged(boolean playWhenReady, int state) {
 				if(state==ExoPlayer.STATE_ENDED){
 					player.release();
-					//Log.i(tag, "player released");
+					Log.i(tag, "player released");
 				}
 			}});
 	    return null;
@@ -66,8 +66,8 @@ public class MyPlayer {
 		// "in 400 m" + "turn right"
 		return play(act,dist, node.mManeuverType);  //distance+turn
 	}
-	public static Uri getUriByName(String res){
-		return Uri.parse("android.resource://cat.app.osmap/"+res);  //drawable/icon
+	public static Uri getUriByName(String packageName, String res){
+		return Uri.parse("android.resource://"+packageName+"/"+res);  //drawable/icon
 	}
 	public static boolean checkRawList(String fileName){
 		java.lang.reflect.Field[] fields=R.raw.class.getFields();

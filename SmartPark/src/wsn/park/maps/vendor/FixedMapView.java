@@ -62,9 +62,11 @@ public final class FixedMapView extends MapView {
             	//Point p = pointFromGeoPoint(gp, this);
             	if(OSM.getInstance().mks.tempMarker!=null){
                 	Point pTemp = getProjection().toPixels(OSM.getInstance().mks.tempMarker.getPosition(), p);//will change p value
-                	p.set(x, y);
-                	if(comparePoint(p,pTemp,50)){
+                	Point press = new Point();
+                	press.set(x, y);
+                	if(comparePoint(press,pTemp,50)){
             			OSM.getInstance().dv.openPlacePopup(OSM.getInstance().mks.tempMarker.getPlace());
+            			//Log.w(tag, "tempmarker.clicked");
                 	}
                 	p.set(x, y);
             	}

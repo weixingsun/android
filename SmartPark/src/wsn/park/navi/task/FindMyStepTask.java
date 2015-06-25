@@ -45,7 +45,7 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 		
 		if(osm.loc.road==null || osm.loc.road.mNodes.size()<1){return null;}
 		if(isWorking() || isRedrawing()){
-			Log.i(tag, "finding my step, skip this call");
+			Log.i(tag, "working/redrawing, skip this call");
 			return null;
 		}
 		return findCurrentStep(osm.mks.myLocMarker.getPosition()); //如果误差超过30米，会认为不在线路上，重新寻路
@@ -100,11 +100,14 @@ public class FindMyStepTask extends AsyncTask<GeoPoint, Void, String> {
 	}
 	
 	private void playHintSounds(int index, int dist) {
-		if(this.currNode!=null  && !DataBus.isPlayed(index,dist)){ //&& this.toCurrent<SavedOptions.VOICE_DISTANCE
+		boolean played = DataBus.isPlayed(index,dist);
+		if(this.currNode!=null  && !played){ //&& this.toCurrent<SavedOptions.VOICE_DISTANCE
 			DataBus.setPlayedId(index,dist);
 			//BigDecimal bd = new BigDecimal(this.toCurrent).setScale(-2, BigDecimal.ROUND_HALF_UP);  //整百
 			String display = MyPlayer.play(osm.act, this.currNode, dist);
-			Toast.makeText(osm.act, "playing "+index+":"+dist+"ERR:"+display, Toast.LENGTH_LONG).show();
+			Toast.makeText(osm.act, "playing "+index+":"+dist+" :"+display, Toast.LENGTH_LONG).show();
+		}else{
+			Toast.makeText(osm.act, "not playing "+index+":"+dist+" played="+played+", currNode="+currNode, Toast.LENGTH_LONG).show();
 		}
 	}
 
