@@ -8,6 +8,7 @@ import org.osmdroid.util.GeoPoint;
 
 import wsn.park.maps.Mode;
 import wsn.park.maps.OSM;
+import wsn.park.model.Place;
 import wsn.park.model.SavedPlace;
 import wsn.park.ui.marker.OsmMapsItemizedOverlay;
 import wsn.park.util.GeoOptions;
@@ -27,17 +28,19 @@ public class MyMapEventsReceiver implements MapEventsReceiver{
 	}
 	@Override
 	public boolean longPressHelper(GeoPoint p) {
-		if (osm.rto.isNetworkAvailable() ) {	//|| loc.myPos == null
+		if (osm.net.isNetworkConnected() ) {	//|| loc.myPos == null
 			if(Mode.getID()!=Mode.NAVI)
-				osm.startTask("geo", new GeoPoint(p),"route");
+				osm.startTask("geo", p,"route");
 			//Log.i(tag , "long press network available");
 		}else{
-			if(SavedOptions.selectedNavi!=null && SavedOptions.selectedNavi.equals(RouteOptions.OFFLINE)){
+			/*if(SavedOptions.selectedNavi!=null && SavedOptions.selectedNavi.equals(RouteOptions.OFFLINE)){
 				//TODO offline geo
 				Toast.makeText(osm.act, GeoOptions.OFFLINE_GEOCODING_UNAVAILABLE, Toast.LENGTH_LONG).show();
-			}else{
-				Toast.makeText(osm.act, GeoOptions.NETWORK_UNAVAILABLE, Toast.LENGTH_LONG).show();
-			}
+			}*/
+			Toast.makeText(osm.act, GeoOptions.NETWORK_UNAVAILABLE, Toast.LENGTH_LONG).show();
+			Place place = GeoOptions.getLLPlace(p);
+			osm.mks.updateTargetMarker(place);
+			osm.dv.openPlacePopup(place);
 		}
 		return false;
 	}

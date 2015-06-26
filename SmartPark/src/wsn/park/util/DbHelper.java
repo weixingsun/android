@@ -360,9 +360,9 @@ import android.util.Log;
 	        cv.put("lng", addr.getLng());
 	        cv.put("machine_code", android_id);
 	        //cv.put("user_name", user_name);
-	        cv.put("special", addr.getSpecial());
+	        cv.put("special", addr.getType());
 	        long row=setting_db.insert(MY_PLACE_TABLE, null, cv);
-	        Log.w(tag, "insertMyPlace:"+addr.getBriefName()+"id="+addr.getId()+",special="+addr.getSpecial());
+	        Log.w(tag, "insertMyPlace:"+addr.getBriefName()+"id="+addr.getId()+",special="+addr.getType());
 	        return addr.getId();
 		}
 		public int deleteHistoryPlaces() {

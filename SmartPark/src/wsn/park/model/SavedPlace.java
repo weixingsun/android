@@ -3,7 +3,7 @@ package wsn.park.model;
 import org.osmdroid.util.GeoPoint;
 
 public class SavedPlace implements Place {
-	public SavedPlace(int id,String name,String admin,double lat,double lng,String countryCode,String machine,String user,int special,boolean star){
+	public SavedPlace(int id,String name,String admin,double lat,double lng,String countryCode,String machine,String user,int type,boolean star){
 		this.id=id;
 		this.name=name;
 		this.admin=admin;
@@ -12,7 +12,7 @@ public class SavedPlace implements Place {
 		this.countryCode=countryCode;
 		this.machine_code=machine;
 		this.user_name=user;
-		this.special = special;
+		this.type = type;
 		this.star = star;
 	}
 	public SavedPlace(String name,String admin,double lat,double lng,String countryCode){
@@ -30,25 +30,25 @@ public class SavedPlace implements Place {
 		this.countryCode=countryCode;
 		this.dist=dist;
 	}
-	public SavedPlace(String name,String admin,double lat,double lng,String countryCode,int special){
+	public SavedPlace(String name,String admin,double lat,double lng,String countryCode,int type){
 		this.name=name;
 		this.admin=admin;
 		this.lat=lat;
 		this.lng=lng;
 		this.countryCode=countryCode;
-		this.special = special;
+		this.type = type;
 	}
-	public SavedPlace(String name,String admin,GeoPoint p,String countryCode,int special){
+	public SavedPlace(String name,String admin,GeoPoint p,String countryCode,int type){
 		this.name=name;
 		this.admin=admin;
 		this.lat=p.getLatitude();
 		this.lng=p.getLongitude();
 		this.countryCode=countryCode;
-		this.special = special;
+		this.type = type;
 	}
 	
 	//id, name, admin, lat,lng, machine_code, user_name
-	private int id,special;
+	private int id,type;
 	private String name,admin, machine_code, user_name,countryCode;
 	private double lat,lng,dist;
 	private boolean star;
@@ -106,12 +106,6 @@ public class SavedPlace implements Place {
 	public void setCountryCode(String country_code) {
 		this.countryCode = country_code;
 	}
-	public int getSpecial() {
-		return special;
-	}
-	public void setSpecial(int special) {
-		this.special = special;
-	}
 	public GeoPoint getPosition(){
 		return new GeoPoint(this.lat,this.lng);
 	}
@@ -126,5 +120,13 @@ public class SavedPlace implements Place {
 	}
 	public void setStar(boolean star) {
 		this.star = star;
+	}
+	@Override
+	public void setType(int type) {
+		this.type=type;
+	}
+	@Override
+	public int getType() {
+		return type;
 	}
 }

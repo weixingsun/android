@@ -22,9 +22,10 @@ public class ParkingPlace implements Place{
 	public static final int ERROR = -1;
 	
 	//id,status,type,lat,lng,operator,admin,country,comment
-	private int id,type,status;
+	private int id,status;
 	private String operator,admin,country,comment;
 	private double lat,lng;
+	boolean star;
 	public int getId() {
 		return id;
 	}
@@ -59,10 +60,10 @@ public class ParkingPlace implements Place{
 		return new GeoPoint(this.lat,this.lng);
 	}
 	public int getType() {
-		return type;
+		return Place.PARK;
 	}
 	public void setType(int type) {
-		this.type = type;
+		
 	}
 	public int getStatus() {
 		return status;
@@ -85,7 +86,7 @@ public class ParkingPlace implements Place{
 	@Override
 	public String toString(){
 		String line1=ParkingPlace.class.getSimpleName()+"("+lat+","+lng+")["+"id="+id;
-		String line2=",type="+type+",status="+status+",operator="+operator;
+		String line2=",type="+Place.PARK+",status="+status+",operator="+operator;
 		String line3=",admin="+admin+",country="+country+",comment="+comment+"]";
 		return line1+line2+line3;
 	}
@@ -97,23 +98,14 @@ public class ParkingPlace implements Place{
 	public String getCountryCode() {
 		return this.country;
 	}
-	@Override
-	public void setSpecial(int special) {
-		
-	}
-	@Override
-	public int getSpecial() {
-		return Place.PARK;
-	}
+
 	@Override
 	public boolean isStar() {
-		// TODO Auto-generated method stub
-		return false;
+		return star;
 	}
 	@Override
 	public void setStar(boolean star) {
-		// TODO Auto-generated method stub
-		
+		this.star=star;
 	}
 	
 }

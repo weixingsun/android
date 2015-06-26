@@ -247,7 +247,7 @@ public class Device {
 	    				dbHelper.deleteMyPlaces(sp.getId());
 	    				Log.w(tag, "delete place.star="+sp.isStar());
 	    			}else{
-	    				sp.setSpecial(Place.NORMAL);
+	    				sp.setType(Place.NORMAL);
 	    				dbHelper.addMyPlace(sp);
 	    				//osm.mks.selectedMarker.setSp(sp);
 	    				star.setText(STARRED);
@@ -300,6 +300,7 @@ public class Device {
 	        		Mode.setID(Mode.NORMAL);
 	        		naviPop.dismiss();
 	        		osm.mks.removeAllRouteMarkers();
+	        		osm.map.invalidate();
 	        	}});
 		}
 	    public void updateNaviInstruction(String instruction,int resId){
@@ -318,7 +319,7 @@ public class Device {
             lat.setText(String.valueOf(p.getLat()));
             lng.setText(String.valueOf(p.getLng()));
             country_code.setText(p.getCountryCode());
-        	special.setText(String.valueOf(p.getSpecial()));
+        	special.setText(String.valueOf(p.getType()));
         	star.setText(String.valueOf(p.isStar()));
         	hidePopupIcons(p);
             if(p.getId()==0) p.setId(dbHelper.getMaxID(DbHelper.MY_PLACE_TABLE)+1);
@@ -354,7 +355,7 @@ public class Device {
 //	            iconWork.setVisibility(View.VISIBLE);
 //	            break;
 			}
-			switch(sp.getSpecial()){
+			switch(sp.getType()){
 			case Place.NORMAL: //cancel save
 				iconStar.setImageResource(R.drawable.heart_broken_48);
 				break;

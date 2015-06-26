@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.osmdroid.util.GeoPoint;
+
+import wsn.park.model.LLPlace;
+import wsn.park.model.Place;
 import wsn.park.model.SavedPlace;
 
 import android.location.Address;
@@ -51,6 +55,10 @@ public class GeoOptions {
 	public static SavedPlace getMyPlace(Address addr){
 		SavedPlace sp = new SavedPlace(getAddressName(addr), addr.getAdminArea(), addr.getLatitude(), addr.getLongitude(),addr.getCountryCode());
 		return sp;
+	}
+	public static Place getLLPlace(GeoPoint gp){
+		LLPlace lp = new LLPlace(gp);
+		return lp;
 	}
 	public static List<SavedPlace> getSavedPlaceFromAddress(List<Address> l){
 		List<SavedPlace> list = new ArrayList<SavedPlace>();

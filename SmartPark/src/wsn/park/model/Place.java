@@ -18,8 +18,8 @@ public interface Place {
 	public double getLng();
 	public int getId();
 	public void setId(int i);
-	public void setSpecial(int special);
-	public int getSpecial();
+	public void setType(int type);
+	public int getType();
 	public boolean isStar();
 	public void setStar(boolean star);
 }
