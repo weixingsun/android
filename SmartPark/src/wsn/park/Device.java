@@ -292,7 +292,7 @@ public class Device {
 	        //navi.setFocusable(true);
 	        naviPop.update();
 	        tv_instruction = (TextView) naviLayout.findViewById(R.id.navi_instruction);
-	        iconNaviFlag = (ImageView) naviLayout.findViewById(R.id.navi_flag); 
+	        iconNaviFlag = (ImageView) naviLayout.findViewById(R.id.navi_flag);
 	        iconCloseNavi = (ImageView) naviLayout.findViewById(R.id.close_navi);
 	        iconCloseNavi.setOnClickListener(new OnClickListener(){
 	        	@Override

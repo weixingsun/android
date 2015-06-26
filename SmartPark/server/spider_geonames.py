@@ -172,12 +172,15 @@ mapquest_url='http://www.mapquestapi.com/geocoding/v1/reverse?key=YOUR_KEY_HERE&
 test_url='http://maps.googleapis.com/maps/api/geocode/json?latlng=-46.3865651,169.7818566'
 test_url2='http://api.geonames.org/countrySubdivision?username=weixingsun&lat=-46.3865651&lng=169.7818566'
 geo_url='http://api.geonames.org/countrySubdivision?username=weixingsun&'	#lat=-46.3865651&lng=169.7818566
+#osm_url='http://nominatim.openstreetmap.org/search?q=45.8364043,24.8345179&format=xml&addressdetails=1'
+
 #deleteFile(test_admin_file)
 #json_text = getHtml3(test_url2).decode("utf-8")
 #appendTxt(test_file,json_text)
 #admin = getAdminGeoNames(json_text)
 #columns = defaultdict(list)
 loopInCsvGeoNames('nz.csv','nz_write_geonames.csv')
+
 
 #print(columns['name'])
 #print(columns['lat'])
